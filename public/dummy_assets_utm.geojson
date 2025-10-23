@@ -1,0 +1,629 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            516134.4186761863,
+                            10048412.325735362
+                        ],
+                        [
+                            516245.69077072944,
+                            10048412.327895466
+                        ],
+                        [
+                            516245.68861519016,
+                            10048522.858367812
+                        ],
+                        [
+                            516134.41653541115,
+                            10048522.856202776
+                        ],
+                        [
+                            516134.4186761863,
+                            10048412.325735362
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "nama_asset": "Gedung Kantor BPKAD",
+                "kode_asset": "AST-001",
+                "kabupaten": "Kota Samarinda",
+                "kecamatan": "Samarinda Utara",
+                "kelurahan": "Samarinda Utara",
+                "unit_kerja": "BPKAD Provinsi Kalimantan Timur",
+                "luas_m2": "2500.00"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            516857.5275284519,
+                            10055762.618973948
+                        ],
+                        [
+                            516968.798600842,
+                            10055762.621573133
+                        ],
+                        [
+                            516968.79600789514,
+                            10055873.152099555
+                        ],
+                        [
+                            516857.5249525081,
+                            10055873.14949522
+                        ],
+                        [
+                            516857.5275284519,
+                            10055762.618973948
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "nama_asset": "Kantor Dinas Pendidikan",
+                "kode_asset": "AST-002",
+                "kabupaten": "Kota Samarinda",
+                "kecamatan": "Samarinda Ilir",
+                "kelurahan": "Samarinda Ilir",
+                "unit_kerja": "Dinas Pendidikan Provinsi Kalimantan Timur",
+                "luas_m2": "3200.00"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            517970.2656512663,
+                            10054657.340010837
+                        ],
+                        [
+                            518137.1725945457,
+                            10054657.344090044
+                        ],
+                        [
+                            518137.168517587,
+                            10054823.139958942
+                        ],
+                        [
+                            517970.26161182614,
+                            10054823.135867361
+                        ],
+                        [
+                            517970.2656512663,
+                            10054657.340010837
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "nama_asset": "Gedung DPRD Kaltim",
+                "kode_asset": "AST-003",
+                "kabupaten": "Kota Samarinda",
+                "kecamatan": "Samarinda Kota",
+                "kelurahan": "Samarinda Kota",
+                "unit_kerja": "DPRD Provinsi Kalimantan Timur",
+                "luas_m2": "4500.00"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            516023.04377212486,
+                            10053496.725183133
+                        ],
+                        [
+                            516189.9508373746,
+                            10053496.728745094
+                        ],
+                        [
+                            516189.94727528654,
+                            10053662.524471547
+                        ],
+                        [
+                            516023.0402467598,
+                            10053662.520898547
+                        ],
+                        [
+                            516023.04377212486,
+                            10053496.725183133
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "nama_asset": "Rumah Dinas Gubernur",
+                "kode_asset": "AST-004",
+                "kabupaten": "Kota Samarinda",
+                "kecamatan": "Samarinda Ulu",
+                "kelurahan": "Samarinda Ulu",
+                "unit_kerja": "Pemerintah Provinsi Kalimantan Timur",
+                "luas_m2": "5000.00"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            480865.31084030174,
+                            10139821.370502196
+                        ],
+                        [
+                            481032.18362707074,
+                            10139821.35949118
+                        ],
+                        [
+                            481032.19452562043,
+                            10139987.156111035
+                        ],
+                        [
+                            480865.3218347346,
+                            10139987.167135099
+                        ],
+                        [
+                            480865.31084030174,
+                            10139821.370502196
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "nama_asset": "Kantor Gubernur Lama",
+                "kode_asset": "AST-101",
+                "kabupaten": "Kota Balikpapan",
+                "kecamatan": "Balikpapan Selatan",
+                "kelurahan": "Balikpapan Selatan",
+                "unit_kerja": "Pemerintah Provinsi Kalimantan Timur",
+                "luas_m2": "3800.00"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            481310.23364289774,
+                            10138716.03074709
+                        ],
+                        [
+                            481477.1070313689,
+                            10138716.020078225
+                        ],
+                        [
+                            481477.1175901597,
+                            10138881.81665107
+                        ],
+                        [
+                            481310.2442968142,
+                            10138881.827332677
+                        ],
+                        [
+                            481310.23364289774,
+                            10138716.03074709
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "nama_asset": "Gedung Perwakilan Provinsi",
+                "kode_asset": "AST-102",
+                "kabupaten": "Kota Balikpapan",
+                "kecamatan": "Balikpapan Tengah",
+                "kelurahan": "Balikpapan Tengah",
+                "unit_kerja": "Pemerintah Provinsi Kalimantan Timur",
+                "luas_m2": "2800.00"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            482756.3393224695,
+                            10136505.321924636
+                        ],
+                        [
+                            482978.83870533266,
+                            10136505.309035059
+                        ],
+                        [
+                            482978.85143877834,
+                            10136726.37095288
+                        ],
+                        [
+                            482756.3522223675,
+                            10136726.383863319
+                        ],
+                        [
+                            482756.3393224695,
+                            10136505.321924636
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "nama_asset": "Balai Latihan Kerja BPP",
+                "kode_asset": "AST-103",
+                "kabupaten": "Kota Balikpapan",
+                "kecamatan": "Balikpapan Utara",
+                "kelurahan": "Balikpapan Utara",
+                "unit_kerja": "Dinas Tenaga Kerja Provinsi Kalimantan Timur",
+                "luas_m2": "4200.00"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            499443.6396810162,
+                            10045869.977366816
+                        ],
+                        [
+                            499610.54777696537,
+                            10045869.977277143
+                        ],
+                        [
+                            499610.5478504545,
+                            10046035.772434277
+                        ],
+                        [
+                            499443.63978600065,
+                            10046035.772524275
+                        ],
+                        [
+                            499443.6396810162,
+                            10045869.977366816
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "nama_asset": "Kantor Cabang Dinas Provinsi",
+                "kode_asset": "AST-201",
+                "kabupaten": "Kab. Kutai Kartanegara",
+                "kecamatan": "Tenggarong",
+                "kelurahan": "Tenggarong",
+                "unit_kerja": "Pemerintah Provinsi Kalimantan Timur",
+                "luas_m2": "2400.00"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            500556.3596119328,
+                            10046975.27842858
+                        ],
+                        [
+                            500834.53941923066,
+                            10046975.278653665
+                        ],
+                        [
+                            500834.539150141,
+                            10047251.603924893
+                        ],
+                        [
+                            500556.3594325397,
+                            10047251.603698485
+                        ],
+                        [
+                            500556.3596119328,
+                            10046975.27842858
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "nama_asset": "Gudang Penyimpanan BMN",
+                "kode_asset": "AST-202",
+                "kabupaten": "Kab. Kutai Kartanegara",
+                "kecamatan": "Tenggarong Seberang",
+                "kelurahan": "Tenggarong Seberang",
+                "unit_kerja": "BPKAD Provinsi Kalimantan Timur",
+                "luas_m2": "5500.00"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            564315.3447235272,
+                            58031.26308271457
+                        ],
+                        [
+                            564482.2587791539,
+                            58031.27853194839
+                        ],
+                        [
+                            564482.274123557,
+                            57865.47478716192
+                        ],
+                        [
+                            564315.3600282054,
+                            57865.45938206388
+                        ],
+                        [
+                            564315.3447235272,
+                            58031.26308271457
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "nama_asset": "Kantor Perwakilan Sangatta",
+                "kode_asset": "AST-301",
+                "kabupaten": "Kab. Kutai Timur",
+                "kecamatan": "Sangatta Utara",
+                "kelurahan": "Sangatta Utara",
+                "unit_kerja": "Pemerintah Provinsi Kalimantan Timur",
+                "luas_m2": "3100.00"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            565094.3797945499,
+                            56925.976152617644
+                        ],
+                        [
+                            565261.2943214669,
+                            56925.99149094446
+                        ],
+                        [
+                            565261.3095550324,
+                            56760.18754388963
+                        ],
+                        [
+                            565094.394989148,
+                            56760.17225023278
+                        ],
+                        [
+                            565094.3797945499,
+                            56925.976152617644
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "nama_asset": "Rumah Jabatan Pejabat",
+                "kode_asset": "AST-302",
+                "kabupaten": "Kab. Kutai Timur",
+                "kecamatan": "Sangatta Selatan",
+                "kelurahan": "Sangatta Selatan",
+                "unit_kerja": "Pemerintah Provinsi Kalimantan Timur",
+                "luas_m2": "2600.00"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            412693.8623533519,
+                            10209474.982467469
+                        ],
+                        [
+                            412860.69982447714,
+                            10209474.906947715
+                        ],
+                        [
+                            412860.77483813633,
+                            10209640.71941206
+                        ],
+                        [
+                            412693.93751066906,
+                            10209640.794991506
+                        ],
+                        [
+                            412693.8623533519,
+                            10209474.982467469
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "nama_asset": "Kantor Koordinasi Wilayah",
+                "kode_asset": "AST-401",
+                "kabupaten": "Kab. Paser",
+                "kecamatan": "Tanah Grogot",
+                "kelurahan": "Tanah Grogot",
+                "unit_kerja": "Pemerintah Provinsi Kalimantan Timur",
+                "luas_m2": "2900.00"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            553968.8636412956,
+                            14590.492594788671
+                        ],
+                        [
+                            554135.7816847877,
+                            14590.495855069374
+                        ],
+                        [
+                            554135.7849098236,
+                            14424.694760057982
+                        ],
+                        [
+                            553968.8668563867,
+                            14424.691536825665
+                        ],
+                        [
+                            553968.8636412956,
+                            14590.492594788671
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "nama_asset": "Kantor Layanan Publik",
+                "kode_asset": "AST-501",
+                "kabupaten": "Kota Bontang",
+                "kecamatan": "Bontang Selatan",
+                "kelurahan": "Bontang Selatan",
+                "unit_kerja": "Pemerintah Provinsi Kalimantan Timur",
+                "luas_m2": "2200.00"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            555081.6284725759,
+                            15695.856572812774
+                        ],
+                        [
+                            555248.5466980716,
+                            15695.860152294712
+                        ],
+                        [
+                            555248.5502401744,
+                            15530.058805998402
+                        ],
+                        [
+                            555081.632003976,
+                            15530.055264327591
+                        ],
+                        [
+                            555081.6284725759,
+                            15695.856572812774
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "nama_asset": "Gedung Arsip Daerah",
+                "kode_asset": "AST-502",
+                "kabupaten": "Kota Bontang",
+                "kecamatan": "Bontang Utara",
+                "kelurahan": "Bontang Utara",
+                "unit_kerja": "Pemerintah Provinsi Kalimantan Timur",
+                "luas_m2": "1900.00"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            456053.1625253364,
+                            10114401.45901594
+                        ],
+                        [
+                            456386.9412341583,
+                            10114401.417608174
+                        ],
+                        [
+                            456386.9822740866,
+                            10114733.016644092
+                        ],
+                        [
+                            456053.2038793708,
+                            10114733.05817183
+                        ],
+                        [
+                            456053.1625253364,
+                            10114401.45901594
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "nama_asset": "Kantor Transisi IKN",
+                "kode_asset": "AST-601",
+                "kabupaten": "Kab. Penajam Paser Utara",
+                "kecamatan": "Penajam",
+                "kelurahan": "Penajam",
+                "unit_kerja": "Pemerintah Provinsi Kalimantan Timur",
+                "luas_m2": "8000.00"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            490543.50060657033,
+                            10126557.21212621
+                        ],
+                        [
+                            490932.8861455602,
+                            10126557.200820556
+                        ],
+                        [
+                            490932.89715849276,
+                            10126944.057931555
+                        ],
+                        [
+                            490543.5120924526,
+                            10126944.06927175
+                        ],
+                        [
+                            490543.50060657033,
+                            10126557.21212621
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "nama_asset": "Gedung Persiapan Pemindahan",
+                "kode_asset": "AST-602",
+                "kabupaten": "Kab. Penajam Paser Utara",
+                "kecamatan": "Sepaku (Area IKN)",
+                "kelurahan": "Sepaku",
+                "unit_kerja": "Pemerintah Provinsi Kalimantan Timur",
+                "luas_m2": "12000.00"
+            }
+        }
+    ]
+}
