@@ -5,7 +5,7 @@
 	<!--begin::Head-->
 	<head>
 <base href="../../../" />
-<title>{{ config('app.name', 'BPKAD') }} | {{ $title ?? '-' }}</title>
+<title>{{ config('app.name', 'ESDM') }} | {{ $title ?? '-' }}</title>
 		<meta charset="utf-8" />
 		<link rel="shortcut icon" href="{{ asset('assets/media/logos/logo.png') }}" />
 		<!--begin::Fonts(mandatory for all pages)-->

@@ -142,7 +142,7 @@
                 <div class="logo-container">
                     <img class="logo" src="{{ asset('assets/media/logos/logo.png') }}" alt="Logo Dinas ESDM" />
                     <div class="logo-text">
-                        <div class="logo-title">BPKAD</div>
+                        <div class="logo-title">ESDM</div>
                         <div class="logo-subtitle">Provinsi Kalimantan Timur</div>
                     </div>
                 </div>
