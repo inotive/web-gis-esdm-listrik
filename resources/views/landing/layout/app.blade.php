@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>@yield('title','ASET PEMPROV KALTIM')</title>
+  <title>@yield('title','ESDM')</title>
 
   {{-- ArcGIS CSS --}}
   <link rel="stylesheet" href="https://js.arcgis.com/4.29/esri/themes/light/main.css">

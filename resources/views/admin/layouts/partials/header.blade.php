@@ -2,7 +2,8 @@
   <div class="topbar-left">
     <div class="search" role="search">
       <i class="ri-search-line"></i>
-      <input type="text" placeholder="Cari data wilayah, pelanggan, dan lainnya..." aria-label="Pencarian" />
+      <input type="text" placeholder="Cari" aria-label="Pencarian" />
+      <button class="search-btn" aria-label="Cari"><i class="ri-search-2-line"></i></button>
     </div>
   </div>
   <div class="actions">

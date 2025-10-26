@@ -1,6 +1,6 @@
 @extends('landing.layout.app')
 
-@section('title', 'ASET PEMPROV KALTIM')
+@section('title', 'ESDM')
 
 @section('content')
   <div id="viewDiv">

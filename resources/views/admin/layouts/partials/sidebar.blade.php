@@ -1,5 +1,5 @@
 <aside class="sidebar" aria-label="Sidebar navigasi">
-  <!-- Topbar di dalam sidebar -->
+  <!-- Topbar di dalam sidebar (sinkron dgn header) -->
   <div class="sidebar-topbar">
     <div class="brand">
       <img class="logo" src="{{ asset('assets/media/logos/logo.png') }}" alt="Logo Dinas ESDM" />
@@ -42,16 +42,14 @@
   <nav class="menu-section">
     <div class="menu-title">Konfigurasi</div>
 
-    <a class="menu-item" href="#"><span class="menu-icon"><i class="ri-map-pin-line"></i></span><span class="menu-label">Data Wilayah</span></a>
-    <a class="menu-item" href="#"><span class="menu-icon"><i class="ri-team-line"></i></span><span class="menu-label">Data Pelanggan</span></a>
+    <a class="menu-item" href="{{ route('admin.data-wilayah.index') }}"><span class="menu-icon"><i class="ri-map-pin-line"></i></span><span class="menu-label">Data Wilayah</span></a>
+    <a class="menu-item" href="{{ route('admin.pelanggan.index') }}"><span class="menu-icon"><i class="ri-team-line"></i></span><span class="menu-label">Data Pelanggan</span></a>
     <a class="menu-item" href="#"><span class="menu-icon"><i class="ri-plug-line"></i></span><span class="menu-label">Data Infrastruktur Jaringan</span></a>
     <a class="menu-item" href="#"><span class="menu-icon"><i class="ri-base-station-line"></i></span><span class="menu-label">Data Gardu</span></a>
     <a class="menu-item" href="#"><span class="menu-icon"><i class="ri-building-4-line"></i></span><span class="menu-label">Data Pembangkit Lokal</span></a>
     <a class="menu-item" href="#"><span class="menu-icon"><i class="ri-road-map-line"></i></span><span class="menu-label">Data Jalan &amp; Aksesbilitas</span></a>
     <a class="menu-item" href="#"><span class="menu-icon"><i class="ri-slideshow-2-line"></i></span><span class="menu-label">Variabel Skoring &amp; Bobot</span></a>
-    <a class="menu-item" href="#"><span class="menu-icon"><i class="ri-user-settings-line"></i></span><span class="menu-label">Manajemen Pengguna</span></a>
+    <a class="menu-item" href="{{ route('admin.hak-akses.user.index')}}"><span class="menu-icon"><i class="ri-user-settings-line"></i></span><span class="menu-label">Manajemen Pengguna</span></a>
     <a class="menu-item" href="#"><span class="menu-icon"><i class="ri-settings-3-line"></i></span><span class="menu-label">Pengaturan Sistem</span></a>
   </nav>
-
- 
 </aside>
