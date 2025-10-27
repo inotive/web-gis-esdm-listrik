@@ -3,11 +3,18 @@
         Options -MultiViews
     </IfModule>
     RewriteEngine On
+
+    # Redirect to public directory for existing files and directories
     RewriteCond %{REQUEST_FILENAME} -d [OR]
     RewriteCond %{REQUEST_FILENAME} -f
-    RewriteRule ^ ^$1 [N]
+    RewriteRule ^ - [L]
+
+    # Serve static files from the public directory
     RewriteCond %{REQUEST_URI} (\.\w+$) [NC]
-    RewriteRule ^(.*)$ public/$1
+    RewriteRule ^(.*)$ public/$1 [L]
+
+    # Route all other requests to server.php
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteRule ^ server.php
+    RewriteRule ^ server.php [L]
+</IfModule>
