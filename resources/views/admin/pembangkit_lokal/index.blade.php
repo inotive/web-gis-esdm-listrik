@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Dashboard ESDM - GIS & Layer Management')
+@section('title', 'Dashboard ESDM - Pembangkit Lokal')
 
 @push('styles')
 <style>
@@ -21,8 +21,9 @@
   table.data tbody tr:hover{background:#FAFAFA}
 
   .col-no{width:70px;text-align:center}
-  .col-jen{width:160px}
-  .col-koor{width:220px}
+  .col-tipe{width:140px}
+  .col-daya{width:170px}
+  .col-sta{width:150px}
   .col-aksi{width:130px;text-align:center}
   .btn-ico{--size:32px;width:var(--size);height:var(--size);display:inline-grid;place-items:center;border:1px solid var(--line);background:#fff;border-radius:8px;cursor:pointer}
   .btn-ico:hover{background:#F8FAFC}
@@ -45,36 +46,46 @@
   <div class="page-head">
     <div>
       <div class="page-meta">Selasa, 22 September 2025</div>
-      <div class="page-title">GIS & Layer Management</div>
+      <div class="page-title">Pembangkit Lokal</div>
     </div>
     <div class="page-actions">
       <div class="date-pill"><i class="ri-calendar-line"></i><span>September 2025</span></div>
 
-      {{-- Modal Create Layer (with map) --}}
-      @include('admin.gis.create')
+      {{-- Modal Create Pembangkit --}}
+      @include('admin.pembangkit_lokal.create')
 
-      <button class="btn btn-primary btn-add"><i class="ri-add-line"></i> Tambah Layer</button>
+      <button class="btn btn-primary btn-add"><i class="ri-add-line"></i> Tambah Pembangkit</button>
     </div>
   </div>
 
   <section class="card" style="margin-top:18px;">
     <div class="card-header">
-      <div class="card-title">Daftar Layer / Titik</div>
+  
 
       <form id="filterForm" class="toolbar" method="GET" action="#">
         <div class="input-group w-search">
           <span class="input-group-text"><i class="ri-search-line"></i></span>
-          <input type="text" name="q" value="{{ request('q') }}" class="form-control" placeholder="Cari Nama Fitur...">
+          <input type="text" name="q" value="{{ request('q') }}" class="form-control" placeholder="Cari Nama Pembangkit...">
           @if(request('q')) <button type="button" class="btn-ghost" id="btnClearSearch"><i class="ri-close-line"></i></button> @endif
         </div>
 
         <div class="input-group w-filter">
-          <span class="input-group-text"><i class="ri-shape-line"></i></span>
-          <select class="form-select auto-submit" name="jenis">
-            <option value="">Semua Jenis</option>
-            <option {{ request('jenis')=='gardu' ? 'selected':'' }} value="gardu">Gardu</option>
-            <option {{ request('jenis')=='pembangkit' ? 'selected':'' }} value="pembangkit">Pembangkit</option>
-            <option {{ request('jenis')=='pemukiman' ? 'selected':'' }} value="pemukiman">Pemukiman</option>
+          <span class="input-group-text"><i class="ri-flashlight-line"></i></span>
+          <select class="form-select auto-submit" name="tipe">
+            <option value="">Semua Tipe</option>
+            @foreach(['PLTD','PLTS','PLTMH'] as $t)
+              <option {{ request('tipe')===$t ? 'selected':'' }}>{{ $t }}</option>
+            @endforeach
+          </select>
+        </div>
+
+        <div class="input-group w-filter">
+          <span class="input-group-text"><i class="ri-checkbox-circle-line"></i></span>
+          <select class="form-select auto-submit" name="status">
+            <option value="">Semua Status</option>
+            @foreach(['Beroperasi','Uji Coba','Perawatan'] as $s)
+              <option {{ request('status')===$s ? 'selected':'' }}>{{ $s }}</option>
+            @endforeach
           </select>
         </div>
 
@@ -88,28 +99,28 @@
           <thead>
             <tr>
               <th class="col-no">No</th>
-              <th>Nama Fitur</th>
-              <th class="col-jen">Jenis</th>
-              <th class="col-koor">Koordinat</th>
-              <th>Keterangan</th>
+              <th>Nama Pembangkit</th>
+              <th class="col-tipe">Tipe</th>
+              <th class="col-daya">Daya Terpasang</th>
+              <th class="col-sta">Status</th>
               <th class="col-aksi">Aksi</th>
             </tr>
           </thead>
           <tbody>
             @php $rows = [
-              ['Gardu A-01','gardu','-0.502100, 117.153700','Trafo 250 kVA'],
-              ['PLTS Desa M','pembangkit','-0.612345, 117.201234','250 kWp'],
-              ['PTL Long Pelay','pemukiman','-0.432100, 117.320000','KK 120'],
-              ['Gardu B-02','gardu','-0.521000, 117.111000','Trafo 160 kVA'],
-              ['PLTMH Lembah N','pembangkit','-0.700000, 116.980000','1.2 MW'],
+              ['PLTD Sungai K','PLTD','2 MW','Beroperasi'],
+              ['PLTS Desa M','PLTS','250 kWp','Uji Coba'],
+              ['PLTMH Lembah N','PLTMH','1.2 MW','Beroperasi'],
+              ['PLTS Pulau O','PLTS','500 kWp','Perawatan'],
+              ['PLTD Hulu P','PLTD','5 MW','Beroperasi'],
             ]; @endphp
             @foreach ($rows as $i => $r)
               <tr>
                 <td class="col-no">{{ $i+1 }}</td>
                 <td><strong>{{ $r[0] }}</strong></td>
-                <td class="col-jen">{{ ucfirst($r[1]) }}</td>
-                <td class="col-koor">{{ $r[2] }}</td>
-                <td>{{ $r[3] }}</td>
+                <td class="col-tipe">{{ $r[1] }}</td>
+                <td class="col-daya">{{ $r[2] }}</td>
+                <td class="col-sta">{{ $r[3] }}</td>
                 <td class="col-aksi">
                   <a href="#" class="btn-ico" title="Pengaturan"><i class="ri-settings-3-line"></i></a>
                   <button type="button" class="btn-ico danger" title="Hapus"><i class="ri-delete-bin-6-line"></i></button>
@@ -120,12 +131,13 @@
         </table>
 
         <div class="table-footer">
-          <div class="summary">Menampilkan <strong>1–5</strong> dari <strong>42</strong> layer</div>
+          <div class="summary">Menampilkan <strong>1–5</strong> dari <strong>37</strong> data</div>
           <div class="show-wrap">
             <span>Show</span>
             <form id="perPageForm" method="GET" action="#">
               <input type="hidden" name="q" value="{{ request('q') }}">
-              <input type="hidden" name="jenis" value="{{ request('jenis') }}">
+              <input type="hidden" name="tipe" value="{{ request('tipe') }}">
+              <input type="hidden" name="status" value="{{ request('status') }}">
               <select class="form-select auto-submit" name="per_page">
                 @foreach([5,10,25,50,100] as $pp)
                   <option value="{{ $pp }}" {{ (string)request('per_page','10')===(string)$pp ? 'selected':'' }}>{{ $pp }}</option>
@@ -161,8 +173,10 @@
         if (perPageForm && perPageForm.contains(el)) perPageForm.submit(); else if (filterForm) filterForm.submit();
       });
     });
-    document.getElementById('btnClearSearch')?.addEventListener('click', ()=>{ const i=filterForm.querySelector('input[name="q"]'); if(i) i.value=''; filterForm.submit(); });
-    document.getElementById('btnReset')?.addEventListener('click', ()=>{ filterForm.reset(); const i=filterForm.querySelector('input[name="q"]'); if(i) i.value=''; filterForm.submit(); });
+    const btnClear = document.getElementById('btnClearSearch');
+    btnClear?.addEventListener('click', () => { const i=filterForm.querySelector('input[name="q"]'); if(i) i.value=''; filterForm.submit(); });
+    const btnReset = document.getElementById('btnReset');
+    btnReset?.addEventListener('click', () => { filterForm.reset(); const i=filterForm.querySelector('input[name="q"]'); if(i) i.value=''; filterForm.submit(); });
   });
 </script>
 @endpush

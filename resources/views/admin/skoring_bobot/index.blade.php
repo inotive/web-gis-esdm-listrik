@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Dashboard ESDM - GIS & Layer Management')
+@section('title', 'Dashboard ESDM - Variabel Skoring & Bobot')
 
 @push('styles')
 <style>
@@ -21,8 +21,8 @@
   table.data tbody tr:hover{background:#FAFAFA}
 
   .col-no{width:70px;text-align:center}
-  .col-jen{width:160px}
-  .col-koor{width:220px}
+  .col-bbt{width:140px}
+  .col-grp{width:180px}
   .col-aksi{width:130px;text-align:center}
   .btn-ico{--size:32px;width:var(--size);height:var(--size);display:inline-grid;place-items:center;border:1px solid var(--line);background:#fff;border-radius:8px;cursor:pointer}
   .btn-ico:hover{background:#F8FAFC}
@@ -45,36 +45,36 @@
   <div class="page-head">
     <div>
       <div class="page-meta">Selasa, 22 September 2025</div>
-      <div class="page-title">GIS & Layer Management</div>
+      <div class="page-title">Variabel Skoring & Bobot</div>
     </div>
     <div class="page-actions">
       <div class="date-pill"><i class="ri-calendar-line"></i><span>September 2025</span></div>
 
-      {{-- Modal Create Layer (with map) --}}
-      @include('admin.gis.create')
+      {{-- Modal Create Skoring & Bobot --}}
+      @include('admin.skoring_bobot.create')
 
-      <button class="btn btn-primary btn-add"><i class="ri-add-line"></i> Tambah Layer</button>
+      <button class="btn btn-primary btn-add"><i class="ri-add-line"></i> Tambah Variabel</button>
     </div>
   </div>
 
   <section class="card" style="margin-top:18px;">
     <div class="card-header">
-      <div class="card-title">Daftar Layer / Titik</div>
+     
 
       <form id="filterForm" class="toolbar" method="GET" action="#">
         <div class="input-group w-search">
           <span class="input-group-text"><i class="ri-search-line"></i></span>
-          <input type="text" name="q" value="{{ request('q') }}" class="form-control" placeholder="Cari Nama Fitur...">
+          <input type="text" name="q" value="{{ request('q') }}" class="form-control" placeholder="Cari Variabel...">
           @if(request('q')) <button type="button" class="btn-ghost" id="btnClearSearch"><i class="ri-close-line"></i></button> @endif
         </div>
 
         <div class="input-group w-filter">
-          <span class="input-group-text"><i class="ri-shape-line"></i></span>
-          <select class="form-select auto-submit" name="jenis">
-            <option value="">Semua Jenis</option>
-            <option {{ request('jenis')=='gardu' ? 'selected':'' }} value="gardu">Gardu</option>
-            <option {{ request('jenis')=='pembangkit' ? 'selected':'' }} value="pembangkit">Pembangkit</option>
-            <option {{ request('jenis')=='pemukiman' ? 'selected':'' }} value="pemukiman">Pemukiman</option>
+          <span class="input-group-text"><i class="ri-shape-2-line"></i></span>
+          <select class="form-select auto-submit" name="grup">
+            <option value="">Semua Grup</option>
+            @foreach(['Sosial','Teknis','Ekonomi'] as $g)
+              <option {{ request('grup')===$g ? 'selected':'' }}>{{ $g }}</option>
+            @endforeach
           </select>
         </div>
 
@@ -88,27 +88,27 @@
           <thead>
             <tr>
               <th class="col-no">No</th>
-              <th>Nama Fitur</th>
-              <th class="col-jen">Jenis</th>
-              <th class="col-koor">Koordinat</th>
+              <th>Variabel</th>
+              <th class="col-bbt">Bobot</th>
+              <th class="col-grp">Grup</th>
               <th>Keterangan</th>
               <th class="col-aksi">Aksi</th>
             </tr>
           </thead>
           <tbody>
             @php $rows = [
-              ['Gardu A-01','gardu','-0.502100, 117.153700','Trafo 250 kVA'],
-              ['PLTS Desa M','pembangkit','-0.612345, 117.201234','250 kWp'],
-              ['PTL Long Pelay','pemukiman','-0.432100, 117.320000','KK 120'],
-              ['Gardu B-02','gardu','-0.521000, 117.111000','Trafo 160 kVA'],
-              ['PLTMH Lembah N','pembangkit','-0.700000, 116.980000','1.2 MW'],
+              ['Jumlah KK','0.30','Sosial','Semakin besar semakin prioritas'],
+              ['Jarak ke Gardu','0.25','Teknis','Semakin jauh skor naik'],
+              ['Akses Jalan','0.20','Teknis','Baik/Sedang/Rusak direduksi'],
+              ['Biaya Per Sambungan','0.15','Ekonomi','Semakin rendah semakin prioritas'],
+              ['Potensi EBT','0.10','Teknis','PLTS/PLTMH/dsb'],
             ]; @endphp
             @foreach ($rows as $i => $r)
               <tr>
                 <td class="col-no">{{ $i+1 }}</td>
                 <td><strong>{{ $r[0] }}</strong></td>
-                <td class="col-jen">{{ ucfirst($r[1]) }}</td>
-                <td class="col-koor">{{ $r[2] }}</td>
+                <td class="col-bbt">{{ $r[1] }}</td>
+                <td class="col-grp">{{ $r[2] }}</td>
                 <td>{{ $r[3] }}</td>
                 <td class="col-aksi">
                   <a href="#" class="btn-ico" title="Pengaturan"><i class="ri-settings-3-line"></i></a>
@@ -120,12 +120,12 @@
         </table>
 
         <div class="table-footer">
-          <div class="summary">Menampilkan <strong>1–5</strong> dari <strong>42</strong> layer</div>
+          <div class="summary">Menampilkan <strong>1–5</strong> dari <strong>12</strong> variabel</div>
           <div class="show-wrap">
             <span>Show</span>
             <form id="perPageForm" method="GET" action="#">
               <input type="hidden" name="q" value="{{ request('q') }}">
-              <input type="hidden" name="jenis" value="{{ request('jenis') }}">
+              <input type="hidden" name="grup" value="{{ request('grup') }}">
               <select class="form-select auto-submit" name="per_page">
                 @foreach([5,10,25,50,100] as $pp)
                   <option value="{{ $pp }}" {{ (string)request('per_page','10')===(string)$pp ? 'selected':'' }}>{{ $pp }}</option>

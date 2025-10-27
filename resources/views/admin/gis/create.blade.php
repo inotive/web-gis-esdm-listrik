@@ -1,116 +1,110 @@
-@extends('admin.layouts.app')
+@includeWhen(true,'admin.data_gardu.create')
 
-@section('title', 'Tambah Data Asset - Dinas ESDM')
-
-@section('page-title', 'Tambah Data Asset')
-
-@section('breadcrumb')
-<li class="breadcrumb-item">
-    <span class="bullet bg-gray-500 w-5px h-2px"></span>
-</li>
-<li class="breadcrumb-item text-muted">Konfigurasi</li>
-<li class="breadcrumb-item">
-    <span class="bullet bg-gray-500 w-5px h-2px"></span>
-</li>
-<li class="breadcrumb-item text-muted">
-    <a href="{{ route('admin.asset.index') }}" class="text-muted text-hover-primary">Data Asset</a>
-</li>
-<li class="breadcrumb-item">
-    <span class="bullet bg-gray-500 w-5px h-2px"></span>
-</li>
-<li class="breadcrumb-item text-muted">Tambah</li>
-@endsection
-
-{{-- ✅ LEAFLET CSS & JS --}}
 @push('styles')
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-<link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
 <style>
-    .leaflet-draw-toolbar a {
-        background-image: url('https://unpkg.com/leaflet-draw@1.0.4/dist/images/spritesheet.png');
-    }
-    .leaflet-retina .leaflet-draw-toolbar a {
-        background-image: url('https://unpkg.com/leaflet-draw@1.0.4/dist/images/spritesheet-2x.png');
-    }
-    .leaflet-draw-actions a {
-        background-image: url('https://unpkg.com/leaflet-draw@1.0.4/dist/images/spritesheet.png');
-    }
-    .leaflet-retina .leaflet-draw-actions a {
-        background-image: url('https://unpkg.com/leaflet-draw@1.0.4/dist/images/spritesheet-2x.png');
-    }
+  #map-create-layer{width:100%;height:340px;border:1px solid var(--line);border-radius:12px}
+  .input-group-mini{display:flex;gap:10px}
+  .input-group-mini .input{flex:1}
 </style>
 @endpush
 
-@section('content')
-<div class="row col-12">
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title align-items-start flex-column mb-0">
-                <span class="card-label fw-bold fs-3">Form Tambah Data Asset</span>
-            </h3>
-        </div>
-        <div class="card-body">
-            @if ($errors->any())
-                <div class="alert alert-danger mb-6">
-                    <h4 class="mb-3">Terjadi kesalahan</h4>
-                    <ul class="mb-0 ps-5">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
+@push('scripts')
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+@endpush
 
-            <form action="{{ route('admin.asset.store') }}" method="POST" enctype="multipart/form-data" data-region-form="asset">
-                @csrf
-
-                @include('admin.asset.partials.form-fields', [
-                    'asset' => null,
-                    'kategoriList' => $kategoriList,
-                    'unitKerjaList' => $unitKerjaList,
-                    'statusList' => $statusList,
-                    'provinsiList' => $provinsiList,
-                    'kabupatenList' => $kabupatenList,
-                    'kecamatanList' => $kecamatanList,
-                    'kelurahanList' => $kelurahanList,
-                ])
-
-                <div class="row mt-8">
-                    <div class="col-12 d-flex justify-content-between pt-5">
-                        <a href="{{ route('admin.asset.index') }}" class="btn btn-light">
-                            <i class="fa-solid fa-arrow-left fs-3 me-2"></i> Batal
-
-                            Batal
-                        </a>
-                        <button type="submit" class="btn btn-success">
-                            <i class="ki-duotone ki-check fs-3 me-2">
-                                <span class="path1"></span>
-                                <span class="path2"></span>
-                            </i>
-                            Simpan Data
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </div>
+<div class="modal" id="modalCreateLayer" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="ttlLayer">
+    <div class="modal-hd">
+      <div id="ttlLayer" class="modal-ttl">Tambah Layer / Titik GIS</div>
+      <button type="button" class="modal-x" onclick="__closeModal('modalCreateLayer')"><i class="ri-close-line" style="color:#16a34a"></i></button>
     </div>
+    <form class="modal-bd form" id="formCreateLayer">
+      <div class="f">
+        <label>Nama Fitur</label>
+        <input class="input" name="nama" placeholder="Contoh: Gardu A-01 atau PLTS Desa L" required>
+      </div>
+      <div class="row">
+        <div class="f">
+          <label>Jenis</label>
+          <select class="select" name="jenis" required>
+            <option value="">Pilih</option>
+            <option value="gardu">Gardu</option>
+            <option value="pembangkit">Pembangkit</option>
+            <option value="pemukiman">Pemukiman Tanpa Listrik</option>
+          </select>
+        </div>
+        <div class="f">
+          <label>Keterangan Singkat</label>
+          <input class="input" name="ket" placeholder="Opsional">
+        </div>
+      </div>
+
+      <div class="f">
+        <label>Koordinat</label>
+        <div class="input-group-mini">
+          <input class="input" name="lat" id="layerLat" placeholder="Lat" required>
+          <input class="input" name="lng" id="layerLng" placeholder="Lng" required>
+          <button class="btn-soft" type="button" id="btnUseCenter" title="Pakai pusat peta"><i class="ri-focus-2-line"></i></button>
+        </div>
+      </div>
+
+      <div id="map-create-layer" aria-label="Map pilih koordinat"></div>
+
+      <div class="modal-ft">
+        <button type="button" class="btn-soft" onclick="__closeModal('modalCreateLayer')">Batal</button>
+        <button class="btn-primary" type="submit">Simpan</button>
+      </div>
+    </form>
+  </div>
 </div>
-@endsection
 
 @push('scripts')
-{{-- ✅ LEAFLET & DRAW PLUGIN --}}
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+<script>
+  (function(){
+    const btn = document.querySelector('.page-actions .btn-add');   // di halaman GIS: "Import Layer" atau "Tambah Layer"
+    if(btn) btn.addEventListener('click', ()=> __openModal('modalCreateLayer'));
 
-{{-- Region cascade script --}}
-@include('admin.asset.partials.region-script', [
-    'kabupatenList' => $kabupatenList,
-    'kecamatanList' => $kecamatanList,
-    'kelurahanList' => $kelurahanList,
-])
+    let map, marker;
+    const modal = document.getElementById('modalCreateLayer');
+    const latEl = document.getElementById('layerLat');
+    const lngEl = document.getElementById('layerLng');
 
-{{-- ✅ Leaflet Map script --}}
-@include('admin.asset.partials.leaflet-map-script')
+    function initMap(){
+      if(map) return;
+      map = L.map('map-create-layer').setView([-0.5021, 117.1537], 11);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 18}).addTo(map);
+      map.on('click', e => place(e.latlng));
+    }
+    function place(latlng){
+      if(marker) marker.setLatLng(latlng);
+      else marker = L.marker(latlng, {draggable:true}).addTo(map).on('dragend', e=>{
+        const p = e.target.getLatLng(); latEl.value = p.lat.toFixed(6); lngEl.value = p.lng.toFixed(6);
+      });
+      latEl.value = latlng.lat.toFixed(6); lngEl.value = latlng.lng.toFixed(6);
+    }
+
+    modal?.addEventListener('click', (e)=>{ if(e.target.id==='modalCreateLayer') __closeModal('modalCreateLayer'); });
+    // saat modal dibuka: init map & invalidateSize
+    const obs = new MutationObserver(() => {
+      if(modal.classList.contains('show')){
+        initMap();
+        setTimeout(()=> map?.invalidateSize(), 120);
+      }
+    });
+    obs.observe(modal, {attributes:true, attributeFilter:['class']});
+
+    document.getElementById('btnUseCenter')?.addEventListener('click', ()=>{
+      if(!map) return; place(map.getCenter());
+    });
+
+    const form = document.getElementById('formCreateLayer');
+    form?.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(form));
+      console.log('Simpan Layer (dummy):', data);
+      __closeModal('modalCreateLayer');
+    });
+  })();
+</script>
 @endpush
