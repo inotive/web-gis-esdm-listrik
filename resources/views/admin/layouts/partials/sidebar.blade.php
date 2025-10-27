@@ -101,12 +101,12 @@
       <span class="menu-label">Variabel Skoring &amp; Bobot</span>
     </a>
 
-    <a class="menu-item {{ nav_active('admin.hak-akses.user.*', 'admin.hak-akses.role.*', 'admin.hak-akses.permission.*') }}"
+    <a class="menu-item {{ nav_active('admin.hak-akses.user.*') }}"
        href="{{ route('admin.hak-akses.user.index') }}">
       <span class="menu-icon"><i class="ri-user-settings-line" aria-hidden="true"></i></span>
       <span class="menu-label">Manajemen Pengguna</span>
     </a>
-       <a class="menu-item {{ nav_active('admin.hak-akses.role.*', 'admin.hak-akses.role.*', 'admin.hak-akses.permission.*') }}"
+       <a class="menu-item {{ nav_active('admin.hak-akses.role.*') }}"
        href="{{ route('admin.hak-akses.role.index') }}">
       <span class="menu-icon"><i class="ri-user-settings-line" aria-hidden="true"></i></span>
       <span class="menu-label">Role</span>
