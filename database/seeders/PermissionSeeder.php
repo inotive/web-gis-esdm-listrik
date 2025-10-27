@@ -23,26 +23,6 @@ class PermissionSeeder extends Seeder
                 // Dashboard
                 ['name' => 'dashboard.view', 'group' => 'Dashboard', 'display_name' => 'Lihat Dashboard'],
                 
-                // Asset Management
-                ['name' => 'asset.view', 'group' => 'Asset', 'display_name' => 'Lihat Daftar Asset'],
-                ['name' => 'asset.create', 'group' => 'Asset', 'display_name' => 'Tambah Asset'],
-                ['name' => 'asset.edit', 'group' => 'Asset', 'display_name' => 'Edit Asset'],
-                ['name' => 'asset.delete', 'group' => 'Asset', 'display_name' => 'Hapus Asset'],
-                ['name' => 'asset.peta', 'group' => 'Asset', 'display_name' => 'Lihat Peta Persebaran'],
-                ['name' => 'asset.rekapitulasi', 'group' => 'Asset', 'display_name' => 'Lihat Rekapitulasi'],
-                ['name' => 'asset.dokumen', 'group' => 'Asset', 'display_name' => 'Lihat Dokumen Asset'],
-                ['name' => 'asset.export', 'group' => 'Asset', 'display_name' => 'Export Data Asset'],
-                
-                // Asset Table Columns
-                ['name' => 'asset.column.kode', 'group' => 'Kolom Tabel Asset', 'display_name' => 'Lihat Kolom Kode Asset'],
-                ['name' => 'asset.column.kategori_tanah', 'group' => 'Kolom Tabel Asset', 'display_name' => 'Lihat Kolom Kategori Tanah'],
-                ['name' => 'asset.column.unit_kerja', 'group' => 'Kolom Tabel Asset', 'display_name' => 'Lihat Kolom Unit Kerja'],
-                ['name' => 'asset.column.status_hukum', 'group' => 'Kolom Tabel Asset', 'display_name' => 'Lihat Kolom Status Hukum'],
-                ['name' => 'asset.column.asal', 'group' => 'Kolom Tabel Asset', 'display_name' => 'Lihat Kolom Asal Perolehan'],
-                ['name' => 'asset.column.kabupaten', 'group' => 'Kolom Tabel Asset', 'display_name' => 'Lihat Kolom Kabupaten'],
-                ['name' => 'asset.column.kecamatan', 'group' => 'Kolom Tabel Asset', 'display_name' => 'Lihat Kolom Kecamatan'],
-                ['name' => 'asset.column.sertifikat', 'group' => 'Kolom Tabel Asset', 'display_name' => 'Lihat Kolom Sertifikat'],
-                ['name' => 'asset.column.aksi', 'group' => 'Kolom Tabel Asset', 'display_name' => 'Lihat Kolom Aksi'],
                 
                 // Role & Permission Management
                 ['name' => 'role.view', 'group' => 'Role & Permission', 'display_name' => 'Lihat Daftar Role'],
