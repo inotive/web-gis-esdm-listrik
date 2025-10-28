@@ -1,12 +1,12 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Tambah Data Gardu')
+@section('title', 'Ubah Data Gardu')
 
 @section('content')
   <div class="page-head">
     <div>
       <div class="page-meta">{{ now()->translatedFormat('l, d F Y') }}</div>
-      <div class="page-title">Tambah Data Gardu</div>
+      <div class="page-title">Ubah Data Gardu</div>
     </div>
     <div class="page-actions">
       <a href="{{ route('admin.gardu.index') }}" class="btn btn-light"><i class="ri-arrow-left-line"></i> Kembali</a>
@@ -25,11 +25,12 @@
         </div>
       @endif
 
-      <form action="{{ route('admin.gardu.store') }}" method="POST" class="form">
-        @include('admin.data_gardu._form')
+      <form action="{{ route('admin.gardu.update', $gardu) }}" method="POST" class="form">
+        @method('PUT')
+        @include('admin.data_gardu._form', ['gardu' => $gardu])
 
         <div class="mt-3 d-flex gap-2">
-          <button type="submit" class="btn btn-primary"><i class="ri-save-3-line"></i> Simpan</button>
+          <button type="submit" class="btn btn-primary"><i class="ri-save-3-line"></i> Perbarui</button>
           <a href="{{ route('admin.gardu.index') }}" class="btn btn-secondary">Batal</a>
         </div>
       </form>
