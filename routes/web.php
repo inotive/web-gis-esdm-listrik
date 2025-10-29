@@ -68,18 +68,34 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
     });
     // Data Wilayah
     Route::group(['middleware' => [], 'as' => 'data-wilayah.', 'prefix' => 'data-wilayah'], function () {
-        Route::get('/', [DataWilayahController::class, 'index'])->name('index');
+         Route::get('/', [DataWilayahController::class, 'index'])->name('index');
+    Route::post('/', [DataWilayahController::class, 'store'])->name('store');
+    Route::get('/{wilayah}/edit', [DataWilayahController::class, 'edit'])->name('edit');
+    Route::put('/{wilayah}', [DataWilayahController::class, 'update'])->name('update');
+    Route::delete('/{wilayah}', [DataWilayahController::class, 'destroy'])->name('destroy');
+
+    // Endpoints opsi untuk dropdown berjenjang
+    Route::get('/options/regencies', [DataWilayahController::class, 'optionsRegencies'])->name('options.regencies');
+    Route::get('/options/districts', [DataWilayahController::class, 'optionsDistricts'])->name('options.districts');
+    Route::get('/options/villages', [DataWilayahController::class, 'optionsVillages'])->name('options.villages');
     });
 
     // Data Pelanggan
     Route::group(['middleware' => [], 'as' => 'pelanggan.', 'prefix' => 'pelanggan'], function () {
         Route::get('/', [PelangganController::class, 'index'])->name('index');
+        
     });
 
-    // ===== Tambahan menu baru =====
     Route::group(['as' => 'gardu.', 'prefix' => 'gardu'], function () {
         Route::get('/', [DataGarduController::class, 'index'])->name('index');
+        Route::get('/create', [DataGarduController::class, 'create'])->name('create');
+        Route::post('/', [DataGarduController::class, 'store'])->name('store');
+        Route::get('/{gardu}/edit', [DataGarduController::class, 'edit'])->name('edit');
+        Route::put('/{gardu}', [DataGarduController::class, 'update'])->name('update');
+        Route::delete('/{gardu}', [DataGarduController::class, 'destroy'])->name('destroy');
+         Route::get('/location-suggest', [DataGarduController::class, 'locationSuggest'])->name('location.suggest');
     });
+
 
     Route::group(['as' => 'pembangkit.', 'prefix' => 'pembangkit-lokal'], function () {
         Route::get('/', [PembangkitLokalController::class, 'index'])->name('index');
