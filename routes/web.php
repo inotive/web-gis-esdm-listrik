@@ -128,7 +128,11 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
 
      Route::group(['as' => 'infrastruktur.', 'prefix' => 'infrastruktur-jaringan'], function () {
         Route::get('/', [InfrastrukturJaringanController::class, 'index'])->name('index');
+        Route::post('/', [InfrastrukturJaringanController::class, 'store'])->name('store');
+        Route::put('/{infrastruktur}', [InfrastrukturJaringanController::class, 'update'])->name('update');
+        Route::delete('/{infrastruktur}', [InfrastrukturJaringanController::class, 'destroy'])->name('destroy');
     });
+
 
     Route::group(['as' => 'survey.', 'prefix' => 'hasil-survei-lapangan'], function () {
         Route::get('/', [SurveyLapanganController::class, 'index'])->name('index');
