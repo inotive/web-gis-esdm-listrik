@@ -97,9 +97,18 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
     });
 
 
-    Route::group(['as' => 'pembangkit.', 'prefix' => 'pembangkit-lokal'], function () {
-        Route::get('/', [PembangkitLokalController::class, 'index'])->name('index');
+        Route::group(['as' => 'pembangkit.', 'prefix' => 'pembangkit-lokal'], function () {
+        Route::get('/',            [PembangkitLokalController::class, 'index'])->name('index');
+        Route::get('/create',      [PembangkitLokalController::class, 'create'])->name('create');
+        Route::post('/',           [PembangkitLokalController::class, 'store'])->name('store');
+        Route::get('/{pembangkit}/edit', [PembangkitLokalController::class, 'edit'])->name('edit');
+        Route::put('/{pembangkit}',       [PembangkitLokalController::class, 'update'])->name('update');
+        Route::delete('/{pembangkit}',    [PembangkitLokalController::class, 'destroy'])->name('destroy');
+
+        // Autocomplete lokasi
+        Route::get('/location-suggest', [PembangkitLokalController::class, 'locationSuggest'])->name('location.suggest');
     });
+
 
     Route::group(['as' => 'jalan.', 'prefix' => 'jalan-akses'], function () {
         Route::get('/', [JalanAksesController::class, 'index'])->name('index');
