@@ -193,7 +193,7 @@
 
       <div class="content-wrap">
         @yield('content')
-        @include('admin.layouts.partials.footer')
+        <!-- @include('admin.layouts.partials.footer') -->
       </div>
     </main>
   </div>

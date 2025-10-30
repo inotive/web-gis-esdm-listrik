@@ -1,29 +1,16 @@
-<div id="modalEditGardu" class="modal-overlay" aria-hidden="true">
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalEditGarduTitle">
+<div id="modalEditPembangkit" class="modal-overlay" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalEditTitle">
     <div class="modal-header">
-      <h3 id="modalEditGarduTitle">Ubah Gardu</h3>
-      <button type="button" class="btn-x" onclick="__closeModal('modalEditGardu')" aria-label="Tutup"><i class="ri-close-line"></i></button>
+      <h3 id="modalEditTitle">Ubah Pembangkit Lokal</h3>
+      <button type="button" class="btn-x" onclick="__closeModal('modalEditPembangkit')" aria-label="Tutup">
+        <i class="ri-close-line"></i>
+      </button>
     </div>
 
-    <form id="formEditGardu" method="POST" action="#">
+    <form id="formEditPembangkit" method="POST" action="#">
       @csrf @method('PUT')
       <div class="modal-body">
         <div class="form-grid">
-          <div class="f">
-            <label>Nama Gardu <span class="text-danger">*</span></label>
-            <input type="text" id="nama_edit" name="nama" class="input" required>
-          </div>
-
-          <div class="f">
-            <label>Jenis Gardu <span class="text-danger">*</span></label>
-            <select id="jenis_edit" name="jenis_gardu_distribusi" class="select" required>
-              <option value="">Pilih Jenis</option>
-              @foreach($jenisOptions as $opt)
-                <option value="{{ $opt }}">{{ $opt }}</option>
-              @endforeach
-            </select>
-          </div>
-
           <div class="f full">
             <label>Lokasi <span class="muted">(ketik lalu pilih dari saran)</span></label>
             <div class="suggest-wrap">
@@ -37,6 +24,11 @@
             <input type="hidden" name="district_id" id="district_id_edit">
             <input type="hidden" name="village_id"  id="village_id_edit">
           </div>
+
+          <div class="f">
+            <label>Kapasitas Gardu <span class="text-danger">*</span></label>
+            <input type="text" id="kapasitas_edit" name="kapasitas_gardu" class="input" placeholder="cth: 250 kVA / 2 MW" required>
+          </div>
         </div>
       </div>
       <div class="modal-footer">
@@ -48,13 +40,11 @@
 
 @push('scripts')
 <script>
-(function(){
-  const route = "{{ route('admin.gardu.location.suggest') }}";
-  const debounce=(fn,ms=250)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms);}};
-
-  function initSuggestEdit(){
+  // autocomplete EDIT
+  (function(){
     const elInput = document.getElementById('lokasiInputEdit');
     const elBox   = document.getElementById('suggestBoxEdit');
+    const route   = "{{ route('admin.pembangkit.location.suggest') }}";
     const hid = {
       wilayah:  document.getElementById('wilayah_id_edit'),
       province: document.getElementById('province_id_edit'),
@@ -64,11 +54,14 @@
     };
     let items=[], activeIndex=-1, lastQuery='';
 
+    const debounce=(fn,ms=250)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms);};};
+    function clearIds(){ hid.wilayah.value=''; hid.province.value=''; hid.regency.value=''; hid.district.value=''; hid.village.value=''; }
     function closeList(){ items=[]; activeIndex=-1; elBox.style.display='none'; elBox.innerHTML=''; }
-    function render(){ if(!items.length){ closeList(); return; }
-      elBox.innerHTML=items.map((it,i)=>`<div class="suggest-item ${i===activeIndex?'active':''}" data-i="${i}">${it.label}<div class="muted">${it.type.toUpperCase()}</div></div>`).join('');
+    function renderList(){
+      if(!items.length){ closeList(); return; }
+      elBox.innerHTML = items.map((it,i)=>`<div class="suggest-item ${i===activeIndex?'active':''}" data-idx="${i}">${it.label}<div class="muted">${it.type.toUpperCase()}</div></div>`).join('');
       elBox.style.display='block';
-      elBox.querySelectorAll('.suggest-item').forEach(el=>el.addEventListener('mousedown', e=>{e.preventDefault();apply(items[+el.dataset.i]);}));
+      elBox.querySelectorAll('.suggest-item').forEach(el=>el.addEventListener('mousedown', e=>{e.preventDefault();apply(items[+el.dataset.idx]);}));
     }
     function apply(it){
       elInput.value = it.value || it.label;
@@ -79,12 +72,12 @@
       hid.village.value  = it.ids?.village_id  || '';
       closeList();
     }
-    async function get(q){ const r=await fetch(route+'?q='+encodeURIComponent(q),{headers:{'Accept':'application/json'}}); return r.ok? r.json():[]; }
+    async function suggest(q){ const r=await fetch(route+'?q='+encodeURIComponent(q),{headers:{'Accept':'application/json'}}); return r.ok? r.json():[]; }
     const onType = debounce(async ()=>{
-      const q=elInput.value.trim();
-      if(q.length<2){ closeList(); return; } // saat edit, jangan auto-clear id
-      if(q!==lastQuery){ lastQuery=q; }
-      items = await get(q); activeIndex=-1; render();
+      const q = elInput.value.trim();
+      if(q.length<2){ closeList(); /*jangan clear id saat edit kalau user belum ngetik*/ return; }
+      if(q!==lastQuery) clearIds(); lastQuery=q;
+      items = await suggest(q); activeIndex=-1; renderList();
     },250);
 
     elInput?.addEventListener('input', onType);
@@ -92,18 +85,17 @@
       if(!['ArrowDown','ArrowUp','Enter','Escape'].includes(e.key)) return;
       if(e.key==='Escape'){ closeList(); return; }
       if(!items.length) return;
-      if(e.key==='ArrowDown'){ e.preventDefault(); activeIndex=(activeIndex+1)%items.length; render(); }
-      if(e.key==='ArrowUp'){ e.preventDefault(); activeIndex=(activeIndex-1+items.length)%items.length; render(); }
+      if(e.key==='ArrowDown'){ e.preventDefault(); activeIndex=(activeIndex+1)%items.length; renderList(); }
+      if(e.key==='ArrowUp'){ e.preventDefault(); activeIndex=(activeIndex-1+items.length)%items.length; renderList(); }
       if(e.key==='Enter'){ e.preventDefault(); if(activeIndex>=0) apply(items[activeIndex]); else closeList(); }
     });
 
-    // expose untuk re-render saat modal dibuka
-    window.__invalidateSuggestGarduEdit = ()=>{ if(elInput.value.trim().length>=2){ onType(); } };
-  }
+    // untuk reflow ketika modal baru dibuka
+    window.__invalidateSuggestEdit = ()=>{ if(elInput.value.trim().length>=2){ onType(); } };
 
-  initSuggestEdit();
-
-  document.getElementById('modalEditGardu')?.addEventListener('click', e=>{ if(e.target.id==='modalEditGardu') __closeModal('modalEditGardu'); });
-})();
+    document.getElementById('modalEditPembangkit')?.addEventListener('click', e=>{
+      if(e.target.id==='modalEditPembangkit') __closeModal('modalEditPembangkit');
+    });
+  })();
 </script>
 @endpush

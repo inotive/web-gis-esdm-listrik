@@ -97,9 +97,18 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
     });
 
 
-    Route::group(['as' => 'pembangkit.', 'prefix' => 'pembangkit-lokal'], function () {
-        Route::get('/', [PembangkitLokalController::class, 'index'])->name('index');
+        Route::group(['as' => 'pembangkit.', 'prefix' => 'pembangkit-lokal'], function () {
+        Route::get('/',            [PembangkitLokalController::class, 'index'])->name('index');
+        Route::get('/create',      [PembangkitLokalController::class, 'create'])->name('create');
+        Route::post('/',           [PembangkitLokalController::class, 'store'])->name('store');
+        Route::get('/{pembangkit}/edit', [PembangkitLokalController::class, 'edit'])->name('edit');
+        Route::put('/{pembangkit}',       [PembangkitLokalController::class, 'update'])->name('update');
+        Route::delete('/{pembangkit}',    [PembangkitLokalController::class, 'destroy'])->name('destroy');
+
+        // Autocomplete lokasi
+        Route::get('/location-suggest', [PembangkitLokalController::class, 'locationSuggest'])->name('location.suggest');
     });
+
 
     Route::group(['as' => 'jalan.', 'prefix' => 'jalan-akses'], function () {
         Route::get('/', [JalanAksesController::class, 'index'])->name('index');
@@ -119,7 +128,11 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
 
      Route::group(['as' => 'infrastruktur.', 'prefix' => 'infrastruktur-jaringan'], function () {
         Route::get('/', [InfrastrukturJaringanController::class, 'index'])->name('index');
+        Route::post('/', [InfrastrukturJaringanController::class, 'store'])->name('store');
+        Route::put('/{infrastruktur}', [InfrastrukturJaringanController::class, 'update'])->name('update');
+        Route::delete('/{infrastruktur}', [InfrastrukturJaringanController::class, 'destroy'])->name('destroy');
     });
+
 
     Route::group(['as' => 'survey.', 'prefix' => 'hasil-survei-lapangan'], function () {
         Route::get('/', [SurveyLapanganController::class, 'index'])->name('index');

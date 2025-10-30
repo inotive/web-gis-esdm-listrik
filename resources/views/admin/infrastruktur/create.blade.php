@@ -1,75 +1,41 @@
-<!-- Modal Create Infrastruktur -->
-<div id="modalInfra" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalInfraTitle">
-  <div class="modal-backdrop" data-close></div>
-  <div class="modal-card">
-    <div class="modal-head">
-      <div class="modal-title" id="modalInfraTitle">Tambah Infrastruktur</div>
-      <button class="btn-ghost" data-close aria-label="Tutup"><i class="ri-close-line"></i></button>
+<div id="modalCreateInfra" class="modal-overlay" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalCreateInfraTitle">
+    <div class="modal-header">
+      <h3 id="modalCreateInfraTitle">Tambah Infrastruktur</h3>
+      <button type="button" class="btn-x" onclick="__closeModal('modalCreateInfra')" aria-label="Tutup"><i class="ri-close-line"></i></button>
     </div>
 
-    <div class="modal-body">
-      <form id="infraForm" action="#" method="POST" onsubmit="event.preventDefault(); alert('Demo submit: data tidak disimpan (tanpa DB).');">
-        @csrf
-        <div class="grid-2">
-          <div class="form-row">
-            <label class="label">Jenis Infrastruktur</label>
-            <select class="select" name="jenis" required>
-              <option value="">Pilih jenis...</option>
-              <option value="JTM">JTM</option>
-              <option value="JTR">JTR</option>
-              <option value="Gardu">Gardu</option>
-              <option value="Trafo">Trafo</option>
+    <form id="formCreateInfra" method="POST" action="{{ route('admin.infrastruktur.store') }}">
+      @csrf
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="f">
+            <label>Jaringan <span class="text-danger">*</span></label>
+            <select name="jaringan" class="select" required>
+              <option value="">Pilih</option>
+              <option value="distribusi" {{ old('jaringan')==='distribusi'?'selected':'' }}>Distribusi</option>
+              <option value="transmisi" {{ old('jaringan')==='transmisi'?'selected':'' }}>Transmisi</option>
             </select>
+            @error('jaringan')<small class="text-danger">{{ $message }}</small>@enderror
           </div>
 
-          <div class="form-row">
-            <label class="label">Kode Aset</label>
-            <input class="input" type="text" name="kode" placeholder="AS-007" required>
+          <div class="f">
+            <label>Jenis <span class="text-danger">*</span></label>
+            <input type="text" name="jenis" value="{{ old('jenis') }}" class="input" placeholder="cth: JTM / JTR / Gardu / Trafo" required>
+            @error('jenis')<small class="text-danger">{{ $message }}</small>@enderror
           </div>
 
-          <div class="form-row">
-            <label class="label">Nama Aset</label>
-            <input class="input" type="text" name="nama" placeholder="JTM 20kV Segmen C" required>
-          </div>
-
-          <div class="form-row">
-            <label class="label">Kondisi</label>
-            <select class="select" name="kondisi" required>
-              <option value="">Pilih kondisi...</option>
-              <option>Baik</option>
-              <option>Sedang</option>
-              <option>Rusak</option>
-            </select>
-          </div>
-
-          <div class="form-row">
-            <label class="label">Latitude</label>
-            <input id="infraLat" class="input" type="text" name="lat" placeholder="-0.502100" required>
-          </div>
-
-          <div class="form-row">
-            <label class="label">Longitude</label>
-            <input id="infraLng" class="input" type="text" name="lng" placeholder="117.153200" required>
-          </div>
-
-          <div class="form-row" style="grid-column:1 / -1;">
-            <label class="label">Peta Lokasi</label>
-            <div id="infraMap" class="map-shell" aria-label="Peta Infrastruktur"></div>
-          </div>
-
-          <div class="form-row" style="grid-column:1 / -1;">
-            <label class="label">Keterangan</label>
-            <textarea class="textarea" name="keterangan" placeholder="Catatan tambahan..."></textarea>
+          <div class="f full">
+            <label>Panjang Jaringan (km) <span class="text-danger">*</span></label>
+            <input type="number" step="0.01" min="0" name="panjang_jaringan" value="{{ old('panjang_jaringan') }}" class="input" placeholder="cth: 12.50" required>
+            @error('panjang_jaringan')<small class="text-danger">{{ $message }}</small>@enderror
           </div>
         </div>
-      </form>
-    </div>
+      </div>
 
-    <div class="modal-actions">
-      <button class="btn btn-primary" form="infraForm" type="submit">
-        <i class="ri-save-3-line"></i> Simpan
-      </button>
-      <button class="btn btn-ghost" data-close>Batalkan</button>
-    </div>
+      <div class="modal-footer">
+        <button class="btn-save" type="submit"><i class="ri-save-3-line"></i> Simpan</button>
+      </div>
+    </form>
   </div>
 </div>
