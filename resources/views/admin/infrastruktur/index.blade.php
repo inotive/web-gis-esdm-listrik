@@ -4,53 +4,129 @@
 
 @push('styles')
 <style>
-  .toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;}
-  .w-search{width:clamp(230px,38vw,340px);} .w-filter{width:clamp(180px,26vw,230px);}
-  .input-group{display:flex;align-items:center;background:#FCFCFD;border:1px solid var(--line);border-radius:10px;overflow:hidden;height:36px;}
-  .input-group:focus-within{border-color:#CBD5E1;box-shadow:0 0 0 3px rgba(16,185,129,.12)}
-  .input-group-text{display:grid;place-items:center;width:36px;height:100%;color:#94A3B8;background:#F8FAFC;border-right:1px solid var(--line)}
-  .form-control,.form-select{height:36px;border:none;background:transparent;padding:0 10px;font:inherit;color:var(--text);outline:none;width:100%}
-  .btn-ghost{height:32px;padding:0 10px;border:1px solid var(--line);background:#fff;border-radius:8px;cursor:pointer}
-  .btn-ghost:hover{background:#F8FAFC}
+  /* ========= MODAL STYLING (konsisten dengan data-wilayah) ========= */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(15,23,42,.45); display:none; z-index:1000; 
+    padding:18px; overflow:auto;
+  }
+  .modal-overlay.show{ display:block; }
+  
+  .modal{
+    max-width:620px; margin:20px auto; background:#fff; border:1px solid var(--line); 
+    border-radius:16px; box-shadow:var(--shadow-2); overflow:hidden;
+  }
+  
+  .modal-header{
+    display:flex; justify-content:space-between; align-items:center; 
+    padding:18px 20px; border-bottom:1px solid var(--line);
+  }
+  .modal-header h3{
+    margin:0; font-weight:800; font-size:20px; letter-spacing:-.2px; color:#111827;
+  }
+  
+  .btn-x{
+    width:36px; height:36px; display:grid; place-items:center; 
+    border:1px solid #E2E8F0; background:#fff; border-radius:10px; cursor:pointer;
+    transition:background .18s ease;
+  }
+  .btn-x:hover{ background:#F8FAFC; }
+  .btn-x i{ font-size:18px; color:#64748B; }
+  
+  .modal-body{ padding:18px 20px 6px; }
+  .modal-footer{ padding:14px 20px 18px; }
+  
+  .btn-save{
+    width:100%; height:44px; border:none; border-radius:10px; 
+    font-weight:700; color:#fff; background:var(--accent-2); 
+    box-shadow:0 10px 22px rgba(34,197,94,.22); cursor:pointer;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    transition:filter .18s ease;
+  }
+  .btn-save:hover{ filter:brightness(.95); }
+  
+  /* Form Grid - 2 kolom untuk modal infrastruktur */
+  .form-grid{
+    display:grid; grid-template-columns:repeat(2, 1fr); gap:16px;
+  }
+  .form-grid .f{ display:flex; flex-direction:column; }
+  .form-grid .f.full{ grid-column:1 / -1; }
+  
+  /* Form elements */
+  .form-group{ margin-bottom:16px; }
+  
+  .form-grid label, .form-group label{
+    display:block; font-size:14px; color:#374151; margin:0 0 8px; font-weight:600;
+  }
+  
+  .select, .input{
+    width:100%; height:44px; padding:0 12px; border:1px solid #E2E8F0; 
+    border-radius:10px; background:#FCFCFD; outline:none; font:inherit; 
+    color:#111827; transition:border-color .18s ease, box-shadow .18s ease;
+  }
+  .select::placeholder, .input::placeholder{ color:#94A3B8; }
+  .select:focus, .input:focus{
+    border-color:#CBD5E1; box-shadow:0 0 0 3px rgba(16,185,129,.12);
+  }
+  
+  .text-danger{ color:#F8285A; font-size:11px; margin-top:4px; display:block; }
+  
+  /* Header / Filter */
+  .card-header{ background:white; border-bottom:1px solid #F1F1F4; padding:8px 20px; }
+  .toolbar{ display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  .w-search{ width:250px; }
+  .w-filter{ width:139px; }
+  .input-group{ display:flex; align-items:center; background:#FCFCFC; border:1px solid #DBDFE9; border-radius:6px; overflow:hidden; height:32px; }
+  .input-group-text{ display:flex; align-items:center; justify-content:center; width:32px; height:100%; color:#99A1B7; background:transparent; border:none; padding:0; }
+  .form-control{ height:100%; border:none; background:transparent; padding:0 10px; font-size:11px; color:#78829D; outline:none; width:100%; }
+  .input-group.has-select{ position:relative; }
+  .form-select{
+    height:100%; border:none; background:transparent; padding:0 28px 0 10px; font-size:11px; color:#7c7c7c; outline:none; width:100%;
+    appearance:none; -webkit-appearance:none; -moz-appearance:none;
+  }
+  .input-group.has-select::after{
+    content:''; position:absolute; right:10px; top:50%; transform:translateY(-50%); width:14px; height:14px;
+    background-image:url("data:image/svg+xml,%3Csvg width='14' height='14' viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3 5L7 9L11 5' stroke='%237c7c7c' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:center; background-size:contain; pointer-events:none;
+  }
+  .btn-ghost{ height:32px; padding:0 10px; border:1px solid #F1F1F4; background:#fff; border-radius:6px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; font-size:13px; color:#4B5675; transition:all .2s; }
+  .btn-ghost:hover{ background:#F8FAFC; }
 
-  .table-shell{border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-1)}
-  table.data{width:100%;border-collapse:separate;border-spacing:0}
-  table.data thead th{background:#FCFCFD;color:#64748B;font-weight:700;padding:12px 18px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
-  table.data tbody td{padding:16px 18px;border-bottom:1px solid var(--line);color:#252F4A;vertical-align:middle}
-  table.data tbody tr:hover{background:#FAFAFA}
+  /* Table */
+  .table-shell{ background:white; overflow:hidden; }
+  .table-wilayah{ width:100%; border-collapse:collapse; }
+  .table-wilayah thead{ background:#FCFCFC; }
+  .table-wilayah thead th{ background:#FCFCFC; color:#4B5675; font-weight:400; font-size:13px; padding:12px 20px; text-align:left; border-bottom:1px solid #F1F1F4; white-space:nowrap; }
+  .table-wilayah tbody td{ padding:23px 20px; border-bottom:1px solid #F1F1F4; color:#252F4A; font-size:14px; vertical-align:middle; }
+  .table-wilayah tbody tr:last-child td{ border-bottom:none; }
+  .table-wilayah tbody tr:hover{ background:#FCFCFC; }
 
-  .col-no{width:70px;text-align:center}
-  .col-aksi{width:160px;text-align:center}
-  .btn-ico{--size:32px;width:var(--size);height:var(--size);display:inline-grid;place-items:center;border:1px solid var(--line);background:#fff;border-radius:8px;cursor:pointer}
-  .btn-ico:hover{background:#F8FAFC}
-  .btn-ico.danger{border-color:#FEE2E2;background:#FFF;color:#DC2626}
-  .btn-ico.danger:hover{background:#FFF5F5}
+  .col-no{ width:48px; text-align:center; color:#071437; }
+  .col-aksi{ width:120px; text-align:center; vertical-align:middle; }
 
-  .table-footer{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:14px 18px;border-top:1px solid var(--line);background:#fff;border-bottom-left-radius:16px;border-bottom-right-radius:16px}
-  .summary{color:var(--text-dim)}
-  .show-wrap{display:inline-flex;align-items:center;gap:8px;color:#var(--text-dim)}
-  .show-wrap .form-select{width:92px}
+  .btn-ico{ width:24px; height:24px; display:inline-flex; align-items:center; justify-content:center; border:none; background:transparent; cursor:pointer; transition:transform .2s; padding:0; margin:0 6px; vertical-align:middle; }
+  .btn-ico:hover{ transform:scale(1.1); }
+  .btn-ico svg{ width:24px; height:24px; display:block; }
+  .btn-ico.edit svg path{ stroke:#DFA000; }
+  .btn-ico.edit svg circle{ fill:#DFA000; }
+  .btn-ico.danger svg path{ stroke:#F8285A; }
 
-  /* modal base */
-  .modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;z-index:1000;padding:18px;overflow:auto;}
-  .modal-overlay.show{display:block;}
-  .modal{max-width:640px;margin:20px auto;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-2);overflow:hidden;}
-  .modal-header{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid var(--line);}
-  .modal-header h3{margin:0;font-weight:800;font-size:20px;letter-spacing:-.2px;}
-  .btn-x{width:36px;height:36px;display:grid;place-items:center;border:1px solid #E2E8F0;background:#fff;border-radius:10px;cursor:pointer;}
-  .btn-x:hover{background:#F8FAFC;}
-  .modal-body{padding:18px 20px 6px;}
-  .modal-footer{padding:14px 20px 18px;}
-  .btn-save{width:100%;height:44px;border:none;border-radius:10px;font-weight:700;color:#fff;background:var(--accent-2);box-shadow:0 10px 22px rgba(34,197,94,.22);cursor:pointer;}
-  .btn-save:hover{filter:brightness(.95);}
+  /* Footer */
+  .table-footer{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px; padding:14px 20px; border-top:1px solid #F1F1F4; background:#fff; }
+  .summary{ color:#4B5675; font-size:13px; white-space:nowrap; }
+  .show-wrap{ display:inline-flex; align-items:center; gap:10px; color:#4B5675; font-size:13px; white-space:nowrap; }
+  .show-wrap form{ display:inline-flex; margin:0; padding:0; }
+  .show-wrap .form-select{ width:70px; height:30px; background:#FCFCFC; border:1px solid #DBDFE9; border-radius:6px; padding:4px 8px; font-size:11px; color:#252F4A; cursor:pointer; text-align:center; appearance:none; background-image:url("data:image/svg+xml,%3Csvg width='14' height='14' viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3 5L7 9L11 5' stroke='%237c7c7c' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 8px center; background-size:14px; padding-right:30px; }
+  .show-wrap .form-select:focus{ outline:none; border-color:#17C653; }
 
-  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  .form-grid .full{grid-column:1/-1}
-  .f{display:flex;flex-direction:column;gap:8px}
-  .f label{font-size:13px;color:#475569}
-  .input,.select{height:42px;border:1px solid var(--line,#E5E7EB);border-radius:10px;background:#FCFCFD;padding:0 12px;font:inherit;color:#111827}
-  .input:focus,.select:focus{outline:none;border-color:#CBD5E1;box-shadow:0 0 0 3px rgba(16,185,129,.12)}
-  .muted{color:#64748B;font-size:12px}
+  @media (max-width:768px){
+    .toolbar{ flex-direction:column; align-items:stretch; gap:12px; }
+    .w-search,.w-filter{ width:100%; }
+    .table-wilayah{ font-size:13px; }
+    .table-wilayah thead th, .table-wilayah tbody td{ padding:12px 10px; }
+    .col-no{ width:40px; }
+    .table-footer{ flex-direction:column; align-items:flex-start; }
+    .form-grid{ grid-template-columns:1fr; }
+  }
 </style>
 @endpush
 
@@ -83,14 +159,13 @@
       <form id="filterForm" class="toolbar" method="GET" action="{{ route('admin.infrastruktur.index') }}">
         <div class="input-group w-search">
           <span class="input-group-text"><i class="ri-search-line"></i></span>
-          <input type="text" name="q" value="{{ $q ?? '' }}" class="form-control" placeholder="Cari Jenis/Panjang...">
+          <input type="text" name="q" value="{{ $q ?? '' }}" class="form-control" placeholder="Cari Jenis/Panjang..." autocomplete="off">
           @if(!empty($q))
-            <button type="button" class="btn-ghost" id="btnClearSearch" title="Bersihkan"><i class="ri-close-line"></i></button>
+            <button type="button" class="btn-ghost" id="btnClearSearch" title="Bersihkan"><i class="ri-close-line"></i><span class="d-none d-sm-inline"> Clear</span></button>
           @endif
         </div>
 
-        <div class="input-group w-filter">
-          <span class="input-group-text"><i class="ri-filter-3-line"></i></span>
+        <div class="input-group w-filter has-select">
           <select class="form-select auto-submit" name="jaringan" aria-label="Filter Jaringan">
             <option value="">Semua Jaringan</option>
             @foreach($jaringanOptions as $val => $label)
@@ -107,7 +182,7 @@
 
     <div class="card-body" style="padding:0;">
       <div class="table-responsive table-shell">
-        <table class="data">
+        <table class="table-wilayah">
           <thead>
             <tr>
               <th class="col-no">No</th>
@@ -127,22 +202,26 @@
               <td class="col-aksi">
                 <button
                   type="button"
-                  class="btn-ico btn-edit"
+                  class="btn-ico edit btn-edit"
                   title="Ubah"
                   data-action="{{ route('admin.infrastruktur.update', $it) }}"
                   data-jaringan="{{ $it->jaringan }}"
                   data-jenis="{{ $it->jenis }}"
                   data-panjang="{{ $it->panjang_jaringan }}"
-                ><i class="ri-edit-2-line"></i></button>
+                >
+                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="2" fill="#DFA000"/><path d="M12 5L9 8M12 5L15 8M12 5V3M12 19L9 16M12 19L15 16M12 19V21M19 12L16 9M19 12L16 15M19 12H21M5 12L8 9M5 12L8 15M5 12H3" stroke="#DFA000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
 
-                <form action="{{ route('admin.infrastruktur.destroy', $it) }}" method="POST" style="display:inline-block" onsubmit="return confirm('Hapus data ini?')">
+                <form action="{{ route('admin.infrastruktur.destroy', $it) }}" method="POST" style="display:inline-block;margin:0" onsubmit="return confirm('Hapus data ini?')">
                   @csrf @method('DELETE')
-                  <button type="submit" class="btn-ico danger" title="Hapus"><i class="ri-delete-bin-6-line"></i></button>
+                  <button type="submit" class="btn-ico danger" title="Hapus">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 20H15M10 4H14M7 7H17L16 20H8L7 7Z" stroke="#F8285A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
                 </form>
               </td>
             </tr>
           @empty
-            <tr><td colspan="5" style="text-align:center;padding:28px">Belum ada data</td></tr>
+            <tr><td colspan="5" style="text-align:center;color:#64748B;padding:40px;">Belum ada data</td></tr>
           @endforelse
           </tbody>
         </table>
@@ -175,7 +254,6 @@
 
 @push('scripts')
 <script>
-  // helper open/close modal
   window.__openModal  = id => { const o=document.getElementById(id); if(o){o.classList.add('show'); document.body.style.overflow='hidden';}};
   window.__closeModal = id => { const o=document.getElementById(id); if(o){o.classList.remove('show'); document.body.style.overflow='';}};
 
@@ -195,16 +273,12 @@
 
     document.getElementById('btnReset')?.addEventListener('click', ()=>{
       filterForm.reset();
-      ['q','jaringan'].forEach(n=>{
-        const el = filterForm.querySelector(`[name="${n}"]`); if (el) el.value='';
-      });
+      ['q','jaringan'].forEach(n=>{ const el = filterForm.querySelector(`[name="${n}"]`); if (el) el.value=''; });
       filterForm.submit();
     });
 
-    // open create
     document.querySelector('.btn-add')?.addEventListener('click', (e)=>{ e.preventDefault(); __openModal('modalCreateInfra'); });
 
-    // open edit + prefill
     document.querySelectorAll('.btn-edit').forEach(btn=>{
       btn.addEventListener('click', ()=>{
         const form = document.getElementById('formEditInfra');
@@ -216,7 +290,6 @@
       });
     });
 
-    // close modal on backdrop click
     document.getElementById('modalCreateInfra')?.addEventListener('click', e=>{ if(e.target.id==='modalCreateInfra') __closeModal('modalCreateInfra'); });
     document.getElementById('modalEditInfra')?.addEventListener('click', e=>{ if(e.target.id==='modalEditInfra') __closeModal('modalEditInfra'); });
   });

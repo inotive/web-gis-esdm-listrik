@@ -83,8 +83,12 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
     // Data Pelanggan
     Route::group(['middleware' => [], 'as' => 'pelanggan.', 'prefix' => 'pelanggan'], function () {
         Route::get('/', [PelangganController::class, 'index'])->name('index');
-        
+        Route::post('/', [PelangganController::class, 'store'])->name('store');
+        Route::put('/{pelanggan}', [PelangganController::class, 'update'])->name('update');
+        Route::delete('/{pelanggan}', [PelangganController::class, 'destroy'])->name('destroy');
     });
+
+    // routes/web.php
 
     Route::group(['as' => 'gardu.', 'prefix' => 'gardu'], function () {
         Route::get('/', [DataGarduController::class, 'index'])->name('index');
@@ -93,20 +97,18 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
         Route::get('/{gardu}/edit', [DataGarduController::class, 'edit'])->name('edit');
         Route::put('/{gardu}', [DataGarduController::class, 'update'])->name('update');
         Route::delete('/{gardu}', [DataGarduController::class, 'destroy'])->name('destroy');
-         Route::get('/location-suggest', [DataGarduController::class, 'locationSuggest'])->name('location.suggest');
     });
 
 
-        Route::group(['as' => 'pembangkit.', 'prefix' => 'pembangkit-lokal'], function () {
-        Route::get('/',            [PembangkitLokalController::class, 'index'])->name('index');
-        Route::get('/create',      [PembangkitLokalController::class, 'create'])->name('create');
-        Route::post('/',           [PembangkitLokalController::class, 'store'])->name('store');
-        Route::get('/{pembangkit}/edit', [PembangkitLokalController::class, 'edit'])->name('edit');
-        Route::put('/{pembangkit}',       [PembangkitLokalController::class, 'update'])->name('update');
-        Route::delete('/{pembangkit}',    [PembangkitLokalController::class, 'destroy'])->name('destroy');
+    // routes/web.php
 
-        // Autocomplete lokasi
-        Route::get('/location-suggest', [PembangkitLokalController::class, 'locationSuggest'])->name('location.suggest');
+    Route::group(['as' => 'pembangkit.', 'prefix' => 'pembangkit-lokal'], function () {
+        Route::get('/', [PembangkitLokalController::class, 'index'])->name('index');
+        Route::get('/create', [PembangkitLokalController::class, 'create'])->name('create');
+        Route::post('/', [PembangkitLokalController::class, 'store'])->name('store');
+        Route::get('/{pembangkit}/edit', [PembangkitLokalController::class, 'edit'])->name('edit');
+        Route::put('/{pembangkit}', [PembangkitLokalController::class, 'update'])->name('update');
+        Route::delete('/{pembangkit}', [PembangkitLokalController::class, 'destroy'])->name('destroy');
     });
 
 

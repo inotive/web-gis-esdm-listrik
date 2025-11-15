@@ -1,4 +1,5 @@
 <?php
+// app/Models/Gardu.php
 
 namespace App\Models;
 
@@ -12,32 +13,94 @@ class Gardu extends Model
         'nama',
         'lokasi',
         'jenis_gardu_distribusi',
-        'province_id',
-        'regency_id',
-        'district_id',
-        'village_id',
+        'wilayah_id',
     ];
 
     /**
-     * Relasi ke master wilayah (tanpa FK di DB).
+     * Relasi ke wilayah
+     */
+    public function wilayah()
+    {
+        return $this->belongsTo(Wilayah::class, 'wilayah_id', 'id');
+    }
+
+    /**
+     * Relasi ke province via wilayah
      */
     public function province()
     {
-        return $this->belongsTo(RegProvince::class, 'province_id', 'id');
+        return $this->hasOneThrough(
+            RegProvince::class,
+            Wilayah::class,
+            'id',           // FK di wilayah (wilayah_id di gardu)
+            'id',           // PK di province
+            'wilayah_id',   // FK lokal di gardu
+            'regency_id'    // FK di wilayah yang menunjuk ke regency, lalu ke province
+        )->join('reg_regencies', 'reg_regencies.id', '=', 'wilayah.regency_id')
+         ->where('reg_provinces.id', '=', \DB::raw('reg_regencies.province_id'));
     }
 
+    /**
+     * Relasi ke regency via wilayah
+     */
     public function regency()
     {
-        return $this->belongsTo(RegRegency::class, 'regency_id', 'id');
+        return $this->hasOneThrough(
+            RegRegency::class,
+            Wilayah::class,
+            'id',           // FK di wilayah
+            'id',           // PK di regency
+            'wilayah_id',   // FK lokal di gardu
+            'regency_id'    // FK di wilayah
+        );
     }
 
+    /**
+     * Relasi ke district via wilayah
+     */
     public function district()
     {
-        return $this->belongsTo(RegDistrict::class, 'district_id', 'id');
+        return $this->hasOneThrough(
+            RegDistrict::class,
+            Wilayah::class,
+            'id',           // FK di wilayah
+            'id',           // PK di district
+            'wilayah_id',   // FK lokal di gardu
+            'district_id'   // FK di wilayah
+        );
     }
 
+    /**
+     * Relasi ke village via wilayah
+     */
     public function village()
     {
-        return $this->belongsTo(RegVillage::class, 'village_id', 'id');
+        return $this->hasOneThrough(
+            RegVillage::class,
+            Wilayah::class,
+            'id',           // FK di wilayah
+            'id',           // PK di village
+            'wilayah_id',   // FK lokal di gardu
+            'village_id'    // FK di wilayah
+        );
+    }
+
+    /**
+     * Accessor untuk mendapatkan lokasi lengkap dari wilayah
+     */
+    public function getLokasiLengkapAttribute()
+    {
+        if (!$this->wilayah) {
+            return $this->lokasi ?: '—';
+        }
+
+        $parts = array_filter([
+            optional($this->wilayah->village)->name,
+            optional($this->wilayah->district)->name,
+            optional($this->wilayah->regency)->name,
+            optional($this->wilayah->province)->name,
+        ]);
+
+        return implode(', ', $parts) ?: $this->lokasi ?: '—';
     }
 }

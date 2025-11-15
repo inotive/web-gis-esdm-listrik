@@ -1,4 +1,5 @@
 <?php
+// app/Models/PembangkitLokal.php
 
 namespace App\Models;
 
@@ -19,17 +20,27 @@ class PembangkitLokal extends Model
     }
 
     /**
-     * Helper label lokasi (village, district, regency, province)
+     * Accessor untuk mendapatkan lokasi lengkap dari wilayah
+     */
+    public function getLokasiLengkapAttribute()
+    {
+        if (!$this->wilayah) return '—';
+
+        $parts = array_filter([
+            optional($this->wilayah->village)->name,
+            optional($this->wilayah->district)->name,
+            optional($this->wilayah->regency)->name,
+            optional(optional($this->wilayah->regency)->province)->name,
+        ]);
+
+        return implode(', ', $parts) ?: '—';
+    }
+
+    /**
+     * Helper label lokasi (backward compatibility)
      */
     public function lokasiLabel(): string
     {
-        $w = $this->wilayah;
-        if (!$w) return '';
-        $v = optional($w->village)->name;
-        $d = optional($w->district)->name;
-        $r = optional($w->regency)->name;
-        $p = optional(optional($w->regency)->province)->name;
-
-        return collect([$v, $d, $r, $p])->filter()->implode(', ');
+        return $this->lokasi_lengkap;
     }
 }
