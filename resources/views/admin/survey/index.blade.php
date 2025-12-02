@@ -1,290 +1,333 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Dashboard ESDM - Hasil Survei Lapangan')
+@section('title', 'Dashboard ESDM - Peta Persebaran Aset')
 
 @push('styles')
 <style>
-  .toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:8px 10px; }
-  .toolbar .w-search { width: clamp(230px, 38vw, 360px); }
-  .toolbar .w-filter { width: clamp(180px, 26vw, 240px); }
+  #adminMapWrap { height: 70vh; width: 100%; background:#f3f4f6; border-radius: 16px; overflow: hidden; }
+  #viewDiv { height: 100%; width: 100%; }
 
-  .input-group {
-    display:flex; align-items:center; background:#FCFCFD; border:1px solid var(--line);
-    border-radius:10px; overflow:hidden; height:36px;
+  .detail-panel{
+    position:absolute;
+    right:16px;
+    top:16px;
+    bottom:16px;
+    width:320px;
+    max-height:calc(100% - 32px);
+    background:#fff;border:1px solid #e5e7eb;border-radius:14px;
+    box-shadow:0 12px 28px rgba(0,0,0,.15);
+    padding:12px;display:none;z-index:40;overflow:auto
   }
-  .input-group:focus-within { border-color:#CBD5E1; box-shadow:0 0 0 3px rgba(16,185,129,.12); }
-  .input-group-text {
-    display:grid; place-items:center; width:36px; height:100%; color:#94A3B8; background:#F8FAFC; border-right:1px solid var(--line);
-  }
-  .form-control, .form-select {
-    height:36px; border:none; background:transparent; padding:0 10px; font: inherit; color: var(--text);
-    outline:none; width:100%;
-  }
-  .btn-ghost { height:32px; padding:0 10px; border:1px solid var(--line); background:#fff; border-radius:8px; cursor:pointer; }
-  .btn-ghost:hover { background:#F8FAFC; }
+  .detail-panel.show{display:block}
+  .dp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .dp-title{font-weight:800;color:#0f172a;font-size:16px}
+  .dp-close{border:none;background:#f1f5f9;width:32px;height:32px;border-radius:10px;cursor:pointer}
 
-  .table-shell { border: 1px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-1); }
-  .table-esdm { width:100%; border-collapse:separate; border-spacing:0; }
-  .table-esdm thead th {
-    background:#FCFCFD; color:#64748B; font-weight:700; padding:12px 18px; text-align:left;
-    border-bottom:1px solid var(--line); white-space:nowrap;
+  .dp-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .dp-item{background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;padding:8px}
+  .dp-item.full{grid-column:1 / -1}
+  .dp-label{font-size:11px;color:#64748b;margin-bottom:3px}
+  .dp-value{font-size:13px;font-weight:700;color:#0f172a;word-break:break-word}
+  .dp-link{font-size:13px;font-weight:700}
+
+  .esri-ui.bottom-right>.esri-component{box-shadow:0 8px 20px rgba(0,0,0,.18);border-radius:12px;overflow:hidden}
+
+  .filter-panel{
+    position:absolute;
+    left:20px;
+    bottom:20px;
+    width:320px;
+    max-height:420px;
+    background:#fff;
+    border-radius:18px;
+    box-shadow:0 20px 60px rgba(15,23,42,.25);
+    border:1px solid #e2e8f0;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    z-index:45;
   }
-  .table-esdm tbody td {
-    padding:14px 18px; border-bottom:1px solid var(--line); color:#252F4A; vertical-align:middle;
+  .filter-head{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:10px 14px;border-bottom:1px solid #e2e8f0;background:#f8fafc;
   }
-  .table-esdm tbody tr:hover { background:#FAFAFA; }
-
-  .col-no{ width:70px; text-align:center; }
-  .col-aksi{ width:130px; text-align:center; }
-  .btn-ico { --size:32px; width:var(--size); height:var(--size); display:inline-grid; place-items:center;
-    border:1px solid var(--line); background:#fff; border-radius:8px; cursor:pointer; }
-  .btn-ico:hover{ background:#F8FAFC; }
-  .btn-ico.danger { border-color:#FEE2E2; color:#DC2626; }
-  .btn-ico.danger:hover { background:#FFF5F5; }
-
-  .table-footer{
-    display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px;
-    padding:14px 18px; border-top:1px solid var(--line); background:#fff; border-bottom-left-radius:16px; border-bottom-right-radius:16px;
+  .filter-title{font-weight:700;font-size:14px;color:#0f172a;display:flex;align-items:center;gap:6px}
+  .filter-body{padding:10px 14px;overflow:auto;gap:10px;display:flex;flex-direction:column;}
+  .filter-row{display:flex;flex-direction:column;gap:4px;font-size:13px;}
+  .filter-label{color:#64748b;font-weight:600;display:flex;align-items:center;gap:6px;}
+  .filter-select{
+    width:100%;border-radius:10px;border:1px solid #e2e8f0;min-height:36px;
+    padding:6px 10px;font-size:13px;background:#f8fafc;color:#0f172a;
   }
-  .summary{ color:var(--text-dim); }
-  .show-wrap{ display:inline-flex; align-items:center; gap:8px; color:var(--text-dim); }
-  .show-wrap .form-select { width:92px; }
-
-  .pagination { display:flex; gap:6px; list-style:none; padding:0; margin:0; }
-  .page-link { min-width:34px; height:34px; padding:0 10px; display:flex; align-items:center; justify-content:center;
-    border:1px solid var(--line); background:#fff; border-radius:8px; text-decoration:none; color:var(--text); }
-  .page-link:hover { background:#F8FAFC; }
-  .page-item.active .page-link { background:var(--active-soft); color:#0F5132; border-color:#B7F7CF; font-weight:700; }
-
-  /* Modal */
-  .modal { position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:100; }
-  .modal.show { display:flex; }
-  .modal-backdrop { position:absolute; inset:0; background:rgba(15,23,42,.4); }
-  .modal-card {
-    position:relative; width:min(920px, 96vw); background:#fff; border-radius:16px; border:1px solid var(--line);
-    box-shadow:0 20px 60px rgba(2,6,23,.18); overflow:hidden;
+  .filter-toggle{
+    width:28px;height:28px;border-radius:999px;border:1px solid #cbd5e1;
+    background:#fff;display:inline-grid;place-items:center;cursor:pointer;color:#64748b;
   }
-  .modal-head { padding:14px 16px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; }
-  .modal-title { font-weight:700; }
-  .modal-body { padding:16px; }
-  .modal-actions { display:flex; justify-content:flex-end; gap:10px; padding:14px 16px; border-top:1px solid var(--line); }
+  .filter-panel.is-collapsed .filter-body{display:none;}
+  .filter-panel.is-collapsed{width:auto;min-width:52px;}
 
-  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-  .form-row { display:flex; flex-direction:column; gap:6px; }
-  .label { font-size:13px; color:#475569; }
-  .input, .select, .textarea {
-    width:100%; border:1px solid #E2E8F0; border-radius:10px; padding:10px 12px; background:#FCFCFD; outline:none;
+  @media (max-width:1024px){
+    #adminMapWrap{height:60vh; min-height:360px;}
+    .detail-panel{position:relative;top:auto;right:auto;bottom:auto;width:100%;max-height:260px;margin-top:10px;}
+    .filter-panel{left:12px;right:12px;bottom:12px;width:auto;}
   }
-  .textarea { min-height:90px; resize:vertical; }
-  .map-shell { height:300px; border:1px solid #E2E8F0; border-radius:12px; overflow:hidden; }
-
-  @media (max-width:780px){ .grid-2 { grid-template-columns:1fr; } }
 </style>
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      integrity="sha256-o9N1j7kGStb0v7cG3G3bZ6bSDo5Cw3tC1u1b2H0wM0A=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://js.arcgis.com/4.29/esri/themes/light/main.css">
 @endpush
 
 @section('content')
-  <!-- Header -->
   <div class="page-head">
     <div>
-      <div class="page-meta">Selasa, 22 September 2025</div>
-      <div class="page-title">Hasil Survei Lapangan</div>
-    </div>
-    <div class="page-actions">
-      <div class="date-pill"><i class="ri-calendar-line"></i><span>September 2025</span></div>
-
-      {{-- Modal Create --}}
-      @include('admin.survey.create')
-
-      <button class="btn btn-primary btn-add">
-        <i class="ri-add-line"></i>
-        Tambah Hasil Survei
-      </button>
+      <div class="page-meta">Peta Interaktif</div>
+      <div class="page-title">Peta Persebaran Aset Tanah</div>
     </div>
   </div>
 
-  <!-- Kartu -->
   <section class="card" style="margin-top:18px;">
-    <div class="card-header">
-     
-
-      <form id="surveyFilterForm" class="toolbar" method="GET" action="#">
-        <!-- Search -->
-        <div class="input-group w-search">
-          <span class="input-group-text"><i class="ri-search-line"></i></span>
-          <input type="text" name="q" value="{{ request('q') }}" class="form-control"
-                 placeholder="Cari lokasi / desa..." aria-label="Cari lokasi">
-          @if(request('q'))
-            <button type="button" class="btn-ghost" id="btnSurveyClear" title="Bersihkan">
-              <i class="ri-close-line"></i>
-            </button>
-          @endif
+    <div class="card-body" style="position:relative;">
+      <div id="filterPanel" class="filter-panel">
+        <div class="filter-head">
+          <div class="filter-title">
+            <i class="ri-filter-3-line"></i>
+            <span>Filter Peta</span>
+          </div>
+          <button id="filterToggle" type="button" class="filter-toggle" title="Sembunyikan / tampilkan filter">
+            <i class="ri-arrow-up-s-line"></i>
+          </button>
         </div>
-
-        <!-- Filter tanggal -->
-        <div class="input-group w-filter">
-          <span class="input-group-text"><i class="ri-calendar-line"></i></span>
-          <input class="form-control auto-submit" type="date" name="tgl" value="{{ request('tgl') }}" aria-label="Tanggal">
-        </div>
-
-        <!-- Petugas -->
-        <div class="input-group w-filter">
-          <span class="input-group-text"><i class="ri-user-line"></i></span>
-          <select class="form-select auto-submit" name="petugas">
-            <option value="">Semua Petugas</option>
-            <option value="eko" {{ request('petugas')==='eko' ? 'selected':'' }}>Eko</option>
-            <option value="sari" {{ request('petugas')==='sari' ? 'selected':'' }}>Sari</option>
-            <option value="budi" {{ request('petugas')==='budi' ? 'selected':'' }}>Budi</option>
-          </select>
-        </div>
-
-        <button type="button" class="btn-ghost" id="btnSurveyReset" title="Reset filter">
-          <i class="ri-refresh-line"></i><span class="d-none d-sm-inline"> Reset</span>
-        </button>
-      </form>
-    </div>
-
-    <div class="card-body" style="padding:0;">
-      <div class="table-responsive table-shell">
-        <table class="table-esdm">
-          <thead>
-            <tr>
-              <th class="col-no">No</th>
-              <th>Tanggal</th>
-              <th>Lokasi/Desa</th>
-              <th>Koordinat</th>
-              <th>Petugas</th>
-              <th>Temuan</th>
-              <th class="col-aksi">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            @php $rows = [
-              ['2025-09-02','Muara Lesan','-0.5042, 117.1501','Eko','Calon pelanggan 42 KK, akses sulit.'],
-              ['2025-09-04','Long Duhung','-0.5111, 117.1462','Sari','Butuh trafo 160 kVA.'],
-              ['2025-09-07','Sinduung Indah','-0.4980, 117.1609','Budi','JTR perlu peremajaan.'],
-              ['2025-09-10','Long Pelay','-0.5150, 117.1401','Eko','Gardu eksisting rusak ringan.'],
-            ]; @endphp
-
-            @foreach ($rows as $i => $r)
-              <tr>
-                <td class="col-no">{{ $i+1 }}</td>
-                <td>{{ \Carbon\Carbon::parse($r[0])->format('d M Y') }}</td>
-                <td><strong>{{ $r[1] }}</strong></td>
-                <td>{{ $r[2] }}</td>
-                <td>{{ $r[3] }}</td>
-                <td>{{ $r[4] }}</td>
-                <td class="col-aksi">
-                  <a href="#" class="btn-ico" title="Detail"><i class="ri-eye-line"></i></a>
-                  <button type="button" class="btn-ico danger" title="Hapus"><i class="ri-delete-bin-6-line"></i></button>
-                </td>
-              </tr>
-            @endforeach
-          </tbody>
-        </table>
-
-        <div class="table-footer">
-          <div class="summary">Menampilkan <strong>1–4</strong> dari <strong>4</strong> survei</div>
-
-          <div class="show-wrap">
-            <span>Show</span>
-            <form id="surveyPerPageForm" method="GET" action="#">
-              <input type="hidden" name="q" value="{{ request('q') }}">
-              <input type="hidden" name="tgl" value="{{ request('tgl') }}">
-              <input type="hidden" name="petugas" value="{{ request('petugas') }}">
-              <select class="form-select auto-submit" name="per_page" aria-label="Jumlah baris per halaman">
-                @foreach([5,10,25,50,100] as $pp)
-                  <option value="{{ $pp }}" {{ (string)request('per_page','10')===(string)$pp ? 'selected':'' }}>{{ $pp }}</option>
-                @endforeach
-              </select>
-            </form>
-            <span>per page</span>
+        <div class="filter-body">
+          <div class="filter-row">
+            <span class="filter-label"><i class="ri-government-line"></i>Kabupaten/Kota</span>
+            <select class="filter-select" id="filterKabupaten">
+              <option value="">Semua Kabupaten/Kota</option>
+            </select>
           </div>
 
-          <nav aria-label="Pagination">
-            <ul class="pagination">
-              <li class="page-item disabled"><span class="page-link" aria-label="Sebelumnya"><i class="ri-arrow-left-s-line"></i></span></li>
-              <li class="page-item active" aria-current="page"><span class="page-link">1</span></li>
-              <li class="page-item"><a class="page-link" href="#">2</a></li>
-              <li class="page-item"><a class="page-link" href="#" aria-label="Berikutnya"><i class="ri-arrow-right-s-line"></i></a></li>
-            </ul>
-          </nav>
+          <div class="filter-row">
+            <span class="filter-label"><i class="ri-community-line"></i>Kecamatan</span>
+            <select class="filter-select" id="filterKecamatan" disabled>
+              <option value="">Pilih Kabupaten terlebih dahulu</option>
+            </select>
+          </div>
+
+          <div class="filter-row">
+            <span class="filter-label"><i class="ri-home-4-line"></i>Kelurahan/Desa</span>
+            <select class="filter-select" id="filterKelurahan" disabled>
+              <option value="">Pilih Kecamatan terlebih dahulu</option>
+            </select>
+          </div>
+
+          <div class="filter-row">
+            <span class="filter-label"><i class="ri-shape-2-line"></i>Desa Berlistrik</span>
+            <select class="filter-select" id="filterDesaBerlistrik">
+              <option value="">Semua Desa Berlistrik</option>
+              <option value="">Desa Berlistrik</option>
+              <option value="">Desa Tidak Berlistrik</option>
+            </select>
+          </div>
         </div>
+      </div>
+
+      <div id="adminMapWrap">
+        <div id="viewDiv"></div>
+        <aside id="detailPanel" class="detail-panel" aria-live="polite">
+          <div class="dp-head">
+            <div class="dp-title">Detail Aset</div>
+            <button id="dpClose" class="dp-close" title="Tutup">✕</button>
+          </div>
+
+          <div class="dp-grid">
+            <div class="dp-item full">
+              <div class="dp-label">Unit Kerja</div>
+              <div class="dp-value" id="dpUnitKerja">-</div>
+            </div>
+
+            <div class="dp-item"><div class="dp-label">Nama</div><div class="dp-value" id="dpNama">-</div></div>
+            <div class="dp-item"><div class="dp-label">Luas (m²)</div><div class="dp-value" id="dpLuas">-</div></div>
+            <div class="dp-item"><div class="dp-label">Kelurahan</div><div class="dp-value" id="dpKelurahan">-</div></div>
+            <div class="dp-item"><div class="dp-label">Kecamatan</div><div class="dp-value" id="dpKecamatan">-</div></div>
+            <div class="dp-item"><div class="dp-label">Kabupaten</div><div class="dp-value" id="dpKabupaten">-</div></div>
+            <div class="dp-item"><div class="dp-label">Provinsi</div><div class="dp-value" id="dpProvinsi">-</div></div>
+            <div class="dp-item full"><div class="dp-label">Alamat</div><div class="dp-value" id="dpAlamat">-</div></div>
+            <div class="dp-item full"><div class="dp-label">Sertifikat</div><div class="dp-value" id="dpSertifikat">-</div></div>
+          </div>
+        </aside>
       </div>
     </div>
   </section>
 @endsection
 
 @push('scripts')
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-o9N1j7kGStb0v7cG3G3bZ6bSDo5Cw3tC1u1b2H0wM0A=" crossorigin="anonymous"></script>
+<script src="https://js.arcgis.com/4.29/"></script>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const f = document.getElementById('surveyFilterForm');
-    const per = document.getElementById('surveyPerPageForm');
+(function(){
+  const $ = id => document.getElementById(id);
+  const fmt = (n) => (n===null||n===undefined||isNaN(n)) ? "-" : Number(n).toLocaleString('id-ID');
 
-    document.querySelectorAll('.auto-submit').forEach(el => {
-      el.addEventListener('change', () => { if (per && per.contains(el)) per.submit(); else if (f) f.submit(); });
+  require([
+    "esri/Map","esri/Basemap","esri/views/MapView","esri/layers/GeoJSONLayer",
+    "esri/widgets/Legend","esri/widgets/Expand","esri/widgets/Home","esri/widgets/Search",
+    "esri/widgets/ScaleBar","esri/widgets/BasemapGallery","esri/widgets/BasemapToggle",
+    "esri/widgets/BasemapGallery/support/LocalBasemapsSource"
+  ], function(Map,Basemap,MapView,GeoJSONLayer,Legend,Expand,Home,Search,ScaleBar,BasemapGallery,BasemapToggle,LocalBasemapsSource){
+
+    const map = new Map({ basemap: Basemap.fromId("satellite") });
+
+    const view = new MapView({
+      container: "viewDiv",
+      map, center: [117.15, -0.5], zoom: 10,
+      popup: { autoOpenEnabled: false }
     });
 
-    const btnClear = document.getElementById('btnSurveyClear');
-    if (btnClear && f) {
-      btnClear.addEventListener('click', () => {
-        const input = f.querySelector('input[name="q"]');
-        if (input) input.value = '';
-        f.submit();
-      });
-    }
-
-    const btnReset = document.getElementById('btnSurveyReset');
-    if (btnReset && f) {
-      btnReset.addEventListener('click', () => {
-        f.reset();
-        const q = f.querySelector('input[name="q"]');
-        if (q) q.value = '';
-        f.submit();
-      });
-    }
-
-    // Modal open/close
-    const modal = document.getElementById('modalSurvey');
-    const btnOpen = document.querySelector('.btn-add');
-    const overlay = modal?.querySelector('.modal-backdrop');
-    const btnClose = modal?.querySelectorAll('[data-close]');
-
-    function openModal(){ modal?.classList.add('show'); setTimeout(initSurveyMap, 50); }
-    function closeModal(){ modal?.classList.remove('show'); }
-
-    btnOpen?.addEventListener('click', openModal);
-    overlay?.addEventListener('click', closeModal);
-    btnClose?.forEach(b => b.addEventListener('click', closeModal));
-
-    // Leaflet Map
-    let _surveyMap;
-    function initSurveyMap(){
-      if (_surveyMap) return;
-      const el = document.getElementById('surveyMap');
-      if (!el) return;
-      _surveyMap = L.map(el).setView([-0.5042, 117.1501], 13);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19, attribution: '&copy; OpenStreetMap'
-      }).addTo(_surveyMap);
-
-      const latInput = document.getElementById('surveyLat');
-      const lngInput = document.getElementById('surveyLng');
-      const marker = L.marker(_surveyMap.getCenter(), { draggable:true }).addTo(_surveyMap);
-
-      function syncInputs(latlng){
-        latInput.value = latlng.lat.toFixed(6);
-        lngInput.value = latlng.lng.toFixed(6);
+    const asetLayer = new GeoJSONLayer({
+      url: "{{ url('/api/aset') }}",
+      title: "Aset Tanah Pemerintah",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-fill",
+          color: [37, 99, 235, 0.45],
+          outline: { color: [29, 78, 216, 1], width: 2 }
+        }
       }
-      syncInputs(marker.getLatLng());
-      marker.on('dragend', () => syncInputs(marker.getLatLng()));
-      _surveyMap.on('click', (e) => { marker.setLatLng(e.latlng); syncInputs(e.latlng); });
+    });
+    map.add(asetLayer);
+
+    const bm_osm=Basemap.fromId("osm"); bm_osm.title="Peta (OSM)";
+    const bm_sat=Basemap.fromId("satellite"); bm_sat.title="Satelit";
+    const bm_hybrid=Basemap.fromId("hybrid"); bm_hybrid.title="Hybrid";
+    const bm_terrain=Basemap.fromId("terrain"); bm_terrain.title="Medan";
+    const bm_topo=Basemap.fromId("topo-vector"); bm_topo.title="Topografi";
+    const bm_gray=Basemap.fromId("gray-vector"); bm_gray.title="Abu-abu";
+    const bm_dark=Basemap.fromId("dark-gray-vector"); bm_dark.title="Gelap";
+    const bm_street=Basemap.fromId("streets-vector"); bm_street.title="Streets";
+    const localSource = new LocalBasemapsSource({ basemaps:[bm_osm,bm_sat,bm_hybrid,bm_terrain,bm_topo,bm_gray,bm_dark,bm_street] });
+
+    view.ui.add(new Home({view}), "top-left");
+    view.ui.add(new Search({view, allPlaceholder:"Cari lokasi atau aset"}), "top-right");
+    view.ui.add(new ScaleBar({view, unit:"metric"}), "bottom-left");
+
+    const legendExpand = new Expand({
+      view, content: new Legend({view, layerInfos:[{layer: asetLayer, title:"Aset Tanah Pemerintah"}]}),
+      expanded:false, expandIconClass:"esri-icon-layer-list", expandTooltip:"Legenda"
+    });
+    view.ui.add(legendExpand, "bottom-right");
+
+    const bgExpand = new Expand({
+      view, content: new BasemapGallery({view, source: localSource}),
+      expanded:false, expandIconClass:"esri-icon-basemap", expandTooltip:"Ganti basemap"
+    });
+    view.ui.add(bgExpand, "bottom-right");
+
+    view.ui.add(new BasemapToggle({view, nextBasemap: bm_osm}), "bottom-right");
+
+    const filterPanel = $('filterPanel');
+    const filterToggle = $('filterToggle');
+    if (filterPanel && filterToggle) {
+      filterToggle.addEventListener('click', function(){
+        const collapsed = filterPanel.classList.toggle('is-collapsed');
+        this.innerHTML = collapsed
+          ? '<i class="ri-arrow-down-s-line"></i>'
+          : '<i class="ri-arrow-up-s-line"></i>';
+      });
     }
+
+    const panel = $('detailPanel');
+    $('dpClose').addEventListener('click', ()=> panel.classList.remove('show'));
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') panel.classList.remove('show'); });
+
+    const setText = (id,val)=>{ $(id).textContent = (val && String(val).trim()!=='') ? val : '-'; };
+
+    function openPanel(attrs){
+      setText('dpUnitKerja', attrs.unit_kerja || '-');
+      setText('dpNama', attrs.nama_asset || '-');
+      setText('dpLuas', fmt(attrs.luas_m2 || 0));
+      setText('dpKelurahan', attrs.kelurahan || attrs.village || '-');
+      setText('dpKecamatan', attrs.kecamatan || attrs.district || '-');
+      setText('dpKabupaten', attrs.kabupaten || attrs.regency || '-');
+      setText('dpProvinsi', attrs.provinsi || attrs.province || '-');
+      setText('dpAlamat', attrs.alamat || '-');
+      const link = attrs.sertifikat_url || attrs.link_sertif || attrs.file_url || null;
+      $('dpSertifikat').innerHTML = link ? `<a class="dp-link" target="_blank" href="${link}">Lihat ⦿</a>` : '-';
+      panel.classList.add('show');
+    }
+
+    let layerView, highlightHandle=null;
+    view.whenLayerView(asetLayer).then(lv => { layerView = lv; });
+
+    view.on("pointer-move", function(evt){
+      view.hitTest(evt, { include: [asetLayer] }).then((res)=>{
+        const hit = res.results.some(r => r.graphic && r.graphic.layer === asetLayer);
+        view.container.style.cursor = hit ? "pointer" : "default";
+      });
+    });
+
+    view.on("click", function(event){
+      view.hitTest(event, { include: [asetLayer] }).then(function(response){
+        const r = response.results.find(x => x.graphic && x.graphic.layer === asetLayer);
+        if (!r || !r.graphic) { panel.classList.remove('show'); if(highlightHandle){highlightHandle.remove();highlightHandle=null;} return; }
+        if (layerView) {
+          if (highlightHandle) { highlightHandle.remove(); }
+          highlightHandle = layerView.highlight(r.graphic);
+        }
+        openPanel(r.graphic.attributes || {});
+      });
+    });
+
+    asetLayer.when(async () => {
+      try {
+        const q = asetLayer.createQuery();
+        q.where = "1=1";
+        q.outFields = ["unit_kerja"];
+        q.returnGeometry = false;
+
+        const res = await asetLayer.queryFeatures(q);
+        const values = Array.from(
+          new Set(
+            res.features
+              .map(f => (f.attributes.unit_kerja ? String(f.attributes.unit_kerja).trim() : "-"))
+          )
+        ).sort((a,b)=>a.localeCompare(b,'id'));
+
+        const palette = [
+          [59,130,246], [16,185,129], [245,158,11], [236,72,153],
+          [99,102,241], [34,197,94],  [249,115,22], [139,92,246],
+          [2,132,199],  [234,179,8],  [239,68,68],  [20,184,166],
+          [168,85,247], [14,165,233], [217,119,6],  [5,150,105]
+        ];
+
+        const uniqueValueInfos = values.map((v, i) => {
+          const rgb = palette[i % palette.length];
+          return {
+            value: v === "-" ? null : v,
+            label: v === "-" ? "Tanpa Unit Kerja" : v,
+            symbol: {
+              type: "simple-fill",
+              color: [rgb[0], rgb[1], rgb[2], 0.45],
+              outline: { color: [rgb[0], rgb[1], rgb[2], 1], width: 1.5 }
+            }
+          };
+        });
+
+        asetLayer.renderer = {
+          type: "unique-value",
+          field: "unit_kerja",
+          defaultLabel: "Tanpa Unit Kerja",
+          defaultSymbol: {
+            type: "simple-fill",
+            color: [148, 163, 184, 0.35],
+            outline: { color: [100, 116, 139, 1], width: 1.2 }
+          },
+          uniqueValueInfos
+        };
+      } catch (err) {
+        console.error("Gagal membuat renderer unik unit_kerja:", err);
+      }
+    });
   });
+})();
 </script>
 @endpush

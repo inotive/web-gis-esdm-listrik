@@ -119,12 +119,13 @@
         .forgot-password:hover { text-decoration: underline; }
 
         .login-button {
-            width: 100%; padding: 12px 18px; background-color: var(--primary);
-            color: var(--white); border: none; border-radius: var(--border-radius);
+            width: 100%; padding: 12px 18px; background-color: #ffcd23;
+            color: #000; border: none; border-radius: var(--border-radius);
             font-size: 16px; font-weight: 600; cursor: pointer;
             transition: var(--transition); box-shadow: var(--shadow-xs);
+            
         }
-        .login-button:hover { background-color: #0a1a33; box-shadow: var(--shadow-md); }
+        .login-button:hover { background-color: #ffcd23; box-shadow: var(--shadow-md); }
         .login-button:active { transform: translateY(1px); }
 
         @media (max-width: 1024px) {
@@ -140,7 +141,7 @@
         <div class="login-form-section">
             <div class="header">
                 <div class="logo-container">
-                    <img class="logo" src="{{ asset('assets/media/logos/logo.png') }}" alt="Logo Dinas ESDM" />
+                    <img class="logo" src="{{ asset('assets/media/esdm.png') }}" alt="Logo Dinas ESDM" />
                     <div class="logo-text">
                         <div class="logo-title">ESDM</div>
                         <div class="logo-subtitle">Provinsi Kalimantan Timur</div>

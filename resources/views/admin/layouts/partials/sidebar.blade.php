@@ -35,21 +35,27 @@
             <span class="menu-label">Dashboards</span>
         </a>
 
-        {{-- <a class="menu-item {{ request()->routeIs('admin.survey.*') ? 'active' : '' }}"
-      href="{{ route('admin.survey.index') }}">
-      <span class="menu-icon"><i class="ri-clipboard-line"></i></span>
-      <span class="menu-label">Hasil Survey Lapangan</span>
-    </a> --}}
+        <a class="menu-item {{ request()->routeIs('admin.survey.*') ? 'active' : '' }}"
+            href="{{ route('admin.survey.index') }}">
+            <span class="menu-icon"><i class="ri-map-2-line" aria-hidden="true"></i></span>
+            <span class="menu-label">Peta Persebaran</span>
+        </a>
 
-        <a class="menu-item {{ nav_active('admin.pemukiman.*') }}" href="{{ route('admin.pemukiman.index') }}">
+        <a class="menu-item"
+            href="">
+            <span class="menu-icon"><i class="ri-file-text-line" aria-hidden="true"></i></span>
+            <span class="menu-label">Dokumen</span>
+        </a>
+
+        {{-- <a class="menu-item {{ nav_active('admin.pemukiman.*') }}" href="{{ route('admin.pemukiman.index') }}">
             <span class="menu-icon"><i class="ri-home-2-line" aria-hidden="true"></i></span>
             <span class="menu-label">Pemukiman Tanpa Listrik</span>
-        </a>
+        </a> --}}
 
-        <a class="menu-item {{ nav_active('admin.gis.*') }}" href="{{ route('admin.gis.index') }}">
+        {{-- <a class="menu-item {{ nav_active('admin.gis.*') }}" href="{{ route('admin.gis.index') }}">
             <span class="menu-icon"><i class="ri-stack-line" aria-hidden="true"></i></span>
             <span class="menu-label">GIS &amp; Layer Management</span>
-        </a>
+        </a> --}}
     </nav>
 
     <!-- separator -->
