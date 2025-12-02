@@ -17,40 +17,56 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
-  /* ====== Gaya “mirip Data Gardu” ====== */
-  .toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px}
-  .toolbar .w-search{width:clamp(230px,38vw,340px)}
-  .input-group{display:flex;align-items:center;background:#FCFCFD;border:1px solid var(--line);border-radius:10px;overflow:hidden;height:36px}
-  .input-group:focus-within{border-color:#CBD5E1;box-shadow:0 0 0 3px rgba(16,185,129,.12)}
-  .input-group-text{display:grid;place-items:center;width:36px;height:100%;color:#94A3B8;background:#F8FAFC;border-right:1px solid var(--line)}
-  .form-control,.form-select{height:36px;border:none;background:transparent;padding:0 10px;font:inherit;color:var(--text);outline:none;width:100%}
-  .btn-ghost{height:32px;padding:0 10px;border:1px solid var(--line);background:#fff;border-radius:8px;cursor:pointer}
-  .btn-ghost:hover{background:#F8FAFC}
+  /* Header / Filter */
+  .card-header{ background:white; border-bottom:1px solid #F1F1F4; padding:8px 20px; }
+  .toolbar{ display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  .w-search{ width:250px; }
+  .input-group{ display:flex; align-items:center; background:#FCFCFC; border:1px solid #DBDFE9; border-radius:6px; overflow:hidden; height:32px; }
+  .input-group-text{ display:flex; align-items:center; justify-content:center; width:32px; height:100%; color:#99A1B7; background:transparent; border:none; padding:0; }
+  .form-control{ height:100%; border:none; background:transparent; padding:0 10px; font-size:11px; color:#78829D; outline:none; width:100%; }
+  .btn-ghost{ height:32px; padding:0 10px; border:1px solid #F1F1F4; background:#fff; border-radius:6px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; font-size:13px; color:#4B5675; transition:.2s; }
+  .btn-ghost:hover{ background:#F8FAFC; }
 
-  .table-shell{border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-1)}
-  table.data{width:100%;border-collapse:separate;border-spacing:0}
-  table.data thead th{background:#FCFCFD;color:#64748B;font-weight:700;padding:12px 18px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
-  table.data tbody td{padding:16px 18px;border-bottom:1px solid var(--line);color:#252F4A;vertical-align:middle}
-  table.data tbody tr:hover{background:#FAFAFA}
+  /* Table */
+  .table-shell{ background:white; overflow:hidden; }
+  table.data{ width:100%; border-collapse:collapse; }
+  table.data thead{ background:#FCFCFC; }
+  table.data thead th{ background:#FCFCFC; color:#4B5675; font-weight:400; font-size:13px; padding:12px 20px; text-align:left; border-bottom:1px solid #F1F1F4; white-space:nowrap; }
+  table.data tbody td{ padding:23px 20px; border-bottom:1px solid #F1F1F4; color:#252F4A; font-size:14px; vertical-align:middle; }
+  table.data tbody tr:last-child td{ border-bottom:none; }
+  table.data tbody tr:hover{ background:#FCFCFC; }
 
-  .col-no{width:70px;text-align:center}
-  .col-user{min-width:260px}
-  .col-aksi{width:130px;text-align:center}
+  .col-no{ width:48px; text-align:center; color:#071437; }
+  .col-user{ min-width:260px; }
+  .col-aksi{ width:120px; text-align:center; vertical-align:middle; }
 
-  .btn-ico{--size:32px;width:var(--size);height:var(--size);display:inline-grid;place-items:center;border:1px solid var(--line);background:#fff;border-radius:8px;cursor:pointer}
-  .btn-ico:hover{background:#F8FAFC}
-  .btn-ico.danger{border-color:#FEE2E2;color:#DC2626}
-  .btn-ico.danger:hover{background:#FFF5F5}
+  .btn-ico{ width:24px; height:24px; display:inline-flex; align-items:center; justify-content:center; border:none; background:transparent; cursor:pointer; transition:transform .2s; padding:0; margin:0 6px; vertical-align:middle; }
+  .btn-ico:hover{ transform:scale(1.1); }
 
-  .table-footer{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:14px 18px;border-top:1px solid var(--line);background:#fff;border-bottom-left-radius:16px;border-bottom-right-radius:16px}
-  .summary{color:var(--text-dim)}
-  .show-wrap{display:inline-flex;align-items:center;gap:8px;color:var(--text-dim)}
-  .show-wrap .form-select{width:92px}
-  .pagination{display:flex;gap:6px;list-style:none;padding:0;margin:0}
-  .page-link{min-width:34px;height:34px;padding:0 10px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);background:#fff;border-radius:8px;text-decoration:none;color:var(--text)}
-  .page-link:hover{background:#F8FAFC}
-  .page-item.active .page-link{background:var(--active-soft);color:#0F5132;border-color:#B7F7CF;font-weight:700}
-  .page-item.disabled .page-link{opacity:.5;pointer-events:none}
+  /* Footer */
+  .table-footer{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px; padding:14px 20px; border-top:1px solid #F1F1F4; background:#fff; }
+  .summary{ color:#4B5675; font-size:13px; white-space:nowrap; }
+  .show-wrap{ display:inline-flex; align-items:center; gap:10px; color:#4B5675; font-size:13px; white-space:nowrap; }
+  .show-wrap .form-select{
+    width:70px; height:30px; background:#FCFCFC; border:1px solid #DBDFE9; border-radius:6px; padding:4px 8px; font-size:11px; color:#252F4A; cursor:pointer; text-align:center;
+    appearance:none; background-image:url("data:image/svg+xml,%3Csvg width='14' height='14' viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3 5L7 9L11 5' stroke='%237c7c7c' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 8px center; background-size:14px; padding-right:30px;
+  }
+
+  .pagination{ display:flex; align-items:center; gap:2px; }
+  .pagination .page-item{ list-style:none; }
+  .pagination .page-link{ width:30px; height:30px; display:flex; align-items:center; justify-content:center; border-radius:6px; font-size:14px; color:#4B5675; text-decoration:none; transition:.2s; border:none; background:transparent; }
+  .pagination .page-link:hover{ background:#F5F5F5; }
+  .pagination .page-item.active .page-link{ background:#F1F1F4; color:#252F4A; font-weight:500; }
+  .pagination .page-item.disabled .page-link{ opacity:.5; cursor:not-allowed; }
+
+  @media (max-width:768px){
+    .toolbar{ flex-direction:column; align-items:stretch; gap:12px; }
+    .w-search{ width:100%; }
+    table.data{ font-size:13px; }
+    table.data thead th, table.data tbody td{ padding:12px 10px; }
+    .col-no{ width:40px; }
+    .table-footer{ flex-direction:column; align-items:flex-start; }
+  }
 </style>
 @endpush
 
@@ -71,13 +87,12 @@
     <div class="card-header">
       <div class="card-title">Daftar User Login</div>
 
-      <!-- Toolbar: Search -->
       <form id="filterForm" class="toolbar" method="GET" action="#">
         <div class="input-group w-search">
           <span class="input-group-text"><i class="ri-search-line"></i></span>
-          <input type="text" id="userSearch" value="{{ request('q') }}" class="form-control" placeholder="Cari nama / email / username / role..." aria-label="Cari user">
+          <input type="text" id="userSearch" value="{{ request('q') }}" class="form-control" placeholder="Cari nama / email / username / role..." aria-label="Cari user" autocomplete="off">
           @if(request('q'))
-            <button type="button" class="btn-ghost" id="btnClearSearch" title="Bersihkan"><i class="ri-close-line"></i></button>
+            <button type="button" class="btn-ghost" id="btnClearSearch" title="Bersihkan"><i class="ri-close-line"></i><span class="d-none d-sm-inline"> Clear</span></button>
           @endif
         </div>
         <button type="button" class="btn-ghost" id="btnReset" title="Reset">
@@ -136,14 +151,13 @@
                 <td>{{ \Carbon\Carbon::parse($value->created_at)->format('d M Y') }}</td>
                 <td class="col-aksi">
                   <a href="#" class="btn-ico" title="Edit" data-bs-toggle="modal" data-bs-target="#kt_modal_{{ $value->id }}"><i class="ri-edit-2-line"></i></a>
-                  <button data-route="{{ route('admin.hak-akses.user.destroy', $value->id) }}" class="btn-ico danger" title="Hapus" onclick="destroyItem(this)"><i class="ri-delete-bin-6-line"></i></button>
+                  <button data-route="{{ route('admin.hak-akses.user.destroy', $value->id) }}" class="btn-ico" title="Hapus" onclick="destroyItem(this)"><i class="ri-delete-bin-6-line"></i></button>
                 </td>
               </tr>
             @endforeach
           </tbody>
         </table>
 
-        <!-- Footer: info + per-page + pagination -->
         <div class="table-footer">
           <div class="summary" id="dt-info-area">Menampilkan 0–0 dari 0 data</div>
 
@@ -158,7 +172,7 @@
           </div>
 
           <nav aria-label="Pagination">
-            <ul class="pagination" id="dt-paging-area"><!-- render via JS --></ul>
+            <ul class="pagination" id="dt-paging-area"></ul>
           </nav>
         </div>
       </div>
@@ -168,20 +182,17 @@
   {{-- MODAL CREATE --}}
   @include('admin.user.create')
 
-  {{-- MODALS EDIT (render di luar tabel) --}}
+  {{-- MODALS EDIT --}}
   @foreach ($data as $value)
     @include('admin.user.component.modal', ['value' => $value])
   @endforeach
 @endsection
 
 @push('scripts')
-<!-- 1) jQuery duluan (tanpa integrity agar tidak diblok) -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<!-- 2) DataTables setelah jQuery -->
 <script src="{{ asset('assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
 
 <script>
-  // ===== Helper form delete =====
   if (typeof window.FormElementHelper === 'undefined') {
     class FormElementHelper {
       constructor(){ this.form=document.createElement('form'); }
@@ -191,7 +202,6 @@
     window.FormElementHelper = FormElementHelper;
   }
 
-  // ===== Modal toggler (open/close) =====
   (function(){
     const openModal = sel => document.querySelector(sel)?.classList.add('show');
     const closeModal = m => m?.classList.remove('show');
@@ -205,27 +215,18 @@
     document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(document.querySelector('.modal.show')); });
   })();
 
-  // ===== DataTables init =====
   jQuery(function($){
     const dt = $("#kt_datatable_dom_positioning").DataTable({
-      language:{
-        lengthMenu:"Show _MENU_",
-        info:"_START_ - _END_ dari _TOTAL_ data",
-        infoEmpty:"Tidak ada data",
-        zeroRecords:"Tidak ada data yang cocok",
-        paginate:{ previous:"‹", next:"›" }
-      },
-      dom:"t",
-      ordering:false,
-      autoWidth:false,
+      language:{ lengthMenu:"Show _MENU_", info:"_START_ - _END_ dari _TOTAL_ data", infoEmpty:"Tidak ada data", zeroRecords:"Tidak ada data yang cocok", paginate:{ previous:"‹", next:"›" } },
+      dom:"t", ordering:false, autoWidth:false,
       pageLength: parseInt(document.getElementById('perPageSelect')?.value || 25, 10),
       columnDefs:[
-        {targets:0, width:'70px', className:'text-center'},
+        {targets:0, width:'48px', className:'text-center'},
         {targets:1, width:'auto'},
         {targets:2, width:'150px'},
         {targets:3, width:'220px'},
         {targets:4, width:'125px'},
-        {targets:5, width:'130px', className:'text-center'}
+        {targets:5, width:'120px', className:'text-center'}
       ]
     });
 
@@ -273,26 +274,14 @@
     searchEl?.addEventListener('input', ()=>{ clearTimeout(t); t=setTimeout(()=> dt.search(searchEl.value).draw(), 300); });
     document.getElementById('btnClearSearch')?.addEventListener('click', ()=>{ if(searchEl){ searchEl.value=''; dt.search('').draw(); } });
     document.getElementById('btnReset')?.addEventListener('click', ()=>{ if(searchEl){ searchEl.value=''; dt.search('').draw(); } });
-
-    // per page
-    document.getElementById('perPageSelect')?.addEventListener('change', e=>{
-      dt.page.len(parseInt(e.target.value||25,10)).draw();
-    });
   });
 
-  // Delete confirm
   window.destroyItem = (e) => {
     const route = e.getAttribute('data-route');
     Swal.fire({
-      title:"Apakah Anda Yakin?",
-      html:"<p>Setelah Data Dihapus maka Anda Tidak Akan Bisa Mengembalikan Data Kembali!</p>",
-      icon:"warning",
-      showCancelButton:true,
-      reverseButtons:true,
-      confirmButtonColor:'#d33',
-      cancelButtonColor:'#3085d6',
-      confirmButtonText:'Hapus!',
-      cancelButtonText:'Batalkan!'
+      title:"Apakah Anda Yakin?", html:"<p>Setelah Data Dihapus maka Anda Tidak Akan Bisa Mengembalikan Data Kembali!</p>",
+      icon:"warning", showCancelButton:true, reverseButtons:true, confirmButtonColor:'#d33', cancelButtonColor:'#3085d6',
+      confirmButtonText:'Hapus!', cancelButtonText:'Batalkan!'
     }).then((res)=>{
       if(res.isConfirmed){
         (new FormElementHelper)

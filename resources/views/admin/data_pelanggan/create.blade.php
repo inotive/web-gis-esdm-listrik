@@ -8,7 +8,7 @@
       </button>
     </div>
 
-    <form id="formPelanggan" action="#" method="POST" onsubmit="event.preventDefault(); this.closest('.modal').classList.remove('show');">
+    <form id="formPelanggan" action="{{ route('admin.pelanggan.store') }}" method="POST">
       @csrf
       <div class="modal-body">
 
