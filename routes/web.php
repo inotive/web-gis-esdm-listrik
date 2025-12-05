@@ -44,23 +44,23 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-   
-        
+
+
         Route::group(['as' => 'hak-akses.', 'prefix' => 'hak-akses'], function () {
         // Role Management
         Route::middleware('can:role.view')->group(function () {
             Route::get('role', [RoleController::class, 'index'])->name('role.index');
             Route::get('role/{role}/permissions', [RoleController::class, 'permissions'])->name('role.permissions');
         });
-        
+
         Route::post('role', [RoleController::class, 'store'])->middleware('can:role.create')->name('role.store');
         Route::put('role/{role}', [RoleController::class, 'update'])->middleware('can:role.edit')->name('role.update');
         Route::delete('role/{role}', [RoleController::class, 'destroy'])->middleware('can:role.delete')->name('role.destroy');
         Route::put('role/{role}/permissions', [RoleController::class, 'updatePermissions'])->middleware('can:role.permission')->name('role.permissions.update');
-        
+
         // Permission Management
         Route::resource('permission', PermissionController::class)->except('show', 'create', 'edit');
-        
+
         // User Management
         Route::middleware('can:user.view')->group(function () {
             Route::resource('user', UserController::class)->except('show');
@@ -118,6 +118,9 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
 
     Route::group(['as' => 'skoring.', 'prefix' => 'skoring-bobot'], function () {
         Route::get('/', [SkoringBobotController::class, 'index'])->name('index');
+        Route::post('/', [SkoringBobotController::class, 'store'])->name('store');
+        Route::put('/{variabel}', [SkoringBobotController::class, 'update'])->name('update');
+        Route::delete('/{variabel}', [SkoringBobotController::class, 'destroy'])->name('destroy');
     });
 
     Route::group(['as' => 'pemukiman.', 'prefix' => 'pemukiman-tanpa-listrik'], function () {
