@@ -37,23 +37,51 @@
   const fmt = (n) => (n===null||n===undefined||isNaN(n)) ? "-" : Number(n).toLocaleString('id-ID');
 
   require([
-    "esri/Map","esri/Basemap","esri/views/MapView","esri/layers/GeoJSONLayer",
-    "esri/widgets/Legend","esri/widgets/Expand","esri/widgets/Home","esri/widgets/Search",
-    "esri/widgets/ScaleBar","esri/widgets/BasemapGallery","esri/widgets/BasemapToggle",
+    "esri/Map",
+    "esri/Basemap",
+    "esri/views/MapView",
+    "esri/layers/GeoJSONLayer",
+    "esri/widgets/Legend",
+    "esri/widgets/Expand",
+    "esri/widgets/Home",
+    "esri/widgets/Search",
+    "esri/widgets/ScaleBar",
+    "esri/widgets/BasemapGallery",
+    "esri/widgets/BasemapToggle",
     "esri/widgets/BasemapGallery/support/LocalBasemapsSource"
-  ], function(Map,Basemap,MapView,GeoJSONLayer,Legend,Expand,Home,Search,ScaleBar,BasemapGallery,BasemapToggle,LocalBasemapsSource){
+  ], function(
+    Map,
+    Basemap,
+    MapView,
+    GeoJSONLayer,
+    Legend,
+    Expand,
+    Home,
+    Search,
+    ScaleBar,
+    BasemapGallery,
+    BasemapToggle,
+    LocalBasemapsSource
+  ){
 
     // ================== MAP & VIEW ==================
-    const map = new Map({ basemap: Basemap.fromId("satellite") });
+    const map = new Map({
+      basemap: Basemap.fromId("satellite")
+    });
 
     const view = new MapView({
       container: "viewDiv",
-      map, center: [117.15, -0.5], zoom: 10,
-      popup: { autoOpenEnabled: false }
+      map: map,
+      center: [117.15, -0.5], // Perkiraan Kaltim
+      zoom: 10,
+      popup: {
+        autoOpenEnabled: false
+      }
     });
 
-    // ================== LAYER ==================
-    // Mulai dengan simbol default; nanti diganti UniqueValueRenderer berdasarkan unit_kerja
+    // ================== LAYERS ==================
+
+    // Layer Aset Tanah
     const asetLayer = new GeoJSONLayer({
       url: "{{ url('/api/aset') }}",
       title: "Aset Tanah Pemerintah",
@@ -63,50 +91,156 @@
         symbol: {
           type: "simple-fill",
           color: [37, 99, 235, 0.45],
-          outline: { color: [29, 78, 216, 1], width: 2 }
+          outline: {
+            color: [29, 78, 216, 1],
+            width: 2
+          }
         }
       }
     });
     map.add(asetLayer);
 
+    // Layer Desa Berlistrik PLN
+    const desaBerlistrikLayer = new GeoJSONLayer({
+      url: "{{ url('/api/data-berlistrik') }}",
+      title: "Desa Berlistrik PLN",
+      outFields: ["*"],
+      popupTemplate: {
+        title: "{NAMOBJ}",
+        content: `
+          <b>Status Listrik:</b> {H_Survei}<br>
+          <b>Kecamatan:</b> {WADMKC}<br>
+          <b>Desa:</b> {WADMKD}<br>
+          <b>Kabupaten:</b> {WADMKK}<br>
+          <b>Provinsi:</b> {WADMPR}
+        `
+      },
+      renderer: {
+        type: "unique-value",
+        field: "H_Survei",
+        defaultLabel: "Status tidak diketahui",
+        defaultSymbol: {
+          type: "simple-fill",
+          color: [148, 163, 184, 0.35],
+          outline: { color: [100, 116, 139, 1], width: 1 }
+        },
+        uniqueValueInfos: [
+          {
+            value: "Belum Terlayani Listrik",
+            label: "Belum Terlayani Listrik",
+            symbol: {
+              type: "simple-fill",
+              color: [220, 38, 38, 0.45], // merah
+              outline: { color: [185, 28, 28, 1], width: 1.5 }
+            }
+          },
+          {
+            value: "Terlayani Listrik",
+            label: "Sudah Terlayani Listrik",
+            symbol: {
+              type: "simple-fill",
+              color: [34, 197, 94, 0.45], // hijau
+              outline: { color: [22, 163, 74, 1], width: 1.5 }
+            }
+          }
+        ]
+      }
+    });
+    map.add(desaBerlistrikLayer);
+
     // ================== WIDGETS ==================
-    const bm_osm=Basemap.fromId("osm"); bm_osm.title="Peta (OSM)";
-    const bm_sat=Basemap.fromId("satellite"); bm_sat.title="Satelit";
-    const bm_hybrid=Basemap.fromId("hybrid"); bm_hybrid.title="Hybrid";
-    const bm_terrain=Basemap.fromId("terrain"); bm_terrain.title="Medan";
-    const bm_topo=Basemap.fromId("topo-vector"); bm_topo.title="Topografi";
-    const bm_gray=Basemap.fromId("gray-vector"); bm_gray.title="Abu-abu";
-    const bm_dark=Basemap.fromId("dark-gray-vector"); bm_dark.title="Gelap";
-    const bm_street=Basemap.fromId("streets-vector"); bm_street.title="Streets";
-    const localSource = new LocalBasemapsSource({ basemaps:[bm_osm,bm_sat,bm_hybrid,bm_terrain,bm_topo,bm_gray,bm_dark,bm_street] });
 
-    view.ui.add(new Home({view}), "top-left");
-    view.ui.add(new Search({view, allPlaceholder:"Cari lokasi atau aset"}), "top-right");
-    view.ui.add(new ScaleBar({view, unit:"metric"}), "bottom-left");
+    // Basemaps lokal
+    const bm_osm     = Basemap.fromId("osm");          bm_osm.title     = "Peta (OSM)";
+    const bm_sat     = Basemap.fromId("satellite");    bm_sat.title     = "Satelit";
+    const bm_hybrid  = Basemap.fromId("hybrid");       bm_hybrid.title  = "Hybrid";
+    const bm_terrain = Basemap.fromId("terrain");      bm_terrain.title = "Medan";
+    const bm_topo    = Basemap.fromId("topo-vector");  bm_topo.title    = "Topografi";
+    const bm_gray    = Basemap.fromId("gray-vector");  bm_gray.title    = "Abu-abu";
+    const bm_dark    = Basemap.fromId("dark-gray-vector"); bm_dark.title = "Gelap";
+    const bm_street  = Basemap.fromId("streets-vector");   bm_street.title = "Streets";
 
+    const localSource = new LocalBasemapsSource({
+      basemaps: [
+        bm_osm,
+        bm_sat,
+        bm_hybrid,
+        bm_terrain,
+        bm_topo,
+        bm_gray,
+        bm_dark,
+        bm_street
+      ]
+    });
+
+    // Home
+    const homeWidget = new Home({ view: view });
+    view.ui.add(homeWidget, "top-left");
+
+    // Search
+    const searchWidget = new Search({
+      view: view,
+      allPlaceholder: "Cari lokasi atau aset"
+    });
+    view.ui.add(searchWidget, "top-right");
+
+    // ScaleBar
+    const scaleBar = new ScaleBar({
+      view: view,
+      unit: "metric"
+    });
+    view.ui.add(scaleBar, "bottom-left");
+
+    // Legend (dua layer: aset + desa berlistrik)
     const legendExpand = new Expand({
-      view, content: new Legend({view, layerInfos:[{layer: asetLayer, title:"Aset Tanah Pemerintah"}]}),
-      expanded:false, expandIconClass:"esri-icon-layer-list", expandTooltip:"Legenda"
+      view: view,
+      content: new Legend({
+        view: view,
+        layerInfos: [
+          { layer: asetLayer,           title: "Aset Tanah Pemerintah" },
+          { layer: desaBerlistrikLayer, title: "Desa Berlistrik PLN" }
+        ]
+      }),
+      expanded: false,
+      expandIconClass: "esri-icon-layer-list",
+      expandTooltip: "Legenda"
     });
     view.ui.add(legendExpand, "bottom-right");
 
-    const bgExpand = new Expand({
-      view, content: new BasemapGallery({view, source: localSource}),
-      expanded:false, expandIconClass:"esri-icon-basemap", expandTooltip:"Ganti basemap"
+    // Basemap Gallery
+    const basemapGalleryExpand = new Expand({
+      view: view,
+      content: new BasemapGallery({
+        view: view,
+        source: localSource
+      }),
+      expanded: false,
+      expandIconClass: "esri-icon-basemap",
+      expandTooltip: "Ganti basemap"
     });
-    view.ui.add(bgExpand, "bottom-right");
+    view.ui.add(basemapGalleryExpand, "bottom-right");
 
-    view.ui.add(new BasemapToggle({view, nextBasemap: bm_osm}), "bottom-right");
+    // Basemap Toggle
+    const basemapToggle = new BasemapToggle({
+      view: view,
+      nextBasemap: bm_osm
+    });
+    view.ui.add(basemapToggle, "bottom-right");
 
-    // ================== DETAIL PANEL ==================
+    // ================== DETAIL PANEL (UNTUK ASET) ==================
+
     const panel = $('detailPanel');
-    $('dpClose').addEventListener('click', ()=> panel.classList.remove('show'));
-    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') panel.classList.remove('show'); });
+    $('dpClose').addEventListener('click', () => panel.classList.remove('show'));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') panel.classList.remove('show');
+    });
 
-    const setText = (id,val)=>{ $(id).textContent = (val && String(val).trim()!=='') ? val : '-'; };
+    const setText = (id, val) => {
+      $(id).textContent = (val && String(val).trim() !== '') ? val : '-';
+    };
 
     function openPanel(attrs){
-      setText('dpUnitKerja', attrs.unit_kerja || '-');           // << tambahan UNIT KERJA
+      setText('dpUnitKerja', attrs.unit_kerja || '-');
       setText('dpNama', attrs.nama_asset || '-');
       setText('dpLuas', fmt(attrs.luas_m2 || 0));
       setText('dpKelurahan', attrs.kelurahan || attrs.village || '-');
@@ -114,36 +248,58 @@
       setText('dpKabupaten', attrs.kabupaten || attrs.regency || '-');
       setText('dpProvinsi', attrs.provinsi || attrs.province || '-');
       setText('dpAlamat', attrs.alamat || '-');
+
       const link = attrs.sertifikat_url || attrs.link_sertif || attrs.file_url || null;
-      $('dpSertifikat').innerHTML = link ? `<a class="dp-link" target="_blank" href="${link}">Lihat ⦿</a>` : '-';
+      $('dpSertifikat').innerHTML = link
+        ? `<a class="dp-link" target="_blank" href="${link}">Lihat ⦿</a>`
+        : '-';
+
       panel.classList.add('show');
     }
 
-    // Highlight + pointer
-    let layerView, highlightHandle=null;
-    view.whenLayerView(asetLayer).then(lv => { layerView = lv; });
+    // Highlight + pointer HANYA untuk asetLayer
+    let layerView, highlightHandle = null;
+    view.whenLayerView(asetLayer).then(function(lv) {
+      layerView = lv;
+    });
 
     view.on("pointer-move", function(evt){
-      view.hitTest(evt, { include: [asetLayer] }).then((res)=>{
-        const hit = res.results.some(r => r.graphic && r.graphic.layer === asetLayer);
+      view.hitTest(evt, { include: [asetLayer] }).then(function(res){
+        const hit = res.results.some(function(r){
+          return r.graphic && r.graphic.layer === asetLayer;
+        });
         view.container.style.cursor = hit ? "pointer" : "default";
       });
     });
 
     view.on("click", function(event){
       view.hitTest(event, { include: [asetLayer] }).then(function(response){
-        const r = response.results.find(x => x.graphic && x.graphic.layer === asetLayer);
-        if (!r || !r.graphic) { panel.classList.remove('show'); if(highlightHandle){highlightHandle.remove();highlightHandle=null;} return; }
+        const r = response.results.find(function(x){
+          return x.graphic && x.graphic.layer === asetLayer;
+        });
+
+        if (!r || !r.graphic) {
+          panel.classList.remove('show');
+          if (highlightHandle) {
+            highlightHandle.remove();
+            highlightHandle = null;
+          }
+          return;
+        }
+
         if (layerView) {
-          if (highlightHandle) { highlightHandle.remove(); }
+          if (highlightHandle) {
+            highlightHandle.remove();
+          }
           highlightHandle = layerView.highlight(r.graphic);
         }
+
         openPanel(r.graphic.attributes || {});
       });
     });
 
-    // ================== GROUPING BY UNIT_KERJA ==================
-    // Buat renderer unik per "unit_kerja" dengan palet warna
+    // ================== GROUPING BY UNIT_KERJA (ASET) ==================
+
     asetLayer.when(async () => {
       try {
         const q = asetLayer.createQuery();
@@ -152,14 +308,16 @@
         q.returnGeometry = false;
 
         const res = await asetLayer.queryFeatures(q);
+
         const values = Array.from(
           new Set(
-            res.features
-              .map(f => (f.attributes.unit_kerja ? String(f.attributes.unit_kerja).trim() : "-"))
+            res.features.map(f =>
+              f.attributes.unit_kerja ? String(f.attributes.unit_kerja).trim() : "-"
+            )
           )
-        ).sort((a,b)=>a.localeCompare(b,'id'));
+        ).sort((a, b) => a.localeCompare(b, 'id'));
 
-        // Palet warna (RGB)
+        // Palet warna untuk unit kerja
         const palette = [
           [59,130,246], [16,185,129], [245,158,11], [236,72,153],
           [99,102,241], [34,197,94],  [249,115,22], [139,92,246],
@@ -175,7 +333,10 @@
             symbol: {
               type: "simple-fill",
               color: [rgb[0], rgb[1], rgb[2], 0.45],
-              outline: { color: [rgb[0], rgb[1], rgb[2], 1], width: 1.5 }
+              outline: {
+                color: [rgb[0], rgb[1], rgb[2], 1],
+                width: 1.5
+              }
             }
           };
         });
@@ -186,14 +347,11 @@
           defaultLabel: "Tanpa Unit Kerja",
           defaultSymbol: {
             type: "simple-fill",
-            color: [148, 163, 184, 0.35], // slate-400 transparan
+            color: [148, 163, 184, 0.35],
             outline: { color: [100, 116, 139, 1], width: 1.2 }
           },
-          uniqueValueInfos
+          uniqueValueInfos: uniqueValueInfos
         };
-
-        // Perbarui legend jika sebelumnya belum terbuka
-        // (Legend akan mengikuti renderer baru secara otomatis)
       } catch (err) {
         console.error("Gagal membuat renderer unik unit_kerja:", err);
       }
