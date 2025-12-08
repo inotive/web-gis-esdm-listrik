@@ -70,6 +70,11 @@
             <span class="menu-label">Data Wilayah</span>
         </a>
 
+        <a class="menu-item {{ nav_active('admin.desa.*') }}" href="{{ route('admin.desa.index') }}">
+            <span class="menu-icon"><i class="ri-home-3-line" aria-hidden="true"></i></span>
+            <span class="menu-label">Data Desa</span>
+        </a>
+
         <a class="menu-item {{ nav_active('admin.pelanggan.*') }}" href="{{ route('admin.pelanggan.index') }}">
             <span class="menu-icon"><i class="ri-team-line" aria-hidden="true"></i></span>
             <span class="menu-label">Data Pelanggan</span>

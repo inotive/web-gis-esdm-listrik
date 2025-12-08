@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\JalanAksesController;
 use App\Http\Controllers\Admin\SkoringBobotController;
 use App\Http\Controllers\Admin\PemukimanTanpaListrikController;
 use App\Http\Controllers\Admin\GisController;
+use App\Http\Controllers\Admin\DesaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -86,6 +87,19 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
         Route::post('/', [PelangganController::class, 'store'])->name('store');
         Route::put('/{pelanggan}', [PelangganController::class, 'update'])->name('update');
         Route::delete('/{pelanggan}', [PelangganController::class, 'destroy'])->name('destroy');
+    });
+
+    // Data Desa
+    Route::group(['middleware' => [], 'as' => 'desa.', 'prefix' => 'desa'], function () {
+        Route::get('/', [DesaController::class, 'index'])->name('index');
+        Route::post('/', [DesaController::class, 'store'])->name('store');
+        Route::get('/{desa}/edit', [DesaController::class, 'edit'])->name('edit');
+        Route::put('/{desa}', [DesaController::class, 'update'])->name('update');
+        Route::delete('/{desa}', [DesaController::class, 'destroy'])->name('destroy');
+
+        // Endpoints opsi untuk dropdown berjenjang
+        Route::get('/options/regencies', [DesaController::class, 'optionsRegencies'])->name('options.regencies');
+        Route::get('/options/districts', [DesaController::class, 'optionsDistricts'])->name('options.districts');
     });
 
     // routes/web.php
