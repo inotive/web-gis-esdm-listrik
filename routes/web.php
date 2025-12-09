@@ -25,6 +25,7 @@ use App\Http\Controllers\Admin\PemukimanTanpaListrikController;
 use App\Http\Controllers\Admin\GisController;
 use App\Http\Controllers\Admin\DesaController;
 use App\Http\Controllers\Admin\PerusahaanController;
+use App\Http\Controllers\Admin\PermohonanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -170,6 +171,16 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
 
     Route::group(['as' => 'survey.', 'prefix' => 'hasil-survei-lapangan'], function () {
         Route::get('/', [SurveyLapanganController::class, 'index'])->name('index');
+    });
+
+    // Permohonan
+    Route::group(['as' => 'permohonan.', 'prefix' => 'permohonan'], function () {
+        Route::get('/', [PermohonanController::class, 'index'])->name('index');
+        Route::get('/create', [PermohonanController::class, 'create'])->name('create');
+        Route::post('/', [PermohonanController::class, 'store'])->name('store');
+        Route::get('/{permohonan}/edit', [PermohonanController::class, 'edit'])->name('edit');
+        Route::put('/{permohonan}', [PermohonanController::class, 'update'])->name('update');
+        Route::delete('/{permohonan}', [PermohonanController::class, 'destroy'])->name('destroy');
     });
 });
 

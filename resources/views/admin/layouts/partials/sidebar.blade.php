@@ -111,6 +111,11 @@
             <span class="menu-label">Variabel Skoring &amp; Bobot</span>
         </a>
 
+        <a class="menu-item {{ nav_active('admin.permohonan.*') }}" href="{{ route('admin.permohonan.index') }}">
+            <span class="menu-icon"><i class="ri-file-list-3-line" aria-hidden="true"></i></span>
+            <span class="menu-label">Manajemen Permohonan</span>
+        </a>
+
         <a class="menu-item {{ nav_active('admin.hak-akses.user.*', 'admin.hak-akses.role.*', 'admin.hak-akses.permission.*') }}"
             href="{{ route('admin.hak-akses.user.index') }}">
             <span class="menu-icon"><i class="ri-user-settings-line" aria-hidden="true"></i></span>
