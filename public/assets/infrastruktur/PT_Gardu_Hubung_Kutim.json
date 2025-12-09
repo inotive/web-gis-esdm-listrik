@@ -1,0 +1,18 @@
+{"type":"FeatureCollection", "features": [
+{"type":"Feature","geometry":{"type":"Point","coordinates":[117.56104293900012,0.7561859360000653]},"properties":{"NAMA":"SEPASO INC SDI.02","GlobalID":"{895EAD1F-3909-4C27-A610-47DC52F249C3}","ORIG_FID":0}},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[117.56107009400012,0.7562139550000211]},"properties":{"NAMA":"SEPASO OG SEPASO 1","GlobalID":"{7C035200-6DDF-4D03-A094-75FBDA431132}","ORIG_FID":1}},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[117.56105013100012,0.7561691710000673]},"properties":{"NAMA":"SEPASO OG SEPASO 2","GlobalID":"{90BC30EE-E990-4193-8C8F-C97199FA382A}","ORIG_FID":2}},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[117.53882500000009,0.4912890000000516]},"properties":{"NAMA":"APT INC COUPLE APT 1","GlobalID":"{E7E5DF34-AC86-44BD-962D-85D76C08B58B}","ORIG_FID":3}},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[117.53882500000009,0.4912890000000516]},"properties":{"NAMA":"APT INC COUPLE APT 2","GlobalID":"{EAE76875-9CD4-4A57-ABC5-667BDFFCE4E2}","ORIG_FID":4}},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[117.53853300000003,0.49155000000007476]},"properties":{"NAMA":"APT OG APT 1","GlobalID":"{E7E17ED1-4890-42F7-B9A2-56BC206C9481}","ORIG_FID":5}},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[117.53853300000003,0.49155000000007476]},"properties":{"NAMA":"APT OG APT 2","GlobalID":"{F20C3CFB-D4C2-49D3-A514-88B648AD9E67}","ORIG_FID":6}},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[117.53853300000003,0.49155000000007476]},"properties":{"NAMA":"APT OG APT 4","GlobalID":"{DEC5A78C-DB81-4E63-A51E-2853A2CDD851}","ORIG_FID":7}},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[117.53853300000003,0.49155000000007476]},"properties":{"NAMA":"APT OG APT 3","GlobalID":"{7846D05F-3D22-4A13-BB89-97283C30188E}","ORIG_FID":8}},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[117.52643950200002,0.5321922360000713]},"properties":{"NAMA":"SANGATTA INC COUPLER TO STA.02","GlobalID":"{3769434E-6B22-4278-9B58-E94AAB4566BC}","ORIG_FID":9}},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[117.52650101400002,0.5321924570000647]},"properties":{"NAMA":"SANGATTA INC STA.02","GlobalID":"{67D71085-1A98-40E2-A579-AC5E212399FD}","ORIG_FID":10}},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[117.52627931000006,0.5321769510000536]},"properties":{"NAMA":"SANGATTA INC SDI 1","GlobalID":"{667ADFEA-2476-4430-A95F-E626EDEB9283}","ORIG_FID":11}},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[117.52612667500011,0.5322284500000478]},"properties":{"NAMA":"SANGATTA OG KABO","GlobalID":"{8DD9D72A-999B-485E-8FA0-EC5177BC4D9A}","ORIG_FID":12}},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[117.52635996400011,0.5322352710000473]},"properties":{"NAMA":"SANGATTA OG TANGO DELTA","GlobalID":"{12AF9463-F563-4ECC-997E-00EF58A633DD}","ORIG_FID":13}},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[117.52659572400012,0.5321588740000607]},"properties":{"NAMA":"SANGATTA OG RANTAU PULUNG","GlobalID":"{99CE323B-2022-4CE7-A28D-0703BF17B936}","ORIG_FID":14}},
+{"type":"Feature","geometry":{"type":"Point","coordinates":[117.52665900000011,0.5322270000000344]},"properties":{"NAMA":"SANGATTA OG COUPLER TO STA.02","GlobalID":"{FB45F20A-3610-48F1-A612-3E637ABC3D0D}","ORIG_FID":15}}
+]}
