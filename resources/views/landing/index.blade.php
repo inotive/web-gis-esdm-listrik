@@ -31,7 +31,6 @@
 @endsection
 
 @push('scripts')
-{{-- pastikan tidak double include kalau sudah di layout --}}
 <script>window.dojoConfig = { async: true };</script>
 <script src="https://js.arcgis.com/4.29/"></script>
 
@@ -76,7 +75,7 @@
     const view = new MapView({
       container: "viewDiv",
       map: map,
-      center: [117.15, -0.5], // Perkiraan Kaltim
+      center: [117.15, -0.5],
       zoom: 10,
       popup: {
         autoOpenEnabled: false
@@ -85,7 +84,7 @@
 
     // ================== LAYERS ==================
 
-    // Layer Aset Tanah
+    // Aset Tanah
     const asetLayer = new GeoJSONLayer({
       url: "{{ url('/api/aset') }}",
       title: "Aset Tanah Pemerintah",
@@ -95,16 +94,13 @@
         symbol: {
           type: "simple-fill",
           color: [37, 99, 235, 0.45],
-          outline: {
-            color: [29, 78, 216, 1],
-            width: 2
-          }
+          outline: { color: [29, 78, 216, 1], width: 2 }
         }
       }
     });
     map.add(asetLayer);
 
-    // Layer Desa Berlistrik PLN
+    // Desa Berlistrik PLN
     const desaBerlistrikLayer = new GeoJSONLayer({
       url: "{{ url('/api/data-berlistrik') }}",
       title: "Desa Berlistrik PLN",
@@ -134,7 +130,7 @@
             label: "Belum Terlayani Listrik",
             symbol: {
               type: "simple-fill",
-              color: [220, 38, 38, 0.45], // merah
+              color: [220, 38, 38, 0.45],
               outline: { color: [185, 28, 28, 1], width: 1.5 }
             }
           },
@@ -143,7 +139,7 @@
             label: "Sudah Terlayani Listrik",
             symbol: {
               type: "simple-fill",
-              color: [34, 197, 94, 0.45], // hijau
+              color: [34, 197, 94, 0.45],
               outline: { color: [22, 163, 74, 1], width: 1.5 }
             }
           }
@@ -152,7 +148,7 @@
     });
     map.add(desaBerlistrikLayer);
 
-    // 🔹 Layer Jalan Nasional (dari DB via API)
+    // Jalan Nasional
     const jalanNasionalLayer = new GeoJSONLayer({
       url: "{{ url('/api/data-jalan-nasional') }}",
       title: "Jalan Nasional",
@@ -176,9 +172,64 @@
     });
     map.add(jalanNasionalLayer);
 
-    // ================== WIDGETS ==================
+    // Jalan Provinsi
+    const jalanProvinsiLayer = new GeoJSONLayer({
+      url: "{{ url('/api/data-jalan-provinsi') }}",
+      title: "Jalan Provinsi",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-line",
+          color: [0, 255, 255, 1], // cyan / toska
+          width: 2.5
+        }
+      },
+      popupTemplate: {
+        title: "{Nm_Ruas}",
+        content: `
+          <b>Status:</b> {Status}<br>
+          <b>Fungsi:</b> {Fungsi}<br>
+          <b>Tahun Data:</b> {Thn_Data}<br>
+          <b>Provinsi:</b> {Propinsi}<br>
+          <b>Kab/Kota:</b> {Kab_Kot}<br>
+          <b>Kecamatan:</b> {Kecamatan}<br>
+          <b>Desa/Kel:</b> {Desa_Kel}<br>
+          <b>Panjang (km):</b> {Panjang}<br>
+          <b>Status Pembangunan:</b> {Status_J_1}
+        `
+      }
+    });
+    map.add(jalanProvinsiLayer);
 
-    // Basemaps lokal
+    // 🔹 Jaringan Listrik Balikpapan (SUTM)
+    const jaringanListrikBalikpapanLayer = new GeoJSONLayer({
+      url: "{{ url('/api/jaringan-listrik-balikpapan') }}",
+      title: "Jaringan Listrik Balikpapan (SUTM)",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-line",
+          color: [0, 255, 0, 1], // hijau terang biar beda
+          width: 2
+        }
+      },
+      popupTemplate: {
+        title: "{NAMOBJ}",
+        content: `
+          <b>Nama Objek:</b> {NAMOBJ}<br>
+          <b>Kab/Kota:</b> {WADMKK}<br>
+          <b>Provinsi:</b> {WADMPR}<br>
+          <b>Sumber Data:</b> {SBDATA}<br>
+          <b>Panjang (km):</b> {Length}<br>
+          <b>Keterangan:</b> {REMARK}
+        `
+      }
+    });
+    map.add(jaringanListrikBalikpapanLayer);
+
+    // ================== WIDGETS ==================
     const bm_osm     = Basemap.fromId("osm");          bm_osm.title     = "Peta (OSM)";
     const bm_sat     = Basemap.fromId("satellite");    bm_sat.title     = "Satelit";
     const bm_hybrid  = Basemap.fromId("hybrid");       bm_hybrid.title  = "Hybrid";
@@ -189,45 +240,34 @@
     const bm_street  = Basemap.fromId("streets-vector");   bm_street.title = "Streets";
 
     const localSource = new LocalBasemapsSource({
-      basemaps: [
-        bm_osm,
-        bm_sat,
-        bm_hybrid,
-        bm_terrain,
-        bm_topo,
-        bm_gray,
-        bm_dark,
-        bm_street
-      ]
+      basemaps: [bm_osm, bm_sat, bm_hybrid, bm_terrain, bm_topo, bm_gray, bm_dark, bm_street]
     });
 
-    // Home
     const homeWidget = new Home({ view: view });
     view.ui.add(homeWidget, "top-left");
 
-    // Search
     const searchWidget = new Search({
       view: view,
       allPlaceholder: "Cari lokasi atau aset"
     });
     view.ui.add(searchWidget, "top-right");
 
-    // ScaleBar
     const scaleBar = new ScaleBar({
       view: view,
       unit: "metric"
     });
     view.ui.add(scaleBar, "bottom-left");
 
-    // Legend (Aset + Desa Berlistrik + Jalan Nasional)
     const legendExpand = new Expand({
       view: view,
       content: new Legend({
         view: view,
         layerInfos: [
-          { layer: asetLayer,           title: "Aset Tanah Pemerintah" },
-          { layer: desaBerlistrikLayer, title: "Desa Berlistrik PLN" },
-          { layer: jalanNasionalLayer,  title: "Jalan Nasional" }
+          { layer: asetLayer,                  title: "Aset Tanah Pemerintah" },
+          { layer: desaBerlistrikLayer,        title: "Desa Berlistrik PLN" },
+          { layer: jalanNasionalLayer,         title: "Jalan Nasional" },
+          { layer: jalanProvinsiLayer,         title: "Jalan Provinsi" },
+          { layer: jaringanListrikBalikpapanLayer, title: "Jaringan Listrik Balikpapan (SUTM)" }
         ]
       }),
       expanded: false,
@@ -236,7 +276,6 @@
     });
     view.ui.add(legendExpand, "bottom-right");
 
-    // Basemap Gallery
     const basemapGalleryExpand = new Expand({
       view: view,
       content: new BasemapGallery({
@@ -249,15 +288,13 @@
     });
     view.ui.add(basemapGalleryExpand, "bottom-right");
 
-    // Basemap Toggle
     const basemapToggle = new BasemapToggle({
       view: view,
       nextBasemap: bm_osm
     });
     view.ui.add(basemapToggle, "bottom-right");
 
-    // ================== DETAIL PANEL (UNTUK ASET) ==================
-
+    // ================== DETAIL PANEL (ASET) ==================
     const panel = $('detailPanel');
     $('dpClose').addEventListener('click', () => panel.classList.remove('show'));
     document.addEventListener('keydown', (e) => {
@@ -286,7 +323,6 @@
       panel.classList.add('show');
     }
 
-    // Highlight + pointer HANYA untuk asetLayer
     let layerView, highlightHandle = null;
     view.whenLayerView(asetLayer).then(function(lv) {
       layerView = lv;
@@ -327,8 +363,7 @@
       });
     });
 
-    // ================== GROUPING BY UNIT_KERJA (ASET) ==================
-
+    // Grouping by unit_kerja
     asetLayer.when(async () => {
       try {
         const q = asetLayer.createQuery();
@@ -346,7 +381,6 @@
           )
         ).sort((a, b) => a.localeCompare(b, 'id'));
 
-        // Palet warna untuk unit kerja
         const palette = [
           [59,130,246], [16,185,129], [245,158,11], [236,72,153],
           [99,102,241], [34,197,94],  [249,115,22], [139,92,246],
@@ -362,10 +396,7 @@
             symbol: {
               type: "simple-fill",
               color: [rgb[0], rgb[1], rgb[2], 0.45],
-              outline: {
-                color: [rgb[0], rgb[1], rgb[2], 1],
-                width: 1.5
-              }
+              outline: { color: [rgb[0], rgb[1], rgb[2], 1], width: 1.5 }
             }
           };
         });

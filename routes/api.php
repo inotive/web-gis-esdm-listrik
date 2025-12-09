@@ -5,12 +5,20 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AssetController;
 use App\Http\Controllers\Api\DataBerlistrikController;
 use App\Http\Controllers\Api\DatajalannasionalController;
+use App\Http\Controllers\Api\DatajalanprovinsiController;
+use App\Http\Controllers\Api\JaringanlistrikbalikpapanController;
 
 Route::get('/aset', [AssetController::class, 'index']);
 Route::get('/data-berlistrik', [DataBerlistrikController::class, 'index']);
 
-// 🔹 Endpoint baru jalan nasional
+// Jalan nasional
 Route::get('/data-jalan-nasional', [DatajalannasionalController::class, 'index']);
+
+// Jalan provinsi
+Route::get('/data-jalan-provinsi', [DatajalanprovinsiController::class, 'index']);
+
+// 🔹 Jaringan listrik Balikpapan (SUTM)
+Route::get('/jaringan-listrik-balikpapan', [JaringanlistrikbalikpapanController::class, 'index']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
