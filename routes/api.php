@@ -7,18 +7,18 @@ use App\Http\Controllers\Api\DataBerlistrikController;
 use App\Http\Controllers\Api\DatajalannasionalController;
 use App\Http\Controllers\Api\DatajalanprovinsiController;
 use App\Http\Controllers\Api\JaringanlistrikbalikpapanController;
+use App\Http\Controllers\Api\JaringanlistrikbontangController;
 
 Route::get('/aset', [AssetController::class, 'index']);
 Route::get('/data-berlistrik', [DataBerlistrikController::class, 'index']);
 
-// Jalan nasional
 Route::get('/data-jalan-nasional', [DatajalannasionalController::class, 'index']);
-
-// Jalan provinsi
 Route::get('/data-jalan-provinsi', [DatajalanprovinsiController::class, 'index']);
 
-// 🔹 Jaringan listrik Balikpapan (SUTM)
 Route::get('/jaringan-listrik-balikpapan', [JaringanlistrikbalikpapanController::class, 'index']);
+
+// 🔹 endpoint baru: rencana jaringan listrik Bontang
+Route::get('/jaringan-listrik-bontang', [JaringanlistrikbontangController::class, 'index']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
