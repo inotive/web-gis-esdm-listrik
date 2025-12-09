@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\GisController;
 use App\Http\Controllers\Admin\DesaController;
 use App\Http\Controllers\Admin\PerusahaanController;
 use App\Http\Controllers\Admin\PermohonanController;
+use App\Http\Controllers\Admin\DokumenController;
 
 /*
 |--------------------------------------------------------------------------
@@ -181,6 +182,16 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
         Route::get('/{permohonan}/edit', [PermohonanController::class, 'edit'])->name('edit');
         Route::put('/{permohonan}', [PermohonanController::class, 'update'])->name('update');
         Route::delete('/{permohonan}', [PermohonanController::class, 'destroy'])->name('destroy');
+    });
+
+    // Dokumen
+    Route::group(['as' => 'dokumen.', 'prefix' => 'dokumen'], function () {
+        Route::get('/', [DokumenController::class, 'index'])->name('index');
+        Route::post('/folder', [DokumenController::class, 'storeFolder'])->name('folder.store');
+        Route::post('/file', [DokumenController::class, 'storeFiles'])->name('file.store');
+        Route::put('/{dokumen}', [DokumenController::class, 'update'])->name('update');
+        Route::delete('/{dokumen}', [DokumenController::class, 'destroy'])->name('destroy');
+        Route::get('/{dokumen}/download', [DokumenController::class, 'download'])->name('download');
     });
 });
 
