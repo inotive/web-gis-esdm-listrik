@@ -75,6 +75,11 @@
             <span class="menu-label">Data Desa</span>
         </a>
 
+        <a class="menu-item {{ nav_active('admin.perusahaan.*') }}" href="{{ route('admin.perusahaan.index') }}">
+            <span class="menu-icon"><i class="ri-building-line" aria-hidden="true"></i></span>
+            <span class="menu-label">Data Perusahaan</span>
+        </a>
+
         <a class="menu-item {{ nav_active('admin.pelanggan.*') }}" href="{{ route('admin.pelanggan.index') }}">
             <span class="menu-icon"><i class="ri-team-line" aria-hidden="true"></i></span>
             <span class="menu-label">Data Pelanggan</span>

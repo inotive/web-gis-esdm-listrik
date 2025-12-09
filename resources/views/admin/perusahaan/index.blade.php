@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Dashboard ESDM - Data Desa')
+@section('title', 'Dashboard ESDM - Data Perusahaan')
 
 @push('styles')
 <style>
@@ -149,16 +149,16 @@
     overflow: hidden;
   }
 
-  .table-desa{
+  .table-perusahaan{
     width: 100%;
     border-collapse: collapse;
   }
 
-  .table-desa thead {
+  .table-perusahaan thead {
     background: #FCFCFC;
   }
 
-  .table-desa thead th{
+  .table-perusahaan thead th{
     background: #FCFCFC;
     color: #4B5675;
     font-weight: 400;
@@ -170,15 +170,15 @@
     border-radius: 0;
   }
 
-  .table-desa thead th:first-child {
+  .table-perusahaan thead th:first-child {
     border-top-left-radius: 0;
   }
 
-  .table-desa thead th:last-child {
+  .table-perusahaan thead th:last-child {
     border-top-right-radius: 0;
   }
 
-  .table-desa tbody td{
+  .table-perusahaan tbody td{
     padding: 23px 20px;
     border-bottom: 1px solid #F1F1F4;
     color: #252F4A;
@@ -186,11 +186,11 @@
     vertical-align: middle;
   }
 
-  .table-desa tbody tr:last-child td {
+  .table-perusahaan tbody tr:last-child td {
     border-bottom: none;
   }
 
-  .table-desa tbody tr:hover{
+  .table-perusahaan tbody tr:hover{
     background: #FCFCFC;
   }
 
@@ -386,12 +386,12 @@
     }
 
     /* Table */
-    .table-desa {
+    .table-perusahaan {
       font-size: 13px;
     }
 
-    .table-desa thead th,
-    .table-desa tbody td {
+    .table-perusahaan thead th,
+    .table-perusahaan tbody td {
       padding: 12px 10px;
     }
 
@@ -424,7 +424,7 @@
   <div class="page-head">
     <div>
       <div class="page-meta">{{ now()->translatedFormat('l, d F Y') }}</div>
-      <div class="page-title">Data Desa</div>
+      <div class="page-title">Data Perusahaan</div>
     </div>
     <div class="page-actions">
       <div class="date-pill">
@@ -432,24 +432,24 @@
         <span>{{ now()->translatedFormat('F Y') }}</span>
       </div>
 
-      @include('admin.desa.create') {{-- modal create --}}
-      @include('admin.desa.edit_modal') {{-- modal edit --}}
+      @include('admin.perusahaan.create') {{-- modal create --}}
+      @include('admin.perusahaan.edit_modal') {{-- modal edit --}}
 
       <button class="btn btn-primary btn-add">
         <i class="ri-add-line"></i>
-        Tambah Data Desa
+        Tambah Data Perusahaan
       </button>
     </div>
   </div>
 
   <section class="card" style="margin-top:18px;">
     <div class="card-header">
-      <form id="filterForm" class="toolbar" method="GET" action="{{ route('admin.desa.index') }}">
-        {{-- Search Nama Desa --}}
+      <form id="filterForm" class="toolbar" method="GET" action="{{ route('admin.perusahaan.index') }}">
+        {{-- Search Nama Perusahaan --}}
         <div class="input-group w-search">
           <span class="input-group-text"><i class="ri-search-line"></i></span>
           <input type="text" name="q" value="{{ request('q') }}" class="form-control"
-                 placeholder="Cari Nama Desa" autocomplete="off">
+                 placeholder="Cari Nama Perusahaan" autocomplete="off">
         </div>
 
         {{-- Filter Berdasarkan --}}
@@ -478,38 +478,44 @@
 
     <div class="card-body" style="padding:0;">
       <div class="table-responsive table-shell">
-        <table class="table-desa">
+        <table class="table-perusahaan">
           <thead>
             <tr>
               <th class="col-no">No</th>
-              <th>Nama Desa</th>
+              <th>Nama Perusahaan</th>
+              <th>Alamat</th>
+              <th>Desa</th>
               <th>Kecamatan</th>
               <th>Kabupaten/Kota</th>
               <th class="col-aksi">Aksi</th>
             </tr>
           </thead>
           <tbody>
-            @forelse ($desas as $i => $desa)
+            @forelse ($perusahaans as $i => $perusahaan)
               <tr>
-                <td class="col-no">{{ $desas->firstItem() + $i }}</td>
-                <td><strong>{{ $desa->name }}</strong></td>
-                <td>{{ $desa->district->name ?? '-' }}</td>
-                <td>{{ $desa->district->regency->name ?? '-' }}</td>
+                <td class="col-no">{{ $perusahaans->firstItem() + $i }}</td>
+                <td><strong>{{ $perusahaan->nama }}</strong></td>
+                <td>{{ $perusahaan->alamat ?? '-' }}</td>
+                <td>{{ $perusahaan->village->name ?? '-' }}</td>
+                <td>{{ $perusahaan->village->district->name ?? '-' }}</td>
+                <td>{{ $perusahaan->village->district->regency->name ?? '-' }}</td>
                 <td class="col-aksi">
-                  <button type="button" class="btn-ico edit btn-edit-desa"
-                    data-id="{{ $desa->id }}"
-                    data-name="{{ $desa->name }}"
-                    data-regency-id="{{ $desa->district->regency_id ?? '' }}"
-                    data-district-id="{{ $desa->district_id }}"
+                  <button type="button" class="btn-ico edit btn-edit-perusahaan"
+                    data-id="{{ $perusahaan->id }}"
+                    data-nama="{{ $perusahaan->nama }}"
+                    data-alamat="{{ $perusahaan->alamat ?? '' }}"
+                    data-regency-id="{{ $perusahaan->village->district->regency_id ?? '' }}"
+                    data-district-id="{{ $perusahaan->village->district_id ?? '' }}"
+                    data-village-id="{{ $perusahaan->village_id }}"
                     title="Edit">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <circle cx="12" cy="12" r="2" fill="#DFA000"/>
                       <path d="M12 5L9 8M12 5L15 8M12 5V3M12 19L9 16M12 19L15 16M12 19V21M19 12L16 9M19 12L16 15M19 12H21M5 12L8 9M5 12L8 15M5 12H3" stroke="#DFA000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                   </button>
-                  <form action="{{ route('admin.desa.destroy', $desa) }}" method="POST" style="display:inline-block;margin:0;" class="form-delete-desa" data-name="{{ $desa->name }}">
+                  <form action="{{ route('admin.perusahaan.destroy', $perusahaan) }}" method="POST" style="display:inline-block;margin:0;" class="form-delete-perusahaan" data-name="{{ $perusahaan->nama }}">
                     @csrf @method('DELETE')
-                    <button type="button" class="btn-ico danger btn-delete-desa" title="Hapus">
+                    <button type="button" class="btn-ico danger btn-delete-perusahaan" title="Hapus">
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M9 20H15M10 4H14M7 7H17L16 20H8L7 7Z" stroke="#F8285A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                       </svg>
@@ -518,7 +524,7 @@
                 </td>
               </tr>
             @empty
-              <tr><td colspan="5" class="text-center" style="text-align:center;color:#64748B;padding:40px;">Belum ada data</td></tr>
+              <tr><td colspan="7" class="text-center" style="text-align:center;color:#64748B;padding:40px;">Belum ada data</td></tr>
             @endforelse
           </tbody>
         </table>
@@ -527,10 +533,11 @@
           <div class="table-footer-left">
             <div class="show-wrap">
               <span>Show</span>
-              <form id="perPageForm" method="GET" action="{{ route('admin.desa.index') }}">
+              <form id="perPageForm" method="GET" action="{{ route('admin.perusahaan.index') }}">
                 <input type="hidden" name="q" value="{{ request('q') }}">
                 <input type="hidden" name="regency_id" value="{{ request('regency_id') }}">
                 <input type="hidden" name="district_id" value="{{ request('district_id') }}">
+                <input type="hidden" name="village_id" value="{{ request('village_id') }}">
                 <select class="form-select auto-submit" name="per_page" aria-label="Jumlah baris per halaman">
                   @foreach([5,10,25,50,100] as $pp)
                     <option value="{{ $pp }}" {{ (string)request('per_page','10')===(string)$pp ? 'selected':'' }}>{{ $pp }}</option>
@@ -543,10 +550,10 @@
 
           <div class="table-footer-right">
             <div class="summary">
-              {{ $desas->firstItem() ?: 0 }}-{{ $desas->lastItem() ?: 0 }} of {{ $desas->total() }}
+              {{ $perusahaans->firstItem() ?: 0 }}-{{ $perusahaans->lastItem() ?: 0 }} of {{ $perusahaans->total() }}
             </div>
 
-            {{ $desas->links() }}
+            {{ $perusahaans->links() }}
           </div>
         </div>
       </div>
@@ -595,15 +602,15 @@
     @endif
 
     // ========== Delete Confirmation ==========
-    document.querySelectorAll('.btn-delete-desa').forEach(btn => {
+    document.querySelectorAll('.btn-delete-perusahaan').forEach(btn => {
       btn.addEventListener('click', function(e) {
         e.preventDefault();
-        const form = this.closest('.form-delete-desa');
+        const form = this.closest('.form-delete-perusahaan');
         const name = form.dataset.name;
 
         Swal.fire({
           title: 'Konfirmasi Hapus',
-          html: `Apakah Anda yakin ingin menghapus data desa <strong>${name}</strong>?<br><small class="text-muted">Data yang dihapus tidak dapat dikembalikan.</small>`,
+          html: `Apakah Anda yakin ingin menghapus data perusahaan <strong>${name}</strong>?<br><small class="text-muted">Data yang dihapus tidak dapat dikembalikan.</small>`,
           icon: 'warning',
           showCancelButton: true,
           confirmButtonColor: '#ef4444',
@@ -662,7 +669,7 @@
         if (!rid) return;
 
         try {
-          const res = await fetch('{{ route('admin.desa.options.districts') }}?regency_id=' + encodeURIComponent(rid));
+          const res = await fetch('{{ route('admin.perusahaan.options.districts') }}?regency_id=' + encodeURIComponent(rid));
           const rows = await res.json();
           rows.forEach(r => {
             const opt = document.createElement('option');

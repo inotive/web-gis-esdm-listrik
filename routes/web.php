@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\SkoringBobotController;
 use App\Http\Controllers\Admin\PemukimanTanpaListrikController;
 use App\Http\Controllers\Admin\GisController;
 use App\Http\Controllers\Admin\DesaController;
+use App\Http\Controllers\Admin\PerusahaanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -100,6 +101,20 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
         // Endpoints opsi untuk dropdown berjenjang
         Route::get('/options/regencies', [DesaController::class, 'optionsRegencies'])->name('options.regencies');
         Route::get('/options/districts', [DesaController::class, 'optionsDistricts'])->name('options.districts');
+    });
+
+    // Data Perusahaan
+    Route::group(['middleware' => [], 'as' => 'perusahaan.', 'prefix' => 'perusahaan'], function () {
+        Route::get('/', [PerusahaanController::class, 'index'])->name('index');
+        Route::post('/', [PerusahaanController::class, 'store'])->name('store');
+        Route::get('/{perusahaan}/edit', [PerusahaanController::class, 'edit'])->name('edit');
+        Route::put('/{perusahaan}', [PerusahaanController::class, 'update'])->name('update');
+        Route::delete('/{perusahaan}', [PerusahaanController::class, 'destroy'])->name('destroy');
+
+        // Endpoints opsi untuk dropdown berjenjang
+        Route::get('/options/regencies', [PerusahaanController::class, 'optionsRegencies'])->name('options.regencies');
+        Route::get('/options/districts', [PerusahaanController::class, 'optionsDistricts'])->name('options.districts');
+        Route::get('/options/villages', [PerusahaanController::class, 'optionsVillages'])->name('options.villages');
     });
 
     // routes/web.php
