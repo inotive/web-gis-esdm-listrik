@@ -632,9 +632,9 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-fill",
-          color: [255, 99, 71, 0.25], // tomat transparan
-          outline: { color: [178, 34, 34, 1], width: 1.3 }
+          type: "simple-line",
+          color: [220, 20, 60, 1], // merah tua
+          width: 1.6
         }
       },
       popupTemplate: {
@@ -652,6 +652,105 @@
       }
     });
     map.add(lnBatasDesaLayer);
+
+    // LN Batas Kabupaten/Kota
+    const lnBatasKabKotaLayer = new GeoJSONLayer({
+      url: "{{ url('/api/ln-batas-kabkota') }}",
+      title: "LN Batas Kabupaten/Kota",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-line",
+          color: [0, 122, 255, 1], // biru terang
+          width: 2
+        }
+      },
+      popupTemplate: {
+        title: "{WADMKK}",
+        content: `
+          <b>Provinsi:</b> {WADMPR}<br>
+          <b>Kabupaten/Kota:</b> {WADMKK}<br>
+          <b>Panjang (Shape_Leng):</b> {Shape_Leng}<br>
+          <b>FID:</b> {FID_AR_BAT}
+        `
+      }
+    });
+    map.add(lnBatasKabKotaLayer);
+
+    // LN Batas Kecamatan
+    const lnBatasKecamatanLayer = new GeoJSONLayer({
+      url: "{{ url('/api/ln-batas-kecamatan') }}",
+      title: "LN Batas Kecamatan",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-line",
+          color: [255, 140, 0, 1], // oranye tua
+          width: 1.8
+        }
+      },
+      popupTemplate: {
+        title: "{WADMKC}",
+        content: `
+          <b>Provinsi:</b> {WADMPR}<br>
+          <b>Kabupaten:</b> {WADMKK}<br>
+          <b>Kecamatan:</b> {WADMKC}<br>
+          <b>Panjang (Shape_Leng):</b> {Shape_Leng}<br>
+          <b>FID:</b> {FID_AR_BAT}
+        `
+      }
+    });
+    map.add(lnBatasKecamatanLayer);
+
+    // LN Batas Negara
+    const lnBatasNegaraLayer = new GeoJSONLayer({
+      url: "{{ url('/api/ln-batas-negara') }}",
+      title: "LN Batas Negara",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-line",
+          color: [34, 139, 34, 1], // hijau gelap
+          width: 2.2
+        }
+      },
+      popupTemplate: {
+        title: "Batas Negara",
+        content: `
+          <b>Provinsi:</b> {WADMPR}<br>
+          <b>Panjang (Shape_Leng):</b> {Shape_Leng}<br>
+          <b>FID Export:</b> {FID_Export}
+        `
+      }
+    });
+    map.add(lnBatasNegaraLayer);
+
+    // LN Batas Provinsi
+    const lnBatasProvinsiLayer = new GeoJSONLayer({
+      url: "{{ url('/api/ln-batas-provinsi') }}",
+      title: "LN Batas Provinsi",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-line",
+          color: [128, 0, 0, 1], // maroon
+          width: 2.4
+        }
+      },
+      popupTemplate: {
+        title: "Batas Provinsi",
+        content: `
+          <b>Provinsi:</b> {WADMPR}<br>
+          <b>Panjang (Shape_Leng):</b> {Shape_Leng}<br>
+          <b>FID Export:</b> {FID_Export}
+        `
+      }
+    });
+    map.add(lnBatasProvinsiLayer);
 
     // ================== WIDGETS ==================
     const bm_osm     = Basemap.fromId("osm");          bm_osm.title     = "Peta (OSM)";
@@ -704,6 +803,11 @@
           { layer: lnTransmisiLayer,              title: "LN Transmisi" },
           { layer: ln2SutmPaserLayer,             title: "LN2 SUTM Paser" },
           { layer: ln2SutmPPULayer,               title: "LN2 SUTM PPU" },
+          { layer: lnBatasNegaraLayer,            title: "LN Batas Negara" },
+          { layer: lnBatasProvinsiLayer,          title: "LN Batas Provinsi" },
+          { layer: lnBatasKabKotaLayer,           title: "LN Batas Kabupaten/Kota" },
+          { layer: lnBatasKecamatanLayer,         title: "LN Batas Kecamatan" },
+          { layer: lnBatasDesaLayer,             title: "LN Batas Desa" },
           { layer: arBatasKaltimLayer,            title: "AR Batas Kaltim Full KK KC KD" },
           { layer: arBatasKecamatanLayer,         title: "AR Batas Kaltim KK Kecamatan" },
           { layer: sutmBerauLayer,                 title: "LN SUTM Berau" }
