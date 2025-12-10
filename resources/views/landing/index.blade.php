@@ -624,6 +624,191 @@
     });
     map.add(sutmBerauLayer);
 
+    // PT Gardu Berau
+    const ptGarduBerauLayer = new GeoJSONLayer({
+      url: "{{ url('/api/pt-gardu-berau') }}",
+      title: "PT Gardu Berau",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-marker",
+          color: [255, 165, 0, 0.8], // oranye
+          size: 8,
+          outline: { color: [0, 0, 0, 0.6], width: 0.5 }
+        }
+      },
+      popupTemplate: {
+        title: "{descriptio}",
+        content: `
+          <b>Klasifikasi:</b> {classifica}<br>
+          <b>Lokasi:</b> {location}<br>
+          <b>Alamat:</b> {streetaddr}<br>
+          <b>Kota:</b> {city}<br>
+          <b>Penyulang:</b> {penyulang}<br>
+          <b>Status:</b> {status}<br>
+          <b>Type Gardu:</b> {type_gardu}<br>
+          <b>Panjang (Shape_Leng):</b> {Shape_Leng}<br>
+          <b>Luas (Shape_Area):</b> {Shape_Area}
+        `
+      }
+    });
+    map.add(ptGarduBerauLayer);
+
+    // PT Gardu Distribusi Kutim
+    const ptGarduDistribusiKutimLayer = new GeoJSONLayer({
+      url: "{{ url('/api/pt-gardu-distribusi-kutim') }}",
+      title: "PT Gardu Distribusi Kutim",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-marker",
+          color: [0, 191, 255, 0.85], // biru muda
+          size: 8,
+          outline: { color: [0, 0, 0, 0.6], width: 0.5 }
+        }
+      },
+      popupTemplate: {
+        title: "{classifica}",
+        content: `
+          <b>Klasifikasi:</b> {classifica}<br>
+          <b>Global ID:</b> {globalid}<br>
+          <b>ORIG_FID:</b> {ORIG_FID}
+        `
+      }
+    });
+    map.add(ptGarduDistribusiKutimLayer);
+
+    // PT Gardu Hubung Kutim
+    const ptGarduHubungKutimLayer = new GeoJSONLayer({
+      url: "{{ url('/api/pt-gardu-hubung-kutim') }}",
+      title: "PT Gardu Hubung Kutim",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-marker",
+          color: [186, 85, 211, 0.85], // ungu muda
+          size: 9,
+          outline: { color: [0, 0, 0, 0.6], width: 0.6 }
+        }
+      },
+      popupTemplate: {
+        title: "{NAMA}",
+        content: `
+          <b>GlobalID:</b> {GlobalID}<br>
+          <b>ORIG_FID:</b> {ORIG_FID}
+        `
+      }
+    });
+    map.add(ptGarduHubungKutimLayer);
+
+    // PT Gardu Induk Kutim
+    const ptGarduIndukKutimLayer = new GeoJSONLayer({
+      url: "{{ url('/api/pt-gardu-induk-kutim') }}",
+      title: "PT Gardu Induk Kutim",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-marker",
+          color: [255, 99, 132, 0.9], // merah muda cerah
+          size: 9,
+          outline: { color: [0, 0, 0, 0.6], width: 0.6 }
+        }
+      },
+      popupTemplate: {
+        title: "{classifica}",
+        content: `
+          <b>GlobalID:</b> {globalid}<br>
+          <b>ORIG_FID:</b> {ORIG_FID}
+        `
+      }
+    });
+    map.add(ptGarduIndukKutimLayer);
+
+    // PT Pembangkit Eksisting
+    const ptPembangkitEksistingLayer = new GeoJSONLayer({
+      url: "{{ url('/api/pt-pembangkit-eksisting') }}",
+      title: "PT Pembangkit Eksisting",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-marker",
+          color: [0, 255, 127, 0.85], // spring green
+          size: 10,
+          outline: { color: [0, 0, 0, 0.7], width: 0.6 }
+        }
+      },
+      popupTemplate: {
+        title: "{NAMOBJ}",
+        content: `
+          <b>Jenis Pembangkit:</b> {J_Pmbngkt}<br>
+          <b>Provinsi:</b> {WADMPR}<br>
+          <b>Remark:</b> {REMARK}<br>
+          <b>Sumber:</b> {SBDATA}<br>
+          <b>STSJRN:</b> {STSJRN}
+        `
+      }
+    });
+    map.add(ptPembangkitEksistingLayer);
+
+    // PT Rencana Pembangkit Tenaga Listrik Bontang
+    const ptRencanaPembangkitBontangLayer = new GeoJSONLayer({
+      url: "{{ url('/api/pt-rencana-pembangkit-bontang') }}",
+      title: "PT Rencana Pembangkit Bontang",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-marker",
+          color: [255, 215, 0, 0.9], // emas
+          size: 10,
+          outline: { color: [0, 0, 0, 0.7], width: 0.6 }
+        }
+      },
+      popupTemplate: {
+        title: "{Nama}",
+        content: `
+          <b>Arahan:</b> {Arahan}<br>
+          <b>Fungsi Eksisting:</b> {fungsi_eks}<br>
+          <b>Fungsi Rencana:</b> {fungsi_ren}<br>
+          <b>Penjelasan:</b> {penjelasan}<br>
+          <b>Sumber:</b> {Sumber}
+        `
+      }
+    });
+    map.add(ptRencanaPembangkitBontangLayer);
+
+    // PT Sistem Infrastruktur Energi Balikpapan
+    const ptSistemEnergiBalikpapanLayer = new GeoJSONLayer({
+      url: "{{ url('/api/pt-sistem-energi-balikpapan') }}",
+      title: "PT Sistem Energi Balikpapan",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-marker",
+          color: [30, 144, 255, 0.9], // dodger blue
+          size: 10,
+          outline: { color: [0, 0, 0, 0.7], width: 0.6 }
+        }
+      },
+      popupTemplate: {
+        title: "{NAMOBJ}",
+        content: `
+          <b>Provinsi:</b> {WADMPR}<br>
+          <b>Kab/Kota:</b> {WADMKK}<br>
+          <b>Remark:</b> {REMARK}<br>
+          <b>Sumber:</b> {SBDATA}<br>
+          <b>STSJRN:</b> {STSJRN}
+        `
+      }
+    });
+    map.add(ptSistemEnergiBalikpapanLayer);
+
     // LN Batas Desa
     const lnBatasDesaLayer = new GeoJSONLayer({
       url: "{{ url('/api/ln-batas-desa') }}",
@@ -808,6 +993,13 @@
           { layer: lnBatasKabKotaLayer,           title: "LN Batas Kabupaten/Kota" },
           { layer: lnBatasKecamatanLayer,         title: "LN Batas Kecamatan" },
           { layer: lnBatasDesaLayer,             title: "LN Batas Desa" },
+          { layer: ptGarduBerauLayer,             title: "PT Gardu Berau" },
+          { layer: ptGarduDistribusiKutimLayer,   title: "PT Gardu Distribusi Kutim" },
+          { layer: ptGarduHubungKutimLayer,       title: "PT Gardu Hubung Kutim" },
+          { layer: ptGarduIndukKutimLayer,        title: "PT Gardu Induk Kutim" },
+          { layer: ptPembangkitEksistingLayer,    title: "PT Pembangkit Eksisting" },
+          { layer: ptRencanaPembangkitBontangLayer, title: "PT Rencana Pembangkit Bontang" },
+          { layer: ptSistemEnergiBalikpapanLayer, title: "PT Sistem Energi Balikpapan" },
           { layer: arBatasKaltimLayer,            title: "AR Batas Kaltim Full KK KC KD" },
           { layer: arBatasKecamatanLayer,         title: "AR Batas Kaltim KK Kecamatan" },
           { layer: sutmBerauLayer,                 title: "LN SUTM Berau" }
