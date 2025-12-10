@@ -82,7 +82,9 @@
       }
     });
 
-    // ================== LAYER ASET (MASIH API) ==================
+    // ================== LAYERS ==================
+
+    // Aset Tanah
     const asetLayer = new GeoJSONLayer({
       url: "{{ url('/api/aset') }}",
       title: "Aset Tanah Pemerintah",
@@ -97,8 +99,6 @@
       }
     });
     map.add(asetLayer);
-
-    // ================== LAYER LAIN (MASIH API) ==================
 
     // Desa Berlistrik PLN
     const desaBerlistrikLayer = new GeoJSONLayer({
@@ -148,7 +148,7 @@
     });
     map.add(desaBerlistrikLayer);
 
-    // Jalan Nasional (garis → simple-line)
+    // Jalan Nasional
     const jalanNasionalLayer = new GeoJSONLayer({
       url: "{{ url('/api/data-jalan-nasional') }}",
       title: "Jalan Nasional",
@@ -172,7 +172,7 @@
     });
     map.add(jalanNasionalLayer);
 
-    // Jalan Provinsi (garis → simple-line)
+    // Jalan Provinsi
     const jalanProvinsiLayer = new GeoJSONLayer({
       url: "{{ url('/api/data-jalan-provinsi') }}",
       title: "Jalan Provinsi",
@@ -202,313 +202,408 @@
     });
     map.add(jalanProvinsiLayer);
 
-    // ================== JARINGAN LISTRIK DARI FILE GEOJSON (public/assets/Jaringan-Listrik) ==================
-
-    const jaringanEnergiKukarLayer = new GeoJSONLayer({
-      url: "{{ asset('assets/Jaringan-Listrik/LN_Sistem_Jaringan_Energi_Kukar.json') }}",
-      title: "Sistem Jaringan Energi Kukar",
-      outFields: ["*"],
-      renderer: {
-        type: "simple",
-        symbol: {
-          type: "simple-line",
-          color: [255, 0, 0, 1],
-          width: 1.5
-        }
-      }
-    });
-    map.add(jaringanEnergiKukarLayer);
-
-    const jaringanEnergiMahuluLayer = new GeoJSONLayer({
-      url: "{{ asset('assets/Jaringan-Listrik/LN_Sistem_Jaringan_Energi_Mahulu.json') }}",
-      title: "Sistem Jaringan Energi Mahulu",
-      outFields: ["*"],
-      renderer: {
-        type: "simple",
-        symbol: {
-          type: "simple-line",
-          color: [0, 0, 255, 1],
-          width: 1.5
-        }
-      }
-    });
-    map.add(jaringanEnergiMahuluLayer);
-
-    const jaringanEnergiSamarindaLayer = new GeoJSONLayer({
-      url: "{{ asset('assets/Jaringan-Listrik/LN_Sistem_Jaringan_Energi_Samarinda.json') }}",
-      title: "Sistem Jaringan Energi Samarinda",
-      outFields: ["*"],
-      renderer: {
-        type: "simple",
-        symbol: {
-          type: "simple-line",
-          color: [255, 165, 0, 1],
-          width: 1.5
-        }
-      }
-    });
-    map.add(jaringanEnergiSamarindaLayer);
-
-    const sutmBerauLayer = new GeoJSONLayer({
-      url: "{{ asset('assets/Jaringan-Listrik/LN_SUTM_Berau.json') }}",
-      title: "SUTM Berau",
+    // Jaringan Listrik Balikpapan
+    const jaringanListrikBalikpapanLayer = new GeoJSONLayer({
+      url: "{{ url('/api/jaringan-listrik-balikpapan') }}",
+      title: "Jaringan Listrik Balikpapan (SUTM)",
       outFields: ["*"],
       renderer: {
         type: "simple",
         symbol: {
           type: "simple-line",
           color: [0, 255, 0, 1],
-          width: 1.5
+          width: 2
         }
+      },
+      popupTemplate: {
+        title: "{NAMOBJ}",
+        content: `
+          <b>Nama Objek:</b> {NAMOBJ}<br>
+          <b>Kab/Kota:</b> {WADMKK}<br>
+          <b>Provinsi:</b> {WADMPR}<br>
+          <b>Sumber Data:</b> {SBDATA}<br>
+          <b>Panjang (km):</b> {Length}<br>
+          <b>Keterangan:</b> {REMARK}
+        `
       }
     });
-    map.add(sutmBerauLayer);
+    map.add(jaringanListrikBalikpapanLayer);
 
-    const sutmKubarLayer = new GeoJSONLayer({
-      url: "{{ asset('assets/Jaringan-Listrik/LN_SUTM_Kubar.json') }}",
-      title: "SUTM Kubar",
-      outFields: ["*"],
-      renderer: {
-        type: "simple",
-        symbol: {
-          type: "simple-line",
-          color: [0, 255, 255, 1],
-          width: 1.5
-        }
-      }
-    });
-    map.add(sutmKubarLayer);
-
-    const sutmKubarUp2kbLayer = new GeoJSONLayer({
-      url: "{{ asset('assets/Jaringan-Listrik/LN_SUTM_Kubar_UP2KB.json') }}",
-      title: "SUTM Kubar UP2KB",
+    // Rencana Jaringan Listrik Bontang
+    const jaringanListrikBontangLayer = new GeoJSONLayer({
+      url: "{{ url('/api/jaringan-listrik-bontang') }}",
+      title: "Rencana Jaringan Listrik Bontang",
       outFields: ["*"],
       renderer: {
         type: "simple",
         symbol: {
           type: "simple-line",
           color: [255, 0, 255, 1],
-          width: 1.5
+          width: 2
         }
+      },
+      popupTemplate: {
+        title: "{Rencana}",
+        content: `
+          <b>Rencana:</b> {Rencana}<br>
+          <b>Fungsi Eksisting:</b> {fungsi_eks}<br>
+          <b>Fungsi Rencana:</b> {fungsi_ren}<br>
+          <b>Keterangan:</b> {Keterangan}<br>
+          <b>Sumber:</b> {Sumber}
+        `
       }
     });
-    map.add(sutmKubarUp2kbLayer);
+    map.add(jaringanListrikBontangLayer);
 
-    const sutmKutimLayer = new GeoJSONLayer({
-      url: "{{ asset('assets/Jaringan-Listrik/LN_SUTM_Kutim.json') }}",
-      title: "SUTM Kutim",
+    // 🔹 Sistem Jaringan Energi Kukar (SUTT)
+    const sistemJaringanEnergiKukarLayer = new GeoJSONLayer({
+      url: "{{ url('/api/sistem-jaringan-energi-kukar') }}",
+      title: "Sistem Jaringan Energi Kukar (SUTT)",
       outFields: ["*"],
       renderer: {
         type: "simple",
         symbol: {
           type: "simple-line",
-          color: [128, 90, 213, 1],
-          width: 1.5
+          color: [255, 69, 0, 1], // oranye-merah biar beda
+          width: 2.5
         }
+      },
+      popupTemplate: {
+        title: "{NAMOBJ}",
+        content: `
+          <b>Nama Objek:</b> {NAMOBJ}<br>
+          <b>Kab/Kota:</b> {WADMKK}<br>
+          <b>Provinsi:</b> {WADMPR}<br>
+          <b>Keterangan:</b> {REMARK}<br>
+          <b>Sumber Data:</b> {SBDATA}<br>
+          <b>Panjang (SHAPE_Leng):</b> {SHAPE_Leng}
+        `
       }
     });
-    map.add(sutmKutimLayer);
+    map.add(sistemJaringanEnergiKukarLayer);
 
-    const sutmPaserLayer = new GeoJSONLayer({
-      url: "{{ asset('assets/Jaringan-Listrik/LN_SUTM_Paser.json') }}",
-      title: "SUTM Paser",
+    // 🔹 Sistem Jaringan Energi Mahulu (SUTR)
+    const sistemJaringanEnergiMahuluLayer = new GeoJSONLayer({
+      url: "{{ url('/api/sistem-jaringan-energi-mahulu') }}",
+      title: "Sistem Jaringan Energi Mahulu (SUTR)",
       outFields: ["*"],
       renderer: {
         type: "simple",
         symbol: {
           type: "simple-line",
-          color: [234, 179, 8, 1],
-          width: 1.5
+          color: [52, 152, 219, 1], // biru muda
+          width: 2.5
         }
+      },
+      popupTemplate: {
+        title: "{NAMOBJ}",
+        content: `
+          <b>Nama Objek:</b> {NAMOBJ}<br>
+          <b>Kab/Kota:</b> {WADMKK}<br>
+          <b>Provinsi:</b> {WADMPR}<br>
+          <b>Keterangan:</b> {REMARK}<br>
+          <b>Sumber Data:</b> {SBDATA}<br>
+          <b>Panjang (SHAPE_Leng):</b> {SHAPE_Leng}
+        `
       }
     });
-    map.add(sutmPaserLayer);
+    map.add(sistemJaringanEnergiMahuluLayer);
 
-    const sutmPpuLayer = new GeoJSONLayer({
-      url: "{{ asset('assets/Jaringan-Listrik/LN_SUTM_PPU.json') }}",
-      title: "SUTM PPU",
+    // 🔹 Sistem Jaringan Energi Kubar (SUTM)
+    const sistemJaringanEnergiKubarLayer = new GeoJSONLayer({
+      url: "{{ url('/api/sistem-jaringan-energi-kubar') }}",
+      title: "Sistem Jaringan Energi Kubar (SUTM)",
       outFields: ["*"],
       renderer: {
         type: "simple",
         symbol: {
           type: "simple-line",
-          color: [56, 189, 248, 1],
-          width: 1.5
+          color: [128, 0, 128, 1], // ungu
+          width: 2.5
         }
+      },
+      popupTemplate: {
+        title: "{Name}",
+        content: `
+          <b>Nama:</b> {Name}<br>
+          <b>Layer:</b> {layer}<br>
+          <b>Path:</b> {path}<br>
+          <b>Deskripsi:</b> {descriptio}<br>
+          <b>Panjang (Shape_Leng):</b> {Shape_Leng}
+        `
       }
     });
-    map.add(sutmPpuLayer);
+    map.add(sistemJaringanEnergiKubarLayer);
 
+    // 🔹 Sistem Jaringan Energi Kubar UP2KB (SUTM)
+    const sistemJaringanEnergiKubarUP2KBlayer = new GeoJSONLayer({
+      url: "{{ url('/api/sistem-jaringan-energi-kubar-up2kb') }}",
+      title: "Sistem Jaringan Energi Kubar UP2KB (SUTM)",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-line",
+          color: [255, 215, 0, 1], // emas
+          width: 2.5
+        }
+      },
+      popupTemplate: {
+        title: "{descriptio}",
+        content: `
+          <b>Deskripsi:</b> {descriptio}<br>
+          <b>Panjang (Shape_Leng):</b> {Shape_Leng}
+        `
+      }
+    });
+    map.add(sistemJaringanEnergiKubarUP2KBlayer);
+
+    // 🔹 Sistem Jaringan Energi Kutim (SUTM)
+    const sistemJaringanEnergiKutimLayer = new GeoJSONLayer({
+      url: "{{ url('/api/sistem-jaringan-energi-kutim') }}",
+      title: "Sistem Jaringan Energi Kutim (SUTM)",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-line",
+          color: [0, 128, 128, 1], // teal
+          width: 2.5
+        }
+      },
+      popupTemplate: {
+        title: "{classifica}",
+        content: `
+          <b>Klasifikasi:</b> {classifica}<br>
+          <b>GlobalID:</b> {GlobalID}<br>
+          <b>Panjang (Shape_Leng):</b> {Shape_Leng}
+        `
+      }
+    });
+    map.add(sistemJaringanEnergiKutimLayer);
+
+    // 🔹 Sistem Jaringan Energi Paser (SUTM)
+    const sistemJaringanEnergiPaserLayer = new GeoJSONLayer({
+      url: "{{ url('/api/sistem-jaringan-energi-paser') }}",
+      title: "Sistem Jaringan Energi Paser (SUTM)",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-line",
+          color: [210, 105, 30, 1], // cokelat kemerahan
+          width: 2.5
+        }
+      },
+      popupTemplate: {
+        title: "{Jalan}",
+        content: `
+          <b>Status Jalan:</b> {Jalan}<br>
+          <b>Kecamatan:</b> {WADMKC}<br>
+          <b>Desa:</b> {WADMKD}<br>
+          <b>Kabupaten:</b> {WADMKK}<br>
+          <b>Panjang (Shape_Leng):</b> {Shape_Leng}
+        `
+      }
+    });
+    map.add(sistemJaringanEnergiPaserLayer);
+
+    // 🔹 LN SUTM PPU
+    const sutmPPULayer = new GeoJSONLayer({
+      url: "{{ url('/api/sutm-ppu') }}",
+      title: "LN SUTM PPU",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-line",
+          color: [255, 140, 0, 1], // oranye tua
+          width: 2.5
+        }
+      },
+      popupTemplate: {
+        title: "{Nama_Jalan}",
+        content: `
+          <b>Nama Jalan:</b> {Nama_Jalan}<br>
+          <b>Ujung:</b> {Nama_Ujung}<br>
+          <b>Panjang:</b> {Panjang} km<br>
+          <b>Lebar:</b> {Lebar} m<br>
+          <b>Kondisi:</b> {Kondisi}<br>
+          <b>Status Jalan:</b> {Status_Jal}<br>
+          <b>Fungsi Jalan:</b> {Fungsi_Jal}<br>
+          <b>Panjang (SHAPE_Leng):</b> {SHAPE_Leng}
+        `
+      }
+    });
+    map.add(sutmPPULayer);
+
+    // 🔹 LN SUTR Kutim
     const sutrKutimLayer = new GeoJSONLayer({
-      url: "{{ asset('assets/Jaringan-Listrik/LN_SUTR_Kutim.json') }}",
-      title: "SUTR Kutim",
+      url: "{{ url('/api/sutr-kutim') }}",
+      title: "LN SUTR Kutim",
       outFields: ["*"],
       renderer: {
         type: "simple",
         symbol: {
           type: "simple-line",
-          color: [248, 113, 113, 1],
-          width: 1.5
+          color: [153, 102, 255, 1], // ungu muda
+          width: 2.5
         }
+      },
+      popupTemplate: {
+        title: "{classifica}",
+        content: `
+          <b>Klasifikasi:</b> {classifica}<br>
+          <b>GlobalID:</b> {globalid_1}<br>
+          <b>Panjang (shape_Leng):</b> {shape_Leng}
+        `
       }
     });
     map.add(sutrKutimLayer);
 
-    const transmisiLayer = new GeoJSONLayer({
-      url: "{{ asset('assets/Jaringan-Listrik/LN_Transmisi.json') }}",
-      title: "Jaringan Transmisi",
+    // 🔹 LN Transmisi
+    const lnTransmisiLayer = new GeoJSONLayer({
+      url: "{{ url('/api/ln-transmisi') }}",
+      title: "LN Transmisi",
       outFields: ["*"],
       renderer: {
         type: "simple",
         symbol: {
           type: "simple-line",
-          color: [23, 23, 23, 1],
-          width: 2
+          color: [255, 99, 132, 1], // merah muda
+          width: 3
         }
+      },
+      popupTemplate: {
+        title: "{NAMOBJ}",
+        content: `
+          <b>Nama:</b> {NAMOBJ}<br>
+          <b>Provinsi:</b> {WADMPR}<br>
+          <b>Keterangan:</b> {REMARK}<br>
+          <b>Sumber Data:</b> {SBDATA}<br>
+          <b>Panjang (SHAPE_Leng):</b> {SHAPE_Leng}
+        `
       }
     });
-    map.add(transmisiLayer);
+    map.add(lnTransmisiLayer);
 
-    const sutmPaser2Layer = new GeoJSONLayer({
-      url: "{{ asset('assets/Jaringan-Listrik/LN2_SUTM_Paser.json') }}",
-      title: "SUTM Paser (Rencana/Alternatif)",
+    // 🔹 LN2 SUTM Paser
+    const ln2SutmPaserLayer = new GeoJSONLayer({
+      url: "{{ url('/api/ln2-sutm-paser') }}",
+      title: "LN2 SUTM Paser",
       outFields: ["*"],
       renderer: {
         type: "simple",
         symbol: {
           type: "simple-line",
-          color: [190, 24, 93, 1],
-          width: 1.5,
-          style: "dash"
+          color: [75, 0, 130, 1], // ungu tua
+          width: 2.5
         }
+      },
+      popupTemplate: {
+        title: "{Name}",
+        content: `
+          <b>Nama:</b> {Name}<br>
+          <b>Layer:</b> {layer}<br>
+          <b>Path:</b> {path}<br>
+          <b>Tessellate:</b> {tessellate}<br>
+          <b>Panjang (shape_Leng):</b> {shape_Leng}
+        `
       }
     });
-    map.add(sutmPaser2Layer);
+    map.add(ln2SutmPaserLayer);
 
-    const sutmPpu2Layer = new GeoJSONLayer({
-      url: "{{ asset('assets/Jaringan-Listrik/LN2_SUTM_PPU.json') }}",
-      title: "SUTM PPU (Rencana/Alternatif)",
+    // 🔹 LN2 SUTM PPU
+    const ln2SutmPPULayer = new GeoJSONLayer({
+      url: "{{ url('/api/ln2-sutm-ppu') }}",
+      title: "LN2 SUTM PPU",
       outFields: ["*"],
       renderer: {
         type: "simple",
         symbol: {
           type: "simple-line",
-          color: [22, 163, 74, 1],
-          width: 1.5,
-          style: "dash"
+          color: [0, 191, 255, 1], // deep sky blue
+          width: 2.5
         }
+      },
+      popupTemplate: {
+        title: "{NAMOBJ}",
+        content: `
+          <b>Nama:</b> {NAMOBJ}<br>
+          <b>Remark:</b> {REMARK}<br>
+          <b>Jalan Listr:</b> {JalanListr}<br>
+          <b>FCODE:</b> {FCODE}<br>
+          <b>Panjang (SHAPE_Leng):</b> {SHAPE_Leng}
+        `
       }
     });
-    map.add(sutmPpu2Layer);
+    map.add(ln2SutmPPULayer);
 
-    // ================== ADMINISTRASI (public/assets/Administrasi) ==================
-
-    // Poligon batas Kaltim lengkap
-    const batasKaltimFullLayer = new GeoJSONLayer({
-      url: "{{ asset('assets/Administrasi/AR_BATAS_KALTIM_FULL_KK_KC_KD.json') }}",
-      title: "Adm. Kaltim KK/Kec/Desa",
-      outFields: ["*"],
-      renderer: {
-        type: "simple",
-        symbol: {
-          type: "simple-fill", // polygon
-          color: [0, 0, 0, 0], // transparan
-          outline: {
-            color: [148, 163, 184, 1],
-            width: 0.8
-          }
-        }
-      }
-    });
-    map.add(batasKaltimFullLayer);
-
-    const batasKaltimKecamatanLayer = new GeoJSONLayer({
-      url: "{{ asset('assets/Administrasi/AR_BATAS_KALTIM_KK_KECAMATAN.json') }}",
-      title: "Adm. Kaltim per Kecamatan",
+    // 🔹 AR Batas Kaltim Full KK KC KD
+    const arBatasKaltimLayer = new GeoJSONLayer({
+      url: "{{ url('/api/ar-batas-kaltim') }}",
+      title: "AR Batas Kaltim Full KK KC KD",
       outFields: ["*"],
       renderer: {
         type: "simple",
         symbol: {
           type: "simple-fill",
-          color: [0, 0, 0, 0],
-          outline: {
-            color: [59, 130, 246, 1],
-            width: 0.8
-          }
+          color: [255, 215, 0, 0.25],
+          outline: { color: [255, 165, 0, 1], width: 1.5 }
         }
+      },
+      popupTemplate: {
+        title: "{NAMOBJ}",
+        content: `
+          <b>Provinsi:</b> {WADMPR}<br>
+          <b>Kabupaten:</b> {WADMKK}<br>
+          <b>Kecamatan:</b> {WADMKC}<br>
+          <b>Desa:</b> {WADMKD}<br>
+          <b>Remark:</b> {REMARK}<br>
+          <b>Luas:</b> {Luas}<br>
+          <b>Panjang (Shape_Leng):</b> {Shape_Leng}
+        `
       }
     });
-    map.add(batasKaltimKecamatanLayer);
+    map.add(arBatasKaltimLayer);
 
-    const batasDesaLayer = new GeoJSONLayer({
-      url: "{{ asset('assets/Administrasi/LN_BATAS_DESA.json') }}",
-      title: "Batas Desa",
+    // 🔹 LN SUTM Berau
+    const sutmBerauLayer = new GeoJSONLayer({
+      url: "{{ url('/api/sutm-berau') }}",
+      title: "LN SUTM Berau",
       outFields: ["*"],
       renderer: {
         type: "simple",
         symbol: {
           type: "simple-line",
-          color: [156, 163, 175, 1],
-          width: 0.8
+          color: [46, 204, 113, 1], // hijau tosca
+          width: 2.5
         }
+      },
+      popupTemplate: {
+        title: "{kode_hanta}",
+        content: `
+          <b>Nama Segmen:</b> {kode_hanta}<br>
+          <b>Lokasi:</b> {location}<br>
+          <b>Penyulang:</b> {penyulang}<br>
+          <b>Asset Num:</b> {assetnum}<br>
+          <b>Klasifikasi:</b> {classifica}<br>
+          <b>Bahan Kawat:</b> {bahan_kawa}<br>
+          <b>Panjang (Shape_Leng):</b> {Shape_Leng}
+        `
       }
     });
-    map.add(batasDesaLayer);
-
-    const batasKabupatenLayer = new GeoJSONLayer({
-      url: "{{ asset('assets/Administrasi/LN_BATAS_KABUPATENKOTA.json') }}",
-      title: "Batas Kabupaten/Kota",
-      outFields: ["*"],
-      renderer: {
-        type: "simple",
-        symbol: {
-          type: "simple-line",
-          color: [0, 0, 0, 1],
-          width: 1.4
-        }
-      }
-    });
-    map.add(batasKabupatenLayer);
-
-    const batasKecamatanLayer = new GeoJSONLayer({
-      url: "{{ asset('assets/Administrasi/LN_BATAS_KECAMATAN.json') }}",
-      title: "Batas Kecamatan",
-      outFields: ["*"],
-      renderer: {
-        type: "simple",
-        symbol: {
-          type: "simple-line",
-          color: [59, 130, 246, 1],
-          width: 1
-        }
-      }
-    });
-    map.add(batasKecamatanLayer);
-
-    const batasNegaraLayer = new GeoJSONLayer({
-      url: "{{ asset('assets/Administrasi/LN_BATAS_NEGARA.json') }}",
-      title: "Batas Negara",
-      outFields: ["*"],
-      renderer: {
-        type: "simple",
-        symbol: {
-          type: "simple-line",
-          color: [220, 38, 38, 1],
-          width: 2
-        }
-      }
-    });
-    map.add(batasNegaraLayer);
+    map.add(sutmBerauLayer);
 
     // ================== WIDGETS ==================
-    const bm_osm     = Basemap.fromId("osm");            bm_osm.title     = "Peta (OSM)";
-    const bm_sat     = Basemap.fromId("satellite");      bm_sat.title     = "Satelit";
-    const bm_hybrid  = Basemap.fromId("hybrid");         bm_hybrid.title  = "Hybrid";
-    const bm_terrain = Basemap.fromId("terrain");        bm_terrain.title = "Medan";
-    const bm_topo    = Basemap.fromId("topo-vector");    bm_topo.title    = "Topografi";
-    const bm_gray    = Basemap.fromId("gray-vector");    bm_gray.title    = "Abu-abu";
-    const bm_dark    = Basemap.fromId("dark-gray-vector"); bm_dark.title  = "Gelap";
-    const bm_street  = Basemap.fromId("streets-vector"); bm_street.title  = "Streets";
+    const bm_osm     = Basemap.fromId("osm");          bm_osm.title     = "Peta (OSM)";
+    const bm_sat     = Basemap.fromId("satellite");    bm_sat.title     = "Satelit";
+    const bm_hybrid  = Basemap.fromId("hybrid");       bm_hybrid.title  = "Hybrid";
+    const bm_terrain = Basemap.fromId("terrain");      bm_terrain.title = "Medan";
+    const bm_topo    = Basemap.fromId("topo-vector");  bm_topo.title    = "Topografi";
+    const bm_gray    = Basemap.fromId("gray-vector");  bm_gray.title    = "Abu-abu";
+    const bm_dark    = Basemap.fromId("dark-gray-vector"); bm_dark.title = "Gelap";
+    const bm_street  = Basemap.fromId("streets-vector");   bm_street.title = "Streets";
 
     const localSource = new LocalBasemapsSource({
       basemaps: [bm_osm, bm_sat, bm_hybrid, bm_terrain, bm_topo, bm_gray, bm_dark, bm_street]
@@ -529,11 +624,31 @@
     });
     view.ui.add(scaleBar, "bottom-left");
 
-    // Legend otomatis untuk semua layer di map
     const legendExpand = new Expand({
       view: view,
       content: new Legend({
-        view: view
+        view: view,
+        layerInfos: [
+          { layer: asetLayer,                    title: "Aset Tanah Pemerintah" },
+          { layer: desaBerlistrikLayer,          title: "Desa Berlistrik PLN" },
+          { layer: jalanNasionalLayer,           title: "Jalan Nasional" },
+          { layer: jalanProvinsiLayer,           title: "Jalan Provinsi" },
+          { layer: jaringanListrikBalikpapanLayer, title: "Jaringan Listrik Balikpapan" },
+          { layer: jaringanListrikBontangLayer,  title: "Rencana Jaringan Listrik Bontang" },
+          { layer: sistemJaringanEnergiKukarLayer, title: "Sistem Jaringan Energi Kukar (SUTT)" },
+          { layer: sistemJaringanEnergiMahuluLayer, title: "Sistem Jaringan Energi Mahulu (SUTR)" },
+          { layer: sistemJaringanEnergiKubarLayer, title: "Sistem Jaringan Energi Kubar (SUTM)" },
+          { layer: sistemJaringanEnergiKubarUP2KBlayer, title: "Sistem Jaringan Energi Kubar UP2KB (SUTM)" },
+          { layer: sistemJaringanEnergiKutimLayer, title: "Sistem Jaringan Energi Kutim (SUTM)" },
+          { layer: sistemJaringanEnergiPaserLayer, title: "Sistem Jaringan Energi Paser (SUTM)" },
+          { layer: sutrKutimLayer,                 title: "LN SUTR Kutim" },
+          { layer: sutmPPULayer,                 title: "LN SUTM PPU" },
+          { layer: lnTransmisiLayer,              title: "LN Transmisi" },
+          { layer: ln2SutmPaserLayer,             title: "LN2 SUTM Paser" },
+          { layer: ln2SutmPPULayer,               title: "LN2 SUTM PPU" },
+          { layer: arBatasKaltimLayer,            title: "AR Batas Kaltim Full KK KC KD" },
+          { layer: sutmBerauLayer,                 title: "LN SUTM Berau" }
+        ]
       }),
       expanded: false,
       expandIconClass: "esri-icon-layer-list",
@@ -628,7 +743,7 @@
       });
     });
 
-    // ================== RENDERER UNIK ASET BERDASARKAN unit_kerja ==================
+    // Grouping by unit_kerja
     asetLayer.when(async () => {
       try {
         const q = asetLayer.createQuery();
@@ -645,7 +760,7 @@
             )
           )
         ).sort((a, b) => a.localeCompare(b, 'id'));
-        
+
         const palette = [
           [59,130,246], [16,185,129], [245,158,11], [236,72,153],
           [99,102,241], [34,197,94],  [249,115,22], [139,92,246],
@@ -673,7 +788,7 @@
           defaultSymbol: {
             type: "simple-fill",
             color: [148, 163, 184, 0.35],
-            outline: { color: [100, 116, 139, 1.2], width: 1.2 }
+            outline: { color: [100, 116, 139, 1], width: 1.2 }
           },
           uniqueValueInfos: uniqueValueInfos
         };
