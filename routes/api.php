@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\Ln2SutmPPUController;
 use App\Http\Controllers\Api\TransmisiController;
 use App\Http\Controllers\Api\ArBatasKaltimFullController;
 use App\Http\Controllers\Api\ArBatasKaltimKabupatenKotaController;
+use App\Http\Controllers\Api\ArBatasKaltimKecamatanController;
 
 Route::get('/aset', [AssetController::class, 'index']);
 Route::get('/data-berlistrik', [DataBerlistrikController::class, 'index']);
@@ -47,6 +48,7 @@ Route::get('/ln2-sutm-ppu', [Ln2SutmPPUController::class, 'index']);
 Route::get('/ln-transmisi', [TransmisiController::class, 'index']);
 Route::get('/ar-batas-kaltim', [ArBatasKaltimFullController::class, 'index']);
 Route::get('/ar-batas-kaltim-kabkota', [ArBatasKaltimKabupatenKotaController::class, 'index']);
+Route::get('/ar-batas-kaltim-kecamatan', [ArBatasKaltimKecamatanController::class, 'index']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

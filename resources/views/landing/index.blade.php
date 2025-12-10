@@ -567,6 +567,35 @@
     });
     map.add(arBatasKaltimLayer);
 
+    // 🔹 AR Batas Kaltim KK Kecamatan
+    const arBatasKecamatanLayer = new GeoJSONLayer({
+      url: "{{ url('/api/ar-batas-kaltim-kecamatan') }}",
+      title: "AR Batas Kaltim KK Kecamatan",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-fill",
+          color: [144, 238, 144, 0.25], // hijau muda transparan
+          outline: { color: [34, 139, 34, 1], width: 1.2 }
+        }
+      },
+      popupTemplate: {
+        title: "{WADMKC}",
+        content: `
+          <b>Provinsi:</b> {WADMPR}<br>
+          <b>Kabupaten:</b> {WADMKK}<br>
+          <b>Kecamatan:</b> {WADMKC}<br>
+          <b>Desa:</b> {WADMKD}<br>
+          <b>Nama:</b> {NAMOBJ}<br>
+          <b>Remark:</b> {REMARK}<br>
+          <b>Panjang (Shape_Leng):</b> {Shape_Leng}<br>
+          <b>Luas (Shape_Area):</b> {Shape_Area}
+        `
+      }
+    });
+    map.add(arBatasKecamatanLayer);
+
     // 🔹 LN SUTM Berau
     const sutmBerauLayer = new GeoJSONLayer({
       url: "{{ url('/api/sutm-berau') }}",
@@ -594,6 +623,35 @@
       }
     });
     map.add(sutmBerauLayer);
+
+    // LN Batas Desa
+    const lnBatasDesaLayer = new GeoJSONLayer({
+      url: "{{ url('/api/ln-batas-desa') }}",
+      title: "LN Batas Desa",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-fill",
+          color: [255, 99, 71, 0.25], // tomat transparan
+          outline: { color: [178, 34, 34, 1], width: 1.3 }
+        }
+      },
+      popupTemplate: {
+        title: "{WADMKD}",
+        content: `
+          <b>Nama:</b> {NAMOBJ}<br>
+          <b>Provinsi:</b> {WADMPR}<br>
+          <b>Kabupaten:</b> {WADMKK}<br>
+          <b>Kecamatan:</b> {WADMKC}<br>
+          <b>Desa:</b> {WADMKD}<br>
+          <b>Remark:</b> {REMARK}<br>
+          <b>Luas:</b> {Luas}<br>
+          <b>Panjang (Shape_Leng):</b> {Shape_Leng}
+        `
+      }
+    });
+    map.add(lnBatasDesaLayer);
 
     // ================== WIDGETS ==================
     const bm_osm     = Basemap.fromId("osm");          bm_osm.title     = "Peta (OSM)";
@@ -647,6 +705,7 @@
           { layer: ln2SutmPaserLayer,             title: "LN2 SUTM Paser" },
           { layer: ln2SutmPPULayer,               title: "LN2 SUTM PPU" },
           { layer: arBatasKaltimLayer,            title: "AR Batas Kaltim Full KK KC KD" },
+          { layer: arBatasKecamatanLayer,         title: "AR Batas Kaltim KK Kecamatan" },
           { layer: sutmBerauLayer,                 title: "LN SUTM Berau" }
         ]
       }),
