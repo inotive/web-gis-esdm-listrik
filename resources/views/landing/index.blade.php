@@ -809,6 +809,269 @@
     });
     map.add(ptSistemEnergiBalikpapanLayer);
 
+    // 🔹 PT Sistem Infrastruktur Energi Kutai Kartanegara (PLTD)
+    const ptSistemEnergiKukarLayer = new GeoJSONLayer({
+      url: "{{ url('/api/pt-sistem-energi-kukar') }}",
+      title: "PT Sistem Infrastruktur Energi Kutai Kartanegara",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-marker",
+          color: [255, 0, 0, 0.9], // merah
+          size: 11,
+          outline: { color: [0, 0, 0, 0.8], width: 0.7 }
+        }
+      },
+      popupTemplate: {
+        title: "{NAMOBJ}",
+        content: `
+          <b>Provinsi:</b> {WADMPR}<br>
+          <b>Kab/Kota:</b> {WADMKK}<br>
+          <b>Nama Objek:</b> {NAMOBJ}<br>
+          <b>Keterangan:</b> {REMARK}<br>
+          <b>Sumber:</b> {SBDATA}<br>
+          <b>ORDE01:</b> {ORDE01}<br>
+          <b>ORDE02:</b> {ORDE02}<br>
+          <b>ORDE03:</b> {ORDE03}<br>
+          <b>ORDE04:</b> {ORDE04}<br>
+          <b>JNSRSR:</b> {JNSRSR}<br>
+          <b>STSJRN:</b> {STSJRN}
+        `
+      }
+    });
+    map.add(ptSistemEnergiKukarLayer);
+
+    // 🔹 PT Sistem Infrastruktur Energi Mahakam Ulu (PLTS)
+    const ptSistemEnergiMahuluLayer = new GeoJSONLayer({
+      url: "{{ url('/api/pt-sistem-energi-mahulu') }}",
+      title: "PT Sistem Infrastruktur Energi Mahakam Ulu",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-marker",
+          color: [255, 165, 0, 0.9], // oranye
+          size: 11,
+          outline: { color: [0, 0, 0, 0.8], width: 0.7 }
+        }
+      },
+      popupTemplate: {
+        title: "{NAMOBJ}",
+        content: `
+          <b>Provinsi:</b> {WADMPR}<br>
+          <b>Kab/Kota:</b> {WADMKK}<br>
+          <b>Nama Objek:</b> {NAMOBJ}<br>
+          <b>Keterangan:</b> {REMARK}<br>
+          <b>Sumber:</b> {SBDATA}<br>
+          <b>ORDE01:</b> {ORDE01}<br>
+          <b>ORDE02:</b> {ORDE02}<br>
+          <b>ORDE03:</b> {ORDE03}<br>
+          <b>ORDE04:</b> {ORDE04}<br>
+          <b>JNSRSR:</b> {JNSRSR}<br>
+          <b>STSJRN:</b> {STSJRN}
+        `
+      }
+    });
+    map.add(ptSistemEnergiMahuluLayer);
+
+    // 🔹 PT Sistem Infrastruktur Energi Kota Samarinda (Gardu Listrik)
+    const ptSistemEnergiSamarindaLayer = new GeoJSONLayer({
+      url: "{{ url('/api/pt-sistem-energi-samarinda') }}",
+      title: "PT Sistem Infrastruktur Energi Kota Samarinda",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-marker",
+          color: [0, 255, 255, 0.9], // cyan
+          size: 11,
+          outline: { color: [0, 0, 0, 0.8], width: 0.7 }
+        }
+      },
+      popupTemplate: {
+        title: "{NAMOBJ}",
+        content: `
+          <b>Provinsi:</b> {WADMPR}<br>
+          <b>Kab/Kota:</b> {WADMKK}<br>
+          <b>Nama Objek:</b> {NAMOBJ}<br>
+          <b>Keterangan:</b> {REMARK}<br>
+          <b>Sumber:</b> {SBDATA}<br>
+          <b>ORDE01:</b> {ORDE01}<br>
+          <b>ORDE02:</b> {ORDE02}<br>
+          <b>ORDE03:</b> {ORDE03}<br>
+          <b>ORDE04:</b> {ORDE04}<br>
+          <b>JNSRSR:</b> {JNSRSR}<br>
+          <b>STSJRN:</b> {STSJRN}
+        `
+      }
+    });
+    map.add(ptSistemEnergiSamarindaLayer);
+
+    // 🔹 PT Trafo Berau
+    const ptTrafoBerauLayer = new GeoJSONLayer({
+      url: "{{ url('/api/pt-trafo-berau') }}",
+      title: "PT Trafo Berau",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-marker",
+          color: [128, 0, 128, 0.9], // ungu
+          size: 11,
+          outline: { color: [0, 0, 0, 0.8], width: 0.7 }
+        }
+      },
+      popupTemplate: {
+        title: "{descriptio}",
+        content: `
+          <b>Deskripsi:</b> {descriptio}<br>
+          <b>Klasifikasi:</b> {classifica}<br>
+          <b>Lokasi:</b> {location}<br>
+          <b>Nomor Aset:</b> {assetnum}<br>
+          <b>Status:</b> {status}<br>
+          <b>Fasa:</b> {fasa_trafo}<br>
+          <b>Jenis Trafo:</b> {jenis_traf}<br>
+          <b>Kapasitas:</b> {kapasitas}<br>
+          <b>Peruntukan:</b> {peruntukan}<br>
+          <b>Status Kepemilikan:</b> {status_kep}<br>
+          <b>Tegangan:</b> {tegangan_t}<br>
+          <b>Tahun Pembuatan:</b> {th_buat}<br>
+          <b>Penyulang:</b> {penyulang}<br>
+          <b>Serial Number:</b> {serialnum}
+        `
+      }
+    });
+    map.add(ptTrafoBerauLayer);
+
+    // 🔹 PT Trafo Gardu Distribusi PPU
+    const ptTrafoGarduDistribusiPpuLayer = new GeoJSONLayer({
+      url: "{{ url('/api/pt-trafo-gardu-distribusi-ppu') }}",
+      title: "PT Trafo Gardu Distribusi PPU",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-marker",
+          color: [255, 192, 203, 0.9], // pink
+          size: 9,
+          outline: { color: [0, 0, 0, 0.8], width: 0.6 }
+        }
+      },
+      popupTemplate: {
+        title: "{Name}",
+        content: `
+          <b>Nama:</b> {Name}<br>
+          <b>Kode:</b> {Nama}<br>
+          <b>Path Folder:</b> {FolderPath}<br>
+          <b>Nama (Jika Ada):</b> {Nama}<br>
+          <b>Symbol ID:</b> {SymbolID}<br>
+          <b>Alt Mode:</b> {AltMode}<br>
+          <b>Base:</b> {Base}<br>
+          <b>Time Span:</b> {TimeSpan}<br>
+          <b>Time Stamp:</b> {TimeStamp}<br>
+          <b>Begin Time:</b> {BeginTime}<br>
+          <b>End Time:</b> {EndTime}<br>
+          <b>Has Label:</b> {HasLabel}<br>
+          <b>Label ID:</b> {LabelID}
+        `
+      }
+    });
+    map.add(ptTrafoGarduDistribusiPpuLayer);
+
+    // 🔹 PT Trafo Gardu Kubar (Arrester)
+    const ptTrafoGarduKubarLayer = new GeoJSONLayer({
+      url: "{{ url('/api/pt-trafo-gardu-kubar') }}",
+      title: "PT Trafo Gardu Kubar (Arrester)",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-marker",
+          color: [255, 140, 0, 0.9], // oranye
+          size: 9,
+          outline: { color: [0, 0, 0, 0.8], width: 0.6 }
+        }
+      },
+      popupTemplate: {
+        title: "{Name}",
+        content: `
+          <b>Nama:</b> {Name}<br>
+          <b>Kapasitas:</b> {KAPASITAS}<br>
+          <b>Feeder:</b> {FEEDER}<br>
+          <b>Zona:</b> {ZONA}<br>
+          <b>Nilai Pentanahan:</b> {NILAI_PENT}<br>
+          <b>Latitude:</b> {LATITUDE}<br>
+          <b>Longitude:</b> {LONGITUDE}<br>
+          <b>Layer:</b> {layer}<br>
+          <b>Path:</b> {path}<br>
+          <b>Deskripsi:</b> {descriptio}
+        `
+      }
+    });
+    map.add(ptTrafoGarduKubarLayer);
+
+    // 🔹 PT1 Trafo Gardu Paser (Gardu dan Trafo Lainnya)
+    const pt1TrafoGarduPaserLayer = new GeoJSONLayer({
+      url: "{{ url('/api/pt1-trafo-gardu-paser') }}",
+      title: "PT1 Trafo Gardu Paser",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-marker",
+          color: [0, 128, 0, 0.9], // hijau
+          size: 10,
+          outline: { color: [0, 0, 0, 0.8], width: 0.6 }
+        }
+      },
+      popupTemplate: {
+        title: "{Name}",
+        content: `
+          <b>Nama:</b> {Name}<br>
+          <b>Jenis:</b> {Data}<br>
+          <b>Tipe:</b> {Type}<br>
+          <b>Deskripsi:</b> {Descript}<br>
+          <b>Komentar:</b> {Comment}<br>
+          <b>Simbol:</b> {Symbol}<br>
+          <b>Tanggal Waktu:</b> {DateTimeS}<br>
+          <b>Elevasi:</b> {Elevation} m<br>
+          <b>Nama (Jika Ada):</b> {Nama}
+        `
+      }
+    });
+    map.add(pt1TrafoGarduPaserLayer);
+
+    // 🔹 PT2 Trafo Gardu Paser (Gardu Induk Grogot)
+    const pt2TrafoGarduPaserLayer = new GeoJSONLayer({
+      url: "{{ url('/api/pt2-trafo-gardu-paser') }}",
+      title: "PT2 Trafo Gardu Paser",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-marker",
+          color: [255, 0, 0, 0.9], // merah
+          size: 10,
+          outline: { color: [0, 0, 0, 0.8], width: 0.6 }
+        }
+      },
+      popupTemplate: {
+        title: "{Name}",
+        content: `
+          <b>Nama:</b> {Name}<br>
+          <b>Deskripsi:</b> {descriptio}<br>
+          <b>Timestamp:</b> {timestamp}<br>
+          <b>Tes 1:</b> {TES_1}<br>
+          <b>Tes 2:</b> {TES_2}<br>
+          <b>Tes 4:</b> {TES_4}<br>
+          <b>Tes 5 (Koordinat):</b> {TES_5}<br>
+          <b>Tes 6:</b> {TES_6}
+        `
+      }
+    });
+    map.add(pt2TrafoGarduPaserLayer);
+
     // LN Batas Desa
     const lnBatasDesaLayer = new GeoJSONLayer({
       url: "{{ url('/api/ln-batas-desa') }}",
@@ -1000,6 +1263,14 @@
           { layer: ptPembangkitEksistingLayer,    title: "PT Pembangkit Eksisting" },
           { layer: ptRencanaPembangkitBontangLayer, title: "PT Rencana Pembangkit Bontang" },
           { layer: ptSistemEnergiBalikpapanLayer, title: "PT Sistem Energi Balikpapan" },
+          { layer: ptSistemEnergiKukarLayer,      title: "PT Sistem Infrastruktur Energi Kutai Kartanegara" },
+          { layer: ptSistemEnergiMahuluLayer,     title: "PT Sistem Infrastruktur Energi Mahakam Ulu" },
+          { layer: ptSistemEnergiSamarindaLayer,  title: "PT Sistem Infrastruktur Energi Kota Samarinda" },
+          { layer: ptTrafoBerauLayer,             title: "PT Trafo Berau" },
+          { layer: ptTrafoGarduDistribusiPpuLayer, title: "PT Trafo Gardu Distribusi PPU" },
+          { layer: ptTrafoGarduKubarLayer,        title: "PT Trafo Gardu Kubar (Arrester)" },
+          { layer: pt1TrafoGarduPaserLayer,       title: "PT1 Trafo Gardu Paser" },
+          { layer: pt2TrafoGarduPaserLayer,       title: "PT2 Trafo Gardu Paser" },
           { layer: arBatasKaltimLayer,            title: "AR Batas Kaltim Full KK KC KD" },
           { layer: arBatasKecamatanLayer,         title: "AR Batas Kaltim KK Kecamatan" },
           { layer: sutmBerauLayer,                 title: "LN SUTM Berau" }
