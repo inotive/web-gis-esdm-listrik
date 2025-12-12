@@ -84,41 +84,84 @@
       }
     });
 
-    // ========= Hover Modal =========
-    const hoverModal = document.createElement('div');
-    hoverModal.id = 'hoverModal';
-    hoverModal.className = 'hover-modal hidden';
-    view.container.appendChild(hoverModal);
+    // ========= Click Detail Modal =========
+    const detailModal = document.createElement('div');
+    detailModal.id = 'detailModal';
+    detailModal.className = 'detail-modal hidden';
+    detailModal.innerHTML = `
+      <div class="dm-close" title="Tutup">✕</div>
+      <div class="dm-content"></div>
+    `;
+    view.container.appendChild(detailModal);
 
-    const renderHoverContent = (graphic) => {
+    const closeBtn = detailModal.querySelector('.dm-close');
+    const dmContent = detailModal.querySelector('.dm-content');
+
+    const renderDetailContent = (graphic) => {
       const attrs = graphic?.attributes || {};
       const layerTitle = graphic?.layer?.title || 'Detail Fitur';
       const rows = Object.entries(attrs)
-        .map(([k, v]) => `<div class="hm-row"><div class="hm-key">${k}</div><div class="hm-val">${v ?? '-'}</div></div>`)
+        .map(([k, v]) => `<div class="dm-row"><div class="dm-key">${k}</div><div class="dm-val">${v ?? '-'}</div></div>`)
         .join('');
 
-      hoverModal.innerHTML = `
-        <div class="hm-head">${layerTitle}</div>
-        <div class="hm-body">${rows || '<div class="hm-empty">Tidak ada atribut</div>'}</div>
+      dmContent.innerHTML = `
+        <div class="dm-head">${layerTitle}</div>
+        <div class="dm-body">${rows || '<div class="dm-empty">Tidak ada atribut</div>'}</div>
       `;
-      hoverModal.classList.remove('hidden');
     };
 
-    const hideHover = () => hoverModal.classList.add('hidden');
+    const showDetailModal = (event, graphic) => {
+      renderDetailContent(graphic);
 
-    let hoverTimer;
-    view.on('pointer-move', (event) => {
-      clearTimeout(hoverTimer);
-      hoverTimer = setTimeout(() => {
-        view.hitTest(event).then((response) => {
-          const graphic = response.results?.[0]?.graphic;
-          if (!graphic) return hideHover();
-          renderHoverContent(graphic);
-        }).catch(() => hideHover());
-      }, 80); // throttle supaya ringan
+      // Posisikan modal di lokasi klik
+      const x = event.x;
+      const y = event.y;
+
+      detailModal.style.left = `${x + 15}px`;
+      detailModal.style.top = `${y + 15}px`;
+      detailModal.classList.remove('hidden');
+    };
+
+    const hideDetailModal = () => {
+      detailModal.classList.add('hidden');
+    };
+
+    // Close button handler
+    closeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      hideDetailModal();
     });
 
-    view.on('pointer-leave', hideHover);
+    // Keyboard ESC handler
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') hideDetailModal();
+    });
+
+    // Variable untuk tracking mode measurement
+    let measurementActive = false;
+
+    // Click event untuk menampilkan detail
+    view.on('click', (event) => {
+      // Skip jika sedang dalam mode measurement
+      if (measurementActive) {
+        return;
+      }
+
+      view.hitTest(event).then((response) => {
+        const graphic = response.results?.[0]?.graphic;
+
+        // Jika klik di area kosong, tutup modal
+        if (!graphic) {
+          hideDetailModal();
+          return;
+        }
+
+        // Jika klik di graphic, tampilkan detail
+        showDetailModal(event, graphic);
+      }).catch(() => {
+        hideDetailModal();
+      });
+    });
 
     // ================== LAYERS ==================
 
@@ -1408,7 +1451,7 @@
     view.ui.add(basemapToggle, "bottom-right");
 
     // ================== DISTANCE MEASUREMENT & COST CALCULATION ==================
-    const distanceMeasurement = new DistanceMeasurement2D({
+    let distanceMeasurement = new DistanceMeasurement2D({
       view: view,
       unit: "kilometers"
     });
@@ -1440,20 +1483,63 @@
     `;
     view.container.appendChild(costPanel);
 
-    // Close button handler
-    const costClose = costPanel.querySelector('#costClose');
-    costClose.addEventListener('click', () => {
-      costPanel.classList.add('hidden');
-      distanceMeasurement.clear();
-    });
-
     // Distance measurement button
     const measureBtn = document.createElement('div');
     measureBtn.className = 'measure-btn';
     measureBtn.innerHTML = '📏 Ukur Jarak';
     measureBtn.title = 'Klik untuk mengukur jarak dan menghitung biaya';
 
-    let measurementActive = false;
+    // Close button handler for cost panel
+    const costClose = costPanel.querySelector('#costClose');
+    costClose.addEventListener('click', () => {
+      costPanel.classList.add('hidden');
+      measurementActive = false;
+      measureBtn.classList.remove('active');
+      measureBtn.innerHTML = '📏 Ukur Jarak';
+
+      // Reset cursor ke default
+      view.container.style.cursor = 'default';
+
+      // Stop measurement dan clear semua drawing
+      distanceMeasurement.viewModel.clear();
+      distanceMeasurement.destroy();
+
+      // Recreate measurement widget untuk reset state
+      setTimeout(() => {
+        distanceMeasurement = new DistanceMeasurement2D({
+          view: view,
+          unit: "kilometers"
+        });
+
+        // Re-attach watcher
+        distanceMeasurement.viewModel.watch('measurement', (measurement) => {
+          if (measurement) {
+            const distanceKm = measurement.length;
+            const pricePerKm = 150000;
+            const totalCost = distanceKm * pricePerKm;
+
+            const costDistanceEl = costPanel.querySelector('#costDistance');
+            const costTotalEl = costPanel.querySelector('#costTotal');
+
+            if (distanceKm > 0) {
+              costDistanceEl.textContent = `${distanceKm.toFixed(2)} km`;
+              costTotalEl.textContent = `Rp. ${totalCost.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+            } else {
+              costDistanceEl.textContent = '-';
+              costTotalEl.textContent = 'Rp. 0';
+            }
+          }
+        });
+      }, 100);
+
+      // Reset cost values
+      const costDistanceEl = costPanel.querySelector('#costDistance');
+      const costTotalEl = costPanel.querySelector('#costTotal');
+      costDistanceEl.textContent = '-';
+      costTotalEl.textContent = 'Rp. 0';
+    });
+
+    // Measurement button click handler
     measureBtn.addEventListener('click', () => {
       measurementActive = !measurementActive;
 
@@ -1462,11 +1548,56 @@
         measureBtn.innerHTML = '⏹️ Stop Ukur';
         distanceMeasurement.viewModel.start();
         costPanel.classList.remove('hidden');
+        // Tutup detail modal jika terbuka
+        hideDetailModal();
+        // Set cursor untuk drawing
+        view.container.style.cursor = 'crosshair';
       } else {
         measureBtn.classList.remove('active');
         measureBtn.innerHTML = '📏 Ukur Jarak';
-        distanceMeasurement.clear();
+
+        // Reset cursor ke default
+        view.container.style.cursor = 'default';
+
+        // Stop measurement dan clear semua drawing
+        distanceMeasurement.viewModel.clear();
+        distanceMeasurement.destroy();
+
+        // Recreate measurement widget untuk reset state
+        setTimeout(() => {
+          distanceMeasurement = new DistanceMeasurement2D({
+            view: view,
+            unit: "kilometers"
+          });
+
+          // Re-attach watcher
+          distanceMeasurement.viewModel.watch('measurement', (measurement) => {
+            if (measurement) {
+              const distanceKm = measurement.length;
+              const pricePerKm = 150000;
+              const totalCost = distanceKm * pricePerKm;
+
+              const costDistanceEl = costPanel.querySelector('#costDistance');
+              const costTotalEl = costPanel.querySelector('#costTotal');
+
+              if (distanceKm > 0) {
+                costDistanceEl.textContent = `${distanceKm.toFixed(2)} km`;
+                costTotalEl.textContent = `Rp. ${totalCost.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+              } else {
+                costDistanceEl.textContent = '-';
+                costTotalEl.textContent = 'Rp. 0';
+              }
+            }
+          });
+        }, 100);
+
         costPanel.classList.add('hidden');
+
+        // Reset cost values
+        const costDistanceEl = costPanel.querySelector('#costDistance');
+        const costTotalEl = costPanel.querySelector('#costTotal');
+        costDistanceEl.textContent = '-';
+        costTotalEl.textContent = 'Rp. 0';
       }
     });
 
@@ -1497,54 +1628,83 @@
 </script>
 
 <style>
-  /* Hover modal di kanan atas saat pointer di atas peta */
+  /* Detail modal muncul saat klik fitur */
   #viewDiv { position: relative; }
-  .hover-modal {
+  .detail-modal {
     position: absolute;
-    top: 16px;
-    right: 16px;
     width: min(360px, 86vw);
     max-height: 60vh;
     overflow: hidden;
-    background: rgba(15, 23, 42, 0.9);
+    background: rgba(15, 23, 42, 0.95);
     color: #e2e8f0;
     border-radius: 14px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.32);
-    border: 1px solid rgba(226, 232, 240, 0.16);
-    backdrop-filter: blur(8px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+    border: 1px solid rgba(226, 232, 240, 0.18);
+    backdrop-filter: blur(10px);
     display: flex;
     flex-direction: column;
-    z-index: 5;
-    pointer-events: none;
+    z-index: 100;
+    pointer-events: auto;
   }
-  .hover-modal.hidden { display: none; }
-  .hm-head {
-    padding: 10px 14px;
+  .detail-modal.hidden { display: none; }
+
+  .dm-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 1;
+    font-weight: bold;
+  }
+  .dm-close:hover {
+    background: rgba(239, 68, 68, 0.35);
+    color: #fee2e2;
+    transform: scale(1.1);
+  }
+
+  .dm-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dm-head {
+    padding: 10px 40px 10px 14px;
     font-weight: 700;
     font-size: 15px;
     border-bottom: 1px solid rgba(226, 232, 240, 0.16);
-    background: linear-gradient(90deg, rgba(34,197,94,0.16), rgba(15,23,42,0.05));
+    background: linear-gradient(90deg, rgba(34,197,94,0.18), rgba(15,23,42,0.05));
   }
-  .hm-body {
+  .dm-body {
     padding: 10px 14px;
     overflow-y: auto;
     max-height: 50vh;
     display: grid;
     gap: 6px;
   }
-  .hm-row {
+  .dm-row {
     display: grid;
     grid-template-columns: 1fr 1.2fr;
     gap: 8px;
     font-size: 12px;
     padding: 6px 8px;
-    background: rgba(255,255,255,0.03);
+    background: rgba(255,255,255,0.04);
     border: 1px solid rgba(148, 163, 184, 0.16);
     border-radius: 8px;
   }
-  .hm-key { color: #94a3b8; font-weight: 600; word-break: break-word; }
-  .hm-val { color: #e2e8f0; word-break: break-word; }
-  .hm-empty { color: #94a3b8; font-size: 12px; padding: 8px; }
+  .dm-key { color: #94a3b8; font-weight: 600; word-break: break-word; }
+  .dm-val { color: #e2e8f0; word-break: break-word; }
+  .dm-empty { color: #94a3b8; font-size: 12px; padding: 8px; }
 
   /* Layer filter panel */
   .layer-filter {
@@ -1720,8 +1880,8 @@
   }
 
   @media (max-width: 640px) {
-    .hover-modal { width: min(420px, 94vw); top: 10px; right: 10px; }
-    .hm-row { grid-template-columns: 1fr; }
+    .detail-modal { width: min(340px, 94vw); }
+    .dm-row { grid-template-columns: 1fr; }
     .layer-filter { width: 260px; }
     .cost-panel { width: min(280px, 90vw); right: 10px; }
   }
