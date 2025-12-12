@@ -1236,6 +1236,72 @@
     });
     map.add(lnBatasProvinsiLayer);
 
+    // ================== LAYER FILTER PANEL ==================
+    const layerList = [
+      { label: 'Aset Tanah', layer: asetLayer },
+      { label: 'Desa Berlistrik PLN', layer: desaBerlistrikLayer },
+      { label: 'Jalan Nasional', layer: jalanNasionalLayer },
+      { label: 'Jalan Provinsi', layer: jalanProvinsiLayer },
+      { label: 'Jaringan Listrik Balikpapan', layer: jaringanListrikBalikpapanLayer },
+      { label: 'Rencana Jaringan Listrik Bontang', layer: jaringanListrikBontangLayer },
+      { label: 'Sistem Energi Kukar (SUTT)', layer: sistemJaringanEnergiKukarLayer },
+      { label: 'Sistem Energi Mahulu (SUTR)', layer: sistemJaringanEnergiMahuluLayer },
+      { label: 'Sistem Energi Kubar (SUTM)', layer: sistemJaringanEnergiKubarLayer },
+      { label: 'Sistem Energi Kubar UP2KB', layer: sistemJaringanEnergiKubarUP2KBlayer },
+      { label: 'Sistem Energi Kutim (SUTM)', layer: sistemJaringanEnergiKutimLayer },
+      { label: 'Sistem Energi Paser (SUTM)', layer: sistemJaringanEnergiPaserLayer },
+      { label: 'LN SUTM PPU', layer: sutmPPULayer },
+      { label: 'LN SUTR Kutim', layer: sutrKutimLayer },
+      { label: 'LN Transmisi', layer: lnTransmisiLayer },
+      { label: 'LN2 SUTM Paser', layer: ln2SutmPaserLayer },
+      { label: 'LN2 SUTM PPU', layer: ln2SutmPPULayer },
+      { label: 'AR Batas Kaltim Full', layer: arBatasKaltimLayer },
+      { label: 'AR Batas Kec.', layer: arBatasKecamatanLayer },
+      { label: 'LN SUTM Berau', layer: sutmBerauLayer },
+      { label: 'PT Gardu Berau', layer: ptGarduBerauLayer },
+      { label: 'PT Gardu Distribusi Kutim', layer: ptGarduDistribusiKutimLayer },
+      { label: 'PT Gardu Hubung Kutim', layer: ptGarduHubungKutimLayer },
+      { label: 'PT Gardu Induk Kutim', layer: ptGarduIndukKutimLayer },
+      { label: 'PT Pembangkit Eksisting', layer: ptPembangkitEksistingLayer },
+      { label: 'PT Rencana Pembangkit Bontang', layer: ptRencanaPembangkitBontangLayer },
+      { label: 'PT Sistem Energi Balikpapan', layer: ptSistemEnergiBalikpapanLayer },
+      { label: 'PT Sistem Energi Kukar', layer: ptSistemEnergiKukarLayer },
+      { label: 'PT Sistem Energi Mahulu', layer: ptSistemEnergiMahuluLayer },
+      { label: 'PT Sistem Energi Samarinda', layer: ptSistemEnergiSamarindaLayer },
+      { label: 'PT Trafo Berau', layer: ptTrafoBerauLayer },
+      { label: 'PT Trafo Gardu Distribusi PPU', layer: ptTrafoGarduDistribusiPpuLayer },
+      { label: 'PT Trafo Gardu Kubar', layer: ptTrafoGarduKubarLayer },
+      { label: 'PT1 Trafo Gardu Paser', layer: pt1TrafoGarduPaserLayer },
+      { label: 'PT2 Trafo Gardu Paser', layer: pt2TrafoGarduPaserLayer },
+      { label: 'LN Batas Desa', layer: lnBatasDesaLayer },
+      { label: 'LN Batas Kab/Kota', layer: lnBatasKabKotaLayer },
+      { label: 'LN Batas Kecamatan', layer: lnBatasKecamatanLayer },
+      { label: 'LN Batas Negara', layer: lnBatasNegaraLayer },
+      { label: 'LN Batas Provinsi', layer: lnBatasProvinsiLayer }
+    ];
+
+    const layerFilter = document.createElement('div');
+    layerFilter.className = 'layer-filter';
+    layerFilter.innerHTML = `
+      <div class="lf-head">Layer Filter</div>
+      <div class="lf-body">
+        ${layerList.map((item, idx) => {
+          const id = `lf-${idx}`;
+          return `<label class="lf-row"><input type="checkbox" id="${id}" ${item.layer.visible ? 'checked' : ''}> <span>${item.label}</span></label>`;
+        }).join('')}
+      </div>
+    `;
+
+    layerList.forEach((item, idx) => {
+      const cb = layerFilter.querySelector(`#lf-${idx}`);
+      if (!cb) return;
+      cb.addEventListener('change', () => {
+        item.layer.visible = cb.checked;
+      });
+    });
+
+    view.ui.add(layerFilter, 'top-left');
+
     // ================== WIDGETS ==================
     const bm_osm     = Basemap.fromId("osm");          bm_osm.title     = "Peta (OSM)";
     const bm_sat     = Basemap.fromId("satellite");    bm_sat.title     = "Satelit";
@@ -1513,9 +1579,51 @@
   .hm-val { color: #e2e8f0; word-break: break-word; }
   .hm-empty { color: #94a3b8; font-size: 12px; padding: 8px; }
 
+  /* Layer filter panel */
+  .layer-filter {
+    width: 240px;
+    max-height: 440px;
+    overflow: hidden;
+    background: rgba(15,23,42,0.92);
+    color: #e2e8f0;
+    border-radius: 14px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.28);
+    border: 1px solid rgba(226,232,240,0.18);
+    backdrop-filter: blur(8px);
+  }
+  .lf-head {
+    padding: 10px 12px;
+    font-weight: 700;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(226,232,240,0.16);
+    background: linear-gradient(90deg, rgba(37,99,235,0.24), rgba(15,23,42,0.12));
+  }
+  .lf-body {
+    max-height: 380px;
+    overflow-y: auto;
+    padding: 8px 10px 10px;
+    display: grid;
+    gap: 6px;
+  }
+  .lf-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    padding: 6px 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(148,163,184,0.18);
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .lf-row input { accent-color: #22c55e; }
+  .lf-row span { line-height: 1.35; }
+  .lf-row:hover { background: rgba(34,197,94,0.08); }
+
   @media (max-width: 640px) {
     .hover-modal { width: min(420px, 94vw); top: 10px; right: 10px; }
     .hm-row { grid-template-columns: 1fr; }
+    .layer-filter { width: 260px; }
   }
 </style>
 @endpush
