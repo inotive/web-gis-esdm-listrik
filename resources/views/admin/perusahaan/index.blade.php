@@ -530,31 +530,31 @@
         </table>
 
         <div class="table-footer">
-          <div class="table-footer-left">
+            <div class="summary">Menampilkan
+                <strong>{{ $perusahaans->firstItem() ?? 0 }}–{{ $perusahaans->lastItem() ?? 0 }}</strong> dari
+                <strong>{{ $perusahaans->total() }}</strong> data</div>
+
             <div class="show-wrap">
-              <span>Show</span>
-              <form id="perPageForm" method="GET" action="{{ route('admin.perusahaan.index') }}">
-                <input type="hidden" name="q" value="{{ request('q') }}">
-                <input type="hidden" name="regency_id" value="{{ request('regency_id') }}">
-                <input type="hidden" name="district_id" value="{{ request('district_id') }}">
-                <input type="hidden" name="village_id" value="{{ request('village_id') }}">
-                <select class="form-select auto-submit" name="per_page" aria-label="Jumlah baris per halaman">
-                  @foreach([5,10,25,50,100] as $pp)
-                    <option value="{{ $pp }}" {{ (string)request('per_page','10')===(string)$pp ? 'selected':'' }}>{{ $pp }}</option>
-                  @endforeach
-                </select>
-              </form>
-              <span>per page</span>
-            </div>
-          </div>
-
-          <div class="table-footer-right">
-            <div class="summary">
-              {{ $perusahaans->firstItem() ?: 0 }}-{{ $perusahaans->lastItem() ?: 0 }} of {{ $perusahaans->total() }}
+                <span>Show</span>
+                <form id="perPageForm" method="GET" action="#">
+                    <input type="hidden" name="q" value="{{ request('q') }}">
+                    <input type="hidden" name="by" value="{{ request('by') }}">
+                    <input type="hidden" name="val" value="{{ request('val') }}">
+                    <select class="form-select auto-submit" name="per_page"
+                        aria-label="Jumlah baris per halaman">
+                        @foreach ([5, 10, 25, 50, 100] as $pp)
+                            <option value="{{ $pp }}"
+                                {{ (string) request('per_page', '10') === (string) $pp ? 'selected' : '' }}>
+                                {{ $pp }}</option>
+                        @endforeach
+                    </select>
+                </form>
+                <span>per page</span>
             </div>
 
-            {{ $perusahaans->links() }}
-          </div>
+            <nav aria-label="Pagination">
+                {{ $perusahaans->links('pagination::bootstrap-4') }}
+            </nav>
         </div>
       </div>
     </div>

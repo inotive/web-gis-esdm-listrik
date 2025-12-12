@@ -524,30 +524,31 @@
         </table>
 
         <div class="table-footer">
-          <div class="table-footer-left">
+            <div class="summary">Menampilkan
+                <strong>{{ $desas->firstItem() ?? 0 }}–{{ $desas->lastItem() ?? 0 }}</strong> dari
+                <strong>{{ $desas->total() }}</strong> data</div>
+
             <div class="show-wrap">
-              <span>Show</span>
-              <form id="perPageForm" method="GET" action="{{ route('admin.desa.index') }}">
-                <input type="hidden" name="q" value="{{ request('q') }}">
-                <input type="hidden" name="regency_id" value="{{ request('regency_id') }}">
-                <input type="hidden" name="district_id" value="{{ request('district_id') }}">
-                <select class="form-select auto-submit" name="per_page" aria-label="Jumlah baris per halaman">
-                  @foreach([5,10,25,50,100] as $pp)
-                    <option value="{{ $pp }}" {{ (string)request('per_page','10')===(string)$pp ? 'selected':'' }}>{{ $pp }}</option>
-                  @endforeach
-                </select>
-              </form>
-              <span>per page</span>
-            </div>
-          </div>
-
-          <div class="table-footer-right">
-            <div class="summary">
-              {{ $desas->firstItem() ?: 0 }}-{{ $desas->lastItem() ?: 0 }} of {{ $desas->total() }}
+                <span>Show</span>
+                <form id="perPageForm" method="GET" action="#">
+                    <input type="hidden" name="q" value="{{ request('q') }}">
+                    <input type="hidden" name="by" value="{{ request('by') }}">
+                    <input type="hidden" name="val" value="{{ request('val') }}">
+                    <select class="form-select auto-submit" name="per_page"
+                        aria-label="Jumlah baris per halaman">
+                        @foreach ([5, 10, 25, 50, 100] as $pp)
+                            <option value="{{ $pp }}"
+                                {{ (string) request('per_page', '10') === (string) $pp ? 'selected' : '' }}>
+                                {{ $pp }}</option>
+                        @endforeach
+                    </select>
+                </form>
+                <span>per page</span>
             </div>
 
-            {{ $desas->links() }}
-          </div>
+            <nav aria-label="Pagination">
+                {{ $desas->links('pagination::bootstrap-4') }}
+            </nav>
         </div>
       </div>
     </div>
