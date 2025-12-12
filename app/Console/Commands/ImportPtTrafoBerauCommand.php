@@ -12,6 +12,31 @@ class ImportPtTrafoBerauCommand extends Command
 
     protected $description = 'Import data trafo Berau dari file GeoJSON ke tabel pt_trafo_berau';
 
+    /**
+     * Validasi dan clean datetime value
+     * Jika datetime <= 1900-01-01 atau invalid, return null
+     */
+    private function cleanDatetime($value)
+    {
+        if ($value === null || trim($value) === '') {
+            return null;
+        }
+
+        try {
+            $date = new \DateTime($value);
+            $year = (int)$date->format('Y');
+
+            // Jika tahun <= 1900, anggap invalid (data placeholder dari Excel/Shapefile)
+            if ($year <= 1900) {
+                return null;
+            }
+
+            return $date->format('Y-m-d H:i:s');
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
     public function handle(): int
     {
         $fileOpt = $this->option('file') ?? '';
@@ -118,14 +143,14 @@ class ImportPtTrafoBerauCommand extends Command
             $model->globalid      = $globalid;
             $model->assetgroup    = $assetgroup;
             $model->assettype     = $assettype;
-            $model->tglgambar     = $tglgambar;
+            $model->tglgambar     = $this->cleanDatetime($tglgambar);
             $model->usergambar    = $usergambar;
-            $model->tglupdate     = $tglupdate;
+            $model->tglupdate     = $this->cleanDatetime($tglupdate);
             $model->userupdate    = $userupdate;
             $model->assetnum      = $assetnum;
             $model->classifica    = $classifica;
             $model->descriptio    = $descriptio;
-            $model->installdat    = $installdat;
+            $model->installdat    = $this->cleanDatetime($installdat);
             $model->location      = $location;
             $model->manufactur    = $manufactur;
             $model->serialnum     = $serialnum;
@@ -149,17 +174,17 @@ class ImportPtTrafoBerauCommand extends Command
             $model->enabled       = $enabled;
             $model->globalid_1    = $globalid_1;
             $model->created_us    = $created_us;
-            $model->created_da    = $created_da;
+            $model->created_da    = $this->cleanDatetime($created_da);
             $model->last_edite    = $last_edite;
-            $model->last_edi_1    = $last_edi_1;
+            $model->last_edi_1    = $this->cleanDatetime($last_edi_1);
             $model->relationsh    = $relationsh;
             $model->kode_hanta    = $kode_hanta;
-            $model->operatingd    = $operatingd;
+            $model->operatingd    = $this->cleanDatetime($operatingd);
             $model->ownersysid    = $ownersysid;
             $model->sourcestar    = $sourcestar;
             $model->sourceendm    = $sourceendm;
             $model->no_slo        = $no_slo;
-            $model->sloactived    = $sloactived;
+            $model->sloactived    = $this->cleanDatetime($sloactived);
             $model->penyulang     = $penyulang;
             $model->geometry      = $geom;
 
