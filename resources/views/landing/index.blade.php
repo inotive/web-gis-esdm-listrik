@@ -51,7 +51,8 @@
     "esri/widgets/ScaleBar",
     "esri/widgets/BasemapGallery",
     "esri/widgets/BasemapToggle",
-    "esri/widgets/BasemapGallery/support/LocalBasemapsSource"
+    "esri/widgets/BasemapGallery/support/LocalBasemapsSource",
+    "esri/widgets/DistanceMeasurement2D"
   ], function(
     Map,
     Basemap,
@@ -64,7 +65,8 @@
     ScaleBar,
     BasemapGallery,
     BasemapToggle,
-    LocalBasemapsSource
+    LocalBasemapsSource,
+    DistanceMeasurement2D
   ){
 
     // ================== MAP & VIEW ==================
@@ -1405,6 +1407,91 @@
     });
     view.ui.add(basemapToggle, "bottom-right");
 
+    // ================== DISTANCE MEASUREMENT & COST CALCULATION ==================
+    const distanceMeasurement = new DistanceMeasurement2D({
+      view: view,
+      unit: "kilometers"
+    });
+
+    // Create cost calculation panel
+    const costPanel = document.createElement('div');
+    costPanel.id = 'costPanel';
+    costPanel.className = 'cost-panel hidden';
+    costPanel.innerHTML = `
+      <div class="cost-head">
+        <div class="cost-title">Perhitungan Biaya</div>
+        <button id="costClose" class="cost-close" title="Tutup">✕</button>
+      </div>
+      <div class="cost-body">
+        <div class="cost-row">
+          <div class="cost-label">Jarak</div>
+          <div class="cost-value" id="costDistance">-</div>
+        </div>
+        <div class="cost-row">
+          <div class="cost-label">Harga per km</div>
+          <div class="cost-value">Rp. 150.000</div>
+        </div>
+        <div class="cost-divider"></div>
+        <div class="cost-row total">
+          <div class="cost-label">Total Biaya</div>
+          <div class="cost-value" id="costTotal">Rp. 0</div>
+        </div>
+      </div>
+    `;
+    view.container.appendChild(costPanel);
+
+    // Close button handler
+    const costClose = costPanel.querySelector('#costClose');
+    costClose.addEventListener('click', () => {
+      costPanel.classList.add('hidden');
+      distanceMeasurement.clear();
+    });
+
+    // Distance measurement button
+    const measureBtn = document.createElement('div');
+    measureBtn.className = 'measure-btn';
+    measureBtn.innerHTML = '📏 Ukur Jarak';
+    measureBtn.title = 'Klik untuk mengukur jarak dan menghitung biaya';
+
+    let measurementActive = false;
+    measureBtn.addEventListener('click', () => {
+      measurementActive = !measurementActive;
+
+      if (measurementActive) {
+        measureBtn.classList.add('active');
+        measureBtn.innerHTML = '⏹️ Stop Ukur';
+        distanceMeasurement.viewModel.start();
+        costPanel.classList.remove('hidden');
+      } else {
+        measureBtn.classList.remove('active');
+        measureBtn.innerHTML = '📏 Ukur Jarak';
+        distanceMeasurement.clear();
+        costPanel.classList.add('hidden');
+      }
+    });
+
+    view.ui.add(measureBtn, 'top-right');
+
+    // Watch for measurement changes
+    distanceMeasurement.viewModel.watch('measurement', (measurement) => {
+      if (measurement) {
+        const distanceKm = measurement.length;
+        const pricePerKm = 150000;
+        const totalCost = distanceKm * pricePerKm;
+
+        const costDistanceEl = costPanel.querySelector('#costDistance');
+        const costTotalEl = costPanel.querySelector('#costTotal');
+
+        if (distanceKm > 0) {
+          costDistanceEl.textContent = `${distanceKm.toFixed(2)} km`;
+          costTotalEl.textContent = `Rp. ${totalCost.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+        } else {
+          costDistanceEl.textContent = '-';
+          costTotalEl.textContent = 'Rp. 0';
+        }
+      }
+    });
+
   });
 })();
 </script>
@@ -1510,10 +1597,133 @@
     margin: 4px 0;
   }
 
+  /* Distance measurement button */
+  .measure-btn {
+    background: rgba(37, 99, 235, 0.95);
+    color: white;
+    padding: 10px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+    border: 1px solid rgba(59, 130, 246, 0.4);
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .measure-btn:hover {
+    background: rgba(59, 130, 246, 0.95);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.45);
+  }
+  .measure-btn.active {
+    background: rgba(220, 38, 38, 0.95);
+    border-color: rgba(239, 68, 68, 0.4);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+  }
+  .measure-btn.active:hover {
+    background: rgba(239, 68, 68, 0.95);
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.45);
+  }
+
+  /* Cost calculation panel */
+  .cost-panel {
+    position: absolute;
+    top: 70px;
+    right: 16px;
+    width: 280px;
+    background: rgba(15, 23, 42, 0.94);
+    color: #e2e8f0;
+    border-radius: 14px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.32);
+    border: 1px solid rgba(226, 232, 240, 0.18);
+    backdrop-filter: blur(10px);
+    z-index: 10;
+  }
+  .cost-panel.hidden { display: none; }
+
+  .cost-head {
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.16);
+    background: linear-gradient(90deg, rgba(37,99,235,0.24), rgba(15,23,42,0.12));
+    border-radius: 14px 14px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .cost-title {
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .cost-close {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .cost-close:hover {
+    background: rgba(239, 68, 68, 0.3);
+    color: #fee2e2;
+  }
+
+  .cost-body {
+    padding: 14px;
+    display: grid;
+    gap: 10px;
+  }
+  .cost-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 8px;
+  }
+  .cost-row.total {
+    background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(16,185,129,0.1));
+    border-color: rgba(34, 197, 94, 0.3);
+    padding: 12px 12px;
+  }
+  .cost-label {
+    font-size: 13px;
+    color: #cbd5e1;
+    font-weight: 500;
+  }
+  .cost-row.total .cost-label {
+    font-weight: 700;
+    color: #e2e8f0;
+    font-size: 14px;
+  }
+  .cost-value {
+    font-size: 14px;
+    color: #e2e8f0;
+    font-weight: 600;
+  }
+  .cost-row.total .cost-value {
+    font-size: 16px;
+    color: #6ee7b7;
+    font-weight: 700;
+  }
+  .cost-divider {
+    height: 1px;
+    background: rgba(148, 163, 184, 0.24);
+    margin: 4px 0;
+  }
+
   @media (max-width: 640px) {
     .hover-modal { width: min(420px, 94vw); top: 10px; right: 10px; }
     .hm-row { grid-template-columns: 1fr; }
     .layer-filter { width: 260px; }
+    .cost-panel { width: min(280px, 90vw); right: 10px; }
   }
 </style>
 @endpush
