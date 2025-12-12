@@ -82,6 +82,42 @@
       }
     });
 
+    // ========= Hover Modal =========
+    const hoverModal = document.createElement('div');
+    hoverModal.id = 'hoverModal';
+    hoverModal.className = 'hover-modal hidden';
+    view.container.appendChild(hoverModal);
+
+    const renderHoverContent = (graphic) => {
+      const attrs = graphic?.attributes || {};
+      const layerTitle = graphic?.layer?.title || 'Detail Fitur';
+      const rows = Object.entries(attrs)
+        .map(([k, v]) => `<div class="hm-row"><div class="hm-key">${k}</div><div class="hm-val">${v ?? '-'}</div></div>`)
+        .join('');
+
+      hoverModal.innerHTML = `
+        <div class="hm-head">${layerTitle}</div>
+        <div class="hm-body">${rows || '<div class="hm-empty">Tidak ada atribut</div>'}</div>
+      `;
+      hoverModal.classList.remove('hidden');
+    };
+
+    const hideHover = () => hoverModal.classList.add('hidden');
+
+    let hoverTimer;
+    view.on('pointer-move', (event) => {
+      clearTimeout(hoverTimer);
+      hoverTimer = setTimeout(() => {
+        view.hitTest(event).then((response) => {
+          const graphic = response.results?.[0]?.graphic;
+          if (!graphic) return hideHover();
+          renderHoverContent(graphic);
+        }).catch(() => hideHover());
+      }, 80); // throttle supaya ringan
+    });
+
+    view.on('pointer-leave', hideHover);
+
     // ================== LAYERS ==================
 
     // Aset Tanah
@@ -1426,4 +1462,60 @@
   });
 })();
 </script>
+
+<style>
+  /* Hover modal di kanan atas saat pointer di atas peta */
+  #viewDiv { position: relative; }
+  .hover-modal {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: min(360px, 86vw);
+    max-height: 60vh;
+    overflow: hidden;
+    background: rgba(15, 23, 42, 0.9);
+    color: #e2e8f0;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.32);
+    border: 1px solid rgba(226, 232, 240, 0.16);
+    backdrop-filter: blur(8px);
+    display: flex;
+    flex-direction: column;
+    z-index: 5;
+    pointer-events: none;
+  }
+  .hover-modal.hidden { display: none; }
+  .hm-head {
+    padding: 10px 14px;
+    font-weight: 700;
+    font-size: 15px;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.16);
+    background: linear-gradient(90deg, rgba(34,197,94,0.16), rgba(15,23,42,0.05));
+  }
+  .hm-body {
+    padding: 10px 14px;
+    overflow-y: auto;
+    max-height: 50vh;
+    display: grid;
+    gap: 6px;
+  }
+  .hm-row {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 8px;
+    font-size: 12px;
+    padding: 6px 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 8px;
+  }
+  .hm-key { color: #94a3b8; font-weight: 600; word-break: break-word; }
+  .hm-val { color: #e2e8f0; word-break: break-word; }
+  .hm-empty { color: #94a3b8; font-size: 12px; padding: 8px; }
+
+  @media (max-width: 640px) {
+    .hover-modal { width: min(420px, 94vw); top: 10px; right: 10px; }
+    .hm-row { grid-template-columns: 1fr; }
+  }
+</style>
 @endpush
