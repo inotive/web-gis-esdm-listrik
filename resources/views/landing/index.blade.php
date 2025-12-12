@@ -120,22 +120,6 @@
 
     // ================== LAYERS ==================
 
-    // Aset Tanah
-    const asetLayer = new GeoJSONLayer({
-      url: "{{ url('/api/aset') }}",
-      title: "Aset Tanah Pemerintah",
-      outFields: ["*"],
-      renderer: {
-        type: "simple",
-        symbol: {
-          type: "simple-fill",
-          color: [37, 99, 235, 0.45],
-          outline: { color: [29, 78, 216, 1], width: 2 }
-        }
-      }
-    });
-    map.add(asetLayer);
-
     // Desa Berlistrik PLN
     const desaBerlistrikLayer = new GeoJSONLayer({
       url: "{{ url('/api/data-berlistrik') }}",
@@ -1238,7 +1222,6 @@
 
     // ================== LAYER FILTER PANEL ==================
     const layerList = [
-      { label: 'Aset Tanah', layer: asetLayer },
       { label: 'Desa Berlistrik PLN', layer: desaBerlistrikLayer },
       { label: 'Jalan Nasional', layer: jalanNasionalLayer },
       { label: 'Jalan Provinsi', layer: jalanProvinsiLayer },
@@ -1285,6 +1268,8 @@
     layerFilter.innerHTML = `
       <div class="lf-head">Layer Filter</div>
       <div class="lf-body">
+        <label class="lf-row lf-all"><input type="checkbox" id="lf-all" checked> <span><strong>Semua Layer</strong></span></label>
+        <div class="lf-divider"></div>
         ${layerList.map((item, idx) => {
           const id = `lf-${idx}`;
           return `<label class="lf-row"><input type="checkbox" id="${id}" ${item.layer.visible ? 'checked' : ''}> <span>${item.label}</span></label>`;
@@ -1292,11 +1277,30 @@
       </div>
     `;
 
+    // Handle "Semua Layer" checkbox
+    const allCheckbox = layerFilter.querySelector('#lf-all');
+    allCheckbox.addEventListener('change', () => {
+      const isChecked = allCheckbox.checked;
+      layerList.forEach((item, idx) => {
+        item.layer.visible = isChecked;
+        const cb = layerFilter.querySelector(`#lf-${idx}`);
+        if (cb) cb.checked = isChecked;
+      });
+    });
+
+    // Handle individual layer checkboxes
     layerList.forEach((item, idx) => {
       const cb = layerFilter.querySelector(`#lf-${idx}`);
       if (!cb) return;
       cb.addEventListener('change', () => {
         item.layer.visible = cb.checked;
+
+        // Update "Semua Layer" checkbox state
+        const allChecked = layerList.every((_, i) => {
+          const checkbox = layerFilter.querySelector(`#lf-${i}`);
+          return checkbox && checkbox.checked;
+        });
+        allCheckbox.checked = allChecked;
       });
     });
 
@@ -1336,7 +1340,6 @@
       content: new Legend({
         view: view,
         layerInfos: [
-          { layer: asetLayer,                    title: "Aset Tanah Pemerintah" },
           { layer: desaBerlistrikLayer,          title: "Desa Berlistrik PLN" },
           { layer: jalanNasionalLayer,           title: "Jalan Nasional" },
           { layer: jalanProvinsiLayer,           title: "Jalan Provinsi" },
@@ -1401,129 +1404,6 @@
       nextBasemap: bm_osm
     });
     view.ui.add(basemapToggle, "bottom-right");
-
-    // ================== PANEL DETAIL ASET ==================
-    const panel = $('detailPanel');
-    $('dpClose').addEventListener('click', () => panel.classList.remove('show'));
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') panel.classList.remove('show');
-    });
-
-    const setText = (id, val) => {
-      $(id).textContent = (val && String(val).trim() !== '') ? val : '-';
-    };
-
-    function openPanel(attrs){
-      setText('dpUnitKerja',  attrs.unit_kerja || '-');
-      setText('dpNama',       attrs.nama_asset || '-');
-      setText('dpLuas',       fmt(attrs.luas_m2 || 0));
-      setText('dpKelurahan',  attrs.kelurahan || attrs.village || '-');
-      setText('dpKecamatan',  attrs.kecamatan || attrs.district || '-');
-      setText('dpKabupaten',  attrs.kabupaten || attrs.regency || '-');
-      setText('dpProvinsi',   attrs.provinsi  || attrs.province || '-');
-      setText('dpAlamat',     attrs.alamat || '-');
-
-      const link = attrs.sertifikat_url || attrs.link_sertif || attrs.file_url || null;
-      $('dpSertifikat').innerHTML = link
-        ? `<a class="dp-link" target="_blank" href="${link}">Lihat ⦿</a>`
-        : '-';
-
-      panel.classList.add('show');
-    }
-
-    let layerView, highlightHandle = null;
-    view.whenLayerView(asetLayer).then(function(lv) {
-      layerView = lv;
-    });
-
-    view.on("pointer-move", function(evt){
-      view.hitTest(evt, { include: [asetLayer] }).then(function(res){
-        const hit = res.results.some(function(r){
-          return r.graphic && r.graphic.layer === asetLayer;
-        });
-        view.container.style.cursor = hit ? "pointer" : "default";
-      });
-    });
-
-    view.on("click", function(event){
-      view.hitTest(event, { include: [asetLayer] }).then(function(response){
-        const r = response.results.find(function(x){
-          return x.graphic && x.graphic.layer === asetLayer;
-        });
-
-        if (!r || !r.graphic) {
-          panel.classList.remove('show');
-          if (highlightHandle) {
-            highlightHandle.remove();
-            highlightHandle = null;
-          }
-          return;
-        }
-
-        if (layerView) {
-          if (highlightHandle) {
-            highlightHandle.remove();
-          }
-          highlightHandle = layerView.highlight(r.graphic);
-        }
-
-        openPanel(r.graphic.attributes || {});
-      });
-    });
-
-    // Grouping by unit_kerja
-    asetLayer.when(async () => {
-      try {
-        const q = asetLayer.createQuery();
-        q.where = "1=1";
-        q.outFields = ["unit_kerja"];
-        q.returnGeometry = false;
-
-        const res = await asetLayer.queryFeatures(q);
-
-        const values = Array.from(
-          new Set(
-            res.features.map(f =>
-              f.attributes.unit_kerja ? String(f.attributes.unit_kerja).trim() : "-"
-            )
-          )
-        ).sort((a, b) => a.localeCompare(b, 'id'));
-
-        const palette = [
-          [59,130,246], [16,185,129], [245,158,11], [236,72,153],
-          [99,102,241], [34,197,94],  [249,115,22], [139,92,246],
-          [2,132,199],  [234,179,8],  [239,68,68],  [20,184,166],
-          [168,85,247], [14,165,233], [217,119,6],  [5,150,105]
-        ];
-
-        const uniqueValueInfos = values.map((v, i) => {
-          const rgb = palette[i % palette.length];
-          return {
-            value: v === "-" ? null : v,
-            label: v === "-" ? "Tanpa Unit Kerja" : v,
-            symbol: {
-              type: "simple-fill",
-              color: [rgb[0], rgb[1], rgb[2], 0.45],
-              outline: { color: [rgb[0], rgb[1], rgb[2], 1], width: 1.5 }
-            }
-          };
-        });
-
-        asetLayer.renderer = {
-          type: "unique-value",
-          field: "unit_kerja",
-          defaultLabel: "Tanpa Unit Kerja",
-          defaultSymbol: {
-            type: "simple-fill",
-            color: [148, 163, 184, 0.35],
-            outline: { color: [100, 116, 139, 1], width: 1.2 }
-          },
-          uniqueValueInfos: uniqueValueInfos
-        };
-      } catch (err) {
-        console.error("Gagal membuat renderer unik unit_kerja:", err);
-      }
-    });
 
   });
 })();
@@ -1619,6 +1499,16 @@
   .lf-row input { accent-color: #22c55e; }
   .lf-row span { line-height: 1.35; }
   .lf-row:hover { background: rgba(34,197,94,0.08); }
+  .lf-all {
+    background: rgba(37,99,235,0.14) !important;
+    border-color: rgba(59,130,246,0.3) !important;
+  }
+  .lf-all:hover { background: rgba(37,99,235,0.22) !important; }
+  .lf-divider {
+    height: 1px;
+    background: rgba(148,163,184,0.24);
+    margin: 4px 0;
+  }
 
   @media (max-width: 640px) {
     .hover-modal { width: min(420px, 94vw); top: 10px; right: 10px; }
