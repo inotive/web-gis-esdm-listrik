@@ -114,12 +114,45 @@
       renderDetailContent(graphic);
 
       // Posisikan modal di lokasi klik
-      const x = event.x;
-      const y = event.y;
+      let x = event.x;
+      let y = event.y;
 
-      detailModal.style.left = `${x + 15}px`;
-      detailModal.style.top = `${y + 15}px`;
+      // Tampilkan dulu agar bisa menghitung dimensi
       detailModal.classList.remove('hidden');
+
+      // Ambil dimensi modal dan viewport
+      const modalRect = detailModal.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+
+      // Offset dari kursor
+      const offsetX = 15;
+      const offsetY = 15;
+
+      // Hitung posisi dengan offset
+      let finalX = x + offsetX;
+      let finalY = y + offsetY;
+
+      // Cek jika modal terpotong di kanan
+      if (finalX + modalRect.width > viewportWidth) {
+        finalX = x - modalRect.width - offsetX;
+        // Jika masih keluar di kiri, set ke batas kiri
+        if (finalX < 0) {
+          finalX = 10;
+        }
+      }
+
+      // Cek jika modal terpotong di bawah
+      if (finalY + modalRect.height > viewportHeight) {
+        finalY = y - modalRect.height - offsetY;
+        // Jika masih keluar di atas, set ke batas atas
+        if (finalY < 0) {
+          finalY = 10;
+        }
+      }
+
+      detailModal.style.left = `${finalX}px`;
+      detailModal.style.top = `${finalY}px`;
     };
 
     const hideDetailModal = () => {
