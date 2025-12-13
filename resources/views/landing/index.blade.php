@@ -1359,43 +1359,82 @@
     
     // Status Listrik Desa (special case with custom filter)
     categoriesHTML += `
-      <label class="lf-row lf-parent"><input type="checkbox" id="lf-desa-parent" checked> <span><strong>Status Listrik Desa</strong></span></label>
-      <label class="lf-row lf-child"><input type="checkbox" id="lf-desa-belum" checked> <span>Belum Terlayani Listrik</span></label>
-      <label class="lf-row lf-child"><input type="checkbox" id="lf-desa-terlayani" checked> <span>Terlayani Listrik</span></label>
+      <label class="lf-row lf-parent" data-category="desa">
+        <span class="lf-toggle">▼</span>
+        <input type="checkbox" id="lf-desa-parent" checked> 
+        <span><strong>Status Listrik Desa</strong></span>
+      </label>
+      <div class="lf-children" data-category="desa">
+        <label class="lf-row lf-child"><input type="checkbox" id="lf-desa-belum" checked> <span>Belum Terlayani Listrik</span></label>
+        <label class="lf-row lf-child"><input type="checkbox" id="lf-desa-terlayani" checked> <span>Terlayani Listrik</span></label>
+      </div>
     `;
     
     // Transportasi
-    categoriesHTML += `<label class="lf-row lf-parent"><input type="checkbox" id="lf-transportasi-parent" checked> <span><strong>Data Jalan</strong></span></label>`;
+    categoriesHTML += `<label class="lf-row lf-parent" data-category="transportasi">
+      <span class="lf-toggle">▼</span>
+      <input type="checkbox" id="lf-transportasi-parent" checked> 
+      <span><strong>Data Jalan</strong></span>
+    </label>
+    <div class="lf-children" data-category="transportasi">`;
     layerCategories.transportasi.forEach((item, idx) => {
       categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-transportasi-${idx}" checked> <span>${item.label}</span></label>`;
     });
+    categoriesHTML += `</div>`;
     
     // Jaringan Listrik
-    categoriesHTML += `<label class="lf-row lf-parent"><input type="checkbox" id="lf-jaringan-parent" checked> <span><strong>Jaringan Listrik</strong></span></label>`;
+    categoriesHTML += `<label class="lf-row lf-parent" data-category="jaringan">
+      <span class="lf-toggle">▼</span>
+      <input type="checkbox" id="lf-jaringan-parent" checked> 
+      <span><strong>Jaringan Listrik</strong></span>
+    </label>
+    <div class="lf-children" data-category="jaringan">`;
     layerCategories.jaringan.forEach((item, idx) => {
       categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-jaringan-${idx}" checked> <span>${item.label}</span></label>`;
     });
+    categoriesHTML += `</div>`;
     
     // Infrastruktur Listrik
-    categoriesHTML += `<label class="lf-row lf-parent"><input type="checkbox" id="lf-infrastruktur-parent" checked> <span><strong>Infrastruktur Listrik</strong></span></label>`;
+    categoriesHTML += `<label class="lf-row lf-parent" data-category="infrastruktur">
+      <span class="lf-toggle">▼</span>
+      <input type="checkbox" id="lf-infrastruktur-parent" checked> 
+      <span><strong>Infrastruktur Listrik</strong></span>
+    </label>
+    <div class="lf-children" data-category="infrastruktur">`;
     layerCategories.infrastruktur.forEach((item, idx) => {
       categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-infrastruktur-${idx}" checked> <span>${item.label}</span></label>`;
     });
+    categoriesHTML += `</div>`;
     
     // Pembangkit
-    categoriesHTML += `<label class="lf-row lf-parent"><input type="checkbox" id="lf-pembangkit-parent" checked> <span><strong>Pembangkit</strong></span></label>`;
+    categoriesHTML += `<label class="lf-row lf-parent" data-category="pembangkit">
+      <span class="lf-toggle">▼</span>
+      <input type="checkbox" id="lf-pembangkit-parent" checked> 
+      <span><strong>Pembangkit</strong></span>
+    </label>
+    <div class="lf-children" data-category="pembangkit">`;
     layerCategories.pembangkit.forEach((item, idx) => {
       categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-pembangkit-${idx}" checked> <span>${item.label}</span></label>`;
     });
+    categoriesHTML += `</div>`;
     
     // Administrasi
-    categoriesHTML += `<label class="lf-row lf-parent"><input type="checkbox" id="lf-administrasi-parent" checked> <span><strong>Administrasi</strong></span></label>`;
+    categoriesHTML += `<label class="lf-row lf-parent" data-category="administrasi">
+      <span class="lf-toggle">▼</span>
+      <input type="checkbox" id="lf-administrasi-parent" checked> 
+      <span><strong>Administrasi</strong></span>
+    </label>
+    <div class="lf-children" data-category="administrasi">`;
     layerCategories.administrasi.forEach((item, idx) => {
       categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-administrasi-${idx}" checked> <span>${item.label}</span></label>`;
     });
+    categoriesHTML += `</div>`;
     
     layerFilter.innerHTML = `
-      <div class="lf-head">Layer Filter</div>
+      <div class="lf-head">
+        <span>Layer Filter</span>
+        <button class="lf-close-btn" title="Tutup panel">×</button>
+      </div>
       <div class="lf-body">
         <label class="lf-row lf-all"><input type="checkbox" id="lf-all" checked> <span><strong>Semua Layer</strong></span></label>
         <div class="lf-divider"></div>
@@ -1549,8 +1588,65 @@
     setupCategoryHandlers('infrastruktur');
     setupCategoryHandlers('pembangkit');
     setupCategoryHandlers('administrasi');
+    
+    // ================== EXPAND/COLLAPSE FUNCTIONALITY ==================
+    // Add toggle functionality for all parent categories
+    const parentLabels = layerFilter.querySelectorAll('.lf-parent');
+    parentLabels.forEach(parentLabel => {
+      const toggle = parentLabel.querySelector('.lf-toggle');
+      const category = parentLabel.getAttribute('data-category');
+      const childrenContainer = layerFilter.querySelector(`.lf-children[data-category="${category}"]`);
+      
+      if (!toggle || !childrenContainer) return;
+      
+      // Click on toggle or parent label (but not checkbox) to collapse/expand
+      const handleToggle = (e) => {
+        // Don't toggle if clicking on checkbox
+        if (e.target.type === 'checkbox') return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const isCollapsed = childrenContainer.classList.contains('collapsed');
+        
+        if (isCollapsed) {
+          childrenContainer.classList.remove('collapsed');
+          toggle.textContent = '▼';
+        } else {
+          childrenContainer.classList.add('collapsed');
+          toggle.textContent = '▶';
+        }
+      };
+      
+      // Add click handler to the parent label
+      parentLabel.addEventListener('click', handleToggle);
+    });
+    
+    // ================== CLOSE/OPEN PANEL FUNCTIONALITY ==================
+    // Create open button (shown when panel is closed)
+    const openButton = document.createElement('button');
+    openButton.className = 'lf-open-btn';
+    openButton.innerHTML = '☰<br><span style="font-size: 9px; font-weight: 600;"></span>';
+    openButton.title = 'Buka Layer Filter';
+    openButton.style.display = 'none'; // Hidden by default
+    
+    // Get close button
+    const closeButton = layerFilter.querySelector('.lf-close-btn');
+    
+    // Close panel handler
+    closeButton.addEventListener('click', () => {
+      layerFilter.classList.add('lf-minimized');
+      openButton.style.display = 'flex';
+    });
+    
+    // Open panel handler
+    openButton.addEventListener('click', () => {
+      layerFilter.classList.remove('lf-minimized');
+      openButton.style.display = 'none';
+    });
 
     view.ui.add(layerFilter, 'top-left');
+    view.ui.add(openButton, 'top-left');
 
     // ================== WIDGETS ==================
     const bm_osm     = Basemap.fromId("osm");          bm_osm.title     = "Peta (OSM)";
@@ -1925,6 +2021,62 @@
     font-size: 14px;
     border-bottom: 1px solid rgba(226,232,240,0.16);
     background: linear-gradient(90deg, rgba(37,99,235,0.24), rgba(15,23,42,0.12));
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .lf-close-btn {
+    background: rgba(239,68,68,0.2);
+    color: #fca5a5;
+    border: 1px solid rgba(239,68,68,0.3);
+    border-radius: 6px;
+    width: 24px;
+    height: 24px;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+  .lf-close-btn:hover {
+    background: rgba(239,68,68,0.35);
+    color: #fee2e2;
+    transform: scale(1.1);
+  }
+  .lf-open-btn {
+    background: rgba(37,99,235,0.92);
+    color: white;
+    border: 1px solid rgba(59,130,246,0.4);
+    border-radius: 10px;
+    width: 50px;
+    height: 60px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    box-shadow: 0 4px 12px rgba(37,99,235,0.35);
+    backdrop-filter: blur(8px);
+    margin-top: -140px;
+  }
+  .lf-open-btn:hover {
+    background: rgba(59,130,246,0.95);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(37,99,235,0.45);
+  }
+  .layer-filter.lf-minimized {
+    transform: translateX(-280px);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .layer-filter {
+    transition: transform 0.3s ease, opacity 0.3s ease;
   }
   .lf-body {
     max-height: 380px;
@@ -1967,6 +2119,25 @@
     height: 1px;
     background: rgba(148,163,184,0.24);
     margin: 4px 0;
+  }
+  .lf-toggle {
+    font-size: 10px;
+    margin-right: 4px;
+    transition: transform 0.2s ease;
+    user-select: none;
+  }
+  .lf-children {
+    display: grid;
+    gap: 6px;
+    max-height: 1000px;
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+    opacity: 1;
+  }
+  .lf-children.collapsed {
+    max-height: 0;
+    opacity: 0;
+    margin: 0;
   }
 
   /* Distance measurement button */
