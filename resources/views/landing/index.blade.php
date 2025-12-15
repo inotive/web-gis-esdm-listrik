@@ -1298,6 +1298,48 @@
     });
     map.add(lnBatasProvinsiLayer);
 
+    // ================== SET INITIAL LAYER VISIBILITY ==================
+    // Hide all layers on initial load
+    desaBerlistrikLayer.visible = false;
+    jalanNasionalLayer.visible = false;
+    jalanProvinsiLayer.visible = false;
+    jaringanListrikBalikpapanLayer.visible = false;
+    jaringanListrikBontangLayer.visible = false;
+    sistemJaringanEnergiKukarLayer.visible = false;
+    sistemJaringanEnergiMahuluLayer.visible = false;
+    sistemJaringanEnergiKubarLayer.visible = false;
+    sistemJaringanEnergiKubarUP2KBlayer.visible = false;
+    sistemJaringanEnergiKutimLayer.visible = false;
+    sistemJaringanEnergiPaserLayer.visible = false;
+    sutmPPULayer.visible = false;
+    sutrKutimLayer.visible = false;
+    lnTransmisiLayer.visible = false;
+    ln2SutmPaserLayer.visible = false;
+    ln2SutmPPULayer.visible = false;
+    arBatasKaltimLayer.visible = false;
+    arBatasKecamatanLayer.visible = false;
+    sutmBerauLayer.visible = false;
+    ptGarduBerauLayer.visible = false;
+    ptGarduDistribusiKutimLayer.visible = false;
+    ptGarduHubungKutimLayer.visible = false;
+    ptGarduIndukKutimLayer.visible = false;
+    ptPembangkitEksistingLayer.visible = false;
+    ptRencanaPembangkitBontangLayer.visible = false;
+    ptSistemEnergiBalikpapanLayer.visible = false;
+    ptSistemEnergiKukarLayer.visible = false;
+    ptSistemEnergiMahuluLayer.visible = false;
+    ptSistemEnergiSamarindaLayer.visible = false;
+    ptTrafoBerauLayer.visible = false;
+    ptTrafoGarduDistribusiPpuLayer.visible = false;
+    ptTrafoGarduKubarLayer.visible = false;
+    pt1TrafoGarduPaserLayer.visible = false;
+    pt2TrafoGarduPaserLayer.visible = false;
+    lnBatasDesaLayer.visible = false;
+    lnBatasKabKotaLayer.visible = false;
+    lnBatasKecamatanLayer.visible = false;
+    lnBatasNegaraLayer.visible = false;
+    lnBatasProvinsiLayer.visible = false;
+
     // ================== LAYER FILTER PANEL ==================
     // Organize layers into categories
     const layerCategories = {
@@ -1361,72 +1403,72 @@
     categoriesHTML += `
       <label class="lf-row lf-parent" data-category="desa">
         <span class="lf-toggle">▼</span>
-        <input type="checkbox" id="lf-desa-parent" checked> 
+        <input type="checkbox" id="lf-desa-parent">
         <span><strong>Status Listrik Desa</strong></span>
       </label>
       <div class="lf-children" data-category="desa">
-        <label class="lf-row lf-child"><input type="checkbox" id="lf-desa-belum" checked> <span>Belum Terlayani Listrik</span></label>
-        <label class="lf-row lf-child"><input type="checkbox" id="lf-desa-terlayani" checked> <span>Terlayani Listrik</span></label>
+        <label class="lf-row lf-child"><input type="checkbox" id="lf-desa-belum"> <span>Belum Terlayani Listrik</span></label>
+        <label class="lf-row lf-child"><input type="checkbox" id="lf-desa-terlayani"> <span>Terlayani Listrik</span></label>
       </div>
     `;
     
     // Transportasi
     categoriesHTML += `<label class="lf-row lf-parent" data-category="transportasi">
       <span class="lf-toggle">▼</span>
-      <input type="checkbox" id="lf-transportasi-parent" checked> 
+      <input type="checkbox" id="lf-transportasi-parent">
       <span><strong>Data Jalan</strong></span>
     </label>
     <div class="lf-children" data-category="transportasi">`;
     layerCategories.transportasi.forEach((item, idx) => {
-      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-transportasi-${idx}" checked> <span>${item.label}</span></label>`;
+      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-transportasi-${idx}"> <span>${item.label}</span></label>`;
     });
     categoriesHTML += `</div>`;
     
     // Jaringan Listrik
     categoriesHTML += `<label class="lf-row lf-parent" data-category="jaringan">
       <span class="lf-toggle">▼</span>
-      <input type="checkbox" id="lf-jaringan-parent" checked> 
+      <input type="checkbox" id="lf-jaringan-parent">
       <span><strong>Jaringan Listrik</strong></span>
     </label>
     <div class="lf-children" data-category="jaringan">`;
     layerCategories.jaringan.forEach((item, idx) => {
-      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-jaringan-${idx}" checked> <span>${item.label}</span></label>`;
+      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-jaringan-${idx}"> <span>${item.label}</span></label>`;
     });
     categoriesHTML += `</div>`;
     
     // Infrastruktur Listrik
     categoriesHTML += `<label class="lf-row lf-parent" data-category="infrastruktur">
       <span class="lf-toggle">▼</span>
-      <input type="checkbox" id="lf-infrastruktur-parent" checked> 
+      <input type="checkbox" id="lf-infrastruktur-parent">
       <span><strong>Infrastruktur Listrik</strong></span>
     </label>
     <div class="lf-children" data-category="infrastruktur">`;
     layerCategories.infrastruktur.forEach((item, idx) => {
-      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-infrastruktur-${idx}" checked> <span>${item.label}</span></label>`;
+      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-infrastruktur-${idx}"> <span>${item.label}</span></label>`;
     });
     categoriesHTML += `</div>`;
     
     // Pembangkit
     categoriesHTML += `<label class="lf-row lf-parent" data-category="pembangkit">
       <span class="lf-toggle">▼</span>
-      <input type="checkbox" id="lf-pembangkit-parent" checked> 
+      <input type="checkbox" id="lf-pembangkit-parent">
       <span><strong>Pembangkit</strong></span>
     </label>
     <div class="lf-children" data-category="pembangkit">`;
     layerCategories.pembangkit.forEach((item, idx) => {
-      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-pembangkit-${idx}" checked> <span>${item.label}</span></label>`;
+      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-pembangkit-${idx}"> <span>${item.label}</span></label>`;
     });
     categoriesHTML += `</div>`;
     
     // Administrasi
     categoriesHTML += `<label class="lf-row lf-parent" data-category="administrasi">
       <span class="lf-toggle">▼</span>
-      <input type="checkbox" id="lf-administrasi-parent" checked> 
+      <input type="checkbox" id="lf-administrasi-parent">
       <span><strong>Administrasi</strong></span>
     </label>
     <div class="lf-children" data-category="administrasi">`;
     layerCategories.administrasi.forEach((item, idx) => {
-      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-administrasi-${idx}" checked> <span>${item.label}</span></label>`;
+      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-administrasi-${idx}"> <span>${item.label}</span></label>`;
     });
     categoriesHTML += `</div>`;
     
@@ -1436,7 +1478,7 @@
         <button class="lf-close-btn" title="Tutup panel">×</button>
       </div>
       <div class="lf-body">
-        <label class="lf-row lf-all"><input type="checkbox" id="lf-all" checked> <span><strong>Semua Layer</strong></span></label>
+        <label class="lf-row lf-all"><input type="checkbox" id="lf-all"> <span><strong>Semua Layer</strong></span></label>
         <div class="lf-divider"></div>
         ${categoriesHTML}
       </div>
