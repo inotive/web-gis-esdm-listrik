@@ -198,6 +198,31 @@
 
     // ================== LAYERS ==================
 
+    // Helper function to create location pin SVG with custom color
+    const createLocationPinSvg = (fillColor, strokeColor = '#000000', size = 32) => {
+      // Convert RGBA array to hex if needed
+      const toHex = (color) => {
+        if (Array.isArray(color)) {
+          const [r, g, b] = color;
+          return '#' + [r, g, b].map(x => {
+            const hex = Math.round(x).toString(16);
+            return hex.length === 1 ? '0' + hex : hex;
+          }).join('');
+        }
+        return color;
+      };
+      
+      const fill = toHex(fillColor);
+      const stroke = toHex(strokeColor);
+      
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/>
+        <circle cx="12" cy="9" r="2.5" fill="${stroke}"/>
+      </svg>`;
+      
+      return 'data:image/svg+xml;base64,' + btoa(svg);
+    };
+
     // Desa Berlistrik PLN
     const desaBerlistrikLayer = new GeoJSONLayer({
       url: "{{ url('/api/data-berlistrik') }}",
@@ -767,10 +792,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [255, 165, 0, 0.8], // oranye
-          size: 8,
-          outline: { color: [0, 0, 0, 0.6], width: 0.5 }
+          type: "picture-marker",
+          url: createLocationPinSvg([255, 165, 0], [139, 69, 19]),
+          width: "24px",
+          height: "24px"
         }
       },
       popupTemplate: {
@@ -798,10 +823,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [0, 191, 255, 0.85], // biru muda
-          size: 8,
-          outline: { color: [0, 0, 0, 0.6], width: 0.5 }
+          type: "picture-marker",
+          url: createLocationPinSvg([0, 191, 255], [0, 100, 140]),
+          width: "24px",
+          height: "24px"
         }
       },
       popupTemplate: {
@@ -823,10 +848,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [186, 85, 211, 0.85], // ungu muda
-          size: 9,
-          outline: { color: [0, 0, 0, 0.6], width: 0.6 }
+          type: "picture-marker",
+          url: createLocationPinSvg([186, 85, 211], [128, 0, 128]),
+          width: "24px",
+          height: "24px"
         }
       },
       popupTemplate: {
@@ -847,10 +872,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [255, 99, 132, 0.9], // merah muda cerah
-          size: 9,
-          outline: { color: [0, 0, 0, 0.6], width: 0.6 }
+          type: "picture-marker",
+          url: createLocationPinSvg([255, 99, 132], [180, 50, 80]),
+          width: "24px",
+          height: "24px"
         }
       },
       popupTemplate: {
@@ -871,10 +896,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [0, 255, 127, 0.85], // spring green
-          size: 10,
-          outline: { color: [0, 0, 0, 0.7], width: 0.6 }
+          type: "picture-marker",
+          url: createLocationPinSvg([0, 255, 127], [0, 128, 64]),
+          width: "26px",
+          height: "26px"
         }
       },
       popupTemplate: {
@@ -898,10 +923,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [255, 215, 0, 0.9], // emas
-          size: 10,
-          outline: { color: [0, 0, 0, 0.7], width: 0.6 }
+          type: "picture-marker",
+          url: createLocationPinSvg([255, 215, 0], [184, 134, 11]),
+          width: "26px",
+          height: "26px"
         }
       },
       popupTemplate: {
@@ -925,10 +950,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [30, 144, 255, 0.9], // dodger blue
-          size: 10,
-          outline: { color: [0, 0, 0, 0.7], width: 0.6 }
+          type: "picture-marker",
+          url: createLocationPinSvg([30, 144, 255], [0, 90, 180]),
+          width: "26px",
+          height: "26px"
         }
       },
       popupTemplate: {
@@ -952,10 +977,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [255, 0, 0, 0.9], // merah
-          size: 11,
-          outline: { color: [0, 0, 0, 0.8], width: 0.7 }
+          type: "picture-marker",
+          url: createLocationPinSvg([255, 0, 0], [139, 0, 0]),
+          width: "28px",
+          height: "28px"
         }
       },
       popupTemplate: {
@@ -985,10 +1010,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [255, 165, 0, 0.9], // oranye
-          size: 11,
-          outline: { color: [0, 0, 0, 0.8], width: 0.7 }
+          type: "picture-marker",
+          url: createLocationPinSvg([255, 165, 0], [200, 100, 0]),
+          width: "28px",
+          height: "28px"
         }
       },
       popupTemplate: {
@@ -1018,10 +1043,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [0, 255, 255, 0.9], // cyan
-          size: 11,
-          outline: { color: [0, 0, 0, 0.8], width: 0.7 }
+          type: "picture-marker",
+          url: createLocationPinSvg([0, 255, 255], [0, 139, 139]),
+          width: "28px",
+          height: "28px"
         }
       },
       popupTemplate: {
@@ -1051,10 +1076,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [128, 0, 128, 0.9], // ungu
-          size: 11,
-          outline: { color: [0, 0, 0, 0.8], width: 0.7 }
+          type: "picture-marker",
+          url: createLocationPinSvg([128, 0, 128], [75, 0, 75]),
+          width: "28px",
+          height: "28px"
         }
       },
       popupTemplate: {
@@ -1087,10 +1112,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [255, 192, 203, 0.9], // pink
-          size: 9,
-          outline: { color: [0, 0, 0, 0.8], width: 0.6 }
+          type: "picture-marker",
+          url: createLocationPinSvg([255, 192, 203], [199, 21, 133]),
+          width: "24px",
+          height: "24px"
         }
       },
       popupTemplate: {
@@ -1122,10 +1147,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [255, 140, 0, 0.9], // oranye
-          size: 9,
-          outline: { color: [0, 0, 0, 0.8], width: 0.6 }
+          type: "picture-marker",
+          url: createLocationPinSvg([255, 140, 0], [205, 92, 0]),
+          width: "24px",
+          height: "24px"
         }
       },
       popupTemplate: {
@@ -1154,10 +1179,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [0, 128, 0, 0.9], // hijau
-          size: 10,
-          outline: { color: [0, 0, 0, 0.8], width: 0.6 }
+          type: "picture-marker",
+          url: createLocationPinSvg([0, 128, 0], [0, 80, 0]),
+          width: "26px",
+          height: "26px"
         }
       },
       popupTemplate: {
@@ -1185,10 +1210,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [255, 0, 0, 0.9], // merah
-          size: 10,
-          outline: { color: [0, 0, 0, 0.8], width: 0.6 }
+          type: "picture-marker",
+          url: createLocationPinSvg([255, 0, 0], [139, 0, 0]),
+          width: "26px",
+          height: "26px"
         }
       },
       popupTemplate: {
@@ -1378,56 +1403,56 @@
     lnBatasProvinsiLayer.visible = false;
 
     // ================== LAYER FILTER PANEL ==================
-    // Organize layers into categories
+    // Organize layers into categories with icons
     const layerCategories = {
       transportasi: [
-        { label: 'Jalan Nasional', layer: jalanNasionalLayer },
-        { label: 'Jalan Provinsi', layer: jalanProvinsiLayer },
-        { label: 'Jalan Balikpapan', layer: jalanBalikpapanLayer }
+        { label: 'Jalan Nasional', layer: jalanNasionalLayer, icon: '🛣️' },
+        { label: 'Jalan Provinsi', layer: jalanProvinsiLayer, icon: '🛤️' },
+        { label: 'Jalan Balikpapan', layer: jalanBalikpapanLayer, icon: '🚗' }
       ],
       jaringan: [
-        { label: 'Jaringan Listrik Balikpapan', layer: jaringanListrikBalikpapanLayer },
-        { label: 'Rencana Jaringan Listrik Bontang', layer: jaringanListrikBontangLayer },
-        { label: 'Sistem Energi Kukar (SUTT)', layer: sistemJaringanEnergiKukarLayer },
-        { label: 'Sistem Energi Mahulu (SUTR)', layer: sistemJaringanEnergiMahuluLayer },
-        { label: 'Sistem Energi Kubar (SUTM)', layer: sistemJaringanEnergiKubarLayer },
-        { label: 'Sistem Energi Kubar UP2KB', layer: sistemJaringanEnergiKubarUP2KBlayer },
-        { label: 'Sistem Energi Kutim (SUTM)', layer: sistemJaringanEnergiKutimLayer },
-        { label: 'Sistem Energi Paser (SUTM)', layer: sistemJaringanEnergiPaserLayer },
-        { label: 'LN SUTM PPU', layer: sutmPPULayer },
-        { label: 'LN SUTR Kutim', layer: sutrKutimLayer },
-        { label: 'LN Transmisi', layer: lnTransmisiLayer },
-        { label: 'LN2 SUTM Paser', layer: ln2SutmPaserLayer },
-        { label: 'LN2 SUTM PPU', layer: ln2SutmPPULayer },
-        { label: 'LN SUTM Berau', layer: sutmBerauLayer }
+        { label: 'Jaringan Listrik Balikpapan', layer: jaringanListrikBalikpapanLayer, icon: '⚡' },
+        { label: 'Rencana Jaringan Listrik Bontang', layer: jaringanListrikBontangLayer, icon: '📋' },
+        { label: 'Sistem Energi Kukar (SUTT)', layer: sistemJaringanEnergiKukarLayer, icon: '🔌' },
+        { label: 'Sistem Energi Mahulu (SUTR)', layer: sistemJaringanEnergiMahuluLayer, icon: '🔌' },
+        { label: 'Sistem Energi Kubar (SUTM)', layer: sistemJaringanEnergiKubarLayer, icon: '🔌' },
+        { label: 'Sistem Energi Kubar UP2KB', layer: sistemJaringanEnergiKubarUP2KBlayer, icon: '🔌' },
+        { label: 'Sistem Energi Kutim (SUTM)', layer: sistemJaringanEnergiKutimLayer, icon: '🔌' },
+        { label: 'Sistem Energi Paser (SUTM)', layer: sistemJaringanEnergiPaserLayer, icon: '🔌' },
+        { label: 'LN SUTM PPU', layer: sutmPPULayer, icon: '⚡' },
+        { label: 'LN SUTR Kutim', layer: sutrKutimLayer, icon: '⚡' },
+        { label: 'LN Transmisi', layer: lnTransmisiLayer, icon: '🔋' },
+        { label: 'LN2 SUTM Paser', layer: ln2SutmPaserLayer, icon: '⚡' },
+        { label: 'LN2 SUTM PPU', layer: ln2SutmPPULayer, icon: '⚡' },
+        { label: 'LN SUTM Berau', layer: sutmBerauLayer, icon: '⚡' }
       ],
       infrastruktur: [
-        { label: 'PT Gardu Berau', layer: ptGarduBerauLayer },
-        { label: 'PT Gardu Distribusi Kutim', layer: ptGarduDistribusiKutimLayer },
-        { label: 'PT Gardu Hubung Kutim', layer: ptGarduHubungKutimLayer },
-        { label: 'PT Gardu Induk Kutim', layer: ptGarduIndukKutimLayer },
-        { label: 'PT Trafo Berau', layer: ptTrafoBerauLayer },
-        { label: 'PT Trafo Gardu Distribusi PPU', layer: ptTrafoGarduDistribusiPpuLayer },
-        { label: 'PT Trafo Gardu Kubar', layer: ptTrafoGarduKubarLayer },
-        { label: 'PT1 Trafo Gardu Paser', layer: pt1TrafoGarduPaserLayer },
-        { label: 'PT2 Trafo Gardu Paser', layer: pt2TrafoGarduPaserLayer },
-        { label: 'PT Sistem Energi Balikpapan', layer: ptSistemEnergiBalikpapanLayer },
-        { label: 'PT Sistem Energi Kukar', layer: ptSistemEnergiKukarLayer },
-        { label: 'PT Sistem Energi Mahulu', layer: ptSistemEnergiMahuluLayer },
-        { label: 'PT Sistem Energi Samarinda', layer: ptSistemEnergiSamarindaLayer }
+        { label: 'PT Gardu Berau', layer: ptGarduBerauLayer, icon: '🏭' },
+        { label: 'PT Gardu Distribusi Kutim', layer: ptGarduDistribusiKutimLayer, icon: '🏭' },
+        { label: 'PT Gardu Hubung Kutim', layer: ptGarduHubungKutimLayer, icon: '🏭' },
+        { label: 'PT Gardu Induk Kutim', layer: ptGarduIndukKutimLayer, icon: '🏭' },
+        { label: 'PT Trafo Berau', layer: ptTrafoBerauLayer, icon: '🔧' },
+        { label: 'PT Trafo Gardu Distribusi PPU', layer: ptTrafoGarduDistribusiPpuLayer, icon: '🔧' },
+        { label: 'PT Trafo Gardu Kubar', layer: ptTrafoGarduKubarLayer, icon: '🔧' },
+        { label: 'PT1 Trafo Gardu Paser', layer: pt1TrafoGarduPaserLayer, icon: '🔧' },
+        { label: 'PT2 Trafo Gardu Paser', layer: pt2TrafoGarduPaserLayer, icon: '🔧' },
+        { label: 'PT Sistem Energi Balikpapan', layer: ptSistemEnergiBalikpapanLayer, icon: '⚙️' },
+        { label: 'PT Sistem Energi Kukar', layer: ptSistemEnergiKukarLayer, icon: '⚙️' },
+        { label: 'PT Sistem Energi Mahulu', layer: ptSistemEnergiMahuluLayer, icon: '⚙️' },
+        { label: 'PT Sistem Energi Samarinda', layer: ptSistemEnergiSamarindaLayer, icon: '⚙️' }
       ],
       pembangkit: [
-        { label: 'PT Pembangkit Eksisting', layer: ptPembangkitEksistingLayer },
-        { label: 'PT Rencana Pembangkit Bontang', layer: ptRencanaPembangkitBontangLayer }
+        { label: 'PT Pembangkit Eksisting', layer: ptPembangkitEksistingLayer, icon: '🏗️' },
+        { label: 'PT Rencana Pembangkit Bontang', layer: ptRencanaPembangkitBontangLayer, icon: '📐' }
       ],
       administrasi: [
-        { label: 'LN Batas Desa', layer: lnBatasDesaLayer },
-        { label: 'LN Batas Kab/Kota', layer: lnBatasKabKotaLayer },
-        { label: 'LN Batas Kecamatan', layer: lnBatasKecamatanLayer },
-        { label: 'LN Batas Negara', layer: lnBatasNegaraLayer },
-        { label: 'LN Batas Provinsi', layer: lnBatasProvinsiLayer },
-        { label: 'AR Batas Kaltim Full', layer: arBatasKaltimLayer },
-        { label: 'AR Batas Kec.', layer: arBatasKecamatanLayer }
+        { label: 'LN Batas Desa', layer: lnBatasDesaLayer, icon: '🏘️' },
+        { label: 'LN Batas Kab/Kota', layer: lnBatasKabKotaLayer, icon: '🏙️' },
+        { label: 'LN Batas Kecamatan', layer: lnBatasKecamatanLayer, icon: '🏛️' },
+        { label: 'LN Batas Negara', layer: lnBatasNegaraLayer, icon: '🌍' },
+        { label: 'LN Batas Provinsi', layer: lnBatasProvinsiLayer, icon: '🗺️' },
+        { label: 'AR Batas Kaltim Full', layer: arBatasKaltimLayer, icon: '📍' },
+        { label: 'AR Batas Kec.', layer: arBatasKecamatanLayer, icon: '📍' }
       ]
     };
 
@@ -1442,11 +1467,12 @@
       <label class="lf-row lf-parent" data-category="desa">
         <span class="lf-toggle">▼</span>
         <input type="checkbox" id="lf-desa-parent">
+        <span class="lf-icon">🏠</span>
         <span><strong>Status Listrik Desa</strong></span>
       </label>
       <div class="lf-children" data-category="desa">
-        <label class="lf-row lf-child"><input type="checkbox" id="lf-desa-belum"> <span>Belum Terlayani Listrik</span></label>
-        <label class="lf-row lf-child"><input type="checkbox" id="lf-desa-terlayani"> <span>Terlayani Listrik</span></label>
+        <label class="lf-row lf-child"><input type="checkbox" id="lf-desa-belum"> <span class="lf-icon">🔴</span> <span>Belum Terlayani Listrik</span></label>
+        <label class="lf-row lf-child"><input type="checkbox" id="lf-desa-terlayani"> <span class="lf-icon">🟢</span> <span>Terlayani Listrik</span></label>
       </div>
     `;
 
@@ -1454,11 +1480,12 @@
     categoriesHTML += `<label class="lf-row lf-parent" data-category="transportasi">
       <span class="lf-toggle">▼</span>
       <input type="checkbox" id="lf-transportasi-parent">
+      <span class="lf-icon">🚧</span>
       <span><strong>Data Jalan</strong></span>
     </label>
     <div class="lf-children" data-category="transportasi">`;
     layerCategories.transportasi.forEach((item, idx) => {
-      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-transportasi-${idx}"> <span>${item.label}</span></label>`;
+      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-transportasi-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
     });
     categoriesHTML += `</div>`;
 
@@ -1466,11 +1493,12 @@
     categoriesHTML += `<label class="lf-row lf-parent" data-category="jaringan">
       <span class="lf-toggle">▼</span>
       <input type="checkbox" id="lf-jaringan-parent">
+      <span class="lf-icon">⚡</span>
       <span><strong>Jaringan Listrik</strong></span>
     </label>
     <div class="lf-children" data-category="jaringan">`;
     layerCategories.jaringan.forEach((item, idx) => {
-      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-jaringan-${idx}"> <span>${item.label}</span></label>`;
+      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-jaringan-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
     });
     categoriesHTML += `</div>`;
 
@@ -1478,11 +1506,12 @@
     categoriesHTML += `<label class="lf-row lf-parent" data-category="infrastruktur">
       <span class="lf-toggle">▼</span>
       <input type="checkbox" id="lf-infrastruktur-parent">
+      <span class="lf-icon">🏭</span>
       <span><strong>Infrastruktur Listrik</strong></span>
     </label>
     <div class="lf-children" data-category="infrastruktur">`;
     layerCategories.infrastruktur.forEach((item, idx) => {
-      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-infrastruktur-${idx}"> <span>${item.label}</span></label>`;
+      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-infrastruktur-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
     });
     categoriesHTML += `</div>`;
 
@@ -1490,11 +1519,12 @@
     categoriesHTML += `<label class="lf-row lf-parent" data-category="pembangkit">
       <span class="lf-toggle">▼</span>
       <input type="checkbox" id="lf-pembangkit-parent">
+      <span class="lf-icon">🏗️</span>
       <span><strong>Pembangkit</strong></span>
     </label>
     <div class="lf-children" data-category="pembangkit">`;
     layerCategories.pembangkit.forEach((item, idx) => {
-      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-pembangkit-${idx}"> <span>${item.label}</span></label>`;
+      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-pembangkit-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
     });
     categoriesHTML += `</div>`;
 
@@ -1502,21 +1532,22 @@
     categoriesHTML += `<label class="lf-row lf-parent" data-category="administrasi">
       <span class="lf-toggle">▼</span>
       <input type="checkbox" id="lf-administrasi-parent">
+      <span class="lf-icon">🗺️</span>
       <span><strong>Administrasi</strong></span>
     </label>
     <div class="lf-children" data-category="administrasi">`;
     layerCategories.administrasi.forEach((item, idx) => {
-      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-administrasi-${idx}"> <span>${item.label}</span></label>`;
+      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-administrasi-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
     });
     categoriesHTML += `</div>`;
 
     layerFilter.innerHTML = `
       <div class="lf-head">
-        <span>Layer Filter</span>
+        <span>🗂️ Layer Filter</span>
         <button class="lf-close-btn" title="Tutup panel">×</button>
       </div>
       <div class="lf-body">
-        <label class="lf-row lf-all"><input type="checkbox" id="lf-all"> <span><strong>Semua Layer</strong></span></label>
+        <label class="lf-row lf-all"><input type="checkbox" id="lf-all"> <span class="lf-icon">📊</span> <span><strong>Semua Layer</strong></span></label>
         <div class="lf-divider"></div>
         ${categoriesHTML}
       </div>
@@ -2179,6 +2210,16 @@
   }
   .lf-row input { accent-color: #22c55e; }
   .lf-row span { line-height: 1.35; }
+  .lf-icon {
+    font-size: 14px;
+    min-width: 18px;
+    text-align: center;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
+    transition: transform 0.2s ease;
+  }
+  .lf-row:hover .lf-icon {
+    transform: scale(1.15);
+  }
   .lf-row:hover { background: rgba(34,197,94,0.08); }
   .lf-all {
     background: rgba(37,99,235,0.14) !important;
