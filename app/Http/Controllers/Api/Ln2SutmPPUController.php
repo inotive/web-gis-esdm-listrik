@@ -3,92 +3,23 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\LN2_SUTM_PPU;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class Ln2SutmPPUController extends Controller
 {
-    /**
-     * Return LN2 SUTM PPU sebagai GeoJSON FeatureCollection
-     */
-    public function index(): JsonResponse
+    public function index(Request $request)
     {
-        $rows = LN2_SUTM_PPU::whereNotNull('geometry')->get();
+        $path = public_path('assets/Jaringan-Listrik/LN2_SUTM_PPU.json');
 
-        $features = $rows->map(function (LN2_SUTM_PPU $row) {
-            $geom = $row->geometry;
+        if (!file_exists($path)) {
+            return response()->json([
+                'error' => 'File LN2_SUTM_PPU.json tidak ditemukan'
+            ], 404);
+        }
 
-            if (is_string($geom)) {
-                $geom = json_decode($geom, true);
-            }
+        $json = file_get_contents($path);
 
-            if (!$geom || !isset($geom['type'])) {
-                return null;
-            }
-
-            return [
-                'type'       => 'Feature',
-                'properties' => [
-                    'id'          => $row->id,
-                    'OBJECTID'    => $row->objectid,
-                    'FID_Jalan'   => $row->fid_jalan,
-                    'NAMOBJ'      => $row->namobj,
-                    'FCODE'       => $row->fcode,
-                    'REMARK'      => $row->remark,
-                    'METADATA'    => $row->metadata,
-                    'SRS_ID'      => $row->srs_id,
-                    'ARHRJL'      => $row->arhrjl,
-                    'AUTRJL'      => $row->autrjl,
-                    'FGSRJL'      => $row->fgsrjl,
-                    'JARRJL'      => $row->jarrjl,
-                    'JPARJL'      => $row->jparjl,
-                    'KLLRJL'      => $row->kllrjl,
-                    'KONRJL'      => $row->konrjl,
-                    'KPMSTR'      => $row->kpmstr,
-                    'LKONOF'      => $row->lkonof,
-                    'LKSBSP'      => $row->lksbsp,
-                    'LKSRTA'      => $row->lksrta,
-                    'LLHRRT'      => $row->llhrrt,
-                    'LOCRJL'      => $row->locrjl,
-                    'LBRBHJ'      => $row->lbrbhj,
-                    'LBRJLN'      => $row->lbrjln,
-                    'MATRJL'      => $row->matrjl,
-                    'MEDRJL'      => $row->medrjl,
-                    'SPCRJL'      => $row->spcrjl,
-                    'STARJL'      => $row->starjl,
-                    'TOLRJL'      => $row->tolrjl,
-                    'UTKRJL'      => $row->utkrjl,
-                    'VLCPRT'      => $row->vlcprt,
-                    'WLYRJL'      => $row->wlyrjl,
-                    'TGL_SK'      => $row->tgl_sk,
-                    'JLNLYG'      => $row->jlnlyg,
-                    'KLSRJL'      => $row->klsrjl,
-                    'JalanListr'  => $row->jalanlistr,
-                    'FID_BatasP'  => $row->fid_batasp,
-                    'WADMKC'      => $row->wadmkc,
-                    'WADMKD'      => $row->wadmkd,
-                    'WADMKK'      => $row->wadmkk,
-                    'WADMPR'      => $row->wadmpr,
-                    'SHAPE_Leng'  => $row->shape_leng,
-                    'Panjang'     => $row->panjang,
-                ],
-                'geometry'   => $geom,
-            ];
-        })
-        ->filter()
-        ->values()
-        ->toArray();
-
-        return response()->json(
-            [
-                'type'     => 'FeatureCollection',
-                'features' => $features,
-            ],
-            200,
-            [
-                'Content-Type'                => 'application/json',
-                'Access-Control-Allow-Origin' => '*',
-            ]
-        );
+        // Kembalikan apa adanya, karena sudah format GeoJSON
+        return response($json, 200)->header('Content-Type', 'application/json');
     }
 }

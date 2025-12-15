@@ -3,54 +3,23 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\LN_Batas_Negara;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class LnBatasNegaraController extends Controller
 {
-    /**
-     * Return LN_BATAS_NEGARA sebagai GeoJSON FeatureCollection
-     */
-    public function index(): JsonResponse
+    public function index(Request $request)
     {
-        $rows = LN_Batas_Negara::whereNotNull('geometry')->get();
+        $path = public_path('assets/Administrasi/LN_BATAS_NEGARA.json');
 
-        $features = $rows->map(function (LN_Batas_Negara $row) {
-            $geom = $row->geometry;
+        if (!file_exists($path)) {
+            return response()->json([
+                'error' => 'File LN_BATAS_NEGARA.json tidak ditemukan'
+            ], 404);
+        }
 
-            if (is_string($geom)) {
-                $geom = json_decode($geom, true);
-            }
+        $json = file_get_contents($path);
 
-            if (!$geom || !isset($geom['type'])) {
-                return null;
-            }
-
-            return [
-                'type'       => 'Feature',
-                'properties' => [
-                    'id'          => $row->id,
-                    'FID_Export'  => $row->fid_export,
-                    'WADMPR'      => $row->wadmpr,
-                    'Shape_Leng'  => $row->shape_leng,
-                ],
-                'geometry'   => $geom,
-            ];
-        })
-        ->filter()
-        ->values()
-        ->toArray();
-
-        return response()->json(
-            [
-                'type'     => 'FeatureCollection',
-                'features' => $features,
-            ],
-            200,
-            [
-                'Content-Type'                => 'application/json',
-                'Access-Control-Allow-Origin' => '*',
-            ]
-        );
+        // Kembalikan apa adanya, karena sudah format GeoJSON
+        return response($json, 200)->header('Content-Type', 'application/json');
     }
 }

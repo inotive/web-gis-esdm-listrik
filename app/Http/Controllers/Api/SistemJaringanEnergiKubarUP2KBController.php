@@ -3,54 +3,23 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\LN_Sistem_Jaringan_Energi_Kubar_UP2KB;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class SistemJaringanEnergiKubarUP2KBController extends Controller
 {
-    /**
-     * Return Sistem Jaringan Energi Kubar UP2KB sebagai GeoJSON FeatureCollection
-     */
-    public function index(): JsonResponse
+    public function index(Request $request)
     {
-        $rows = LN_Sistem_Jaringan_Energi_Kubar_UP2KB::whereNotNull('geometry')->get();
+        $path = public_path('assets/Jaringan-Listrik/LN_SUTM_Kubar_UP2KB.json');
 
-        $features = $rows->map(function (LN_Sistem_Jaringan_Energi_Kubar_UP2KB $row) {
-            $geom = $row->geometry;
+        if (!file_exists($path)) {
+            return response()->json([
+                'error' => 'File LN_SUTM_Kubar_UP2KB.json tidak ditemukan'
+            ], 404);
+        }
 
-            if (is_string($geom)) {
-                $geom = json_decode($geom, true);
-            }
+        $json = file_get_contents($path);
 
-            if (!$geom || !isset($geom['type'])) {
-                return null;
-            }
-
-            return [
-                'type'       => 'Feature',
-                'properties' => [
-                    'id'         => $row->id,
-                    'OBJECTID'   => $row->objectid,
-                    'descriptio' => $row->descriptio,
-                    'Shape_Leng' => $row->shape_leng,
-                ],
-                'geometry'   => $geom,
-            ];
-        })
-        ->filter()
-        ->values()
-        ->toArray();
-
-        return response()->json(
-            [
-                'type'     => 'FeatureCollection',
-                'features' => $features,
-            ],
-            200,
-            [
-                'Content-Type'                => 'application/json',
-                'Access-Control-Allow-Origin' => '*',
-            ]
-        );
+        // Kembalikan apa adanya, karena sudah format GeoJSON
+        return response($json, 200)->header('Content-Type', 'application/json');
     }
 }

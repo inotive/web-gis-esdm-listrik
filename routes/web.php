@@ -28,6 +28,8 @@ use App\Http\Controllers\Admin\PerusahaanController;
 use App\Http\Controllers\Admin\PermohonanController;
 use App\Http\Controllers\Admin\PermohonanUserController;
 use App\Http\Controllers\Admin\DokumenController;
+use App\Http\Controllers\Admin\RekapDataController;
+use App\Http\Controllers\Admin\DataInfrastrukturController;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,7 +53,7 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
 
 
 
-        Route::group(['as' => 'hak-akses.', 'prefix' => 'hak-akses'], function () {
+    Route::group(['as' => 'hak-akses.', 'prefix' => 'hak-akses'], function () {
         // Role Management
         Route::middleware('can:role.view')->group(function () {
             Route::get('role', [RoleController::class, 'index'])->name('role.index');
@@ -73,16 +75,16 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
     });
     // Data Wilayah
     Route::group(['middleware' => [], 'as' => 'data-wilayah.', 'prefix' => 'data-wilayah'], function () {
-         Route::get('/', [DataWilayahController::class, 'index'])->name('index');
-    Route::post('/', [DataWilayahController::class, 'store'])->name('store');
-    Route::get('/{wilayah}/edit', [DataWilayahController::class, 'edit'])->name('edit');
-    Route::put('/{wilayah}', [DataWilayahController::class, 'update'])->name('update');
-    Route::delete('/{wilayah}', [DataWilayahController::class, 'destroy'])->name('destroy');
+        Route::get('/', [DataWilayahController::class, 'index'])->name('index');
+        Route::post('/', [DataWilayahController::class, 'store'])->name('store');
+        Route::get('/{wilayah}/edit', [DataWilayahController::class, 'edit'])->name('edit');
+        Route::put('/{wilayah}', [DataWilayahController::class, 'update'])->name('update');
+        Route::delete('/{wilayah}', [DataWilayahController::class, 'destroy'])->name('destroy');
 
-    // Endpoints opsi untuk dropdown berjenjang
-    Route::get('/options/regencies', [DataWilayahController::class, 'optionsRegencies'])->name('options.regencies');
-    Route::get('/options/districts', [DataWilayahController::class, 'optionsDistricts'])->name('options.districts');
-    Route::get('/options/villages', [DataWilayahController::class, 'optionsVillages'])->name('options.villages');
+        // Endpoints opsi untuk dropdown berjenjang
+        Route::get('/options/regencies', [DataWilayahController::class, 'optionsRegencies'])->name('options.regencies');
+        Route::get('/options/districts', [DataWilayahController::class, 'optionsDistricts'])->name('options.districts');
+        Route::get('/options/villages', [DataWilayahController::class, 'optionsVillages'])->name('options.villages');
     });
 
     // Data Pelanggan
@@ -110,6 +112,7 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
     Route::group(['middleware' => [], 'as' => 'perusahaan.', 'prefix' => 'perusahaan'], function () {
         Route::get('/', [PerusahaanController::class, 'index'])->name('index');
         Route::post('/', [PerusahaanController::class, 'store'])->name('store');
+        Route::get('/{perusahaan}', [PerusahaanController::class, 'show'])->name('show');
         Route::get('/{perusahaan}/edit', [PerusahaanController::class, 'edit'])->name('edit');
         Route::put('/{perusahaan}', [PerusahaanController::class, 'update'])->name('update');
         Route::delete('/{perusahaan}', [PerusahaanController::class, 'destroy'])->name('destroy');
@@ -119,6 +122,9 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
         Route::get('/options/districts', [PerusahaanController::class, 'optionsDistricts'])->name('options.districts');
         Route::get('/options/villages', [PerusahaanController::class, 'optionsVillages'])->name('options.villages');
     });
+
+    // Data Infrastruktur (Gabungan dengan Tabs)
+    Route::get('/data-infrastruktur', [DataInfrastrukturController::class, 'index'])->name('data-infrastruktur.index');
 
     // routes/web.php
 
@@ -163,7 +169,7 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
         Route::get('/', [GisController::class, 'index'])->name('index');
     });
 
-     Route::group(['as' => 'infrastruktur.', 'prefix' => 'infrastruktur-jaringan'], function () {
+    Route::group(['as' => 'infrastruktur.', 'prefix' => 'infrastruktur-jaringan'], function () {
         Route::get('/', [InfrastrukturJaringanController::class, 'index'])->name('index');
         Route::post('/', [InfrastrukturJaringanController::class, 'store'])->name('store');
         Route::put('/{infrastruktur}', [InfrastrukturJaringanController::class, 'update'])->name('update');
@@ -208,6 +214,11 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
         Route::put('/{dokumen}', [DokumenController::class, 'update'])->name('update');
         Route::delete('/{dokumen}', [DokumenController::class, 'destroy'])->name('destroy');
         Route::get('/{dokumen}/download', [DokumenController::class, 'download'])->name('download');
+    });
+
+    // Rekap Data
+    Route::group(['as' => 'rekap-data.', 'prefix' => 'rekap-data'], function () {
+        Route::get('/', [RekapDataController::class, 'index'])->name('index');
     });
 });
 

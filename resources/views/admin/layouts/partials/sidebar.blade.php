@@ -61,8 +61,18 @@
         @endif
 
 
+         <a class="menu-item {{ nav_active('admin.permohonan.*') }}" href="{{ route('admin.permohonan.index') }}">
+            <span class="menu-icon"><i class="ri-file-list-3-line" aria-hidden="true"></i></span>
+            <span class="menu-label">Perizinan dan Permohonan</span>
+        </a>
+
+         <a class="menu-item {{ nav_active('admin.rekap-data.*') }}" href="{{ route('admin.rekap-data.index') }}">
+            <span class="menu-icon"><i class="ri-file-text-line" aria-hidden="true"></i></span>
+            <span class="menu-label">Rekap Data</span>
+        </a>
+
         {{-- <a class="menu-item {{ nav_active('admin.pemukiman.*') }}" href="{{ route('admin.pemukiman.index') }}">
-            <span class="menu-icon"><i class="ri-home-2-line" aria-hidden="true"></i></span>
+            <span class="menu-icon"><i class="ri-home-2-line" aria-hidden="true"></i></span>sad
             <span class="menu-label">Pemukiman Tanpa Listrik</span>
         </a> --}}
 
@@ -79,10 +89,10 @@
     <nav class="menu-section" aria-label="Konfigurasi">
         <div class="menu-title">Konfigurasi</div>
 
-        <a class="menu-item {{ nav_active('admin.data-wilayah.*') }}" href="{{ route('admin.data-wilayah.index') }}">
+        <!-- <a class="menu-item {{ nav_active('admin.data-wilayah.*') }}" href="{{ route('admin.data-wilayah.index') }}">
             <span class="menu-icon"><i class="ri-map-pin-line" aria-hidden="true"></i></span>
             <span class="menu-label">Data Wilayah</span>
-        </a>
+        </a> -->
 
         <a class="menu-item {{ nav_active('admin.desa.*') }}" href="{{ route('admin.desa.index') }}">
             <span class="menu-icon"><i class="ri-home-3-line" aria-hidden="true"></i></span>
@@ -94,25 +104,15 @@
             <span class="menu-label">Data Perusahaan</span>
         </a>
 
-        <a class="menu-item {{ nav_active('admin.pelanggan.*') }}" href="{{ route('admin.pelanggan.index') }}">
+        <!-- <a class="menu-item {{ nav_active('admin.pelanggan.*') }}" href="{{ route('admin.pelanggan.index') }}">
             <span class="menu-icon"><i class="ri-team-line" aria-hidden="true"></i></span>
             <span class="menu-label">Data Pelanggan</span>
-        </a>
+        </a> -->
 
-        <a class="menu-item {{ request()->routeIs('admin.infrastruktur.*') ? 'active' : '' }}"
-            href="{{ route('admin.infrastruktur.index') }}">
+        <a class="menu-item {{ nav_active('admin.data-infrastruktur.*', 'admin.infrastruktur.*', 'admin.gardu.*', 'admin.pembangkit.*') }}"
+            href="{{ route('admin.data-infrastruktur.index') }}">
             <span class="menu-icon"><i class="ri-plug-line"></i></span>
-            <span class="menu-label">Data Infrastruktur Jaringan</span>
-        </a>
-
-        <a class="menu-item {{ nav_active('admin.gardu.*') }}" href="{{ route('admin.gardu.index') }}">
-            <span class="menu-icon"><i class="ri-base-station-line" aria-hidden="true"></i></span>
-            <span class="menu-label">Data Gardu</span>
-        </a>
-
-        <a class="menu-item {{ nav_active('admin.pembangkit.*') }}" href="{{ route('admin.pembangkit.index') }}">
-            <span class="menu-icon"><i class="ri-building-4-line" aria-hidden="true"></i></span>
-            <span class="menu-label">Data Pembangkit Lokal</span>
+            <span class="menu-label">Data Infrastruktur</span>
         </a>
 
         <a class="menu-item {{ nav_active('admin.jalan.*') }}" href="{{ route('admin.jalan.index') }}">
@@ -125,10 +125,7 @@
             <span class="menu-label">Variabel Skoring &amp; Bobot</span>
         </a>
 
-        <a class="menu-item {{ nav_active('admin.permohonan.*') }}" href="{{ route('admin.permohonan.index') }}">
-            <span class="menu-icon"><i class="ri-file-list-3-line" aria-hidden="true"></i></span>
-            <span class="menu-label">Manajemen Permohonan</span>
-        </a>
+    
 
         <a class="menu-item {{ nav_active('admin.hak-akses.user.*', 'admin.hak-akses.role.*', 'admin.hak-akses.permission.*') }}"
             href="{{ route('admin.hak-akses.user.index') }}">

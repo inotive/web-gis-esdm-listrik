@@ -3,66 +3,23 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\JsonResponse;
-use App\Models\JaringanListrikBalikpapan;
+use Illuminate\Http\Request;
 
-class JaringanlistrikbalikpapanController extends Controller
+class jaringanlistrikbalikpapancontroller extends Controller
 {
-    /**
-     * Return data jaringan listrik Balikpapan sebagai GeoJSON FeatureCollection
-     */
-    public function index(): JsonResponse
+    public function index(Request $request)
     {
-        $rows = JaringanListrikBalikpapan::whereNotNull('geometry')->get();
+        $path = public_path('assets/Jaringan-Listrik/LN_Jaringan_Listrik_Balikpapan.json');
 
-        $features = $rows->map(function (JaringanListrikBalikpapan $row) {
-            $geom = $row->geometry;
+        if (!file_exists($path)) {
+            return response()->json([
+                'error' => 'File LN_Jaringan_Listrik_Balikpapan.json tidak ditemukan'
+            ], 404);
+        }
 
-            // Jika geometry tersimpan sebagai string JSON, decode dulu
-            if (is_string($geom)) {
-                $geom = json_decode($geom, true);
-            }
+        $json = file_get_contents($path);
 
-            if (!$geom || !isset($geom['type'])) {
-                return null; // skip jika geometry invalid
-            }
-
-            return [
-                'type'       => 'Feature',
-                'properties' => [
-                    'id'         => $row->id,
-                    'OBJECTID'   => $row->objectid,
-                    'NAMOBJ'     => $row->namobj,
-                    'ORDE01'     => $row->orde01,
-                    'ORDE02'     => $row->orde02,
-                    'ORDE03'     => $row->orde03,
-                    'ORDE04'     => $row->orde04,
-                    'JNSRSR'     => $row->jnsrsr,
-                    'STSJRN'     => $row->stsjrn,
-                    'WADMPR'     => $row->wadmpr,
-                    'WADMKK'     => $row->wadmkk,
-                    'REMARK'     => $row->remark,
-                    'SBDATA'     => $row->sbdata,
-                    'Length'     => $row->length,
-                    'SHAPE_Leng' => $row->shape_leng,
-                ],
-                'geometry'   => $geom,
-            ];
-        })
-        ->filter()   // buang null
-        ->values()
-        ->toArray();
-
-        return response()->json(
-            [
-                'type'     => 'FeatureCollection',
-                'features' => $features,
-            ],
-            200,
-            [
-                'Content-Type'                => 'application/json',
-                'Access-Control-Allow-Origin' => '*',
-            ]
-        );
+        // Kembalikan apa adanya, karena sudah format GeoJSON
+        return response($json, 200)->header('Content-Type', 'application/json');
     }
 }

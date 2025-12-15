@@ -51,7 +51,8 @@
     "esri/widgets/ScaleBar",
     "esri/widgets/BasemapGallery",
     "esri/widgets/BasemapToggle",
-    "esri/widgets/BasemapGallery/support/LocalBasemapsSource"
+    "esri/widgets/BasemapGallery/support/LocalBasemapsSource",
+    "esri/widgets/DistanceMeasurement2D"
   ], function(
     Map,
     Basemap,
@@ -64,7 +65,8 @@
     ScaleBar,
     BasemapGallery,
     BasemapToggle,
-    LocalBasemapsSource
+    LocalBasemapsSource,
+    DistanceMeasurement2D
   ){
 
     // ================== MAP & VIEW ==================
@@ -82,59 +84,119 @@
       }
     });
 
-    // ========= Hover Modal =========
-    const hoverModal = document.createElement('div');
-    hoverModal.id = 'hoverModal';
-    hoverModal.className = 'hover-modal hidden';
-    view.container.appendChild(hoverModal);
+    // ========= Click Detail Modal =========
+    const detailModal = document.createElement('div');
+    detailModal.id = 'detailModal';
+    detailModal.className = 'detail-modal hidden';
+    detailModal.innerHTML = `
+      <div class="dm-close" title="Tutup">✕</div>
+      <div class="dm-content"></div>
+    `;
+    view.container.appendChild(detailModal);
 
-    const renderHoverContent = (graphic) => {
+    const closeBtn = detailModal.querySelector('.dm-close');
+    const dmContent = detailModal.querySelector('.dm-content');
+
+    const renderDetailContent = (graphic) => {
       const attrs = graphic?.attributes || {};
       const layerTitle = graphic?.layer?.title || 'Detail Fitur';
       const rows = Object.entries(attrs)
-        .map(([k, v]) => `<div class="hm-row"><div class="hm-key">${k}</div><div class="hm-val">${v ?? '-'}</div></div>`)
+        .map(([k, v]) => `<div class="dm-row"><div class="dm-key">${k}</div><div class="dm-val">${v ?? '-'}</div></div>`)
         .join('');
 
-      hoverModal.innerHTML = `
-        <div class="hm-head">${layerTitle}</div>
-        <div class="hm-body">${rows || '<div class="hm-empty">Tidak ada atribut</div>'}</div>
+      dmContent.innerHTML = `
+        <div class="dm-head">${layerTitle}</div>
+        <div class="dm-body">${rows || '<div class="dm-empty">Tidak ada atribut</div>'}</div>
       `;
-      hoverModal.classList.remove('hidden');
     };
 
-    const hideHover = () => hoverModal.classList.add('hidden');
+    const showDetailModal = (event, graphic) => {
+      renderDetailContent(graphic);
 
-    let hoverTimer;
-    view.on('pointer-move', (event) => {
-      clearTimeout(hoverTimer);
-      hoverTimer = setTimeout(() => {
-        view.hitTest(event).then((response) => {
-          const graphic = response.results?.[0]?.graphic;
-          if (!graphic) return hideHover();
-          renderHoverContent(graphic);
-        }).catch(() => hideHover());
-      }, 80); // throttle supaya ringan
-    });
+      // Posisikan modal di lokasi klik
+      let x = event.x;
+      let y = event.y;
 
-    view.on('pointer-leave', hideHover);
+      // Tampilkan dulu agar bisa menghitung dimensi
+      detailModal.classList.remove('hidden');
 
-    // ================== LAYERS ==================
+      // Ambil dimensi modal dan viewport
+      const modalRect = detailModal.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
 
-    // Aset Tanah
-    const asetLayer = new GeoJSONLayer({
-      url: "{{ url('/api/aset') }}",
-      title: "Aset Tanah Pemerintah",
-      outFields: ["*"],
-      renderer: {
-        type: "simple",
-        symbol: {
-          type: "simple-fill",
-          color: [37, 99, 235, 0.45],
-          outline: { color: [29, 78, 216, 1], width: 2 }
+      // Offset dari kursor
+      const offsetX = 15;
+      const offsetY = 15;
+
+      // Hitung posisi dengan offset
+      let finalX = x + offsetX;
+      let finalY = y + offsetY;
+
+      // Cek jika modal terpotong di kanan
+      if (finalX + modalRect.width > viewportWidth) {
+        finalX = x - modalRect.width - offsetX;
+        // Jika masih keluar di kiri, set ke batas kiri
+        if (finalX < 0) {
+          finalX = 10;
         }
       }
+
+      // Cek jika modal terpotong di bawah
+      if (finalY + modalRect.height > viewportHeight) {
+        finalY = y - modalRect.height - offsetY;
+        // Jika masih keluar di atas, set ke batas atas
+        if (finalY < 0) {
+          finalY = 10;
+        }
+      }
+
+      detailModal.style.left = `${finalX}px`;
+      detailModal.style.top = `${finalY}px`;
+    };
+
+    const hideDetailModal = () => {
+      detailModal.classList.add('hidden');
+    };
+
+    // Close button handler
+    closeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      hideDetailModal();
     });
-    map.add(asetLayer);
+
+    // Keyboard ESC handler
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') hideDetailModal();
+    });
+
+    // Variable untuk tracking mode measurement
+    let measurementActive = false;
+
+    // Click event untuk menampilkan detail
+    view.on('click', (event) => {
+      // Skip jika sedang dalam mode measurement
+      if (measurementActive) {
+        return;
+      }
+
+      view.hitTest(event).then((response) => {
+        const graphic = response.results?.[0]?.graphic;
+
+        // Jika klik di area kosong, tutup modal
+        if (!graphic) {
+          hideDetailModal();
+          return;
+        }
+
+        // Jika klik di graphic, tampilkan detail
+        showDetailModal(event, graphic);
+      }).catch(() => {
+        hideDetailModal();
+      });
+    });
+
+    // ================== LAYERS ==================
 
     // Desa Berlistrik PLN
     const desaBerlistrikLayer = new GeoJSONLayer({
@@ -237,6 +299,43 @@
       }
     });
     map.add(jalanProvinsiLayer);
+
+    // Jalan Balikpapan
+    const jalanBalikpapanLayer = new GeoJSONLayer({
+      url: "{{ url('/api/jalan-balikpapan') }}",
+      title: "Jalan Balikpapan",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-line",
+          color: [255, 0, 0, 1], // merah
+          width: 2
+        }
+      },
+      popupTemplate: {
+        title: "{NAMA_RUAS}",
+        content: `
+          <b>Kecamatan:</b> {Kecamatan}<br>
+          <b>F18:</b> {F18}<br>
+          <b>F19:</b> {F19}<br>
+          <b>F20:</b> {F20}<br>
+          <b>F21:</b> {F21}<br>
+          <b>Kode Ruas:</b> {KODE_RUAS}<br>
+          <b>Nama Ruas:</b> {NAMA_RUAS}<br>
+          <b>Tahun Data:</b> {TAHUN_DATA}<br>
+          <b>Fungsi:</b> {FUNGSI}<br>
+          <b>Lebar:</b> {LEBAR} m<br>
+          <b>Panjang:</b> {PANJANG} m<br>
+          <b>Koordinat Awal X:</b> {KOORD_X_AW}<br>
+          <b>Koordinat Awal Y:</b> {KOORD_Y_AW}<br>
+          <b>Koordinat Akhir X:</b> {KOORD_X_AK}<br>
+          <b>Koordinat Akhir Y:</b> {KOORD_Y_AK}<br>
+          <b>Panjang (Shape_Le_1):</b> {Shape_Le_1} km
+        `
+      }
+    });
+    map.add(jalanBalikpapanLayer);
 
     // Jaringan Listrik Balikpapan
     const jaringanListrikBalikpapanLayer = new GeoJSONLayer({
@@ -1236,71 +1335,398 @@
     });
     map.add(lnBatasProvinsiLayer);
 
+    // ================== SET INITIAL LAYER VISIBILITY ==================
+    // Hide all layers on initial load
+    desaBerlistrikLayer.visible = false;
+    jalanNasionalLayer.visible = false;
+    jalanProvinsiLayer.visible = false;
+    jaringanListrikBalikpapanLayer.visible = false;
+    jaringanListrikBontangLayer.visible = false;
+    sistemJaringanEnergiKukarLayer.visible = false;
+    sistemJaringanEnergiMahuluLayer.visible = false;
+    sistemJaringanEnergiKubarLayer.visible = false;
+    sistemJaringanEnergiKubarUP2KBlayer.visible = false;
+    sistemJaringanEnergiKutimLayer.visible = false;
+    sistemJaringanEnergiPaserLayer.visible = false;
+    sutmPPULayer.visible = false;
+    sutrKutimLayer.visible = false;
+    lnTransmisiLayer.visible = false;
+    ln2SutmPaserLayer.visible = false;
+    ln2SutmPPULayer.visible = false;
+    arBatasKaltimLayer.visible = false;
+    arBatasKecamatanLayer.visible = false;
+    sutmBerauLayer.visible = false;
+    ptGarduBerauLayer.visible = false;
+    ptGarduDistribusiKutimLayer.visible = false;
+    ptGarduHubungKutimLayer.visible = false;
+    ptGarduIndukKutimLayer.visible = false;
+    ptPembangkitEksistingLayer.visible = false;
+    ptRencanaPembangkitBontangLayer.visible = false;
+    ptSistemEnergiBalikpapanLayer.visible = false;
+    ptSistemEnergiKukarLayer.visible = false;
+    ptSistemEnergiMahuluLayer.visible = false;
+    ptSistemEnergiSamarindaLayer.visible = false;
+    ptTrafoBerauLayer.visible = false;
+    ptTrafoGarduDistribusiPpuLayer.visible = false;
+    ptTrafoGarduKubarLayer.visible = false;
+    pt1TrafoGarduPaserLayer.visible = false;
+    pt2TrafoGarduPaserLayer.visible = false;
+    lnBatasDesaLayer.visible = false;
+    lnBatasKabKotaLayer.visible = false;
+    lnBatasKecamatanLayer.visible = false;
+    lnBatasNegaraLayer.visible = false;
+    lnBatasProvinsiLayer.visible = false;
+
     // ================== LAYER FILTER PANEL ==================
-    const layerList = [
-      { label: 'Aset Tanah', layer: asetLayer },
-      { label: 'Desa Berlistrik PLN', layer: desaBerlistrikLayer },
-      { label: 'Jalan Nasional', layer: jalanNasionalLayer },
-      { label: 'Jalan Provinsi', layer: jalanProvinsiLayer },
-      { label: 'Jaringan Listrik Balikpapan', layer: jaringanListrikBalikpapanLayer },
-      { label: 'Rencana Jaringan Listrik Bontang', layer: jaringanListrikBontangLayer },
-      { label: 'Sistem Energi Kukar (SUTT)', layer: sistemJaringanEnergiKukarLayer },
-      { label: 'Sistem Energi Mahulu (SUTR)', layer: sistemJaringanEnergiMahuluLayer },
-      { label: 'Sistem Energi Kubar (SUTM)', layer: sistemJaringanEnergiKubarLayer },
-      { label: 'Sistem Energi Kubar UP2KB', layer: sistemJaringanEnergiKubarUP2KBlayer },
-      { label: 'Sistem Energi Kutim (SUTM)', layer: sistemJaringanEnergiKutimLayer },
-      { label: 'Sistem Energi Paser (SUTM)', layer: sistemJaringanEnergiPaserLayer },
-      { label: 'LN SUTM PPU', layer: sutmPPULayer },
-      { label: 'LN SUTR Kutim', layer: sutrKutimLayer },
-      { label: 'LN Transmisi', layer: lnTransmisiLayer },
-      { label: 'LN2 SUTM Paser', layer: ln2SutmPaserLayer },
-      { label: 'LN2 SUTM PPU', layer: ln2SutmPPULayer },
-      { label: 'AR Batas Kaltim Full', layer: arBatasKaltimLayer },
-      { label: 'AR Batas Kec.', layer: arBatasKecamatanLayer },
-      { label: 'LN SUTM Berau', layer: sutmBerauLayer },
-      { label: 'PT Gardu Berau', layer: ptGarduBerauLayer },
-      { label: 'PT Gardu Distribusi Kutim', layer: ptGarduDistribusiKutimLayer },
-      { label: 'PT Gardu Hubung Kutim', layer: ptGarduHubungKutimLayer },
-      { label: 'PT Gardu Induk Kutim', layer: ptGarduIndukKutimLayer },
-      { label: 'PT Pembangkit Eksisting', layer: ptPembangkitEksistingLayer },
-      { label: 'PT Rencana Pembangkit Bontang', layer: ptRencanaPembangkitBontangLayer },
-      { label: 'PT Sistem Energi Balikpapan', layer: ptSistemEnergiBalikpapanLayer },
-      { label: 'PT Sistem Energi Kukar', layer: ptSistemEnergiKukarLayer },
-      { label: 'PT Sistem Energi Mahulu', layer: ptSistemEnergiMahuluLayer },
-      { label: 'PT Sistem Energi Samarinda', layer: ptSistemEnergiSamarindaLayer },
-      { label: 'PT Trafo Berau', layer: ptTrafoBerauLayer },
-      { label: 'PT Trafo Gardu Distribusi PPU', layer: ptTrafoGarduDistribusiPpuLayer },
-      { label: 'PT Trafo Gardu Kubar', layer: ptTrafoGarduKubarLayer },
-      { label: 'PT1 Trafo Gardu Paser', layer: pt1TrafoGarduPaserLayer },
-      { label: 'PT2 Trafo Gardu Paser', layer: pt2TrafoGarduPaserLayer },
-      { label: 'LN Batas Desa', layer: lnBatasDesaLayer },
-      { label: 'LN Batas Kab/Kota', layer: lnBatasKabKotaLayer },
-      { label: 'LN Batas Kecamatan', layer: lnBatasKecamatanLayer },
-      { label: 'LN Batas Negara', layer: lnBatasNegaraLayer },
-      { label: 'LN Batas Provinsi', layer: lnBatasProvinsiLayer }
-    ];
+    // Organize layers into categories
+    const layerCategories = {
+      transportasi: [
+        { label: 'Jalan Nasional', layer: jalanNasionalLayer },
+        { label: 'Jalan Provinsi', layer: jalanProvinsiLayer },
+        { label: 'Jalan Balikpapan', layer: jalanBalikpapanLayer }
+      ],
+      jaringan: [
+        { label: 'Jaringan Listrik Balikpapan', layer: jaringanListrikBalikpapanLayer },
+        { label: 'Rencana Jaringan Listrik Bontang', layer: jaringanListrikBontangLayer },
+        { label: 'Sistem Energi Kukar (SUTT)', layer: sistemJaringanEnergiKukarLayer },
+        { label: 'Sistem Energi Mahulu (SUTR)', layer: sistemJaringanEnergiMahuluLayer },
+        { label: 'Sistem Energi Kubar (SUTM)', layer: sistemJaringanEnergiKubarLayer },
+        { label: 'Sistem Energi Kubar UP2KB', layer: sistemJaringanEnergiKubarUP2KBlayer },
+        { label: 'Sistem Energi Kutim (SUTM)', layer: sistemJaringanEnergiKutimLayer },
+        { label: 'Sistem Energi Paser (SUTM)', layer: sistemJaringanEnergiPaserLayer },
+        { label: 'LN SUTM PPU', layer: sutmPPULayer },
+        { label: 'LN SUTR Kutim', layer: sutrKutimLayer },
+        { label: 'LN Transmisi', layer: lnTransmisiLayer },
+        { label: 'LN2 SUTM Paser', layer: ln2SutmPaserLayer },
+        { label: 'LN2 SUTM PPU', layer: ln2SutmPPULayer },
+        { label: 'LN SUTM Berau', layer: sutmBerauLayer }
+      ],
+      infrastruktur: [
+        { label: 'PT Gardu Berau', layer: ptGarduBerauLayer },
+        { label: 'PT Gardu Distribusi Kutim', layer: ptGarduDistribusiKutimLayer },
+        { label: 'PT Gardu Hubung Kutim', layer: ptGarduHubungKutimLayer },
+        { label: 'PT Gardu Induk Kutim', layer: ptGarduIndukKutimLayer },
+        { label: 'PT Trafo Berau', layer: ptTrafoBerauLayer },
+        { label: 'PT Trafo Gardu Distribusi PPU', layer: ptTrafoGarduDistribusiPpuLayer },
+        { label: 'PT Trafo Gardu Kubar', layer: ptTrafoGarduKubarLayer },
+        { label: 'PT1 Trafo Gardu Paser', layer: pt1TrafoGarduPaserLayer },
+        { label: 'PT2 Trafo Gardu Paser', layer: pt2TrafoGarduPaserLayer },
+        { label: 'PT Sistem Energi Balikpapan', layer: ptSistemEnergiBalikpapanLayer },
+        { label: 'PT Sistem Energi Kukar', layer: ptSistemEnergiKukarLayer },
+        { label: 'PT Sistem Energi Mahulu', layer: ptSistemEnergiMahuluLayer },
+        { label: 'PT Sistem Energi Samarinda', layer: ptSistemEnergiSamarindaLayer }
+      ],
+      pembangkit: [
+        { label: 'PT Pembangkit Eksisting', layer: ptPembangkitEksistingLayer },
+        { label: 'PT Rencana Pembangkit Bontang', layer: ptRencanaPembangkitBontangLayer }
+      ],
+      administrasi: [
+        { label: 'LN Batas Desa', layer: lnBatasDesaLayer },
+        { label: 'LN Batas Kab/Kota', layer: lnBatasKabKotaLayer },
+        { label: 'LN Batas Kecamatan', layer: lnBatasKecamatanLayer },
+        { label: 'LN Batas Negara', layer: lnBatasNegaraLayer },
+        { label: 'LN Batas Provinsi', layer: lnBatasProvinsiLayer },
+        { label: 'AR Batas Kaltim Full', layer: arBatasKaltimLayer },
+        { label: 'AR Batas Kec.', layer: arBatasKecamatanLayer }
+      ]
+    };
 
     const layerFilter = document.createElement('div');
     layerFilter.className = 'layer-filter';
-    layerFilter.innerHTML = `
-      <div class="lf-head">Layer Filter</div>
-      <div class="lf-body">
-        ${layerList.map((item, idx) => {
-          const id = `lf-${idx}`;
-          return `<label class="lf-row"><input type="checkbox" id="${id}" ${item.layer.visible ? 'checked' : ''}> <span>${item.label}</span></label>`;
-        }).join('')}
+
+    // Build category HTML
+    let categoriesHTML = '';
+
+    // Status Listrik Desa (special case with custom filter)
+    categoriesHTML += `
+      <label class="lf-row lf-parent" data-category="desa">
+        <span class="lf-toggle">▼</span>
+        <input type="checkbox" id="lf-desa-parent">
+        <span><strong>Status Listrik Desa</strong></span>
+      </label>
+      <div class="lf-children" data-category="desa">
+        <label class="lf-row lf-child"><input type="checkbox" id="lf-desa-belum"> <span>Belum Terlayani Listrik</span></label>
+        <label class="lf-row lf-child"><input type="checkbox" id="lf-desa-terlayani"> <span>Terlayani Listrik</span></label>
       </div>
     `;
 
-    layerList.forEach((item, idx) => {
-      const cb = layerFilter.querySelector(`#lf-${idx}`);
-      if (!cb) return;
-      cb.addEventListener('change', () => {
-        item.layer.visible = cb.checked;
+    // Transportasi
+    categoriesHTML += `<label class="lf-row lf-parent" data-category="transportasi">
+      <span class="lf-toggle">▼</span>
+      <input type="checkbox" id="lf-transportasi-parent">
+      <span><strong>Data Jalan</strong></span>
+    </label>
+    <div class="lf-children" data-category="transportasi">`;
+    layerCategories.transportasi.forEach((item, idx) => {
+      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-transportasi-${idx}"> <span>${item.label}</span></label>`;
+    });
+    categoriesHTML += `</div>`;
+
+    // Jaringan Listrik
+    categoriesHTML += `<label class="lf-row lf-parent" data-category="jaringan">
+      <span class="lf-toggle">▼</span>
+      <input type="checkbox" id="lf-jaringan-parent">
+      <span><strong>Jaringan Listrik</strong></span>
+    </label>
+    <div class="lf-children" data-category="jaringan">`;
+    layerCategories.jaringan.forEach((item, idx) => {
+      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-jaringan-${idx}"> <span>${item.label}</span></label>`;
+    });
+    categoriesHTML += `</div>`;
+
+    // Infrastruktur Listrik
+    categoriesHTML += `<label class="lf-row lf-parent" data-category="infrastruktur">
+      <span class="lf-toggle">▼</span>
+      <input type="checkbox" id="lf-infrastruktur-parent">
+      <span><strong>Infrastruktur Listrik</strong></span>
+    </label>
+    <div class="lf-children" data-category="infrastruktur">`;
+    layerCategories.infrastruktur.forEach((item, idx) => {
+      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-infrastruktur-${idx}"> <span>${item.label}</span></label>`;
+    });
+    categoriesHTML += `</div>`;
+
+    // Pembangkit
+    categoriesHTML += `<label class="lf-row lf-parent" data-category="pembangkit">
+      <span class="lf-toggle">▼</span>
+      <input type="checkbox" id="lf-pembangkit-parent">
+      <span><strong>Pembangkit</strong></span>
+    </label>
+    <div class="lf-children" data-category="pembangkit">`;
+    layerCategories.pembangkit.forEach((item, idx) => {
+      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-pembangkit-${idx}"> <span>${item.label}</span></label>`;
+    });
+    categoriesHTML += `</div>`;
+
+    // Administrasi
+    categoriesHTML += `<label class="lf-row lf-parent" data-category="administrasi">
+      <span class="lf-toggle">▼</span>
+      <input type="checkbox" id="lf-administrasi-parent">
+      <span><strong>Administrasi</strong></span>
+    </label>
+    <div class="lf-children" data-category="administrasi">`;
+    layerCategories.administrasi.forEach((item, idx) => {
+      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-administrasi-${idx}"> <span>${item.label}</span></label>`;
+    });
+    categoriesHTML += `</div>`;
+
+    layerFilter.innerHTML = `
+      <div class="lf-head">
+        <span>Layer Filter</span>
+        <button class="lf-close-btn" title="Tutup panel">×</button>
+      </div>
+      <div class="lf-body">
+        <label class="lf-row lf-all"><input type="checkbox" id="lf-all"> <span><strong>Semua Layer</strong></span></label>
+        <div class="lf-divider"></div>
+        ${categoriesHTML}
+      </div>
+    `;
+
+    // Handle \"Semua Layer\" checkbox
+    const allCheckbox = layerFilter.querySelector('#lf-all');
+    const desaParentCheckbox = layerFilter.querySelector('#lf-desa-parent');
+    const desaBelumCheckbox = layerFilter.querySelector('#lf-desa-belum');
+    const desaTerlayaniCheckbox = layerFilter.querySelector('#lf-desa-terlayani');
+
+    // Function to update desaBerlistrikLayer renderer based on filter
+    const updateDesaBerlistrikFilter = () => {
+      const showBelum = desaBelumCheckbox.checked;
+      const showTerlayani = desaTerlayaniCheckbox.checked;
+
+      if (!showBelum && !showTerlayani) {
+        desaBerlistrikLayer.visible = false;
+      } else {
+        desaBerlistrikLayer.visible = true;
+        const uniqueValueInfos = [];
+
+        if (showBelum) {
+          uniqueValueInfos.push({
+            value: "Belum Terlayani Listrik",
+            label: "Belum Terlayani Listrik",
+            symbol: {
+              type: "simple-fill",
+              color: [220, 38, 38, 0.45],
+              outline: { color: [185, 28, 28, 1], width: 1.5 }
+            }
+          });
+        }
+
+        if (showTerlayani) {
+          uniqueValueInfos.push({
+            value: "Terlayani Listrik",
+            label: "Sudah Terlayani Listrik",
+            symbol: {
+              type: "simple-fill",
+              color: [34, 197, 94, 0.45],
+              outline: { color: [22, 163, 74, 1], width: 1.5 }
+            }
+          });
+        }
+
+        desaBerlistrikLayer.renderer = {
+          type: "unique-value",
+          field: "H_Survei",
+          defaultLabel: "Status tidak diketahui",
+          defaultSymbol: {
+            type: "simple-fill",
+            color: [148, 163, 184, 0.35],
+            outline: { color: [100, 116, 139, 1], width: 1 }
+          },
+          uniqueValueInfos: uniqueValueInfos
+        };
+      }
+    };
+
+    // Helper function to update parent checkbox based on children
+    const updateParentCheckbox = (parentId, childrenIds) => {
+      const parent = layerFilter.querySelector(`#${parentId}`);
+      const anyChecked = childrenIds.some(id => layerFilter.querySelector(`#${id}`)?.checked);
+      if (parent) parent.checked = anyChecked;
+    };
+
+    // Helper function to set all category checkboxes
+    const setCategoryCheckboxes = (categoryName, isChecked) => {
+      const parent = layerFilter.querySelector(`#lf-${categoryName}-parent`);
+      if (parent) parent.checked = isChecked;
+
+      layerCategories[categoryName]?.forEach((item, idx) => {
+        const checkbox = layerFilter.querySelector(`#lf-${categoryName}-${idx}`);
+        if (checkbox) checkbox.checked = isChecked;
+        item.layer.visible = isChecked;
       });
+    };
+
+    // "Semua Layer" checkbox - controls all categories
+    allCheckbox.addEventListener('change', () => {
+      const isChecked = allCheckbox.checked;
+
+      // Update desa berlistrik filters
+      desaParentCheckbox.checked = isChecked;
+      desaBelumCheckbox.checked = isChecked;
+      desaTerlayaniCheckbox.checked = isChecked;
+      updateDesaBerlistrikFilter();
+
+      // Update all other categories
+      setCategoryCheckboxes('transportasi', isChecked);
+      setCategoryCheckboxes('jaringan', isChecked);
+      setCategoryCheckboxes('infrastruktur', isChecked);
+      setCategoryCheckboxes('pembangkit', isChecked);
+      setCategoryCheckboxes('administrasi', isChecked);
+    });
+
+    // Status Listrik Desa handlers
+    desaParentCheckbox.addEventListener('change', () => {
+      const isChecked = desaParentCheckbox.checked;
+      desaBelumCheckbox.checked = isChecked;
+      desaTerlayaniCheckbox.checked = isChecked;
+      updateDesaBerlistrikFilter();
+    });
+
+    desaBelumCheckbox.addEventListener('change', () => {
+      updateDesaBerlistrikFilter();
+      desaParentCheckbox.checked = desaBelumCheckbox.checked || desaTerlayaniCheckbox.checked;
+    });
+
+    desaTerlayaniCheckbox.addEventListener('change', () => {
+      updateDesaBerlistrikFilter();
+      desaParentCheckbox.checked = desaBelumCheckbox.checked || desaTerlayaniCheckbox.checked;
+    });
+
+    // Setup handlers for each category
+    const setupCategoryHandlers = (categoryName) => {
+      const parentCheckbox = layerFilter.querySelector(`#lf-${categoryName}-parent`);
+      if (!parentCheckbox) return;
+
+      // Parent checkbox controls all children
+      parentCheckbox.addEventListener('change', () => {
+        const isChecked = parentCheckbox.checked;
+        layerCategories[categoryName].forEach((item, idx) => {
+          const childCheckbox = layerFilter.querySelector(`#lf-${categoryName}-${idx}`);
+          if (childCheckbox) childCheckbox.checked = isChecked;
+          item.layer.visible = isChecked;
+        });
+      });
+
+      // Each child checkbox
+      layerCategories[categoryName].forEach((item, idx) => {
+        const childCheckbox = layerFilter.querySelector(`#lf-${categoryName}-${idx}`);
+        if (!childCheckbox) return;
+
+        childCheckbox.addEventListener('change', () => {
+          item.layer.visible = childCheckbox.checked;
+
+          // Update parent checkbox state
+          const childIds = layerCategories[categoryName].map((_, i) => `lf-${categoryName}-${i}`);
+          updateParentCheckbox(`lf-${categoryName}-parent`, childIds);
+        });
+      });
+    };
+
+    // Setup all categories
+    setupCategoryHandlers('transportasi');
+    setupCategoryHandlers('jaringan');
+    setupCategoryHandlers('infrastruktur');
+    setupCategoryHandlers('pembangkit');
+    setupCategoryHandlers('administrasi');
+
+    // ================== EXPAND/COLLAPSE FUNCTIONALITY ==================
+    // Add toggle functionality for all parent categories
+    const parentLabels = layerFilter.querySelectorAll('.lf-parent');
+    parentLabels.forEach(parentLabel => {
+      const toggle = parentLabel.querySelector('.lf-toggle');
+      const category = parentLabel.getAttribute('data-category');
+      const childrenContainer = layerFilter.querySelector(`.lf-children[data-category="${category}"]`);
+
+      if (!toggle || !childrenContainer) return;
+
+      // Click on toggle or parent label (but not checkbox) to collapse/expand
+      const handleToggle = (e) => {
+        // Don't toggle if clicking on checkbox
+        if (e.target.type === 'checkbox') return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const isCollapsed = childrenContainer.classList.contains('collapsed');
+
+        if (isCollapsed) {
+          childrenContainer.classList.remove('collapsed');
+          toggle.textContent = '▼';
+        } else {
+          childrenContainer.classList.add('collapsed');
+          toggle.textContent = '▶';
+        }
+      };
+
+      // Add click handler to the parent label
+      parentLabel.addEventListener('click', handleToggle);
+    });
+
+    // ================== CLOSE/OPEN PANEL FUNCTIONALITY ==================
+    // Create open button (shown when panel is closed)
+    const openButton = document.createElement('button');
+    openButton.className = 'lf-open-btn';
+    openButton.innerHTML = '☰<br><span style="font-size: 9px; font-weight: 600;"></span>';
+    openButton.title = 'Buka Layer Filter';
+    openButton.style.display = 'none'; // Hidden by default
+
+    // Get close button
+    const closeButton = layerFilter.querySelector('.lf-close-btn');
+
+    // Close panel handler
+    closeButton.addEventListener('click', () => {
+      layerFilter.classList.add('lf-minimized');
+      openButton.style.display = 'flex';
+    });
+
+    // Open panel handler
+    openButton.addEventListener('click', () => {
+      layerFilter.classList.remove('lf-minimized');
+      openButton.style.display = 'none';
     });
 
     view.ui.add(layerFilter, 'top-left');
+    view.ui.add(openButton, 'top-left');
 
     // ================== WIDGETS ==================
     const bm_osm     = Basemap.fromId("osm");          bm_osm.title     = "Peta (OSM)";
@@ -1336,10 +1762,10 @@
       content: new Legend({
         view: view,
         layerInfos: [
-          { layer: asetLayer,                    title: "Aset Tanah Pemerintah" },
-          { layer: desaBerlistrikLayer,          title: "Desa Berlistrik PLN" },
+          { layer: desaBerlistrikLayer,          title: "Status Listrik Desa" },
           { layer: jalanNasionalLayer,           title: "Jalan Nasional" },
           { layer: jalanProvinsiLayer,           title: "Jalan Provinsi" },
+          { layer: jalanBalikpapanLayer,         title: "Jalan Balikpapan" },
           { layer: jaringanListrikBalikpapanLayer, title: "Jaringan Listrik Balikpapan" },
           { layer: jaringanListrikBontangLayer,  title: "Rencana Jaringan Listrik Bontang" },
           { layer: sistemJaringanEnergiKukarLayer, title: "Sistem Jaringan Energi Kukar (SUTT)" },
@@ -1402,126 +1828,176 @@
     });
     view.ui.add(basemapToggle, "bottom-right");
 
-    // ================== PANEL DETAIL ASET ==================
-    const panel = $('detailPanel');
-    $('dpClose').addEventListener('click', () => panel.classList.remove('show'));
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') panel.classList.remove('show');
+    // ================== DISTANCE MEASUREMENT & COST CALCULATION ==================
+    let distanceMeasurement = new DistanceMeasurement2D({
+      view: view,
+      unit: "kilometers"
     });
 
-    const setText = (id, val) => {
-      $(id).textContent = (val && String(val).trim() !== '') ? val : '-';
-    };
+    // Create cost calculation panel
+    const costPanel = document.createElement('div');
+    costPanel.id = 'costPanel';
+    costPanel.className = 'cost-panel hidden';
+    costPanel.innerHTML = `
+      <div class="cost-head">
+        <div class="cost-title">Perhitungan Biaya</div>
+        <button id="costClose" class="cost-close" title="Tutup">✕</button>
+      </div>
+      <div class="cost-body">
+        <div class="cost-row">
+          <div class="cost-label">Jarak</div>
+          <div class="cost-value" id="costDistance">-</div>
+        </div>
+        <div class="cost-row">
+          <div class="cost-label">Harga per km</div>
+          <div class="cost-value">Rp. 150.000</div>
+        </div>
+        <div class="cost-divider"></div>
+        <div class="cost-row total">
+          <div class="cost-label">Total Biaya</div>
+          <div class="cost-value" id="costTotal">Rp. 0</div>
+        </div>
+      </div>
+    `;
+    view.container.appendChild(costPanel);
 
-    function openPanel(attrs){
-      setText('dpUnitKerja',  attrs.unit_kerja || '-');
-      setText('dpNama',       attrs.nama_asset || '-');
-      setText('dpLuas',       fmt(attrs.luas_m2 || 0));
-      setText('dpKelurahan',  attrs.kelurahan || attrs.village || '-');
-      setText('dpKecamatan',  attrs.kecamatan || attrs.district || '-');
-      setText('dpKabupaten',  attrs.kabupaten || attrs.regency || '-');
-      setText('dpProvinsi',   attrs.provinsi  || attrs.province || '-');
-      setText('dpAlamat',     attrs.alamat || '-');
+    // Distance measurement button
+    const measureBtn = document.createElement('div');
+    measureBtn.className = 'measure-btn';
+    measureBtn.innerHTML = '📏 Ukur Jarak';
+    measureBtn.title = 'Klik untuk mengukur jarak dan menghitung biaya';
 
-      const link = attrs.sertifikat_url || attrs.link_sertif || attrs.file_url || null;
-      $('dpSertifikat').innerHTML = link
-        ? `<a class="dp-link" target="_blank" href="${link}">Lihat ⦿</a>`
-        : '-';
+    // Close button handler for cost panel
+    const costClose = costPanel.querySelector('#costClose');
+    costClose.addEventListener('click', () => {
+      costPanel.classList.add('hidden');
+      measurementActive = false;
+      measureBtn.classList.remove('active');
+      measureBtn.innerHTML = '📏 Ukur Jarak';
 
-      panel.classList.add('show');
-    }
+      // Reset cursor ke default
+      view.container.style.cursor = 'default';
 
-    let layerView, highlightHandle = null;
-    view.whenLayerView(asetLayer).then(function(lv) {
-      layerView = lv;
-    });
+      // Stop measurement dan clear semua drawing
+      distanceMeasurement.viewModel.clear();
+      distanceMeasurement.destroy();
 
-    view.on("pointer-move", function(evt){
-      view.hitTest(evt, { include: [asetLayer] }).then(function(res){
-        const hit = res.results.some(function(r){
-          return r.graphic && r.graphic.layer === asetLayer;
+      // Recreate measurement widget untuk reset state
+      setTimeout(() => {
+        distanceMeasurement = new DistanceMeasurement2D({
+          view: view,
+          unit: "kilometers"
         });
-        view.container.style.cursor = hit ? "pointer" : "default";
-      });
-    });
 
-    view.on("click", function(event){
-      view.hitTest(event, { include: [asetLayer] }).then(function(response){
-        const r = response.results.find(function(x){
-          return x.graphic && x.graphic.layer === asetLayer;
-        });
+        // Re-attach watcher
+        distanceMeasurement.viewModel.watch('measurement', (measurement) => {
+          if (measurement) {
+            const distanceKm = measurement.length;
+            const pricePerKm = 150000;
+            const totalCost = distanceKm * pricePerKm;
 
-        if (!r || !r.graphic) {
-          panel.classList.remove('show');
-          if (highlightHandle) {
-            highlightHandle.remove();
-            highlightHandle = null;
-          }
-          return;
-        }
+            const costDistanceEl = costPanel.querySelector('#costDistance');
+            const costTotalEl = costPanel.querySelector('#costTotal');
 
-        if (layerView) {
-          if (highlightHandle) {
-            highlightHandle.remove();
-          }
-          highlightHandle = layerView.highlight(r.graphic);
-        }
-
-        openPanel(r.graphic.attributes || {});
-      });
-    });
-
-    // Grouping by unit_kerja
-    asetLayer.when(async () => {
-      try {
-        const q = asetLayer.createQuery();
-        q.where = "1=1";
-        q.outFields = ["unit_kerja"];
-        q.returnGeometry = false;
-
-        const res = await asetLayer.queryFeatures(q);
-
-        const values = Array.from(
-          new Set(
-            res.features.map(f =>
-              f.attributes.unit_kerja ? String(f.attributes.unit_kerja).trim() : "-"
-            )
-          )
-        ).sort((a, b) => a.localeCompare(b, 'id'));
-
-        const palette = [
-          [59,130,246], [16,185,129], [245,158,11], [236,72,153],
-          [99,102,241], [34,197,94],  [249,115,22], [139,92,246],
-          [2,132,199],  [234,179,8],  [239,68,68],  [20,184,166],
-          [168,85,247], [14,165,233], [217,119,6],  [5,150,105]
-        ];
-
-        const uniqueValueInfos = values.map((v, i) => {
-          const rgb = palette[i % palette.length];
-          return {
-            value: v === "-" ? null : v,
-            label: v === "-" ? "Tanpa Unit Kerja" : v,
-            symbol: {
-              type: "simple-fill",
-              color: [rgb[0], rgb[1], rgb[2], 0.45],
-              outline: { color: [rgb[0], rgb[1], rgb[2], 1], width: 1.5 }
+            if (distanceKm > 0) {
+              costDistanceEl.textContent = `${distanceKm.toFixed(2)} km`;
+              costTotalEl.textContent = `Rp. ${totalCost.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+            } else {
+              costDistanceEl.textContent = '-';
+              costTotalEl.textContent = 'Rp. 0';
             }
-          };
+          }
         });
+      }, 100);
 
-        asetLayer.renderer = {
-          type: "unique-value",
-          field: "unit_kerja",
-          defaultLabel: "Tanpa Unit Kerja",
-          defaultSymbol: {
-            type: "simple-fill",
-            color: [148, 163, 184, 0.35],
-            outline: { color: [100, 116, 139, 1], width: 1.2 }
-          },
-          uniqueValueInfos: uniqueValueInfos
-        };
-      } catch (err) {
-        console.error("Gagal membuat renderer unik unit_kerja:", err);
+      // Reset cost values
+      const costDistanceEl = costPanel.querySelector('#costDistance');
+      const costTotalEl = costPanel.querySelector('#costTotal');
+      costDistanceEl.textContent = '-';
+      costTotalEl.textContent = 'Rp. 0';
+    });
+
+    // Measurement button click handler
+    measureBtn.addEventListener('click', () => {
+      measurementActive = !measurementActive;
+
+      if (measurementActive) {
+        measureBtn.classList.add('active');
+        measureBtn.innerHTML = '⏹️ Stop Ukur';
+        distanceMeasurement.viewModel.start();
+        costPanel.classList.remove('hidden');
+        // Tutup detail modal jika terbuka
+        hideDetailModal();
+        // Set cursor untuk drawing
+        view.container.style.cursor = 'crosshair';
+      } else {
+        measureBtn.classList.remove('active');
+        measureBtn.innerHTML = '📏 Ukur Jarak';
+
+        // Reset cursor ke default
+        view.container.style.cursor = 'default';
+
+        // Stop measurement dan clear semua drawing
+        distanceMeasurement.viewModel.clear();
+        distanceMeasurement.destroy();
+
+        // Recreate measurement widget untuk reset state
+        setTimeout(() => {
+          distanceMeasurement = new DistanceMeasurement2D({
+            view: view,
+            unit: "kilometers"
+          });
+
+          // Re-attach watcher
+          distanceMeasurement.viewModel.watch('measurement', (measurement) => {
+            if (measurement) {
+              const distanceKm = measurement.length;
+              const pricePerKm = 150000;
+              const totalCost = distanceKm * pricePerKm;
+
+              const costDistanceEl = costPanel.querySelector('#costDistance');
+              const costTotalEl = costPanel.querySelector('#costTotal');
+
+              if (distanceKm > 0) {
+                costDistanceEl.textContent = `${distanceKm.toFixed(2)} km`;
+                costTotalEl.textContent = `Rp. ${totalCost.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+              } else {
+                costDistanceEl.textContent = '-';
+                costTotalEl.textContent = 'Rp. 0';
+              }
+            }
+          });
+        }, 100);
+
+        costPanel.classList.add('hidden');
+
+        // Reset cost values
+        const costDistanceEl = costPanel.querySelector('#costDistance');
+        const costTotalEl = costPanel.querySelector('#costTotal');
+        costDistanceEl.textContent = '-';
+        costTotalEl.textContent = 'Rp. 0';
+      }
+    });
+
+    view.ui.add(measureBtn, 'top-right');
+
+    // Watch for measurement changes
+    distanceMeasurement.viewModel.watch('measurement', (measurement) => {
+      if (measurement) {
+        const distanceKm = measurement.length;
+        const pricePerKm = 150000;
+        const totalCost = distanceKm * pricePerKm;
+
+        const costDistanceEl = costPanel.querySelector('#costDistance');
+        const costTotalEl = costPanel.querySelector('#costTotal');
+
+        if (distanceKm > 0) {
+          costDistanceEl.textContent = `${distanceKm.toFixed(2)} km`;
+          costTotalEl.textContent = `Rp. ${totalCost.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+        } else {
+          costDistanceEl.textContent = '-';
+          costTotalEl.textContent = 'Rp. 0';
+        }
       }
     });
 
@@ -1530,54 +2006,83 @@
 </script>
 
 <style>
-  /* Hover modal di kanan atas saat pointer di atas peta */
+  /* Detail modal muncul saat klik fitur */
   #viewDiv { position: relative; }
-  .hover-modal {
+  .detail-modal {
     position: absolute;
-    top: 16px;
-    right: 16px;
     width: min(360px, 86vw);
     max-height: 60vh;
     overflow: hidden;
-    background: rgba(15, 23, 42, 0.9);
+    background: rgba(15, 23, 42, 0.95);
     color: #e2e8f0;
     border-radius: 14px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.32);
-    border: 1px solid rgba(226, 232, 240, 0.16);
-    backdrop-filter: blur(8px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+    border: 1px solid rgba(226, 232, 240, 0.18);
+    backdrop-filter: blur(10px);
     display: flex;
     flex-direction: column;
-    z-index: 5;
-    pointer-events: none;
+    z-index: 100;
+    pointer-events: auto;
   }
-  .hover-modal.hidden { display: none; }
-  .hm-head {
-    padding: 10px 14px;
+  .detail-modal.hidden { display: none; }
+
+  .dm-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 1;
+    font-weight: bold;
+  }
+  .dm-close:hover {
+    background: rgba(239, 68, 68, 0.35);
+    color: #fee2e2;
+    transform: scale(1.1);
+  }
+
+  .dm-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dm-head {
+    padding: 10px 40px 10px 14px;
     font-weight: 700;
     font-size: 15px;
     border-bottom: 1px solid rgba(226, 232, 240, 0.16);
-    background: linear-gradient(90deg, rgba(34,197,94,0.16), rgba(15,23,42,0.05));
+    background: linear-gradient(90deg, rgba(34,197,94,0.18), rgba(15,23,42,0.05));
   }
-  .hm-body {
+  .dm-body {
     padding: 10px 14px;
     overflow-y: auto;
     max-height: 50vh;
     display: grid;
     gap: 6px;
   }
-  .hm-row {
+  .dm-row {
     display: grid;
     grid-template-columns: 1fr 1.2fr;
     gap: 8px;
     font-size: 12px;
     padding: 6px 8px;
-    background: rgba(255,255,255,0.03);
+    background: rgba(255,255,255,0.04);
     border: 1px solid rgba(148, 163, 184, 0.16);
     border-radius: 8px;
   }
-  .hm-key { color: #94a3b8; font-weight: 600; word-break: break-word; }
-  .hm-val { color: #e2e8f0; word-break: break-word; }
-  .hm-empty { color: #94a3b8; font-size: 12px; padding: 8px; }
+  .dm-key { color: #94a3b8; font-weight: 600; word-break: break-word; }
+  .dm-val { color: #e2e8f0; word-break: break-word; }
+  .dm-empty { color: #94a3b8; font-size: 12px; padding: 8px; }
 
   /* Layer filter panel */
   .layer-filter {
@@ -1597,6 +2102,62 @@
     font-size: 14px;
     border-bottom: 1px solid rgba(226,232,240,0.16);
     background: linear-gradient(90deg, rgba(37,99,235,0.24), rgba(15,23,42,0.12));
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .lf-close-btn {
+    background: rgba(239,68,68,0.2);
+    color: #fca5a5;
+    border: 1px solid rgba(239,68,68,0.3);
+    border-radius: 6px;
+    width: 24px;
+    height: 24px;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+  .lf-close-btn:hover {
+    background: rgba(239,68,68,0.35);
+    color: #fee2e2;
+    transform: scale(1.1);
+  }
+  .lf-open-btn {
+    background: rgba(37,99,235,0.92);
+    color: white;
+    border: 1px solid rgba(59,130,246,0.4);
+    border-radius: 10px;
+    width: 50px;
+    height: 60px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    box-shadow: 0 4px 12px rgba(37,99,235,0.35);
+    backdrop-filter: blur(8px);
+    margin-top: -140px;
+  }
+  .lf-open-btn:hover {
+    background: rgba(59,130,246,0.95);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(37,99,235,0.45);
+  }
+  .layer-filter.lf-minimized {
+    transform: translateX(-280px);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .layer-filter {
+    transition: transform 0.3s ease, opacity 0.3s ease;
   }
   .lf-body {
     max-height: 380px;
@@ -1619,11 +2180,174 @@
   .lf-row input { accent-color: #22c55e; }
   .lf-row span { line-height: 1.35; }
   .lf-row:hover { background: rgba(34,197,94,0.08); }
+  .lf-all {
+    background: rgba(37,99,235,0.14) !important;
+    border-color: rgba(59,130,246,0.3) !important;
+  }
+  .lf-all:hover { background: rgba(37,99,235,0.22) !important; }
+  .lf-parent {
+    background: rgba(34,197,94,0.12) !important;
+    border-color: rgba(34,197,94,0.3) !important;
+  }
+  .lf-parent:hover { background: rgba(34,197,94,0.18) !important; }
+  .lf-child {
+    margin-left: 20px;
+    background: rgba(255,255,255,0.02) !important;
+    border-left: 3px solid rgba(34,197,94,0.4);
+    font-size: 11.5px;
+  }
+  .lf-divider {
+    height: 1px;
+    background: rgba(148,163,184,0.24);
+    margin: 4px 0;
+  }
+  .lf-toggle {
+    font-size: 10px;
+    margin-right: 4px;
+    transition: transform 0.2s ease;
+    user-select: none;
+  }
+  .lf-children {
+    display: grid;
+    gap: 6px;
+    max-height: 1000px;
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+    opacity: 1;
+  }
+  .lf-children.collapsed {
+    max-height: 0;
+    opacity: 0;
+    margin: 0;
+  }
+
+  /* Distance measurement button */
+  .measure-btn {
+    background: rgba(37, 99, 235, 0.95);
+    color: white;
+    padding: 10px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+    border: 1px solid rgba(59, 130, 246, 0.4);
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .measure-btn:hover {
+    background: rgba(59, 130, 246, 0.95);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.45);
+  }
+  .measure-btn.active {
+    background: rgba(220, 38, 38, 0.95);
+    border-color: rgba(239, 68, 68, 0.4);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+  }
+  .measure-btn.active:hover {
+    background: rgba(239, 68, 68, 0.95);
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.45);
+  }
+
+  /* Cost calculation panel */
+  .cost-panel {
+    position: absolute;
+    top: 70px;
+    right: 16px;
+    width: 280px;
+    background: rgba(15, 23, 42, 0.94);
+    color: #e2e8f0;
+    border-radius: 14px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.32);
+    border: 1px solid rgba(226, 232, 240, 0.18);
+    backdrop-filter: blur(10px);
+    z-index: 10;
+  }
+  .cost-panel.hidden { display: none; }
+
+  .cost-head {
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.16);
+    background: linear-gradient(90deg, rgba(37,99,235,0.24), rgba(15,23,42,0.12));
+    border-radius: 14px 14px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .cost-title {
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .cost-close {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .cost-close:hover {
+    background: rgba(239, 68, 68, 0.3);
+    color: #fee2e2;
+  }
+
+  .cost-body {
+    padding: 14px;
+    display: grid;
+    gap: 10px;
+  }
+  .cost-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 8px;
+  }
+  .cost-row.total {
+    background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(16,185,129,0.1));
+    border-color: rgba(34, 197, 94, 0.3);
+    padding: 12px 12px;
+  }
+  .cost-label {
+    font-size: 13px;
+    color: #cbd5e1;
+    font-weight: 500;
+  }
+  .cost-row.total .cost-label {
+    font-weight: 700;
+    color: #e2e8f0;
+    font-size: 14px;
+  }
+  .cost-value {
+    font-size: 14px;
+    color: #e2e8f0;
+    font-weight: 600;
+  }
+  .cost-row.total .cost-value {
+    font-size: 16px;
+    color: #6ee7b7;
+    font-weight: 700;
+  }
+  .cost-divider {
+    height: 1px;
+    background: rgba(148, 163, 184, 0.24);
+    margin: 4px 0;
+  }
 
   @media (max-width: 640px) {
-    .hover-modal { width: min(420px, 94vw); top: 10px; right: 10px; }
-    .hm-row { grid-template-columns: 1fr; }
+    .detail-modal { width: min(340px, 94vw); }
+    .dm-row { grid-template-columns: 1fr; }
     .layer-filter { width: 260px; }
+    .cost-panel { width: min(280px, 90vw); right: 10px; }
   }
 </style>
 @endpush

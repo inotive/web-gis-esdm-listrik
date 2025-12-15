@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('table_l_n_sistem_jaringan_energi_kubar_up2kb', function (Blueprint $table) {
+        Schema::create('table__l_n__sistem__jaringan__energi__kubar__up2kb', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('objectid')->nullable()->index();
+            $table->unsignedBigInteger('objectid')->nullable();
             $table->text('descriptio')->nullable();
             $table->double('shape_leng')->nullable();
 
@@ -22,6 +22,9 @@ return new class extends Migration
             $table->json('geometry')->nullable();
 
             $table->timestamps();
+
+            // Custom index name to avoid "Identifier name too long" error
+            $table->index('objectid', 'idx_kubar_up2kb_objectid');
         });
     }
 

@@ -3,66 +3,23 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\JsonResponse;
-use App\Models\PT_Trafo_Gardu_Distribusi_PPU;
+use Illuminate\Http\Request;
 
 class PtTrafoGarduDistribusiPpuController extends Controller
 {
-    /**
-     * Return Trafo Gardu Distribusi PPU sebagai GeoJSON FeatureCollection
-     */
-    public function index(): JsonResponse
+    public function index(Request $request)
     {
-        $rows = PT_Trafo_Gardu_Distribusi_PPU::whereNotNull('geometry')->get();
+        $path = public_path('assets/infrastruktur/PT_Trafo_Gardu_Distribusi_PPU.json');
 
-        $features = $rows->map(function (PT_Trafo_Gardu_Distribusi_PPU $row) {
-            $geom = $row->geometry;
+        if (!file_exists($path)) {
+            return response()->json([
+                'error' => 'File PT_Trafo_Gardu_Distribusi_PPU.json tidak ditemukan'
+            ], 404);
+        }
 
-            if (is_string($geom)) {
-                $geom = json_decode($geom, true);
-            }
+        $json = file_get_contents($path);
 
-            if (!$geom || !isset($geom['type'])) {
-                return null;
-            }
-
-            return [
-                'type'       => 'Feature',
-                'properties' => [
-                    'id'         => $row->id,
-                    'OID_'       => $row->oid_,
-                    'Name'       => $row->name,
-                    'FolderPath' => $row->folderpath,
-                    'SymbolID'   => $row->symbolid,
-                    'AltMode'    => $row->altmode,
-                    'Base'       => $row->base,
-                    'TimeSpan'   => $row->timespan,
-                    'TimeStamp'  => $row->timestamp,
-                    'BeginTime'  => $row->begintime,
-                    'EndTime'    => $row->endtime,
-                    'Snippet'    => $row->snippet,
-                    'PopupInfo'  => $row->popupinfo,
-                    'HasLabel'   => $row->haslabel,
-                    'LabelID'    => $row->labelid,
-                    'Nama'       => $row->nama,
-                ],
-                'geometry'   => $geom,
-            ];
-        })
-        ->filter()
-        ->values()
-        ->toArray();
-
-        return response()->json(
-            [
-                'type'     => 'FeatureCollection',
-                'features' => $features,
-            ],
-            200,
-            [
-                'Content-Type'                => 'application/json',
-                'Access-Control-Allow-Origin' => '*',
-            ]
-        );
+        // Kembalikan apa adanya, karena sudah format GeoJSON
+        return response($json, 200)->header('Content-Type', 'application/json');
     }
 }

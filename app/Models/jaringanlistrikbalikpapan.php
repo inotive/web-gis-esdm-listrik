@@ -10,7 +10,7 @@ class JaringanListrikBalikpapan extends Model
     use HasFactory;
 
     // Sesuaikan dengan nama tabel di migration
-    protected $table = 'table_jaringan_listrik_balikpapan';
+    protected $table = 'table__jaringan__listrik__balikpapan';
 
     protected $fillable = [
         'objectid',
