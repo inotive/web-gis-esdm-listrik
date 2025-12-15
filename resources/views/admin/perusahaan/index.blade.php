@@ -427,10 +427,6 @@
       <div class="page-title">Data Perusahaan</div>
     </div>
     <div class="page-actions">
-      <div class="date-pill">
-        <i class="ri-calendar-line"></i>
-        <span>{{ now()->translatedFormat('F Y') }}</span>
-      </div>
 
       @include('admin.perusahaan.create') {{-- modal create --}}
       @include('admin.perusahaan.edit_modal') {{-- modal edit --}}
