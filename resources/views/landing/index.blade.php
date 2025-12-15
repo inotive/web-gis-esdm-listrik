@@ -300,6 +300,43 @@
     });
     map.add(jalanProvinsiLayer);
 
+    // Jalan Balikpapan
+    const jalanBalikpapanLayer = new GeoJSONLayer({
+      url: "{{ url('/api/jalan-balikpapan') }}",
+      title: "Jalan Balikpapan",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-line",
+          color: [255, 0, 0, 1], // merah
+          width: 2
+        }
+      },
+      popupTemplate: {
+        title: "{NAMA_RUAS}",
+        content: `
+          <b>Kecamatan:</b> {Kecamatan}<br>
+          <b>F18:</b> {F18}<br>
+          <b>F19:</b> {F19}<br>
+          <b>F20:</b> {F20}<br>
+          <b>F21:</b> {F21}<br>
+          <b>Kode Ruas:</b> {KODE_RUAS}<br>
+          <b>Nama Ruas:</b> {NAMA_RUAS}<br>
+          <b>Tahun Data:</b> {TAHUN_DATA}<br>
+          <b>Fungsi:</b> {FUNGSI}<br>
+          <b>Lebar:</b> {LEBAR} m<br>
+          <b>Panjang:</b> {PANJANG} m<br>
+          <b>Koordinat Awal X:</b> {KOORD_X_AW}<br>
+          <b>Koordinat Awal Y:</b> {KOORD_Y_AW}<br>
+          <b>Koordinat Akhir X:</b> {KOORD_X_AK}<br>
+          <b>Koordinat Akhir Y:</b> {KOORD_Y_AK}<br>
+          <b>Panjang (Shape_Le_1):</b> {Shape_Le_1} km
+        `
+      }
+    });
+    map.add(jalanBalikpapanLayer);
+
     // Jaringan Listrik Balikpapan
     const jaringanListrikBalikpapanLayer = new GeoJSONLayer({
       url: "{{ url('/api/jaringan-listrik-balikpapan') }}",
@@ -1345,7 +1382,8 @@
     const layerCategories = {
       transportasi: [
         { label: 'Jalan Nasional', layer: jalanNasionalLayer },
-        { label: 'Jalan Provinsi', layer: jalanProvinsiLayer }
+        { label: 'Jalan Provinsi', layer: jalanProvinsiLayer },
+        { label: 'Jalan Balikpapan', layer: jalanBalikpapanLayer }
       ],
       jaringan: [
         { label: 'Jaringan Listrik Balikpapan', layer: jaringanListrikBalikpapanLayer },
@@ -1395,10 +1433,10 @@
 
     const layerFilter = document.createElement('div');
     layerFilter.className = 'layer-filter';
-    
+
     // Build category HTML
     let categoriesHTML = '';
-    
+
     // Status Listrik Desa (special case with custom filter)
     categoriesHTML += `
       <label class="lf-row lf-parent" data-category="desa">
@@ -1411,7 +1449,7 @@
         <label class="lf-row lf-child"><input type="checkbox" id="lf-desa-terlayani"> <span>Terlayani Listrik</span></label>
       </div>
     `;
-    
+
     // Transportasi
     categoriesHTML += `<label class="lf-row lf-parent" data-category="transportasi">
       <span class="lf-toggle">▼</span>
@@ -1423,7 +1461,7 @@
       categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-transportasi-${idx}"> <span>${item.label}</span></label>`;
     });
     categoriesHTML += `</div>`;
-    
+
     // Jaringan Listrik
     categoriesHTML += `<label class="lf-row lf-parent" data-category="jaringan">
       <span class="lf-toggle">▼</span>
@@ -1435,7 +1473,7 @@
       categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-jaringan-${idx}"> <span>${item.label}</span></label>`;
     });
     categoriesHTML += `</div>`;
-    
+
     // Infrastruktur Listrik
     categoriesHTML += `<label class="lf-row lf-parent" data-category="infrastruktur">
       <span class="lf-toggle">▼</span>
@@ -1447,7 +1485,7 @@
       categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-infrastruktur-${idx}"> <span>${item.label}</span></label>`;
     });
     categoriesHTML += `</div>`;
-    
+
     // Pembangkit
     categoriesHTML += `<label class="lf-row lf-parent" data-category="pembangkit">
       <span class="lf-toggle">▼</span>
@@ -1459,7 +1497,7 @@
       categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-pembangkit-${idx}"> <span>${item.label}</span></label>`;
     });
     categoriesHTML += `</div>`;
-    
+
     // Administrasi
     categoriesHTML += `<label class="lf-row lf-parent" data-category="administrasi">
       <span class="lf-toggle">▼</span>
@@ -1471,7 +1509,7 @@
       categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-administrasi-${idx}"> <span>${item.label}</span></label>`;
     });
     categoriesHTML += `</div>`;
-    
+
     layerFilter.innerHTML = `
       <div class="lf-head">
         <span>Layer Filter</span>
@@ -1500,7 +1538,7 @@
       } else {
         desaBerlistrikLayer.visible = true;
         const uniqueValueInfos = [];
-        
+
         if (showBelum) {
           uniqueValueInfos.push({
             value: "Belum Terlayani Listrik",
@@ -1512,7 +1550,7 @@
             }
           });
         }
-        
+
         if (showTerlayani) {
           uniqueValueInfos.push({
             value: "Terlayani Listrik",
@@ -1538,19 +1576,19 @@
         };
       }
     };
-    
+
     // Helper function to update parent checkbox based on children
     const updateParentCheckbox = (parentId, childrenIds) => {
       const parent = layerFilter.querySelector(`#${parentId}`);
       const anyChecked = childrenIds.some(id => layerFilter.querySelector(`#${id}`)?.checked);
       if (parent) parent.checked = anyChecked;
     };
-    
+
     // Helper function to set all category checkboxes
     const setCategoryCheckboxes = (categoryName, isChecked) => {
       const parent = layerFilter.querySelector(`#lf-${categoryName}-parent`);
       if (parent) parent.checked = isChecked;
-      
+
       layerCategories[categoryName]?.forEach((item, idx) => {
         const checkbox = layerFilter.querySelector(`#lf-${categoryName}-${idx}`);
         if (checkbox) checkbox.checked = isChecked;
@@ -1561,13 +1599,13 @@
     // "Semua Layer" checkbox - controls all categories
     allCheckbox.addEventListener('change', () => {
       const isChecked = allCheckbox.checked;
-      
+
       // Update desa berlistrik filters
       desaParentCheckbox.checked = isChecked;
       desaBelumCheckbox.checked = isChecked;
       desaTerlayaniCheckbox.checked = isChecked;
       updateDesaBerlistrikFilter();
-      
+
       // Update all other categories
       setCategoryCheckboxes('transportasi', isChecked);
       setCategoryCheckboxes('jaringan', isChecked);
@@ -1593,12 +1631,12 @@
       updateDesaBerlistrikFilter();
       desaParentCheckbox.checked = desaBelumCheckbox.checked || desaTerlayaniCheckbox.checked;
     });
-    
+
     // Setup handlers for each category
     const setupCategoryHandlers = (categoryName) => {
       const parentCheckbox = layerFilter.querySelector(`#lf-${categoryName}-parent`);
       if (!parentCheckbox) return;
-      
+
       // Parent checkbox controls all children
       parentCheckbox.addEventListener('change', () => {
         const isChecked = parentCheckbox.checked;
@@ -1608,29 +1646,29 @@
           item.layer.visible = isChecked;
         });
       });
-      
+
       // Each child checkbox
       layerCategories[categoryName].forEach((item, idx) => {
         const childCheckbox = layerFilter.querySelector(`#lf-${categoryName}-${idx}`);
         if (!childCheckbox) return;
-        
+
         childCheckbox.addEventListener('change', () => {
           item.layer.visible = childCheckbox.checked;
-          
+
           // Update parent checkbox state
           const childIds = layerCategories[categoryName].map((_, i) => `lf-${categoryName}-${i}`);
           updateParentCheckbox(`lf-${categoryName}-parent`, childIds);
         });
       });
     };
-    
+
     // Setup all categories
     setupCategoryHandlers('transportasi');
     setupCategoryHandlers('jaringan');
     setupCategoryHandlers('infrastruktur');
     setupCategoryHandlers('pembangkit');
     setupCategoryHandlers('administrasi');
-    
+
     // ================== EXPAND/COLLAPSE FUNCTIONALITY ==================
     // Add toggle functionality for all parent categories
     const parentLabels = layerFilter.querySelectorAll('.lf-parent');
@@ -1638,19 +1676,19 @@
       const toggle = parentLabel.querySelector('.lf-toggle');
       const category = parentLabel.getAttribute('data-category');
       const childrenContainer = layerFilter.querySelector(`.lf-children[data-category="${category}"]`);
-      
+
       if (!toggle || !childrenContainer) return;
-      
+
       // Click on toggle or parent label (but not checkbox) to collapse/expand
       const handleToggle = (e) => {
         // Don't toggle if clicking on checkbox
         if (e.target.type === 'checkbox') return;
-        
+
         e.preventDefault();
         e.stopPropagation();
-        
+
         const isCollapsed = childrenContainer.classList.contains('collapsed');
-        
+
         if (isCollapsed) {
           childrenContainer.classList.remove('collapsed');
           toggle.textContent = '▼';
@@ -1659,11 +1697,11 @@
           toggle.textContent = '▶';
         }
       };
-      
+
       // Add click handler to the parent label
       parentLabel.addEventListener('click', handleToggle);
     });
-    
+
     // ================== CLOSE/OPEN PANEL FUNCTIONALITY ==================
     // Create open button (shown when panel is closed)
     const openButton = document.createElement('button');
@@ -1671,16 +1709,16 @@
     openButton.innerHTML = '☰<br><span style="font-size: 9px; font-weight: 600;"></span>';
     openButton.title = 'Buka Layer Filter';
     openButton.style.display = 'none'; // Hidden by default
-    
+
     // Get close button
     const closeButton = layerFilter.querySelector('.lf-close-btn');
-    
+
     // Close panel handler
     closeButton.addEventListener('click', () => {
       layerFilter.classList.add('lf-minimized');
       openButton.style.display = 'flex';
     });
-    
+
     // Open panel handler
     openButton.addEventListener('click', () => {
       layerFilter.classList.remove('lf-minimized');
@@ -1727,6 +1765,7 @@
           { layer: desaBerlistrikLayer,          title: "Status Listrik Desa" },
           { layer: jalanNasionalLayer,           title: "Jalan Nasional" },
           { layer: jalanProvinsiLayer,           title: "Jalan Provinsi" },
+          { layer: jalanBalikpapanLayer,         title: "Jalan Balikpapan" },
           { layer: jaringanListrikBalikpapanLayer, title: "Jaringan Listrik Balikpapan" },
           { layer: jaringanListrikBontangLayer,  title: "Rencana Jaringan Listrik Bontang" },
           { layer: sistemJaringanEnergiKukarLayer, title: "Sistem Jaringan Energi Kukar (SUTT)" },

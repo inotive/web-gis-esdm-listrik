@@ -43,12 +43,16 @@ use App\Http\Controllers\Api\PtTrafoGarduDistribusiPpuController;
 use App\Http\Controllers\Api\PtTrafoGarduKubarController;
 use App\Http\Controllers\Api\Pt1TrafoGarduPaserController;
 use App\Http\Controllers\Api\Pt2TrafoGarduPaserController;
+use App\Http\Controllers\Api\JalanBalikpapanController;
+use App\Http\Controllers\Api\JalanKabupatenBerauController;
 
 // Route::get('/aset', [AssetController::class, 'index']);
 Route::get('/data-berlistrik', [DataBerlistrikController::class, 'index']);
 
 Route::get('/data-jalan-nasional', [DatajalannasionalController::class, 'index']);
 Route::get('/data-jalan-provinsi', [DatajalanprovinsiController::class, 'index']);
+Route::get('/jalan-balikpapan', [JalanBalikpapanController::class, 'index']);
+Route::get('/jalan-kabupaten-berau', [JalanKabupatenBerauController::class, 'index']);
 
 Route::get('/jaringan-listrik-balikpapan', [JaringanlistrikbalikpapanController::class, 'index']);
 Route::get('/jaringan-listrik-bontang', [JaringanlistrikbontangController::class, 'index']);
