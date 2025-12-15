@@ -16,7 +16,7 @@
         <div class="form-group">
           <label class="label">Kabupaten/Kota</label>
           <div class="control">
-            <select name="regency_id" id="cRegency" class="input" required></select>
+            <select name="regency_id" id="cRegency" class="input" data-control="select2" data-placeholder="Pilih Kabupaten/Kota" required></select>
           </div>
         </div>
 
@@ -24,7 +24,7 @@
         <div class="form-group">
           <label class="label">Kecamatan</label>
           <div class="control">
-            <select name="district_id" id="cDistrict" class="input" required></select>
+            <select name="district_id" id="cDistrict" class="input" data-control="select2" data-placeholder="Pilih Kecamatan" required></select>
           </div>
         </div>
 
@@ -32,7 +32,7 @@
         <div class="form-group">
           <label class="label">Desa/Kelurahan</label>
           <div class="control">
-            <select name="village_id" id="cVillage" class="input" required></select>
+            <select name="village_id" id="cVillage" class="input" data-control="select2" data-placeholder="Pilih Desa/Kelurahan" required></select>
           </div>
         </div>
 
@@ -80,12 +80,98 @@
     .input::placeholder{color:#94A3B8;}
     .input:focus{border-color:#CBD5E1;box-shadow:0 0 0 3px rgba(16,185,129,.12);}
     .control textarea{min-height:80px;padding:12px;resize:vertical;}
+
+    /* Select2 Styling for Modal */
+    .modal .select2-container {
+      width: 100% !important;
+    }
+
+    .modal .select2-container--default .select2-selection--single {
+      height: 44px !important;
+      border: 1px solid #E2E8F0 !important;
+      border-radius: 10px !important;
+      background: #FCFCFD !important;
+      display: flex !important;
+      align-items: center !important;
+    }
+
+    .modal .select2-container--default .select2-selection--single .select2-selection__rendered {
+      line-height: 44px !important;
+      padding-left: 12px !important;
+      padding-right: 28px !important;
+      font-size: 14px !important;
+      color: #111827 !important;
+    }
+
+    .modal .select2-container--default .select2-selection--single .select2-selection__arrow {
+      height: 42px !important;
+      right: 12px !important;
+      top: 1px !important;
+    }
+
+    .modal .select2-container--default .select2-selection--single:focus,
+    .modal .select2-container--default.select2-container--focus .select2-selection--single {
+      border-color: #CBD5E1 !important;
+      box-shadow: 0 0 0 3px rgba(16,185,129,.12) !important;
+    }
+
+    .modal .select2-dropdown {
+      border: 1px solid #E2E8F0 !important;
+      border-radius: 10px !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+      margin-top: 4px !important;
+      z-index: 10001 !important;
+    }
+
+    .modal .select2-search--dropdown {
+      padding: 8px !important;
+      border-bottom: 1px solid #F1F1F4 !important;
+    }
+
+    .modal .select2-search--dropdown .select2-search__field {
+      border: 1px solid #E2E8F0 !important;
+      border-radius: 6px !important;
+      padding: 6px 10px !important;
+      font-size: 14px !important;
+      color: #111827 !important;
+      outline: none !important;
+    }
+
+    .modal .select2-search--dropdown .select2-search__field:focus {
+      border-color: #CBD5E1 !important;
+      box-shadow: 0 0 0 3px rgba(16,185,129,.12) !important;
+    }
+
+    .modal .select2-results__option {
+      padding: 10px 12px !important;
+      font-size: 14px !important;
+      color: #111827 !important;
+    }
+
+    .modal .select2-results__option--highlighted {
+      background: #F0FDF4 !important;
+      color: #047857 !important;
+    }
+
+    .modal .select2-results__option[aria-selected="true"] {
+      background: #17C653 !important;
+      color: #fff !important;
+    }
   </style>
 @endpush
 
 @push('scripts')
   <script>
     (function () {
+      // Wait for jQuery to be available
+      function waitForJQuery(callback) {
+        if (typeof jQuery !== 'undefined' && typeof jQuery.fn.select2 !== 'undefined') {
+          callback();
+        } else {
+          setTimeout(() => waitForJQuery(callback), 100);
+        }
+      }
+
       const overlay = document.getElementById('modalCreatePerusahaan');
       const btnClose = document.getElementById('btnCloseCreate');
       const btnAdd = document.querySelector('.btn-add');
@@ -107,29 +193,126 @@
         const res = await fetch(`{{ route('admin.perusahaan.options.regencies') }}`);
         const rows = await res.json();
         rows.forEach(r => option(selReg, r.id, r.name));
+
+        // Initialize Select2 for regency
+        if (jQuery && jQuery.fn.select2) {
+          // Destroy if already initialized
+          if (jQuery(selReg).hasClass('select2-hidden-accessible')) {
+            jQuery(selReg).select2('destroy');
+          }
+
+          jQuery(selReg).select2({
+            placeholder: 'Pilih Kabupaten/Kota',
+            width: '100%',
+            language: {
+              noResults: function() { return "Tidak ada hasil"; },
+              searching: function() { return "Mencari..."; }
+            }
+          });
+
+          // Attach event listener after Select2 initialization
+          // Use setTimeout to ensure Select2 is fully initialized
+          setTimeout(function() {
+            jQuery(selReg).off('change');
+            jQuery(selReg).on('change', function() {
+              const regencyId = jQuery(this).val();
+              // Ensure Select2 displays the selected value
+              if (regencyId) {
+                jQuery(this).trigger('change.select2');
+                loadDistricts(regencyId);
+              }
+            });
+          }, 100);
+        }
+
         selDis.innerHTML = ''; option(selDis, '', 'Pilih Kecamatan');
         selVil.innerHTML = ''; option(selVil, '', 'Pilih Desa/Kelurahan');
+
+        // Destroy Select2 for district and village
+        if (jQuery && jQuery.fn.select2) {
+          if (jQuery(selDis).hasClass('select2-hidden-accessible')) {
+            jQuery(selDis).select2('destroy');
+          }
+          if (jQuery(selVil).hasClass('select2-hidden-accessible')) {
+            jQuery(selVil).select2('destroy');
+          }
+        }
       }
 
       async function loadDistricts(regencyId) {
         selDis.innerHTML = ''; option(selDis, '', 'Pilih Kecamatan');
         selVil.innerHTML = ''; option(selVil, '', 'Pilih Desa/Kelurahan');
+
+        // Destroy Select2 for district and village
+        if (jQuery && jQuery.fn.select2) {
+          if (jQuery(selDis).hasClass('select2-hidden-accessible')) {
+            jQuery(selDis).select2('destroy');
+          }
+          if (jQuery(selVil).hasClass('select2-hidden-accessible')) {
+            jQuery(selVil).select2('destroy');
+          }
+        }
+
         if (!regencyId) return;
         const res = await fetch(`{{ route('admin.perusahaan.options.districts') }}?regency_id=${encodeURIComponent(regencyId)}`);
         const rows = await res.json();
         rows.forEach(r => option(selDis, r.id, r.name));
+
+        // Reinitialize Select2 for district
+        if (jQuery && jQuery.fn.select2) {
+          jQuery(selDis).select2({
+            placeholder: 'Pilih Kecamatan',
+            width: '100%',
+            language: {
+              noResults: function() { return "Tidak ada hasil"; },
+              searching: function() { return "Mencari..."; }
+            }
+          });
+
+          // Reattach event listener after Select2 initialization
+          setTimeout(function() {
+            jQuery(selDis).off('change');
+            jQuery(selDis).on('change', function() {
+              const districtId = jQuery(this).val();
+              // Ensure Select2 displays the selected value
+              if (districtId) {
+                jQuery(this).trigger('change.select2');
+                loadVillages(districtId);
+              }
+            });
+          }, 100);
+        }
       }
 
       async function loadVillages(districtId) {
         selVil.innerHTML = ''; option(selVil, '', 'Pilih Desa/Kelurahan');
+
+        // Destroy Select2 for village
+        if (jQuery && jQuery.fn.select2) {
+          if (jQuery(selVil).hasClass('select2-hidden-accessible')) {
+            jQuery(selVil).select2('destroy');
+          }
+        }
+
         if (!districtId) return;
         const res = await fetch(`{{ route('admin.perusahaan.options.villages') }}?district_id=${encodeURIComponent(districtId)}`);
         const rows = await res.json();
         rows.forEach(r => option(selVil, r.id, r.name));
+
+        // Reinitialize Select2 for village
+        if (jQuery && jQuery.fn.select2) {
+          jQuery(selVil).select2({
+            placeholder: 'Pilih Desa/Kelurahan',
+            width: '100%',
+            language: {
+              noResults: function() { return "Tidak ada hasil"; },
+              searching: function() { return "Mencari..."; }
+            }
+          });
+        }
       }
 
-      selReg?.addEventListener('change', () => loadDistricts(selReg.value));
-      selDis?.addEventListener('change', () => loadVillages(selDis.value));
+      // Event listeners will be attached after Select2 initialization in loadRegencies()
 
       function openModal() {
         overlay.classList.add('show');
@@ -140,6 +323,20 @@
         document.body.style.overflow = '';
         // Reset form
         document.getElementById('formCreatePerusahaan').reset();
+
+        // Destroy Select2 before clearing
+        if (jQuery && jQuery.fn.select2) {
+          if (jQuery(selReg).hasClass('select2-hidden-accessible')) {
+            jQuery(selReg).select2('destroy');
+          }
+          if (jQuery(selDis).hasClass('select2-hidden-accessible')) {
+            jQuery(selDis).select2('destroy');
+          }
+          if (jQuery(selVil).hasClass('select2-hidden-accessible')) {
+            jQuery(selVil).select2('destroy');
+          }
+        }
+
         selReg.innerHTML = '';
         selDis.innerHTML = '';
         selVil.innerHTML = '';
