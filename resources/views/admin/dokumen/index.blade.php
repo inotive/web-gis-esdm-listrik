@@ -111,7 +111,10 @@
     font-weight: 600;
     color: #111827;
     margin-bottom: 4px;
-    word-break: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.4;
   }
 
   .dokumen-meta {
