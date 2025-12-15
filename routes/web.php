@@ -190,6 +190,7 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
         Route::get('/{permohonanId}', [PermohonanUserController::class, 'index'])->name('index');
         Route::get('/{permohonanId}/create', [PermohonanUserController::class, 'create'])->name('create');
         Route::post('/{permohonanId}', [PermohonanUserController::class, 'store'])->name('store');
+        Route::get('/{permohonanId}/{permohonanUser}', [PermohonanUserController::class, 'show'])->name('show');
         Route::get('/{permohonanId}/{permohonanUser}/edit', [PermohonanUserController::class, 'edit'])->name('edit');
         Route::put('/{permohonanId}/{permohonanUser}', [PermohonanUserController::class, 'update'])->name('update');
         Route::delete('/{permohonanId}/{permohonanUser}', [PermohonanUserController::class, 'destroy'])->name('destroy');

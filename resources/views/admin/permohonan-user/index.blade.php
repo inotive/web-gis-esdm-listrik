@@ -121,6 +121,10 @@
     stroke: #3B82F6;
   }
 
+  .btn-ico.detail svg path {
+    stroke: #6366F1;
+  }
+
   .badge {
     display: inline-block;
     padding: 4px 12px;
@@ -623,9 +627,17 @@
                           <path d="M18 6L6 18M6 6L18 18" stroke="#F8285A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                       </button>
+                    @elseif($permohonanUser->status === 'selesai')
+                      {{-- Selesai: bisa lihat detail --}}
+                      <a href="{{ route('admin.permohonan-user.show', [$permohonanId, $permohonanUser]) }}" class="btn-ico detail" title="Detail">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M15 12C15 13.6569 13.6569 15 12 15C10.3431 15 9 13.6569 9 12C9 10.3431 10.3431 9 12 9C13.6569 9 15 10.3431 15 12Z" stroke="#6366F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M2.45801 12C3.73201 7.943 7.52301 5 12 5C16.478 5 20.268 7.943 21.542 12C20.268 16.057 16.478 19 12 19C7.52301 19 3.73201 16.057 2.45801 12Z" stroke="#6366F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </a>
                     @endif
                   @elseif($isOwner)
-                    {{-- User: Bisa cancel jika status pending --}}
+                    {{-- User: Bisa cancel jika status pending, atau lihat detail jika selesai --}}
                     @if($permohonanUser->status === 'pending')
                       <form action="{{ route('admin.permohonan-user.cancel', [$permohonanId, $permohonanUser]) }}" method="POST" style="display:inline-block;margin:0;" class="form-cancel-permohonan-user" data-name="{{ $permohonanUser->permohonan->nama }}">
                         @csrf @method('POST')
@@ -635,6 +647,13 @@
                           </svg>
                         </button>
                       </form>
+                    @elseif($permohonanUser->status === 'selesai')
+                      <a href="{{ route('admin.permohonan-user.show', [$permohonanId, $permohonanUser]) }}" class="btn-ico detail" title="Detail">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M15 12C15 13.6569 13.6569 15 12 15C10.3431 15 9 13.6569 9 12C9 10.3431 10.3431 9 12 9C13.6569 9 15 10.3431 15 12Z" stroke="#6366F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M2.45801 12C3.73201 7.943 7.52301 5 12 5C16.478 5 20.268 7.943 21.542 12C20.268 16.057 16.478 19 12 19C7.52301 19 3.73201 16.057 2.45801 12Z" stroke="#6366F1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </a>
                     @endif
                   @endif
                 </td>

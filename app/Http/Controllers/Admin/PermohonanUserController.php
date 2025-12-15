@@ -143,6 +143,50 @@ class PermohonanUserController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     */
+    public function show($permohonanId, PermohonanUser $permohonanUser)
+    {
+        // Ensure permohonan_id matches
+        if ($permohonanUser->permohonan_id != $permohonanId) {
+            abort(404);
+        }
+
+        // Check access: admin can see all, user can only see their own
+        $userRole = Auth::user()->roles()->first()->name ?? null;
+        $isAdmin = in_array($userRole, ['admin', 'superadmin']);
+
+        if (!$isAdmin && $permohonanUser->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Only show detail if status is selesai
+        if ($permohonanUser->status !== 'selesai') {
+            return redirect()->route('admin.permohonan-user.index', $permohonanId)
+                ->withErrors(['error' => 'Detail hanya dapat dilihat untuk permohonan yang sudah selesai.']);
+        }
+
+        $permohonanUser->load([
+            'permohonan.questions.options' => function($query) {
+                $query->orderBy('id');
+            },
+            'documents',
+            'user'
+        ]);
+
+        $permohonanUser->permohonan->questions = $permohonanUser->permohonan->questions->sortBy('urutan')->values();
+
+        $jawaban = $permohonanUser->jawaban ?? [];
+
+        return view('admin.permohonan-user.show', [
+            'title' => 'Detail Permohonan',
+            'permohonanUser' => $permohonanUser,
+            'jawaban' => $jawaban,
+            'permohonanId' => $permohonanId,
+        ]);
+    }
+
+    /**
      * Show the form for editing the specified resource.
      */
     public function edit($permohonanId, PermohonanUser $permohonanUser)
