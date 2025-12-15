@@ -41,8 +41,8 @@ class DokumenController extends Controller
             ->with(['user', 'children', 'parent']);
         } else {
             // Normal view: only show items in current folder
-            $query = Dokumen::where('parent_id', $folderId ?: null)
-                ->with(['user', 'children']);
+        $query = Dokumen::where('parent_id', $folderId ?: null)
+            ->with(['user', 'children']);
         }
 
         // Apply sorting

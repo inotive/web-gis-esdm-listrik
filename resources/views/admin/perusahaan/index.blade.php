@@ -581,12 +581,12 @@
         {{-- Filter Kecamatan (muncul jika kabupaten dipilih) --}}
         <div class="input-group w-filter has-select" id="filterDistrictWrapper" style="{{ request('regency_id') ? '' : 'display: none;' }}">
           <select class="form-select auto-submit" name="district_id" id="filterDistrict" data-control="select2" data-placeholder="Semua Kecamatan">
-            <option value="">Semua Kecamatan</option>
-            @foreach($districts as $dc)
-              <option value="{{ $dc->id }}" @selected(request('district_id')==$dc->id)>{{ $dc->name }}</option>
-            @endforeach
-          </select>
-        </div>
+              <option value="">Semua Kecamatan</option>
+              @foreach($districts as $dc)
+                <option value="{{ $dc->id }}" @selected(request('district_id')==$dc->id)>{{ $dc->name }}</option>
+              @endforeach
+            </select>
+          </div>
       </form>
     </div>
 
@@ -819,13 +819,13 @@
         });
       } else {
         // Native change event fallback
-        el.addEventListener('change', () => {
-          if (perPageForm && perPageForm.contains(el)) {
-            perPageForm.submit();
-          } else if (filterForm) {
-            filterForm.submit();
-          }
-        });
+      el.addEventListener('change', () => {
+        if (perPageForm && perPageForm.contains(el)) {
+          perPageForm.submit();
+        } else if (filterForm) {
+          filterForm.submit();
+        }
+      });
       }
     });
 
@@ -864,15 +864,15 @@
         if (rid) {
           filterDistrictWrapper.style.display = '';
 
-          try {
-            const res = await fetch('{{ route('admin.perusahaan.options.districts') }}?regency_id=' + encodeURIComponent(rid));
-            const rows = await res.json();
-            rows.forEach(r => {
-              const opt = document.createElement('option');
-              opt.value = r.id;
-              opt.textContent = r.name;
-              selDis.appendChild(opt);
-            });
+        try {
+          const res = await fetch('{{ route('admin.perusahaan.options.districts') }}?regency_id=' + encodeURIComponent(rid));
+          const rows = await res.json();
+          rows.forEach(r => {
+            const opt = document.createElement('option');
+            opt.value = r.id;
+            opt.textContent = r.name;
+            selDis.appendChild(opt);
+          });
 
             // Reinitialize Select2 for district
             if (jQuery && jQuery.fn.select2) {
@@ -899,9 +899,9 @@
                 jQuery(selDis).trigger('change');
               }
             }
-          } catch (error) {
-            console.error('Error loading districts:', error);
-          }
+        } catch (error) {
+          console.error('Error loading districts:', error);
+        }
         } else {
           // Hide district filter if no regency selected
           filterDistrictWrapper.style.display = 'none';
