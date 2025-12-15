@@ -61,11 +61,58 @@ class PerusahaanController extends Controller
             : collect([]);
 
         return view('admin.perusahaan.index', [
-            'title'     => "Manajemen Data Perusahaan",
+            'title' => "Manajemen Data Perusahaan",
             'perusahaans' => $perusahaans,
             'regencies' => $regencies,
             'districts' => $districts,
-            'villages'  => $villages,
+            'villages' => $villages,
+        ]);
+    }
+
+    // SHOW (Detail Perusahaan dengan Perizinan)
+    public function show(Perusahaan $perusahaan)
+    {
+        $perusahaan->load('village.district.regency');
+
+        // Data perizinan contoh (nantinya bisa dari database/relasi)
+        $perizinanData = [
+            [
+                'no_izin' => 'IUPTL/2024/001',
+                'jenis_izin' => 'Izin Usaha Penyediaan Tenaga Listrik (IUPTL)',
+                'tanggal_terbit' => '2024-01-15',
+                'tanggal_berlaku' => '2029-01-15',
+                'status' => 'Aktif',
+                'keterangan' => 'Izin untuk penyediaan tenaga listrik untuk kepentingan umum',
+            ],
+            [
+                'no_izin' => 'IMB/2023/045',
+                'jenis_izin' => 'Izin Mendirikan Bangunan (IMB)',
+                'tanggal_terbit' => '2023-06-20',
+                'tanggal_berlaku' => null,
+                'status' => 'Aktif',
+                'keterangan' => 'Izin pembangunan gardu induk',
+            ],
+            [
+                'no_izin' => 'AMDAL/2023/012',
+                'jenis_izin' => 'Analisis Mengenai Dampak Lingkungan (AMDAL)',
+                'tanggal_terbit' => '2023-03-10',
+                'tanggal_berlaku' => '2028-03-10',
+                'status' => 'Aktif',
+                'keterangan' => 'Dokumen AMDAL untuk pembangunan PLTU',
+            ],
+            [
+                'no_izin' => 'SLO/2022/089',
+                'jenis_izin' => 'Sertifikat Laik Operasi (SLO)',
+                'tanggal_terbit' => '2022-09-01',
+                'tanggal_berlaku' => '2024-09-01',
+                'status' => 'Perlu Diperpanjang',
+                'keterangan' => 'Sertifikat kelayakan operasi instalasi listrik',
+            ],
+        ];
+
+        return view('admin.perusahaan.show', [
+            'perusahaan' => $perusahaan,
+            'perizinanData' => $perizinanData,
         ]);
     }
 
@@ -133,12 +180,12 @@ class PerusahaanController extends Controller
     {
         return $request->validate([
             'village_id' => ['required', 'exists:reg_villages,id'],
-            'nama'       => ['required', 'string', 'max:255'],
-            'alamat'     => ['nullable', 'string'],
+            'nama' => ['required', 'string', 'max:255'],
+            'alamat' => ['nullable', 'string'],
         ], [], [
             'village_id' => 'Desa',
-            'nama'       => 'Nama Perusahaan',
-            'alamat'     => 'Alamat',
+            'nama' => 'Nama Perusahaan',
+            'alamat' => 'Alamat',
         ]);
     }
 
