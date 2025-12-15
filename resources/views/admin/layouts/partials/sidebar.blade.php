@@ -45,6 +45,21 @@
             <span class="menu-icon"><i class="ri-file-text-line" aria-hidden="true"></i></span>
             <span class="menu-label">Dokumen</span>
         </a>
+        @if ($shouldShowMenu ?? false)
+
+            <div class="menu-title">Layanan</div>
+            @foreach ($permohonans as $permohonan)
+                @php
+                    $isActive = request()->routeIs('admin.permohonan-user.*') &&
+                                request()->route('permohonanId') == $permohonan->id;
+                @endphp
+                <a class="menu-item {{ $isActive ? 'active' : '' }}" href="{{ route('admin.permohonan-user.index', $permohonan->id) }}">
+                    <span class="menu-icon"><i class="ri-file-line" aria-hidden="true"></i></span>
+                    <span class="menu-label">{{ $permohonan->nama }}</span>
+                </a>
+            @endforeach
+        @endif
+
 
         {{-- <a class="menu-item {{ nav_active('admin.pemukiman.*') }}" href="{{ route('admin.pemukiman.index') }}">
             <span class="menu-icon"><i class="ri-home-2-line" aria-hidden="true"></i></span>

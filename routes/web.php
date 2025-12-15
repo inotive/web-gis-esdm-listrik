@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\GisController;
 use App\Http\Controllers\Admin\DesaController;
 use App\Http\Controllers\Admin\PerusahaanController;
 use App\Http\Controllers\Admin\PermohonanController;
+use App\Http\Controllers\Admin\PermohonanUserController;
 use App\Http\Controllers\Admin\DokumenController;
 
 /*
@@ -182,6 +183,20 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
         Route::get('/{permohonan}/edit', [PermohonanController::class, 'edit'])->name('edit');
         Route::put('/{permohonan}', [PermohonanController::class, 'update'])->name('update');
         Route::delete('/{permohonan}', [PermohonanController::class, 'destroy'])->name('destroy');
+    });
+
+    // Permohonan User
+    Route::group(['as' => 'permohonan-user.', 'prefix' => 'permohonan-user'], function () {
+        Route::get('/{permohonanId}', [PermohonanUserController::class, 'index'])->name('index');
+        Route::get('/{permohonanId}/create', [PermohonanUserController::class, 'create'])->name('create');
+        Route::post('/{permohonanId}', [PermohonanUserController::class, 'store'])->name('store');
+        Route::get('/{permohonanId}/{permohonanUser}/edit', [PermohonanUserController::class, 'edit'])->name('edit');
+        Route::put('/{permohonanId}/{permohonanUser}', [PermohonanUserController::class, 'update'])->name('update');
+        Route::delete('/{permohonanId}/{permohonanUser}', [PermohonanUserController::class, 'destroy'])->name('destroy');
+        Route::post('/{permohonanId}/{permohonanUser}/approve', [PermohonanUserController::class, 'approve'])->name('approve');
+        Route::post('/{permohonanId}/{permohonanUser}/reject', [PermohonanUserController::class, 'reject'])->name('reject');
+        Route::post('/{permohonanId}/{permohonanUser}/progress', [PermohonanUserController::class, 'progress'])->name('progress');
+        Route::post('/{permohonanId}/{permohonanUser}/cancel', [PermohonanUserController::class, 'cancel'])->name('cancel');
     });
 
     // Dokumen

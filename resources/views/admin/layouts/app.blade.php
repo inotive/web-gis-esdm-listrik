@@ -116,6 +116,16 @@
     .menu-item.active .menu-icon{ background:linear-gradient(180deg,#E8FFF4,#ECFDF5); color:var(--accent); }
     .menu-sep{ border:none; height:1px; background:linear-gradient(90deg, rgba(0,0,0,0.03), rgba(0,0,0,0)); margin:6px 12px; }
 
+    /* Sub Menu */
+    .menu-item-wrapper{ position:relative; }
+    .menu-item-has-submenu{ display:flex; flex-direction:column; }
+    .menu-submenu{ display:none; margin-top:4px; padding-left:0; }
+    .menu-item-has-submenu:hover .menu-submenu,
+    .menu-item-has-submenu.active .menu-submenu{ display:block; }
+    .menu-sub-item{ padding-left:48px; margin:2px 0; }
+    .menu-sub-item .menu-icon{ width:28px; height:28px; font-size:16px; }
+    .menu-sub-item .menu-label{ font-size:13px; font-weight:500; }
+
     /* Page header */
     .page-head{ display:flex; justify-content:space-between; align-items:center; padding:6px 4px 2px 4px; margin-bottom:8px; }
     .page-meta{ color:#6B7280; font-size:13px; }
