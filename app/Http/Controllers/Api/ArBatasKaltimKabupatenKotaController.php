@@ -3,56 +3,23 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\AR_Batas_Kaltim_Kabupaten_Kota;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ArBatasKaltimKabupatenKotaController extends Controller
 {
-    /**
-     * Return AR_BATAS_KALTIM_KABUPATEN_KOTA sebagai GeoJSON FeatureCollection
-     */
-    public function index(): JsonResponse
+    public function index(Request $request)
     {
-        $rows = AR_Batas_Kaltim_Kabupaten_Kota::whereNotNull('geometry')->get();
+        $path = public_path('assets/Administrasi/AR_BATAS_KALTIM_KABUPATEN_KOTA.json');
 
-        $features = $rows->map(function (AR_Batas_Kaltim_Kabupaten_Kota $row) {
-            $geom = $row->geometry;
+        if (!file_exists($path)) {
+            return response()->json([
+                'error' => 'File AR_BATAS_KALTIM_KABUPATEN_KOTA.json tidak ditemukan'
+            ], 404);
+        }
 
-            if (is_string($geom)) {
-                $geom = json_decode($geom, true);
-            }
+        $json = file_get_contents($path);
 
-            if (!$geom || !isset($geom['type'])) {
-                return null;
-            }
-
-            return [
-                'type'       => 'Feature',
-                'properties' => [
-                    'id'          => $row->id,
-                    'OBJECTID'    => $row->objectid,
-                    'WADMPR'      => $row->wadmpr,
-                    'WADMKK'      => $row->wadmkk,
-                    'Shape_Leng'  => $row->shape_leng,
-                    'Shape_Area'  => $row->shape_area,
-                ],
-                'geometry'   => $geom,
-            ];
-        })
-        ->filter()
-        ->values()
-        ->toArray();
-
-        return response()->json(
-            [
-                'type'     => 'FeatureCollection',
-                'features' => $features,
-            ],
-            200,
-            [
-                'Content-Type'                => 'application/json',
-                'Access-Control-Allow-Origin' => '*',
-            ]
-        );
+        // Kembalikan apa adanya, karena sudah format GeoJSON
+        return response($json, 200)->header('Content-Type', 'application/json');
     }
 }

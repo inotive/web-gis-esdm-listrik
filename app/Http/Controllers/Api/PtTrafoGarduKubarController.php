@@ -3,71 +3,23 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\JsonResponse;
-use App\Models\PT_Trafo_Gardu_Kubar;
+use Illuminate\Http\Request;
 
 class PtTrafoGarduKubarController extends Controller
 {
-    /**
-     * Return Trafo Gardu Kubar sebagai GeoJSON FeatureCollection
-     */
-    public function index(): JsonResponse
+    public function index(Request $request)
     {
-        $rows = PT_Trafo_Gardu_Kubar::whereNotNull('geometry')->get();
+        $path = public_path('assets/infrastruktur/PT_Trafo_Gardu_Kubar.json');
 
-        $features = $rows->map(function (PT_Trafo_Gardu_Kubar $row) {
-            $geom = $row->geometry;
+        if (!file_exists($path)) {
+            return response()->json([
+                'error' => 'File PT_Trafo_Gardu_Kubar.json tidak ditemukan'
+            ], 404);
+        }
 
-            if (is_string($geom)) {
-                $geom = json_decode($geom, true);
-            }
+        $json = file_get_contents($path);
 
-            if (!$geom || !isset($geom['type'])) {
-                return null;
-            }
-
-            return [
-                'type'       => 'Feature',
-                'properties' => [
-                    'id'          => $row->id,
-                    'id'          => $row->id_prop,
-                    'Name'        => $row->name,
-                    'descriptio'  => $row->descriptio,
-                    'timestamp'   => $row->timestamp,
-                    'begin'       => $row->begin,
-                    'end'         => $row->end,
-                    'altitudeMo'  => $row->altitudemo,
-                    'tessellate'  => $row->tessellate,
-                    'extrude'     => $row->extrude,
-                    'visibility'  => $row->visibility,
-                    'drawOrder'   => $row->draworder,
-                    'icon'        => $row->icon,
-                    'KAPASITAS'   => $row->kapasitas,
-                    'FEEDER'      => $row->feeder,
-                    'ZONA'        => $row->zona,
-                    'NILAI_PENT'  => $row->nilai_pent,
-                    'LATITUDE'    => $row->latitude,
-                    'LONGITUDE'   => $row->longitude,
-                    'layer'       => $row->layer,
-                    'path'        => $row->path,
-                ],
-                'geometry'   => $geom,
-            ];
-        })
-        ->filter()
-        ->values()
-        ->toArray();
-
-        return response()->json(
-            [
-                'type'     => 'FeatureCollection',
-                'features' => $features,
-            ],
-            200,
-            [
-                'Content-Type'                => 'application/json',
-                'Access-Control-Allow-Origin' => '*',
-            ]
-        );
+        // Kembalikan apa adanya, karena sudah format GeoJSON
+        return response($json, 200)->header('Content-Type', 'application/json');
     }
 }

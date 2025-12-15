@@ -3,66 +3,23 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\LN2_SUTM_Paser;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class Ln2SutmPaserController extends Controller
 {
-    /**
-     * Return LN2 SUTM Paser sebagai GeoJSON FeatureCollection
-     */
-    public function index(): JsonResponse
+    public function index(Request $request)
     {
-        $rows = LN2_SUTM_Paser::whereNotNull('geometry')->get();
+        $path = public_path('assets/Jaringan-Listrik/LN2_SUTM_Paser.json');
 
-        $features = $rows->map(function (LN2_SUTM_Paser $row) {
-            $geom = $row->geometry;
+        if (!file_exists($path)) {
+            return response()->json([
+                'error' => 'File LN2_SUTM_Paser.json tidak ditemukan'
+            ], 404);
+        }
 
-            if (is_string($geom)) {
-                $geom = json_decode($geom, true);
-            }
+        $json = file_get_contents($path);
 
-            if (!$geom || !isset($geom['type'])) {
-                return null;
-            }
-
-            return [
-                'type'       => 'Feature',
-                'properties' => [
-                    'id'          => $row->id,
-                    'OBJECTID'    => $row->objectid,
-                    'Name'        => $row->name,
-                    'descriptio'  => $row->descriptio,
-                    'timestamp'   => $row->timestamp,
-                    'begin'       => $row->begin,
-                    'end'         => $row->end,
-                    'altitudeMo'  => $row->altitudemo,
-                    'tessellate'  => $row->tessellate,
-                    'extrude'     => $row->extrude,
-                    'visibility'  => $row->visibility,
-                    'drawOrder'   => $row->draworder,
-                    'icon'        => $row->icon,
-                    'layer'       => $row->layer,
-                    'path'        => $row->path,
-                    'shape_Leng'  => $row->shape_leng,
-                ],
-                'geometry'   => $geom,
-            ];
-        })
-        ->filter()
-        ->values()
-        ->toArray();
-
-        return response()->json(
-            [
-                'type'     => 'FeatureCollection',
-                'features' => $features,
-            ],
-            200,
-            [
-                'Content-Type'                => 'application/json',
-                'Access-Control-Allow-Origin' => '*',
-            ]
-        );
+        // Kembalikan apa adanya, karena sudah format GeoJSON
+        return response($json, 200)->header('Content-Type', 'application/json');
     }
 }

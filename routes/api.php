@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\AssetController;
+// use App\Http\Controllers\Api\AssetController;
 use App\Http\Controllers\Api\DataBerlistrikController;
 use App\Http\Controllers\Api\DatajalannasionalController;
 use App\Http\Controllers\Api\DatajalanprovinsiController;
@@ -44,7 +44,7 @@ use App\Http\Controllers\Api\PtTrafoGarduKubarController;
 use App\Http\Controllers\Api\Pt1TrafoGarduPaserController;
 use App\Http\Controllers\Api\Pt2TrafoGarduPaserController;
 
-Route::get('/aset', [AssetController::class, 'index']);
+// Route::get('/aset', [AssetController::class, 'index']);
 Route::get('/data-berlistrik', [DataBerlistrikController::class, 'index']);
 
 Route::get('/data-jalan-nasional', [DatajalannasionalController::class, 'index']);

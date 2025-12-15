@@ -3,66 +3,23 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\JsonResponse;
-use App\Models\DataJalanProvinsi;
+use Illuminate\Http\Request;
 
-class DatajalanprovinsiController extends Controller
+class datajalanprovinsicontroller extends Controller
 {
-    /**
-     * Return data jalan provinsi sebagai GeoJSON FeatureCollection
-     */
-    public function index(): JsonResponse
+    public function index(Request $request)
     {
-        $rows = DataJalanProvinsi::whereNotNull('geometry')->get();
+        $path = public_path('assets/Jalan/Provinsi.json');
 
-        $features = $rows->map(function (DataJalanProvinsi $row) {
-            $geom = $row->geometry;
+        if (!file_exists($path)) {
+            return response()->json([
+                'error' => 'File Provinsi.json tidak ditemukan'
+            ], 404);
+        }
 
-            // Jika geometry tersimpan sebagai string, decode dulu
-            if (is_string($geom)) {
-                $geom = json_decode($geom, true);
-            }
+        $json = file_get_contents($path);
 
-            if (!$geom || !isset($geom['type'])) {
-                return null; // skip jika invalid
-            }
-
-            return [
-                'type'       => 'Feature',
-                'properties' => [
-                    'id'          => $row->id,
-                    'OBJECTID'    => $row->objectid,
-                    'Kl_Dat_Das'  => $row->kl_dat_das,
-                    'Nm_Ruas'     => $row->nm_ruas,
-                    'Thn_Data'    => $row->thn_data,
-                    'Status'      => $row->status,
-                    'Fungsi'      => $row->fungsi,
-                    'Mendukung'   => $row->mendukung,
-                    'Propinsi'    => $row->propinsi,
-                    'Kab_Kot'     => $row->kab_kot,
-                    'Kecamatan'   => $row->kecamatan,
-                    'Desa_Kel'    => $row->desa_kel,
-                    'Panjang'     => $row->panjang,
-                    'panjangjal'  => $row->panjangjal,
-                    'Status_J_1'  => $row->status_j_1,
-                ],
-                'geometry'   => $geom,
-            ];
-        })
-        ->filter()
-        ->values()
-        ->toArray();
-
-        return response()->json(
-            [
-                'type'     => 'FeatureCollection',
-                'features' => $features,
-            ],
-            200,
-            [
-                'Content-Type'                => 'application/json',
-                'Access-Control-Allow-Origin' => '*',
-            ]
-        );
+        // Kembalikan apa adanya, karena sudah format GeoJSON
+        return response($json, 200)->header('Content-Type', 'application/json');
     }
 }

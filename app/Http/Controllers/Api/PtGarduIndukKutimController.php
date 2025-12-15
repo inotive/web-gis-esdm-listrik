@@ -3,54 +3,23 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\PT_Gardu_Induk_Kutim;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class PtGarduIndukKutimController extends Controller
 {
-    /**
-     * Return PT_GARDU_INDUK_KUTIM sebagai GeoJSON FeatureCollection
-     */
-    public function index(): JsonResponse
+    public function index(Request $request)
     {
-        $rows = PT_Gardu_Induk_Kutim::whereNotNull('geometry')->get();
+        $path = public_path('assets/infrastruktur/PT_Gardu_Induk_Kutim.json');
 
-        $features = $rows->map(function (PT_Gardu_Induk_Kutim $row) {
-            $geom = $row->geometry;
+        if (!file_exists($path)) {
+            return response()->json([
+                'error' => 'File PT_Gardu_Induk_Kutim.json tidak ditemukan'
+            ], 404);
+        }
 
-            if (is_string($geom)) {
-                $geom = json_decode($geom, true);
-            }
+        $json = file_get_contents($path);
 
-            if (!$geom || !isset($geom['type'])) {
-                return null;
-            }
-
-            return [
-                'type'       => 'Feature',
-                'properties' => [
-                    'id'         => $row->id,
-                    'classifica' => $row->classifica,
-                    'globalid'   => $row->globalid,
-                    'ORIG_FID'   => $row->orig_fid,
-                ],
-                'geometry'   => $geom,
-            ];
-        })
-        ->filter()
-        ->values()
-        ->toArray();
-
-        return response()->json(
-            [
-                'type'     => 'FeatureCollection',
-                'features' => $features,
-            ],
-            200,
-            [
-                'Content-Type'                => 'application/json',
-                'Access-Control-Allow-Origin' => '*',
-            ]
-        );
+        // Kembalikan apa adanya, karena sudah format GeoJSON
+        return response($json, 200)->header('Content-Type', 'application/json');
     }
 }
