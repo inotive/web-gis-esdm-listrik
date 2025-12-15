@@ -122,13 +122,17 @@ class DokumenController extends Controller
 
     /**
      * Store a newly uploaded file.
+     * Allowed types: DOC, DOCX, XLSX, JPG, JPEG, PNG, PDF
      */
     public function storeFiles(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'files' => 'required|array',
-            'files.*' => 'file|max:10240', // Max 10MB per file
+            'files.*' => 'file|max:10240|mimes:doc,docx,xlsx,jpg,jpeg,png,pdf', // Max 10MB, allowed types
             'parent_id' => 'nullable|exists:dokumens,id',
+        ], [
+            'files.*.mimes' => 'Tipe file yang diperbolehkan: doc, docx, xlsx, jpg, jpeg, png, pdf.',
+            'files.*.max' => 'Ukuran file maksimal adalah 10MB per file.',
         ]);
 
         if ($validator->fails()) {
