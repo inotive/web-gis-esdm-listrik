@@ -194,6 +194,40 @@
     display: flex;
     align-items: center;
     gap: 12px;
+    flex: 1;
+  }
+
+  .search-box {
+    position: relative;
+    flex: 1;
+    max-width: 300px;
+  }
+
+  .search-input {
+    width: 100%;
+    height: 36px;
+    padding: 0 36px 0 12px;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 14px;
+    color: #111827;
+    outline: none;
+    transition: all 0.2s;
+  }
+
+  .search-input:focus {
+    border-color: var(--accent-2);
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+  }
+
+  .search-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+    pointer-events: none;
   }
 
   .toolbar-right {
@@ -475,7 +509,16 @@
   <!-- Toolbar -->
   <div class="toolbar">
     <div class="toolbar-left">
-      <span style="font-size: 14px; color: #6b7280; font-weight: 600;">{{ $dokumens->count() }} item</span>
+      <div class="search-box">
+        <input type="text"
+               id="searchInput"
+               class="search-input"
+               placeholder="Cari dokumen atau folder..."
+               value="{{ $search ?? '' }}"
+               autocomplete="off">
+        <i class="ri-search-line search-icon"></i>
+      </div>
+      <span id="itemCount" style="font-size: 14px; color: #6b7280; font-weight: 600;">{{ $dokumens->count() }} item</span>
     </div>
     <div class="toolbar-right">
       <select class="sort-select" id="sortSelect" onchange="applySort()">
@@ -497,9 +540,11 @@
     </div>
   </div>
 
-  @if($dokumens->count() > 0)
+  <!-- Content wrapper for AJAX updates -->
+  <div id="dokumenContent">
     <!-- Grid View -->
-    <div class="dokumen-grid" id="gridView">
+    <div class="dokumen-grid {{ $dokumens->count() > 0 ? '' : 'hidden' }}" id="gridView">
+    @if($dokumens->count() > 0)
       @foreach($dokumens as $dokumen)
         <div class="dokumen-item {{ $dokumen->isFolder() ? 'folder' : '' }}"
              onclick="{{ $dokumen->isFolder() ? "window.location.href='" . route('admin.dokumen.index', ['folder' => $dokumen->id, 'sort' => $sortBy]) . "'" : "window.open('" . $dokumen->url . "', '_blank')" }}">
@@ -532,16 +577,23 @@
             @else
               {{ $dokumen->children->count() }} item
             @endif
+            @if(!empty($search) && $dokumen->parent)
+              <div style="font-size: 11px; color: #3B82F6; margin-top: 4px; font-weight: 500;">
+                <i class="ri-folder-line"></i> {{ $dokumen->parent->nama }}
+              </div>
+            @endif
           </div>
         </div>
       @endforeach
+    @endif
     </div>
 
     <!-- List View -->
-    <div class="dokumen-list" id="listView">
+    <div class="dokumen-list {{ $dokumens->count() > 0 ? '' : 'hidden' }}" id="listView">
+    @if($dokumens->count() > 0)
       @foreach($dokumens as $dokumen)
         <div class="dokumen-list-item {{ $dokumen->isFolder() ? 'folder' : '' }}"
-             onclick="{{ $dokumen->isFolder() ? "window.location.href='" . route('admin.dokumen.index', ['folder' => $dokumen->id, 'sort' => $sortBy]) . "'" : "window.open('" . $dokumen->url . "', '_blank')" }}">
+             onclick="{{ $dokumen->isFolder() ? "window.location.href='" . route('admin.dokumen.index', ['folder' => $dokumen->id, 'sort' => $sortBy, 'q' => $search ?? '']) . "'" : "window.open('" . $dokumen->url . "', '_blank')" }}">
           <div class="dokumen-list-icon">
             @if($dokumen->isFolder())
               <i class="ri-folder-fill"></i>
@@ -558,6 +610,9 @@
                 <span>{{ $dokumen->mime_type ?? '-' }}</span>
               @else
                 <span>{{ $dokumen->children->count() }} item</span>
+              @endif
+              @if(!empty($search) && $dokumen->parent)
+                <span style="color: #3B82F6; font-weight: 500;"><i class="ri-folder-line"></i> {{ $dokumen->parent->nama }}</span>
               @endif
               <span>Oleh: {{ $dokumen->user->name ?? 'System' }}</span>
               <span>{{ $dokumen->created_at->format('d M Y H:i') }}</span>
@@ -579,14 +634,37 @@
           </div>
         </div>
       @endforeach
+    @endif
     </div>
-  @else
+
+    @if($dokumens->count() == 0)
     <div class="empty-state">
       <i class="ri-folder-open-line"></i>
-      <p>Folder ini kosong</p>
-      <p style="font-size: 12px; margin-top: 8px;">Upload file atau buat folder baru untuk memulai</p>
+      @if(!empty($search))
+        <p>Data tidak ditemukan</p>
+        <p style="font-size: 12px; margin-top: 8px;">Tidak ada dokumen atau folder yang cocok dengan kata kunci "{{ $search }}"</p>
+      @else
+        <p>Folder ini kosong</p>
+        <p style="font-size: 12px; margin-top: 8px;">Upload file atau buat folder baru untuk memulai</p>
+      @endif
     </div>
   @endif
+  </div>
+
+  <!-- Loading indicator -->
+  <div id="dokumenLoading" style="display: none; text-align: center; padding: 40px;">
+    <div style="display: inline-block;">
+      <div style="width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--accent-2); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+      <p style="margin-top: 16px; color: #6b7280;">Memuat...</p>
+    </div>
+  </div>
+
+  <style>
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
 </section>
 
 <!-- Modal Create Folder -->
@@ -694,6 +772,11 @@ function switchView(view) {
   const btnGrid = document.getElementById('btnGridView');
   const btnList = document.getElementById('btnListView');
 
+  // Check if all elements exist before accessing classList
+  if (!gridView || !listView || !btnGrid || !btnList) {
+    return; // Exit early if elements don't exist
+  }
+
   if (view === 'grid') {
     gridView.classList.remove('hidden');
     listView.classList.remove('active');
@@ -718,6 +801,125 @@ function applySort() {
 // Initialize view on page load
 document.addEventListener('DOMContentLoaded', function() {
   switchView(currentView);
+
+  // Search functionality with AJAX (only update content, not search box)
+  let searchTimeout;
+  let isSearching = false; // Flag to prevent multiple simultaneous requests
+  let pendingSearchValue = null; // Store pending search value
+  const searchInput = document.getElementById('searchInput');
+  const dokumenContent = document.getElementById('dokumenContent');
+  const dokumenLoading = document.getElementById('dokumenLoading');
+
+  // Function to perform search
+  function performSearch(searchValue) {
+    const url = new URL(window.location.href);
+
+    // Preserve folder and sort parameters
+    const folder = url.searchParams.get('folder');
+    const sort = url.searchParams.get('sort') || 'name_asc';
+
+    // Build request URL
+    const requestUrl = new URL(url.pathname, window.location.origin);
+    if (folder) requestUrl.searchParams.set('folder', folder);
+    if (sort) requestUrl.searchParams.set('sort', sort);
+    if (searchValue) {
+      requestUrl.searchParams.set('q', searchValue);
+    } else {
+      requestUrl.searchParams.delete('q');
+    }
+
+    // Update URL without reload (for bookmarking)
+    const newUrl = requestUrl.toString();
+    window.history.pushState({}, '', newUrl);
+
+    // Set searching flag
+    isSearching = true;
+
+    // Show loading indicator
+    if (dokumenContent) dokumenContent.style.display = 'none';
+    if (dokumenLoading) dokumenLoading.style.display = 'block';
+
+    // Make AJAX request
+    fetch(requestUrl.toString(), {
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'Accept': 'text/html',
+      }
+    })
+    .then(response => response.text())
+    .then(html => {
+      // Parse the response HTML
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const newContent = doc.getElementById('dokumenContent');
+      const newItemCount = doc.getElementById('itemCount');
+
+      if (newContent && dokumenContent) {
+        // Update content
+        dokumenContent.innerHTML = newContent.innerHTML;
+        dokumenContent.style.display = 'block';
+
+        // Update item count
+        if (newItemCount) {
+          const itemCountEl = document.getElementById('itemCount');
+          if (itemCountEl) {
+            itemCountEl.textContent = newItemCount.textContent;
+          }
+        }
+
+        // Reinitialize view after DOM update
+        // Use setTimeout to ensure DOM is fully updated
+        setTimeout(() => {
+          switchView(currentView);
+        }, 0);
+      }
+    })
+    .catch(error => {
+      console.error('Search error:', error);
+      // Fallback to full page reload on error
+      window.location.href = newUrl;
+    })
+    .finally(() => {
+      // Reset searching flag and hide loading indicator
+      isSearching = false;
+      if (dokumenLoading) dokumenLoading.style.display = 'none';
+
+      // Check if there's a pending search
+      if (pendingSearchValue !== null) {
+        const pending = pendingSearchValue;
+        pendingSearchValue = null;
+        performSearch(pending);
+      }
+    });
+  }
+
+  if (searchInput) {
+    let lastSearchValue = searchInput.value.trim();
+
+    searchInput.addEventListener('input', function() {
+      clearTimeout(searchTimeout);
+      const searchValue = this.value.trim();
+
+      // Only trigger search if value changed
+      if (searchValue === lastSearchValue) {
+        return;
+      }
+
+      searchTimeout = setTimeout(() => {
+        // If currently searching, queue this search
+        if (isSearching) {
+          pendingSearchValue = searchValue;
+          return;
+        }
+
+        // Update last search value immediately to prevent duplicate requests
+        lastSearchValue = searchValue;
+
+        // Perform search
+        performSearch(searchValue);
+      }, 500); // 500ms delay for auto-search
+    });
+  }
 });
 
 function openModal(id) {
