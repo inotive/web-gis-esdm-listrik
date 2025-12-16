@@ -49,6 +49,10 @@
 </div>
 
 @push('styles')
+  <!-- Select2 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+
   <style>
     .modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;z-index:1000;padding:18px;overflow:auto;}
     .modal-overlay.show{display:block;}
@@ -69,10 +73,149 @@
     .input{width:100%;height:44px;padding:0 12px;border:1px solid #E2E8F0;border-radius:10px;background:#FCFCFD;outline:none;font:inherit;color:#111827;}
     .input::placeholder{color:#94A3B8;}
     .input:focus{border-color:#CBD5E1;box-shadow:0 0 0 3px rgba(16,185,129,.12);}
+
+    /* ========== Select2 Custom Styles untuk Modal ========== */
+    .modal .select2-container--bootstrap-5 {
+      width: 100% !important;
+    }
+
+    /* Selection Box */
+    .modal .select2-container--bootstrap-5 .select2-selection {
+      min-height: 44px;
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      background: #FCFCFD;
+      transition: all 0.2s ease;
+    }
+
+    .modal .select2-container--bootstrap-5 .select2-selection:hover {
+      border-color: #CBD5E1;
+    }
+
+    .modal .select2-container--bootstrap-5.select2-container--focus .select2-selection,
+    .modal .select2-container--bootstrap-5.select2-container--open .select2-selection {
+      border-color: #CBD5E1;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
+    }
+
+    /* Single Selection */
+    .modal .select2-container--bootstrap-5 .select2-selection--single {
+      height: 44px;
+    }
+
+    .modal .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+      padding-left: 12px;
+      padding-right: 40px;
+      font-size: 14px;
+      color: #111827;
+      line-height: 42px;
+    }
+
+    /* Arrow Icon */
+    .modal .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow {
+      height: 42px;
+      right: 12px;
+      width: 24px;
+    }
+
+    .modal .select2-container--bootstrap-5 .select2-selection--single .select2-selection__arrow b {
+      border-color: #94A3B8 transparent transparent transparent;
+      border-width: 6px 6px 0 6px;
+      margin-top: -3px;
+      transition: transform 0.2s ease;
+    }
+
+    .modal .select2-container--bootstrap-5.select2-container--open .select2-selection--single .select2-selection__arrow b {
+      border-color: transparent transparent #94A3B8 transparent;
+      border-width: 0 6px 6px 6px;
+      margin-top: -4px;
+    }
+
+    /* Clear Button */
+    .modal .select2-container--bootstrap-5 .select2-selection__clear {
+      margin-right: 30px;
+      color: #94A3B8;
+      font-size: 18px;
+      line-height: 42px;
+    }
+
+    .modal .select2-container--bootstrap-5 .select2-selection__clear:hover {
+      color: #64748B;
+    }
+
+    /* Dropdown */
+    .modal .select2-container--bootstrap-5 .select2-dropdown {
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin-top: 4px;
+      overflow: hidden;
+    }
+
+    /* Search Field */
+    .modal .select2-container--bootstrap-5 .select2-search--dropdown {
+      padding: 8px;
+    }
+
+    .modal .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field {
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 14px;
+      color: #111827;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .modal .select2-container--bootstrap-5 .select2-search--dropdown .select2-search__field:focus {
+      border-color: #CBD5E1;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
+    }
+
+    /* Results */
+    .modal .select2-container--bootstrap-5 .select2-results {
+      max-height: 200px;
+    }
+
+    .modal .select2-container--bootstrap-5 .select2-results__option {
+      padding: 10px 12px;
+      font-size: 14px;
+      color: #111827;
+      transition: all 0.15s ease;
+    }
+
+    .modal .select2-container--bootstrap-5 .select2-results__option--highlighted {
+      background-color: #F1F5F9;
+      color: #111827;
+    }
+
+    .modal .select2-container--bootstrap-5 .select2-results__option[aria-selected=true] {
+      background-color: #E8FFF4;
+      color: #10B981;
+      font-weight: 500;
+    }
+
+    .modal .select2-container--bootstrap-5 .select2-results__option[aria-disabled=true] {
+      color: #94A3B8;
+      cursor: not-allowed;
+    }
+
+    /* No Results */
+    .modal .select2-container--bootstrap-5 .select2-results__message {
+      padding: 12px;
+      color: #64748B;
+      font-size: 14px;
+      text-align: center;
+    }
   </style>
 @endpush
 
 @push('scripts')
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <!-- Select2 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
   <script>
     window.__openModal = id => {
       // Close any open modals first
@@ -91,7 +234,53 @@
       }
     };
 
-    document.addEventListener('DOMContentLoaded', function () {
+    // Initialize Select2 for edit modal
+    function initSelect2Edit() {
+      const selRegEdit = $('#edit_regency_id');
+      const selDisEdit = $('#edit_district_id');
+
+      // Destroy existing instances if any
+      if (selRegEdit.hasClass('select2-hidden-accessible')) {
+        selRegEdit.select2('destroy');
+      }
+      if (selDisEdit.hasClass('select2-hidden-accessible')) {
+        selDisEdit.select2('destroy');
+      }
+
+      // Initialize Regency Select2
+      selRegEdit.select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        placeholder: 'Pilih Kabupaten/Kota',
+        allowClear: true,
+        language: {
+          noResults: function() {
+            return "Tidak ada hasil";
+          },
+          searching: function() {
+            return "Mencari...";
+          }
+        }
+      });
+
+      // Initialize District Select2
+      selDisEdit.select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        placeholder: 'Pilih Kecamatan',
+        allowClear: true,
+        language: {
+          noResults: function() {
+            return "Tidak ada hasil";
+          },
+          searching: function() {
+            return "Mencari...";
+          }
+        }
+      });
+    }
+
+    $(document).ready(function() {
       // Close modal on backdrop click
       document.getElementById('modalEditDesa')?.addEventListener('click', e=>{
         if(e.target.id==='modalEditDesa') __closeModal('modalEditDesa');
@@ -108,24 +297,34 @@
       });
 
       // Cascading dropdown handler for edit modal
-      const selRegEdit = document.getElementById('edit_regency_id');
-      const selDisEdit = document.getElementById('edit_district_id');
+      const selRegEdit = $('#edit_regency_id');
+      const selDisEdit = $('#edit_district_id');
 
-      if (selRegEdit && selDisEdit) {
-        selRegEdit.addEventListener('change', async function() {
-          const rid = this.value;
-          selDisEdit.innerHTML = '';
-          if (!rid) return;
-          const res = await fetch('{{ route("admin.desa.options.districts") }}?regency_id=' + encodeURIComponent(rid));
-          const districts = await res.json();
-          districts.forEach(d => {
-            const opt = document.createElement('option');
-            opt.value = d.id;
-            opt.textContent = d.name;
-            selDisEdit.appendChild(opt);
-          });
+      selRegEdit.on('change', async function() {
+        const rid = $(this).val();
+        
+        // Destroy existing instance
+        if (selDisEdit.hasClass('select2-hidden-accessible')) {
+          selDisEdit.select2('destroy');
+        }
+        
+        selDisEdit.empty().append('<option value="">Pilih Kecamatan</option>');
+        
+        if (!rid) {
+          initSelect2Edit();
+          return;
+        }
+        
+        const res = await fetch('{{ route("admin.desa.options.districts") }}?regency_id=' + encodeURIComponent(rid));
+        const districts = await res.json();
+        
+        districts.forEach(d => {
+          selDisEdit.append(new Option(d.name, d.id, false, false));
         });
-      }
+        
+        // Re-initialize Select2
+        initSelect2Edit();
+      });
 
       // Edit button handlers
       document.querySelectorAll('.btn-edit-desa').forEach(btn => {
@@ -142,32 +341,27 @@
           document.getElementById('edit_name').value = name;
 
           // Load regencies
-          const selReg = document.getElementById('edit_regency_id');
-          selReg.innerHTML = '';
+          const selReg = $('#edit_regency_id');
+          selReg.empty();
           const resReg = await fetch('{{ route("admin.desa.options.regencies") }}');
           const regencies = await resReg.json();
           regencies.forEach(r => {
-            const opt = document.createElement('option');
-            opt.value = r.id;
-            opt.textContent = r.name;
-            opt.selected = r.id === regencyId;
-            selReg.appendChild(opt);
+            selReg.append(new Option(r.name, r.id, r.id === regencyId, r.id === regencyId));
           });
 
           // Load districts for selected regency
-          const selDis = document.getElementById('edit_district_id');
-          selDis.innerHTML = '';
+          const selDis = $('#edit_district_id');
+          selDis.empty();
           if (regencyId) {
             const resDis = await fetch('{{ route("admin.desa.options.districts") }}?regency_id=' + encodeURIComponent(regencyId));
             const districts = await resDis.json();
             districts.forEach(d => {
-              const opt = document.createElement('option');
-              opt.value = d.id;
-              opt.textContent = d.name;
-              opt.selected = d.id === districtId;
-              selDis.appendChild(opt);
+              selDis.append(new Option(d.name, d.id, d.id === districtId, d.id === districtId));
             });
           }
+
+          // Initialize Select2 after loading data
+          initSelect2Edit();
 
           __openModal('modalEditDesa');
         });

@@ -201,9 +201,14 @@
             jQuery(selReg).select2('destroy');
           }
 
+          // Get modal element for dropdownParent
+          const modalElement = document.getElementById('modalCreatePerusahaan');
+
           jQuery(selReg).select2({
             placeholder: 'Pilih Kabupaten/Kota',
+            allowClear: true,
             width: '100%',
+            dropdownParent: jQuery(modalElement), // Ensure dropdown is rendered inside modal
             language: {
               noResults: function() { return "Tidak ada hasil"; },
               searching: function() { return "Mencari..."; }
@@ -213,13 +218,86 @@
           // Attach event listener after Select2 initialization
           // Use setTimeout to ensure Select2 is fully initialized
           setTimeout(function() {
-            jQuery(selReg).off('change');
+            // Remove all existing event listeners
+            jQuery(selReg).off('change select2:select select2:clear');
+
+            // Handle when user selects an option - this is the primary event
+            jQuery(selReg).on('select2:select', function(e) {
+              const regencyId = e.params.data.id;
+              const regencyName = e.params.data.text;
+              console.log('Regency selected:', regencyId, regencyName);
+
+              const $select = jQuery(this);
+
+              // Ensure the value is set in the select element
+              $select.val(regencyId);
+
+              // Immediately update the rendered text
+              const $container = $select.next('.select2-container');
+              const $rendered = $container.find('.select2-selection__rendered');
+
+              // Force update the displayed text
+              $rendered.text(regencyName);
+              $rendered.attr('title', regencyName);
+
+              // Ensure the option is selected in the DOM
+              $select.find('option').prop('selected', false);
+              $select.find('option[value="' + regencyId + '"]').prop('selected', true);
+
+              // Force Select2 to update by triggering change
+              $select.trigger('change');
+
+              // Double check after a short delay
+              setTimeout(function() {
+                const checkText = $rendered.text().trim();
+                console.log('Rendered text check:', checkText);
+                if (checkText !== regencyName && checkText !== '') {
+                  console.log('Fixing rendered text again');
+                  $rendered.text(regencyName);
+                  $rendered.attr('title', regencyName);
+                }
+              }, 100);
+
+              // Load districts
+              if (regencyId) {
+                loadDistricts(regencyId);
+              }
+            });
+
+            // Handle change event as fallback (for programmatic changes)
             jQuery(selReg).on('change', function() {
               const regencyId = jQuery(this).val();
-              // Ensure Select2 displays the selected value
+              console.log('Regency changed via change event:', regencyId);
               if (regencyId) {
-                jQuery(this).trigger('change.select2');
                 loadDistricts(regencyId);
+              } else {
+                // Clear district if regency is cleared
+                selDis.innerHTML = '';
+                option(selDis, '', 'Pilih Kecamatan');
+                selVil.innerHTML = '';
+                option(selVil, '', 'Pilih Desa/Kelurahan');
+                if (jQuery(selDis).hasClass('select2-hidden-accessible')) {
+                  jQuery(selDis).select2('destroy');
+                }
+                if (jQuery(selVil).hasClass('select2-hidden-accessible')) {
+                  jQuery(selVil).select2('destroy');
+                }
+              }
+            });
+
+            // Handle clear event
+            jQuery(selReg).on('select2:clear', function() {
+              console.log('Regency cleared');
+              // Clear district and village if regency is cleared
+              selDis.innerHTML = '';
+              option(selDis, '', 'Pilih Kecamatan');
+              selVil.innerHTML = '';
+              option(selVil, '', 'Pilih Desa/Kelurahan');
+              if (jQuery(selDis).hasClass('select2-hidden-accessible')) {
+                jQuery(selDis).select2('destroy');
+              }
+              if (jQuery(selVil).hasClass('select2-hidden-accessible')) {
+                jQuery(selVil).select2('destroy');
               }
             });
           }, 100);
@@ -260,9 +338,14 @@
 
         // Reinitialize Select2 for district
         if (jQuery && jQuery.fn.select2) {
+          // Get modal element for dropdownParent
+          const modalElement = document.getElementById('modalCreatePerusahaan');
+
           jQuery(selDis).select2({
             placeholder: 'Pilih Kecamatan',
+            allowClear: true,
             width: '100%',
+            dropdownParent: jQuery(modalElement), // Ensure dropdown is rendered inside modal
             language: {
               noResults: function() { return "Tidak ada hasil"; },
               searching: function() { return "Mencari..."; }
@@ -271,13 +354,59 @@
 
           // Reattach event listener after Select2 initialization
           setTimeout(function() {
-            jQuery(selDis).off('change');
+            // Remove all existing event listeners
+            jQuery(selDis).off('change select2:select select2:clear');
+
+            // Handle when user selects an option
+            jQuery(selDis).on('select2:select', function(e) {
+              const districtId = e.params.data.id;
+              const districtName = e.params.data.text;
+              console.log('District selected:', districtId, districtName);
+
+              const $select = jQuery(this);
+              $select.val(districtId);
+
+              // Immediately update the rendered text
+              const $container = $select.next('.select2-container');
+              const $rendered = $container.find('.select2-selection__rendered');
+              $rendered.text(districtName);
+              $rendered.attr('title', districtName);
+
+              // Ensure the option is selected in the DOM
+              $select.find('option').prop('selected', false);
+              $select.find('option[value="' + districtId + '"]').prop('selected', true);
+
+              $select.trigger('change');
+
+              // Load villages
+              if (districtId) {
+                loadVillages(districtId);
+              }
+            });
+
+            // Handle change event as fallback
             jQuery(selDis).on('change', function() {
               const districtId = jQuery(this).val();
-              // Ensure Select2 displays the selected value
+              console.log('District changed via change event:', districtId);
               if (districtId) {
-                jQuery(this).trigger('change.select2');
                 loadVillages(districtId);
+              } else {
+                // Clear village if district is cleared
+                selVil.innerHTML = '';
+                option(selVil, '', 'Pilih Desa/Kelurahan');
+                if (jQuery(selVil).hasClass('select2-hidden-accessible')) {
+                  jQuery(selVil).select2('destroy');
+                }
+              }
+            });
+
+            // Handle clear event
+            jQuery(selDis).on('select2:clear', function() {
+              console.log('District cleared');
+              selVil.innerHTML = '';
+              option(selVil, '', 'Pilih Desa/Kelurahan');
+              if (jQuery(selVil).hasClass('select2-hidden-accessible')) {
+                jQuery(selVil).select2('destroy');
               }
             });
           }, 100);
@@ -301,14 +430,44 @@
 
         // Reinitialize Select2 for village
         if (jQuery && jQuery.fn.select2) {
+          // Get modal element for dropdownParent
+          const modalElement = document.getElementById('modalCreatePerusahaan');
+
           jQuery(selVil).select2({
             placeholder: 'Pilih Desa/Kelurahan',
+            allowClear: true,
             width: '100%',
+            dropdownParent: jQuery(modalElement), // Ensure dropdown is rendered inside modal
             language: {
               noResults: function() { return "Tidak ada hasil"; },
               searching: function() { return "Mencari..."; }
             }
           });
+
+          // Attach event listener to ensure value is displayed
+          setTimeout(function() {
+            jQuery(selVil).off('select2:select');
+            jQuery(selVil).on('select2:select', function(e) {
+              const villageId = e.params.data.id;
+              const villageName = e.params.data.text;
+              console.log('Village selected:', villageId, villageName);
+
+              const $select = jQuery(this);
+              $select.val(villageId);
+
+              // Immediately update the rendered text
+              const $container = $select.next('.select2-container');
+              const $rendered = $container.find('.select2-selection__rendered');
+              $rendered.text(villageName);
+              $rendered.attr('title', villageName);
+
+              // Ensure the option is selected in the DOM
+              $select.find('option').prop('selected', false);
+              $select.find('option[value="' + villageId + '"]').prop('selected', true);
+
+              $select.trigger('change');
+            });
+          }, 100);
         }
       }
 

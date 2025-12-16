@@ -3,6 +3,9 @@
 @section('title', 'Dashboard ESDM - Data Desa')
 
 @push('styles')
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
 <style>
   /* Table Header/Filter Section - Sesuai Figma */
   .card-header {
@@ -371,6 +374,137 @@
     cursor: not-allowed;
   }
 
+  /* ========== Select2 Custom Styling (Mengikuti Perusahaan) ========== */
+  .select2-container {
+    width: 100% !important;
+  }
+
+  .select2-container--default .select2-selection--single {
+    height: 32px !important;
+    border: 1px solid #DBDFE9 !important;
+    border-radius: 6px !important;
+    background: #FCFCFC !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 32px !important;
+    padding-left: 10px !important;
+    padding-right: 28px !important;
+    font-size: 11px !important;
+    color: #7c7c7c !important;
+  }
+
+  .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 30px !important;
+    right: 10px !important;
+    top: 1px !important;
+  }
+
+  .select2-container--default .select2-selection--single .select2-selection__arrow b {
+    border-color: #7c7c7c transparent transparent transparent !important;
+    border-width: 5px 4px 0 4px !important;
+    margin-top: -2px !important;
+  }
+
+  .select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
+    border-color: transparent transparent #7c7c7c transparent !important;
+    border-width: 0 4px 5px 4px !important;
+  }
+
+  .select2-container--default .select2-selection--single:focus,
+  .select2-container--default.select2-container--focus .select2-selection--single {
+    border-color: #17C653 !important;
+    outline: none !important;
+  }
+
+  /* Select2 Dropdown */
+  .select2-dropdown {
+    border: 1px solid #DBDFE9 !important;
+    border-radius: 6px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    background: #fff !important;
+    margin-top: 4px !important;
+  }
+
+  .select2-search--dropdown {
+    padding: 8px !important;
+    border-bottom: 1px solid #F1F1F4 !important;
+  }
+
+  .select2-search--dropdown .select2-search__field {
+    border: 1px solid #DBDFE9 !important;
+    border-radius: 6px !important;
+    padding: 6px 10px !important;
+    font-size: 11px !important;
+    color: #252F4A !important;
+    outline: none !important;
+  }
+
+  .select2-search--dropdown .select2-search__field:focus {
+    border-color: #17C653 !important;
+    box-shadow: 0 0 0 3px rgba(23, 198, 83, 0.1) !important;
+  }
+
+  .select2-results {
+    padding: 4px 0 !important;
+  }
+
+  .select2-results__option {
+    padding: 8px 12px !important;
+    font-size: 11px !important;
+    color: #252F4A !important;
+    cursor: pointer !important;
+  }
+
+  .select2-results__option--highlighted {
+    background: #F0FDF4 !important;
+    color: #047857 !important;
+  }
+
+  .select2-results__option[aria-selected="true"] {
+    background: #17C653 !important;
+    color: #fff !important;
+  }
+
+  .select2-results__option[aria-selected="true"]:hover {
+    background: #22C55E !important;
+  }
+
+  .select2-results__option--loading {
+    padding: 8px 12px !important;
+    color: #6b7280 !important;
+    font-size: 11px !important;
+  }
+
+  .select2-results__message {
+    padding: 8px 12px !important;
+    color: #6b7280 !important;
+    font-size: 11px !important;
+  }
+
+  /* Remove default Select2 arrow from input-group */
+  .input-group.has-select::after {
+    display: none !important;
+  }
+
+  /* Ensure Select2 dropdown appears above other elements */
+  .select2-container--open .select2-dropdown {
+    z-index: 9999 !important;
+  }
+
+  /* Per Page Select2 (Smaller Width) */
+  .show-wrap .select2-container {
+    width: 70px !important;
+  }
+
+  .show-wrap .select2-container--default .select2-selection--single .select2-selection__rendered {
+    padding-right: 30px;
+    text-align: center;
+    font-size: 11px !important;
+  }
+
   /* Responsive */
   @media (max-width: 768px) {
     /* Toolbar / Filter Section */
@@ -427,10 +561,6 @@
       <div class="page-title">Data Desa</div>
     </div>
     <div class="page-actions">
-      <div class="date-pill">
-        <i class="ri-calendar-line"></i>
-        <span>{{ now()->translatedFormat('F Y') }}</span>
-      </div>
 
       @include('admin.desa.create') {{-- modal create --}}
       @include('admin.desa.edit_modal') {{-- modal edit --}}
@@ -454,22 +584,28 @@
 
         {{-- Filter Berdasarkan --}}
         <div class="input-group w-filter has-select">
-          <select class="form-select auto-submit" name="regency_id" id="filterRegency">
-            <option value="">Filter Berdasarkan</option>
+          <select class="form-select" name="regency_id" id="filterRegency">
+            <option value="">Semua Kabupaten/Kota</option>
             @foreach($regencies as $rg)
               <option value="{{ $rg->id }}" @selected(request('regency_id')==$rg->id)>{{ $rg->name }}</option>
             @endforeach
           </select>
         </div>
 
-        {{-- Hidden filter untuk maintain state --}}
+        {{-- Filter Kecamatan --}}
         @if(request('regency_id'))
-          <div class="input-group w-filter has-select" style="display: none;">
-            <select class="form-select auto-submit" name="district_id" id="filterDistrict">
+          <div class="input-group w-filter has-select">
+            <select class="form-select" name="district_id" id="filterDistrict">
               <option value="">Semua Kecamatan</option>
               @foreach($districts as $dc)
                 <option value="{{ $dc->id }}" @selected(request('district_id')==$dc->id)>{{ $dc->name }}</option>
               @endforeach
+            </select>
+          </div>
+        @else
+          <div class="input-group w-filter has-select" style="display: none;">
+            <select class="form-select" name="district_id" id="filterDistrict">
+              <option value="">Semua Kecamatan</option>
             </select>
           </div>
         @endif
@@ -534,7 +670,7 @@
                     <input type="hidden" name="q" value="{{ request('q') }}">
                     <input type="hidden" name="by" value="{{ request('by') }}">
                     <input type="hidden" name="val" value="{{ request('val') }}">
-                    <select class="form-select auto-submit" name="per_page"
+                    <select class="form-select" name="per_page"
                         aria-label="Jumlah baris per halaman">
                         @foreach ([5, 10, 25, 50, 100] as $pp)
                             <option value="{{ $pp }}"
@@ -556,6 +692,11 @@
 @endsection
 
 @push('scripts')
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     // ========== SweetAlert Notifications ==========
@@ -628,16 +769,7 @@
     const filterForm = document.getElementById('filterForm');
     const perPageForm = document.getElementById('perPageForm');
 
-    // Auto submit on change
-    document.querySelectorAll('.auto-submit').forEach(el => {
-      el.addEventListener('change', () => {
-        if (perPageForm && perPageForm.contains(el)) {
-          perPageForm.submit();
-        } else if (filterForm) {
-          filterForm.submit();
-        }
-      });
-    });
+    // Note: Auto submit is now handled by Select2 change events above
 
     // Auto submit on search (with debounce)
     const searchInput = filterForm?.querySelector('input[name="q"]');
@@ -651,31 +783,146 @@
       });
     }
 
-    // Cascading filter: load kecamatan after selecting kabupaten
-    const selReg = document.getElementById('filterRegency');
-    const selDis = document.getElementById('filterDistrict');
-
-    if (selReg && selDis) {
-      selReg.addEventListener('change', async () => {
-        const rid = selReg.value;
-        selDis.innerHTML = '<option value="">Semua Kecamatan</option>';
-
-        if (!rid) return;
-
-        try {
-          const res = await fetch('{{ route('admin.desa.options.districts') }}?regency_id=' + encodeURIComponent(rid));
-          const rows = await res.json();
-          rows.forEach(r => {
-            const opt = document.createElement('option');
-            opt.value = r.id;
-            opt.textContent = r.name;
-            selDis.appendChild(opt);
+    // ========== Initialize Select2 ==========
+    // Wait for jQuery to be ready
+    $(document).ready(function() {
+      // Initialize Select2 for all select elements with search enabled
+      function initSelect2() {
+        // Filter Regency (Kabupaten)
+        if ($('#filterRegency').length && !$('#filterRegency').hasClass('select2-hidden-accessible')) {
+          $('#filterRegency').select2({
+            placeholder: 'Semua Kabupaten/Kota',
+            allowClear: true,
+            width: '100%',
+            language: {
+              noResults: function() {
+                return "Tidak ada hasil";
+              },
+              searching: function() {
+                return "Mencari...";
+              }
+            }
           });
-        } catch (error) {
-          console.error('Error loading districts:', error);
         }
+
+        // Filter District (Kecamatan)
+        if ($('#filterDistrict').length && !$('#filterDistrict').hasClass('select2-hidden-accessible')) {
+          $('#filterDistrict').select2({
+            placeholder: 'Semua Kecamatan',
+            allowClear: true,
+            width: '100%',
+            language: {
+              noResults: function() {
+                return "Tidak ada hasil";
+              },
+              searching: function() {
+                return "Mencari...";
+              }
+            }
+          });
+        }
+
+        // Per Page Selector
+        if ($('select[name="per_page"]').length && !$('select[name="per_page"]').hasClass('select2-hidden-accessible')) {
+          $('select[name="per_page"]').select2({
+            width: '70px',
+            minimumResultsForSearch: Infinity, // Disable search for per page (small list)
+            language: {
+              noResults: function() {
+                return "Tidak ada hasil";
+              }
+            }
+          });
+        }
+      }
+
+      // Initialize Select2
+      initSelect2();
+    });
+
+    // ========== Cascading filter with Select2 ==========
+    $(document).ready(function() {
+      const selReg = $('#filterRegency');
+      const selDis = $('#filterDistrict');
+
+      if (selReg.length && selDis.length) {
+        selReg.on('change', async function() {
+          const rid = $(this).val();
+
+          // Destroy existing Select2 instance
+          if (selDis.hasClass('select2-hidden-accessible')) {
+            selDis.select2('destroy');
+          }
+
+          // Clear and reset district select
+          selDis.empty().append('<option value="">Semua Kecamatan</option>');
+          selDis.val('').trigger('change');
+
+          if (!rid) {
+            // Hide district filter if no regency selected
+            selDis.closest('.input-group').hide();
+            return;
+          }
+
+          // Show district filter
+          selDis.closest('.input-group').show();
+
+          try {
+            const res = await fetch('{{ route('admin.desa.options.districts') }}?regency_id=' + encodeURIComponent(rid));
+            const rows = await res.json();
+
+            rows.forEach(r => {
+              const opt = new Option(r.name, r.id, false, false);
+              selDis.append(opt);
+            });
+
+          // Re-initialize Select2 for district after options are added
+          selDis.select2({
+            placeholder: 'Semua Kecamatan',
+            allowClear: true,
+            width: '100%',
+            language: {
+              noResults: function() {
+                return "Tidak ada hasil";
+              },
+              searching: function() {
+                return "Mencari...";
+              }
+            }
+          });
+
+            // Set selected value if exists in request
+            @if(request('district_id'))
+              selDis.val('{{ request('district_id') }}').trigger('change');
+            @endif
+          } catch (error) {
+            console.error('Error loading districts:', error);
+          }
+        });
+      }
+
+      // ========== Auto submit on Select2 change ==========
+      // Handle auto-submit for filter form
+      $('#filterRegency, #filterDistrict').on('change', function() {
+        // Small delay to ensure Select2 value is set
+        setTimeout(() => {
+          const form = document.getElementById('filterForm');
+          if (form) {
+            form.submit();
+          }
+        }, 100);
       });
-    }
+
+      // Handle auto-submit for per page form
+      $('select[name="per_page"]').on('change', function() {
+        setTimeout(() => {
+          const form = document.getElementById('perPageForm');
+          if (form) {
+            form.submit();
+          }
+        }, 100);
+      });
+    });
   });
 </script>
 
