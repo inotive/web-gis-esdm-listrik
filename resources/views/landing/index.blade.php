@@ -2229,44 +2229,102 @@
       }
     };
 
-    // Apply filter to layers
-    const applyWilayahFilter = () => {
+    // Apply filter to layers and zoom to extent
+    const applyWilayahFilter = async () => {
+      let targetLayer = null;
+      let whereClause = '';
+
+      console.log('Applying filter:', { currentRegencyId, currentDistrictId, currentVillageId });
+
       // Filter for LN Batas Desa layer
       if (currentVillageId) {
-        lnBatasDesaLayer.definitionExpression = `id = '${currentVillageId}'`;
+        lnBatasDesaLayer.definitionExpression = `WADMKD = '${currentVillageId}'`;
+        targetLayer = lnBatasDesaLayer;
+        whereClause = `WADMKD = '${currentVillageId}'`;
       } else if (currentDistrictId) {
-        lnBatasDesaLayer.definitionExpression = `district_id = '${currentDistrictId}'`;
+        lnBatasDesaLayer.definitionExpression = `WADMKC = '${currentDistrictId}'`;
       } else if (currentRegencyId) {
-        lnBatasDesaLayer.definitionExpression = `regency_id = '${currentRegencyId}'`;
+        lnBatasDesaLayer.definitionExpression = `WADMKK = '${currentRegencyId}'`;
       } else {
         lnBatasDesaLayer.definitionExpression = null;
       }
 
       // Filter for LN Batas Kecamatan layer
       if (currentDistrictId) {
-        lnBatasKecamatanLayer.definitionExpression = `id = '${currentDistrictId}'`;
+        lnBatasKecamatanLayer.definitionExpression = `WADMKC = '${currentDistrictId}'`;
+        if (!targetLayer) {
+          targetLayer = lnBatasKecamatanLayer;
+          whereClause = `WADMKC = '${currentDistrictId}'`;
+        }
       } else if (currentRegencyId) {
-        lnBatasKecamatanLayer.definitionExpression = `regency_id = '${currentRegencyId}'`;
+        lnBatasKecamatanLayer.definitionExpression = `WADMKK = '${currentRegencyId}'`;
       } else {
         lnBatasKecamatanLayer.definitionExpression = null;
       }
 
       // Filter for LN Batas Kab/Kota layer
       if (currentRegencyId) {
-        lnBatasKabKotaLayer.definitionExpression = `id = '${currentRegencyId}'`;
+        lnBatasKabKotaLayer.definitionExpression = `WADMKK = '${currentRegencyId}'`;
+        if (!targetLayer) {
+          targetLayer = lnBatasKabKotaLayer;
+          whereClause = `WADMKK = '${currentRegencyId}'`;
+        }
       } else {
         lnBatasKabKotaLayer.definitionExpression = null;
       }
 
       // Filter for Data Berlistrik layer
       if (currentVillageId) {
-        desaBerlistrikLayer.definitionExpression = `id = '${currentVillageId}'`;
+        desaBerlistrikLayer.definitionExpression = `WADMKD = '${currentVillageId}'`;
       } else if (currentDistrictId) {
-        desaBerlistrikLayer.definitionExpression = `district_id = '${currentDistrictId}'`;
+        desaBerlistrikLayer.definitionExpression = `WADMKC = '${currentDistrictId}'`;
       } else if (currentRegencyId) {
-        desaBerlistrikLayer.definitionExpression = `regency_id = '${currentRegencyId}'`;
+        desaBerlistrikLayer.definitionExpression = `WADMKK = '${currentRegencyId}'`;
       } else {
         desaBerlistrikLayer.definitionExpression = null;
+      }
+
+      // Zoom to selected area
+      if (targetLayer && whereClause) {
+        console.log('Zooming to:', targetLayer.title, 'with clause:', whereClause);
+        try {
+          // Wait for layer to load if not already loaded
+          await targetLayer.load();
+
+          const query = targetLayer.createQuery();
+          query.where = whereClause;
+          query.returnGeometry = true;
+
+          const results = await targetLayer.queryFeatures(query);
+          console.log('Query results:', results.features.length, 'features found');
+
+          if (results.features.length > 0) {
+            // Calculate extent from all features
+            let extent = null;
+            results.features.forEach(feature => {
+              if (feature.geometry) {
+                if (!extent) {
+                  extent = feature.geometry.extent;
+                } else {
+                  extent = extent.union(feature.geometry.extent);
+                }
+              }
+            });
+
+            if (extent) {
+              console.log('Zooming to extent:', extent);
+              // Zoom to extent with some padding
+              await view.goTo({
+                target: extent.expand(1.2),
+                duration: 1000
+              });
+            }
+          } else {
+            console.warn('No features found for query');
+          }
+        } catch (error) {
+          console.error('Error querying features for zoom:', error);
+        }
       }
     };
 
@@ -2283,7 +2341,7 @@
       villageDropdown.innerHTML = '<option value="">Semua Kelurahan/Desa</option>';
       villageDropdown.disabled = true;
 
-      applyWilayahFilter();
+      await applyWilayahFilter();
     });
 
     // Handle Kecamatan change
@@ -2295,17 +2353,17 @@
 
       await loadVillages(currentDistrictId);
 
-      applyWilayahFilter();
+      await applyWilayahFilter();
     });
 
     // Handle Kelurahan/Desa change
-    villageDropdown.addEventListener('change', (e) => {
+    villageDropdown.addEventListener('change', async (e) => {
       currentVillageId = e.target.value;
-      applyWilayahFilter();
+      await applyWilayahFilter();
     });
 
     // Handle reset filter
-    resetFilterBtn.addEventListener('click', () => {
+    resetFilterBtn.addEventListener('click', async () => {
       currentRegencyId = '';
       currentDistrictId = '';
       currentVillageId = '';
@@ -2320,7 +2378,7 @@
       villageDropdown.innerHTML = '<option value="">Semua Kelurahan/Desa</option>';
       villageDropdown.disabled = true;
 
-      applyWilayahFilter();
+      await applyWilayahFilter();
     });
 
     // Initialize dropdowns
