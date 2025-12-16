@@ -362,6 +362,397 @@
     });
     map.add(jalanBalikpapanLayer);
 
+    // Jalan Berau
+    const jalanBerauLayer = new GeoJSONLayer({
+      url: "{{ url('/api/jalan-berau') }}",
+      title: "Jalan Berau",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-line",
+          color: [255, 165, 0, 1], // orange
+          width: 2
+        }
+      },
+      popupTemplate: {
+        title: "{NAMA_RUAS}",
+        content: `
+          <b>No. Ruas:</b> {NO_RUAS}<br>
+          <b>Nama Ruas:</b> {NAMA_RUAS}<br>
+          <b>Kab/Kota:</b> {KAB_KOTA}<br>
+          <b>Titik Awal:</b> {TTK_PNGKAL}<br>
+          <b>Titik Akhir:</b> {TTK_AKHIR}<br>
+          <b>Panjang:</b> {PANJANG} km<br>
+          <b>Jumlah Jalur (2):</b> {JKP_2}<br>
+          <b>Jumlah Jalur (3):</b> {JKP_3}<br>
+          <b>Jumlah Jalur (4):</b> {JKP_4}<br>
+          <b>Jumlah Lajur Perjalanan:</b> {JLP}<br>
+          <b>Jalan Lingkar Propinsi:</b> {Jling_P}<br>
+          <b>Jumlah Akses Struktur:</b> {JAS}<br>
+          <b>Jumlah Konektivitas Struktur:</b> {JKS}<br>
+          <b>Jumlah Lintas Struktur:</b> {JLS}<br>
+          <b>Jalan Lingkar Struktur:</b> {Jling_S}<br>
+          <b>Fungsi:</b> {FUNGSI}<br>
+          <b>Status:</b> {STATUS}<br>
+          <b>Panjang (Shape_Leng):</b> {Shape_Leng} m
+        `
+      }
+    });
+    map.add(jalanBerauLayer);
+
+    // Jalan Bontang
+    const jalanBontangLayer = new GeoJSONLayer({
+      url: "{{ url('/api/jalan-bontang') }}",
+      title: "Jalan Bontang",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-line",
+          color: [0, 0, 255, 1], // biru
+          width: 2
+        }
+      },
+      popupTemplate: {
+        title: "{Nm_Ruas}",
+        content: `
+          <b>Klasifikasi Data Dasar:</b> {Kl_Dat_Das}<br>
+          <b>Nama Ruas:</b> {Nm_Ruas}<br>
+          <b>Tahun Data:</b> {Thn_Data}<br>
+          <b>Status:</b> {Status}<br>
+          <b>Fungsi:</b> {Fungsi}<br>
+          <b>Mendukung:</b> {Mendukung}<br>
+          <b>Uraian Dukung:</b> {Ura_Dukung}<br>
+          <b>Kode Bangunan PU:</b> {Kd_Bd_PU}<br>
+          <b>Kode Jenis Infrastruktur:</b> {Kd_Jns_Inf}<br>
+          <b>Kode Infrastruktur:</b> {Kd_Inf}<br>
+          <b>Provinsi:</b> {Propinsi}<br>
+          <b>Kabupaten/Kota:</b> {Kab_Kota}<br>
+          <b>Kecamatan:</b> {Kecamatan}<br>
+          <b>Desa/Kelurahan:</b> {Desa_Kel}<br>
+          <b>Titik Ruas Awal:</b> {Tk_Ruas_Aw}<br>
+          <b>Titik Ruas Akhir:</b> {Tk_Ruas_Ak}<br>
+          <b>Kode Patok:</b> {Kd_Patok}<br>
+          <b>Kilometer Awal:</b> {Km_Awal}<br>
+          <b>Kilometer Akhir:</b> {Km_Akhir}<br>
+          <b>Nama Lintas:</b> {Nm_Lintas}<br>
+          <b>Kondisi Baik (%):</b> {Kon_Baik}<br>
+          <b>Kondisi Sedang (%):</b> {Kon_Sdg}<br>
+          <b>Kondisi Renggang (%):</b> {Kon_Rgn}<br>
+          <b>Kondisi Rusak (%):</b> {Kon_Rusak}<br>
+          <b>Kondisi Mantap (%):</b> {Kon_Mntp}<br>
+          <b>Kondisi Tidak Mantap (%):</b> {Kon_T_Mntp}<br>
+          <b>Panjang (km):</b> {Panjang}<br>
+          <b>Lebar Keras (m):</b> {Lbr_Keras}<br>
+          <b>LHRT:</b> {LHRT}<br>
+          <b>VCR:</b> {VCR}<br>
+          <b>Tipe Jalan:</b> {Tipe_Jln}<br>
+          <b>MST:</b> {MST}<br>
+          <b>Tipe Keras:</b> {Tipe_Keras}<br>
+          <b>Tanah Krikil (%):</b> {Tanah_Kri}<br>
+          <b>Macadam (%):</b> {Macadam}<br>
+          <b>Aspal (%):</b> {Aspal}<br>
+          <b>Rigid (%):</b> {Rigid}<br>
+          <b>Tahun Penanganan Akhir:</b> {Thn_Pen_Ak}<br>
+          <b>Jenis Penanganan:</b> {Jns_Pen}<br>
+          <b>Koordinat X Awal:</b> {Koord_X_Aw}<br>
+          <b>Koordinat Y Awal:</b> {Koord_Y_Aw}<br>
+          <b>Koordinat X Akhir:</b> {Koord_X_Ak}<br>
+          <b>Koordinat Y Akhir:</b> {Koord_Y_Ak}
+        `
+      }
+    });
+    map.add(jalanBontangLayer);
+
+    // Jalan Kubar
+    const jalanKubarLayer = new GeoJSONLayer({
+      url: "{{ url('/api/jalan-kubar') }}",
+      title: "Jalan Kubar",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-line",
+          color: [255, 255, 0, 1], // kuning
+          width: 2
+        }
+      },
+      popupTemplate: {
+        title: "{Nm_Ruas}",
+        content: `
+          <b>Nama Ruas:</b> {Nm_Ruas}<br>
+          <b>Fungsi:</b> {Fungsi}<br>
+          <b>Panjang (km):</b> {Panjang}
+        `
+      }
+    });
+    map.add(jalanKubarLayer);
+
+    // Jalan Kutai Kartanegara
+    const jalanKutaiKartanegaraLayer = new GeoJSONLayer({
+      url: "{{ url('/api/jalan-kutai-kartanegara') }}",
+      title: "Jalan Kutai Kartanegara",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-line",
+          color: [255, 165, 100, 1], // orange
+          width: 2
+        }
+      },
+      popupTemplate: {
+        title: "{NAMA_BARU}",
+        content: `
+          <b>No. Lama:</b> {NO_LAMA}<br>
+          <b>No. Baru:</b> {NO_BARU}<br>
+          <b>Nama Lama:</b> {NAMA_LAMA}<br>
+          <b>Nama Baru:</b> {NAMA_BARU}<br>
+          <b>Panjang (P_Km):</b> {P_Km}<br>
+          <b>Kecamatan:</b> {KECAMATAN}<br>
+          <b>Urutan:</b> {URUT}<br>
+          <b>Pangkal:</b> {PANGKAL}<br>
+          <b>Ujung:</b> {UJUNG}<br>
+          <b>Koordinat Pangkal:</b> {KOOR_PANGK}<br>
+          <b>Koordinat Ujung:</b> {KOOR_UJUNG}<br>
+          <b>Lebar (m):</b> {LEBAR_M}<br>
+          <b>Fungsi:</b> {FUNGSI}<br>
+          <b>History:</b> {HISTORY}<br>
+          <b>Panjang:</b> {Panjang}
+        `
+      }
+    });
+    map.add(jalanKutaiKartanegaraLayer);
+
+    // Jalan Kutim
+    const jalanKutimLayer = new GeoJSONLayer({
+      url: "{{ url('/api/jalan-kutim') }}",
+      title: "Jalan Kutim",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-line",
+          color: [148, 0, 211, 1], // violet
+          width: 2
+        }
+      },
+      popupTemplate: {
+        title: "{Nm_Ruas}",
+        content: `
+          <b>Klasifikasi Data Dasar:</b> {Kl_Dat_Das}<br>
+          <b>No. Ruas:</b> {No_Ruas}<br>
+          <b>Nama Ruas:</b> {Nm_Ruas}<br>
+          <b>Fungsi:</b> {Fungsi}<br>
+          <b>Kecamatan:</b> {Kecamatan}<br>
+          <b>Desa/Kelurahan:</b> {Desa_Kel}<br>
+          <b>Titik Ruas Awal:</b> {Tk_Ruas_Aw}<br>
+          <b>Titik Ruas Akhir:</b> {Tk_Ruas_Ak}<br>
+          <b>Panjang:</b> {Panjang}<br>
+          <b>Koordinat X Awal:</b> {Koord_X_Aw}<br>
+          <b>Koordinat Y Awal:</b> {Koord_Y_Aw}<br>
+          <b>Koordinat X Akhir:</b> {Koord_X_Ak}<br>
+          <b>Koordinat Y Akhir:</b> {Koord_Y_Ak}
+        `
+      }
+    });
+    map.add(jalanKutimLayer);
+
+    // Jalan Paser
+    const jalanPaserLayer = new GeoJSONLayer({
+      url: "{{ url('/api/jalan-paser') }}",
+      title: "Jalan Paser",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-line",
+          color: [0, 100, 0, 1], // dark green
+          width: 2
+        }
+      },
+      popupTemplate: {
+        title: "{Nm_Ruas}",
+        content: `
+          <b>OBJECTID_1:</b> {OBJECTID_1}<br>
+          <b>OBJECTID_2:</b> {OBJECTID_2}<br>
+          <b>OBJECTID:</b> {OBJECTID}<br>
+          <b>Klasifikasi Data Dasar:</b> {Kl_Dat_Das}<br>
+          <b>Nama Ruas:</b> {Nm_Ruas}<br>
+          <b>Tahun Data:</b> {Thn_Data}<br>
+          <b>Status:</b> {Status}<br>
+          <b>Fungsi:</b> {Fungsi}<br>
+          <b>Mendukung:</b> {Mendukung}<br>
+          <b>Uraian Dukung:</b> {Ura_Dukung}<br>
+          <b>Kode Bidang PU:</b> {Kd_Bd_PU}<br>
+          <b>Kode Jenis Infrastruktur:</b> {Kd_Jns_inf}<br>
+          <b>Kode Infrastruktur:</b> {Kd_Inf}<br>
+          <b>Propinsi:</b> {Propinsi}<br>
+          <b>Kabupaten/Kota:</b> {Kab_Kot}<br>
+          <b>Kecamatan:</b> {Kecamatan}<br>
+          <b>Desa/Kelurahan:</b> {Desa_Kel}<br>
+          <b>Titik Ruas Awal:</b> {Tk_Ruas_Aw}<br>
+          <b>Titik Ruas Akhir:</b> {Tk_Ruas_Ak}<br>
+          <b>Kode Patok:</b> {Kd_Patok}<br>
+          <b>Nama Lintas:</b> {Nm_Lintas}<br>
+          <b>Kilometer Awal:</b> {Km_Awal}<br>
+          <b>Kilometer Akhir:</b> {Km_Akhir}<br>
+          <b>Kondisi Baik (%):</b> {Kon_Baik}<br>
+          <b>Kondisi Sedang (%):</b> {Kon_Sdg}<br>
+          <b>Kondisi Renggang (%):</b> {Kon_Rgn}<br>
+          <b>Kondisi Rusak (%):</b> {Kon_Rusak}<br>
+          <b>Kondisi Mantap (%):</b> {Kon_Mntp}<br>
+          <b>Kondisi Tidak Mantap (%):</b> {Kon_T_Mntp}<br>
+          <b>Panjang (km):</b> {Panjang}<br>
+          <b>Lebar Keras (m):</b> {Lbr_Keras}<br>
+          <b>LHRT:</b> {LHRT}<br>
+          <b>VCR:</b> {VCR}<br>
+          <b>Tipe Jalan:</b> {Tipe_Jln}<br>
+          <b>MST:</b> {MST}<br>
+          <b>Tipe Keras:</b> {Tipe_Keras}<br>
+          <b>Tanah Krikil (%):</b> {Tanah_Kri}<br>
+          <b>Macadam (%):</b> {Macadam}<br>
+          <b>Aspal (%):</b> {Aspal}<br>
+          <b>Rigid (%):</b> {Rigid}<br>
+          <b>Tahun Penanganan Akhir:</b> {Thn_Pen_Ak}<br>
+          <b>Jenis Penanganan:</b> {Jns_Pen}<br>
+          <b>Panjang (pnj):</b> {pnj}<br>
+          <b>ID:</b> {Id}<br>
+          <b>Panjang (Shape_Leng):</b> {Shape_Leng}<br>
+          <b>Koordinat X Akhir:</b> {X_Ak}<br>
+          <b>Koordinat Y Akhir:</b> {Y_Ak}<br>
+          <b>Koordinat X Awal:</b> {X_Aw}<br>
+          <b>Koordinat Y Awal:</b> {Y_Aw}<br>
+          <b>No:</b> {No}
+        `
+      }
+    });
+    map.add(jalanPaserLayer);
+
+    // Jalan PPU
+    const jalanPPULayer = new GeoJSONLayer({
+      url: "{{ url('/api/jalan-ppu') }}",
+      title: "Jalan PPU",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-line",
+          color: [75, 0, 130, 1], // purple
+          width: 2
+        }
+      },
+      popupTemplate: {
+        title: "{Name}",
+        content: `
+          <b>OID:</b> {OID_}<br>
+          <b>Nama:</b> {Name}<br>
+          <b>Folder Path:</b> {FolderPath}<br>
+          <b>Symbol ID:</b> {SymbolID}<br>
+          <b>Clamped:</b> {Clamped}<br>
+          <b>Panjang (Shape_Leng):</b> {Shape_Leng}
+        `
+      }
+    });
+    map.add(jalanPPULayer);
+
+    // Jalan Samarinda
+    const jalanSamarindaLayer = new GeoJSONLayer({
+      url: "{{ url('/api/jalan-samarinda') }}",
+      title: "Jalan Samarinda",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-line",
+          color: [0, 255, 255, 1], // cyan
+          width: 2
+        }
+      },
+      popupTemplate: {
+        title: "{NAME}",
+        content: `
+          <b>Nama:</b> {NAME}<br>
+          <b>Layer:</b> {LAYER}<br>
+          <b>OBJECTID_1:</b> {OBJECTID_1}<br>
+          <b>OBJECTID:</b> {OBJECTID}<br>
+          <b>Klasifikasi Data Dasar:</b> {Kl_Dat_Das}<br>
+          <b>Nama Ruas:</b> {Nm_Ruas}<br>
+          <b>Tahun Data:</b> {Thn_Data}<br>
+          <b>Status:</b> {Status}<br>
+          <b>Fungsi:</b> {Fungsi}<br>
+          <b>Mendukung:</b> {Mendukung}<br>
+          <b>Uraian Dukung:</b> {Ura_Dukung}<br>
+          <b>Kode Bangunan PU:</b> {Kd_Bd_PU}<br>
+          <b>Kode Jenis Infrastruktur:</b> {Kd_Jns_Inf}<br>
+          <b>Kode Infrastruktur:</b> {Kd_Inf}<br>
+          <b>Propinsi:</b> {Propinsi}<br>
+          <b>Kabupaten/Kota:</b> {Kab_Kot}<br>
+          <b>Kecamatan:</b> {Kecamatan}<br>
+          <b>Desa/Kelurahan:</b> {Desa_Kel}<br>
+          <b>Titik Ruas Awal:</b> {Tk_Ruas_Aw}<br>
+          <b>Titik Ruas Akhir:</b> {Tk_Ruas_Ak}<br>
+          <b>Kode Patok:</b> {Kd_Patok}<br>
+          <b>Kilometer Awal:</b> {Km_Awal}<br>
+          <b>Kilometer Akhir:</b> {Km_Akhir}<br>
+          <b>Nama Lintas:</b> {Nm_Lintas}<br>
+          <b>Kondisi Baik (%):</b> {Kon_Baik}<br>
+          <b>Kondisi Sedang (%):</b> {Kon_Sdg}<br>
+          <b>Kondisi Renggang (%):</b> {Kon_Rgn}<br>
+          <b>Kondisi Rusak (%):</b> {Kon_Rusak}<br>
+          <b>Kondisi Mantap (%):</b> {Kon_Mntp}<br>
+          <b>Kondisi Tidak Mantap (%):</b> {Kon_T_Mntp}<br>
+          <b>Panjang (km):</b> {Panjang}<br>
+          <b>Lebar Keras (m):</b> {Lbr_Keras}<br>
+          <b>LHRT:</b> {LHRT}<br>
+          <b>VCR:</b> {VCR}<br>
+          <b>Tipe Jalan:</b> {Tipe_Jln}<br>
+          <b>MST:</b> {MST}<br>
+          <b>Tanah Krikil (%):</b> {Tanah_Kri}<br>
+          <b>Macadam (%):</b> {Macadam}<br>
+          <b>Aspal (%):</b> {Aspal}<br>
+          <b>Rigid (%):</b> {Rigid}<br>
+          <b>Tahun Penanganan Akhir:</b> {Thn_Pen_Ak}<br>
+          <b>Jenis Penanganan:</b> {Jns_Pen}<br>
+          <b>Koordinat X Awal:</b> {Koord_X_Aw}<br>
+          <b>Koordinat Y Awal:</b> {Koord_Y_Aw}<br>
+          <b>Koordinat X Akhir:</b> {Koord_X_Ak}<br>
+          <b>Koordinat Y Akhir:</b> {Koord_Y_Ak}<br>
+          <b>Panjang (Shape_Leng):</b> {Shape_Leng}<br>
+          <b>Panjang (Shape_Le_1):</b> {Shape_Le_1}<br>
+          <b>Length:</b> {LENGTH}<br>
+          <b>Length 3D:</b> {LENGTH_3D}<br>
+          <b>Bearing:</b> {BEARING}<br>
+          <b>Line Style:</b> {LINE_STYLE}<br>
+          <b>Line Color:</b> {LINE_COLOR}<br>
+          <b>Line Width:</b> {LINE_WIDTH}<br>
+          <b>Font Size:</b> {FONT_SIZE}<br>
+          <b>Font Color:</b> {FONT_COLOR}<br>
+          <b>Font Chars:</b> {FONT_CHARS}<br>
+          <b>Font Weight:</b> {FONT_WEIGH}<br>
+          <b>Elevation:</b> {ELEVATION}<br>
+          <b>Map Name:</b> {MAP_NAME}<br>
+          <b>GM Layer:</b> {GM_LAYER}<br>
+          <b>GM Type:</b> {GM_TYPE}<br>
+          <b>Version:</b> {version}<br>
+          <b>Highway:</b> {highway}<br>
+          <b>OSM ID:</b> {osm_id}<br>
+          <b>Oneway:</b> {oneway}<br>
+          <b>Boat:</b> {boat}<br>
+          <b>Smoothness:</b> {smoothness}<br>
+          <b>Start Time:</b> {START_TIME}<br>
+          <b>End Time:</b> {END_TIME}<br>
+          <b>Koordinat X Awal:</b> {Kord_X_Awa}<br>
+          <b>Koordinat X Akhir:</b> {Kord_X_Akh}<br>
+          <b>Koordinat Y Awal:</b> {Kord_Y_Awa}<br>
+          <b>Koordinat Y Akhir:</b> {Kord_Y_Akh}<br>
+          <b>Koordinat Y Akhir 1:</b> {Kord_Y_a_1}
+        `
+      }
+    });
+    map.add(jalanSamarindaLayer);
+
     // Jaringan Listrik Balikpapan
     const jaringanListrikBalikpapanLayer = new GeoJSONLayer({
       url: "{{ url('/api/jaringan-listrik-balikpapan') }}",
@@ -1365,6 +1756,15 @@
     desaBerlistrikLayer.visible = false;
     jalanNasionalLayer.visible = false;
     jalanProvinsiLayer.visible = false;
+    jalanBalikpapanLayer.visible = false;
+    jalanBerauLayer.visible = false;
+    jalanBontangLayer.visible = false;
+    jalanKubarLayer.visible = false;
+    jalanKutaiKartanegaraLayer.visible = false;
+    jalanKutimLayer.visible = false;
+    jalanPaserLayer.visible = false;
+    jalanPPULayer.visible = false;
+    jalanSamarindaLayer.visible = false;
     jaringanListrikBalikpapanLayer.visible = false;
     jaringanListrikBontangLayer.visible = false;
     sistemJaringanEnergiKukarLayer.visible = false;
@@ -1408,7 +1808,15 @@
       transportasi: [
         { label: 'Jalan Nasional', layer: jalanNasionalLayer, icon: '🛣️' },
         { label: 'Jalan Provinsi', layer: jalanProvinsiLayer, icon: '🛤️' },
-        { label: 'Jalan Balikpapan', layer: jalanBalikpapanLayer, icon: '🚗' }
+        { label: 'Jalan Balikpapan', layer: jalanBalikpapanLayer, icon: '🚗' },
+        { label: 'Jalan Berau', layer: jalanBerauLayer, icon: '🚚' },
+        { label: 'Jalan Bontang', layer: jalanBontangLayer, icon: '🚛' },
+        { label: 'Jalan Kubar', layer: jalanKubarLayer, icon: '🛣️' },
+        { label: 'Jalan Kutai Kartanegara', layer: jalanKutaiKartanegaraLayer, icon: '🛣️' },
+        { label: 'Jalan Kutim', layer: jalanKutimLayer, icon: '🛣️' },
+        { label: 'Jalan Paser', layer: jalanPaserLayer, icon: '🛣️' },
+        { label: 'Jalan PPU', layer: jalanPPULayer, icon: '🛣️' },
+        { label: 'Jalan Samarinda', layer: jalanSamarindaLayer, icon: '🛣️' }
       ],
       jaringan: [
         { label: 'Jaringan Listrik Balikpapan', layer: jaringanListrikBalikpapanLayer, icon: '⚡' },
