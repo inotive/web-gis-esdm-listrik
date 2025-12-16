@@ -28,10 +28,11 @@ class AppServiceProvider extends ServiceProvider
             $permohonans = collect();
             $shouldShowMenu = false;
 
-            if ($userRole == 'superadmin' || $userRole == 'admin') {
-                $permohonans = Permohonan::all();
-                $shouldShowMenu = $permohonans->count() > 0;
-            } elseif (in_array($userRole, ['desa', 'perusahaan'])) {
+            // if ($userRole == 'superadmin' || $userRole == 'admin') {
+            //     $permohonans = Permohonan::all();
+            //     $shouldShowMenu = $permohonans->count() > 0;
+            // } else
+            if (in_array($userRole, ['desa', 'perusahaan'])) {
                 $permohonans = Permohonan::where('jenis_permohonan', $userRole)->get();
                 $shouldShowMenu = $permohonans->count() > 0;
             }

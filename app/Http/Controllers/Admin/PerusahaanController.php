@@ -205,7 +205,7 @@ class PerusahaanController extends Controller
             if ($hasPermohonanUser) {
                 $messages[] = 'Data perusahaan tidak dapat dihapus karena masih memiliki relasi dengan data Permohonan User.';
             }
-            
+
             return redirect()->route('admin.perusahaan.index')
                 ->with('error', implode(' ', $messages));
         }

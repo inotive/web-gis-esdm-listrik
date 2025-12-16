@@ -4,15 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Permohonan;
-use App\Models\PermohonanUser;
-use App\Models\PermohonanQuestion;
-use App\Models\PermohonanQuestionOption;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
-class PermohonanController extends Controller
+class KategoriPermohonanController extends Controller
 {
-    /**
+     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
@@ -34,109 +30,10 @@ class PermohonanController extends Controller
             ->paginate($perPage)
             ->withQueryString();
 
-        // Data Perizinan (contoh - nantinya bisa dari database)
-        $perizinanData = [
-            [
-                'perusahaan' => 'Perusahaan A',
-                'jenis_izin' => 'IUJPTL',
-                'tanggal_berlaku' => '10 Desember 2025',
-                'sumber_pengajuan' => 'Dari Sistem / Manual',
-                'tanggal_pengajuan' => '10 dSE 2025',
-                'tanggal_terbit' => null,
-                'status' => 'Aktif / Menunggu Verifikasi',
-            ],
-            [
-                'perusahaan' => 'PT. Listrik Nusantara',
-                'jenis_izin' => 'IUPTLS',
-                'tanggal_berlaku' => '15 Januari 2026',
-                'sumber_pengajuan' => 'Dari Sistem',
-                'tanggal_pengajuan' => '01 November 2024',
-                'tanggal_terbit' => '15 November 2024',
-                'status' => 'Aktif',
-            ],
-            [
-                'perusahaan' => 'CV. Energi Mandiri',
-                'jenis_izin' => 'SLO',
-                'tanggal_berlaku' => '20 Maret 2025',
-                'sumber_pengajuan' => 'Manual',
-                'tanggal_pengajuan' => '10 Oktober 2024',
-                'tanggal_terbit' => '25 Oktober 2024',
-                'status' => 'Aktif',
-            ],
-            [
-                'perusahaan' => 'PT. Cahaya Timur',
-                'jenis_izin' => 'SKTP',
-                'tanggal_berlaku' => '05 Februari 2025',
-                'sumber_pengajuan' => 'Dari Sistem',
-                'tanggal_pengajuan' => '15 September 2024',
-                'tanggal_terbit' => null,
-                'status' => 'Menunggu Verifikasi',
-            ],
-            [
-                'perusahaan' => 'PT. Borneo Power',
-                'jenis_izin' => 'IUJPTL',
-                'tanggal_berlaku' => '30 Juni 2024',
-                'sumber_pengajuan' => 'Dari Sistem',
-                'tanggal_pengajuan' => '01 Januari 2024',
-                'tanggal_terbit' => '15 Januari 2024',
-                'status' => 'Expired',
-            ],
-        ];
 
-        // Data Permohonan dari PermohonanUser
-        $permohonanUsers = PermohonanUser::with(['permohonan', 'user'])
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        $permohonanData = $permohonanUsers->map(function ($permohonanUser) {
-            $statusText = ucfirst($permohonanUser->status);
-
-            // Mapping status ke format yang lebih user-friendly
-            $statusMap = [
-                'pending' => 'Menunggu Verifikasi',
-                'diproses' => 'Sedang Diproses',
-                'selesai' => 'Aktif',
-                'ditolak' => 'Ditolak',
-                'expired' => 'Expired',
-            ];
-
-            $statusText = $statusMap[$permohonanUser->status] ?? $statusText;
-
-            // Format tanggal
-            $tanggalPengajuan = $permohonanUser->created_at
-                ? $permohonanUser->created_at->translatedFormat('d F Y')
-                : '-';
-
-            $tanggalTerbit = null;
-            if ($permohonanUser->status === 'selesai' && $permohonanUser->updated_at) {
-                $tanggalTerbit = $permohonanUser->updated_at->translatedFormat('d F Y');
-            }
-
-            // Tanggal berlaku (default ke 1 tahun dari tanggal pengajuan atau updated_at jika selesai)
-            $tanggalBerlaku = '-';
-            if ($permohonanUser->status === 'selesai' && $permohonanUser->updated_at) {
-                $tanggalBerlaku = $permohonanUser->updated_at->copy()->addYear()->translatedFormat('d F Y');
-            } elseif ($permohonanUser->created_at) {
-                $tanggalBerlaku = $permohonanUser->created_at->copy()->addYear()->translatedFormat('d F Y');
-            }
-
-            return [
-                'id' => $permohonanUser->id,
-                'perusahaan' => $permohonanUser->user->name ?? '-',
-                'jenis_izin' => $permohonanUser->permohonan->nama ?? '-',
-                'tanggal_berlaku' => $tanggalBerlaku,
-                'sumber_pengajuan' => 'Dari Sistem',
-                'tanggal_pengajuan' => $tanggalPengajuan,
-                'tanggal_terbit' => $tanggalTerbit,
-                'status' => $statusText,
-            ];
-        })->toArray();
-
-        return view('admin.permohonan.index', [
-            'title' => 'Perizinan dan Permohonan',
-            'permohonans' => $permohonans,
-            'perizinanData' => $perizinanData,
-            'permohonanData' => $permohonanData,
+        return view('admin.kategori-permohonan.index', [
+            'title' => 'Kategori Permohonan',
+            'permohonans' => $permohonans
         ]);
     }
 
