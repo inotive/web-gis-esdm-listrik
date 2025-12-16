@@ -241,7 +241,6 @@
       renderer: {
         type: "unique-value",
         field: "H_Survei",
-        defaultLabel: "Status tidak diketahui",
         defaultSymbol: {
           type: "simple-fill",
           color: [148, 163, 184, 0.35],
@@ -2005,7 +2004,6 @@
         desaBerlistrikLayer.renderer = {
           type: "unique-value",
           field: "H_Survei",
-          defaultLabel: "Status tidak diketahui",
           defaultSymbol: {
             type: "simple-fill",
             color: [148, 163, 184, 0.35],
@@ -2181,8 +2179,27 @@
       basemaps: [bm_osm, bm_sat, bm_hybrid, bm_terrain, bm_topo, bm_gray, bm_dark, bm_street]
     });
 
-    const homeWidget = new Home({ view: view });
-    view.ui.add(homeWidget, "top-left");
+    // Custom Home Label & Login Button
+    const homeLabelDiv = document.createElement('div');
+    homeLabelDiv.className = 'esri-component esri-widget';
+    homeLabelDiv.innerHTML = `
+      <div style="padding: 10px 12px; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+        <div style="font-weight: 700; font-size: 14px; color: #1e293b;">Beranda</div>
+        <a href="{{ route('login') }}" style="
+          display: inline-flex; justify-content: center; align-items: center;
+          background-color: #0b2a63; color: white; text-decoration: none;
+          font-size: 12px; font-weight: 600; padding: 6px 12px;
+          border-radius: 6px; width: 100%; text-align: center;
+          transition: background-color 0.2s;
+        " onmouseover="this.style.backgroundColor='#1e40af'" onmouseout="this.style.backgroundColor='#0b2a63'">
+          Masuk Sekarang
+        </a>
+      </div>
+    `;
+    view.ui.add(homeLabelDiv, "top-left");
+
+    // const homeWidget = new Home({ view: view });
+    // view.ui.add(homeWidget, "top-left");
 
     const searchWidget = new Search({
       view: view,

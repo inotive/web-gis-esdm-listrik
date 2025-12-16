@@ -15,6 +15,7 @@
 @push('styles')
 <link href="{{ asset('assets/plugins/custom/datatables/datatables.bundle.css') }}" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
 <style>
   /* Header / Filter */
@@ -85,7 +86,7 @@
 
   <section class="card" style="margin-top:18px;">
     <div class="card-header">
-      <div class="card-title">Daftar User Login</div>
+      <div class="card-title">Daftar Pengguna</div>
 
       <form id="filterForm" class="toolbar" method="GET" action="#">
         <div class="input-group w-search">
@@ -107,10 +108,9 @@
           <thead>
             <tr>
               <th class="col-no">No</th>
-              <th class="col-user">User</th>
+              <th class="col-user">Nama Pengguna & Email</th>
               <th>Username</th>
               <th>Hak Akses</th>
-              <th>Tanggal</th>
               <th class="col-aksi">Aksi</th>
             </tr>
           </thead>
@@ -120,15 +120,11 @@
                 <td class="col-no">{{ $loop->iteration }}</td>
                 <td class="col-user">
                   <div class="d-flex align-items-center">
-                    <div class="symbol symbol-50px me-3">
-                      @if ($value->image)
+                    @if ($value->image)
+                      <div class="symbol symbol-50px me-3">
                         <img src="{{ asset('storage/profile/' . $value->image) }}" alt="" class="rounded">
-                      @else
-                        <div class="symbol-label fs-2 fw-bold bg-light-primary text-primary">
-                          {{ strtoupper(substr($value->name, 0, 1)) }}
-                        </div>
-                      @endif
-                    </div>
+                      </div>
+                    @endif
                     <div class="d-flex justify-content-start flex-column">
                       <strong class="text-gray-900">{{ $value->name }}</strong>
                       <span class="text-muted fw-semibold d-block fs-7">{{ $value->email }}</span>
@@ -148,10 +144,9 @@
                     <span class="text-muted">-</span>
                   @endif
                 </td>
-                <td>{{ \Carbon\Carbon::parse($value->created_at)->format('d M Y') }}</td>
                 <td class="col-aksi">
-                  <a href="#" class="btn-ico" title="Edit" data-bs-toggle="modal" data-bs-target="#kt_modal_{{ $value->id }}"><i class="ri-edit-2-line"></i></a>
-                  <button data-route="{{ route('admin.hak-akses.user.destroy', $value->id) }}" class="btn-ico" title="Hapus" onclick="destroyItem(this)"><i class="ri-delete-bin-6-line"></i></button>
+                  <a href="#" class="btn-ico" title="Edit" data-open="#modalEditUser_{{ $value->id }}"><i class="fa-solid fa-pen-to-square"></i></a>
+                  <button data-route="{{ route('admin.hak-akses.user.destroy', $value->id) }}" class="btn-ico" title="Hapus" onclick="destroyItem(this)"><i class="fa-solid fa-trash"></i></button>
                 </td>
               </tr>
             @endforeach
@@ -165,7 +160,7 @@
             <span>Show</span>
             <select class="form-select" id="perPageSelect" aria-label="Jumlah baris per halaman">
               @foreach([10,25,50,100,200] as $n)
-                <option value="{{ $n }}" {{ (int)request('per_page', 25) === $n ? 'selected' : '' }}>{{ $n }}</option>
+                <option value="{{ $n }}" {{ (int)request('per_page', 10) === $n ? 'selected' : '' }}>{{ $n }}</option>
               @endforeach
             </select>
             <span>per page</span>
@@ -190,6 +185,7 @@
 
 @push('scripts')
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script src="{{ asset('assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
 
 <script>
@@ -208,25 +204,24 @@
     document.addEventListener('click', e=>{
       const opener = e.target.closest('[data-open]');
       if(opener){ e.preventDefault(); openModal(opener.getAttribute('data-open')); }
-      if(e.target.hasAttribute('data-close') || e.target.classList.contains('modal-backdrop')){
-        closeModal(e.target.closest('.modal') || document.querySelector('.modal.show'));
+      if(e.target.hasAttribute('data-close') || e.target.classList.contains('custom-modal-backdrop')){
+        closeModal(e.target.closest('.custom-modal') || document.querySelector('.custom-modal.show'));
       }
     });
-    document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(document.querySelector('.modal.show')); });
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(document.querySelector('.custom-modal.show')); });
   })();
 
   jQuery(function($){
     const dt = $("#kt_datatable_dom_positioning").DataTable({
       language:{ lengthMenu:"Show _MENU_", info:"_START_ - _END_ dari _TOTAL_ data", infoEmpty:"Tidak ada data", zeroRecords:"Tidak ada data yang cocok", paginate:{ previous:"‹", next:"›" } },
       dom:"t", ordering:false, autoWidth:false,
-      pageLength: parseInt(document.getElementById('perPageSelect')?.value || 25, 10),
+      pageLength: parseInt(document.getElementById('perPageSelect')?.value || 10, 10),
       columnDefs:[
         {targets:0, width:'48px', className:'text-center'},
         {targets:1, width:'auto'},
         {targets:2, width:'150px'},
-        {targets:3, width:'220px'},
-        {targets:4, width:'125px'},
-        {targets:5, width:'120px', className:'text-center'}
+        {targets:3, width:'180px'},
+        {targets:4, width:'120px', className:'text-center'}
       ]
     });
 
@@ -274,6 +269,12 @@
     searchEl?.addEventListener('input', ()=>{ clearTimeout(t); t=setTimeout(()=> dt.search(searchEl.value).draw(), 300); });
     document.getElementById('btnClearSearch')?.addEventListener('click', ()=>{ if(searchEl){ searchEl.value=''; dt.search('').draw(); } });
     document.getElementById('btnReset')?.addEventListener('click', ()=>{ if(searchEl){ searchEl.value=''; dt.search('').draw(); } });
+
+    // Pagination dropdown change handler
+    document.getElementById('perPageSelect')?.addEventListener('change', function() {
+      const newLength = parseInt(this.value, 10);
+      dt.page.len(newLength).draw();
+    });
   });
 
   window.destroyItem = (e) => {
@@ -295,7 +296,37 @@
   };
 
   @if (Session::has('pesan'))
-    toastr.{{ Session::get('alert') }}("{{ Session::get('pesan') }}")
+    @if (Session::get('alert') === 'success')
+      toastr.success("{{ Session::get('pesan') }}", "Berhasil!", { 
+        closeButton: true, 
+        progressBar: true, 
+        positionClass: "toast-top-right",
+        timeOut: 3000
+      });
+    @elseif (Session::get('alert') === 'error')
+      toastr.error("{{ Session::get('pesan') }}", "Gagal!", { 
+        closeButton: true, 
+        progressBar: true, 
+        positionClass: "toast-top-right",
+        timeOut: 3000
+      });
+    @else
+      toastr.{{ Session::get('alert') }}("{{ Session::get('pesan') }}", "", { 
+        closeButton: true, 
+        progressBar: true, 
+        positionClass: "toast-top-right",
+        timeOut: 3000
+      });
+    @endif
+  @endif
+
+  @if ($errors->any())
+    toastr.error("{{ $errors->first() }}", "Error!", {
+      closeButton: true,
+      progressBar: true,
+      positionClass: "toast-top-right",
+      timeOut: 4000
+    });
   @endif
 </script>
 @endpush

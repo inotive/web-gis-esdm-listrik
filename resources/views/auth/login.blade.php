@@ -173,11 +173,11 @@
                         <div class="logo-subtitle">Provinsi Kalimantan Timur</div>
                     </div>
                 </div>
-                <!-- Tombol kembali ke landing page -->
+                {{-- <!-- Tombol kembali ke landing page -->
                 <a href="{{ url('/') }}" class="btn-back">
                     <i class="ri-arrow-left-line"></i>
                     <span>Beranda</span>
-                </a>
+                </a> --}}
             </div>
 
             <!-- ⬇️ Form akan berada tepat di tengah -->
@@ -211,6 +211,13 @@
                     </div>
 
                     <button type="submit" class="login-button">Masuk Sekarang</button>
+                    
+                    <div style="margin-top: 16px; text-align: center;">
+                        <a href="{{ url('/') }}" style="color: var(--primary-light); text-decoration: none; font-size: 14px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px;">
+                            <i class="ri-arrow-left-line"></i>
+                            <span>Kembali ke Beranda</span>
+                        </a>
+                    </div>
                 </form>
             </div>
 
