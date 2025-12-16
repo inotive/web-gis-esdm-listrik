@@ -23,9 +23,9 @@ class PermohonanController extends Controller
 
         // Search by name or jenis_permohonan
         if ($q) {
-            $query->where(function($query) use ($q) {
+            $query->where(function ($query) use ($q) {
                 $query->where('nama', 'like', '%' . $q . '%')
-                      ->orWhere('jenis_permohonan', 'like', '%' . $q . '%');
+                    ->orWhere('jenis_permohonan', 'like', '%' . $q . '%');
             });
         }
 
@@ -33,9 +33,73 @@ class PermohonanController extends Controller
             ->paginate($perPage)
             ->withQueryString();
 
+        // Data Perizinan (contoh - nantinya bisa dari database)
+        $perizinanData = [
+            [
+                'perusahaan' => 'Perusahaan A',
+                'jenis_izin' => 'IUJPTL',
+                'tanggal_berlaku' => '10 Desember 2025',
+                'sumber_pengajuan' => 'Dari Sistem / Manual',
+                'tanggal_pengajuan' => '10 dSE 2025',
+                'tanggal_terbit' => null,
+                'status' => 'Aktif / Menunggu Verifikasi',
+            ],
+            [
+                'perusahaan' => 'PT. Listrik Nusantara',
+                'jenis_izin' => 'IUPTLS',
+                'tanggal_berlaku' => '15 Januari 2026',
+                'sumber_pengajuan' => 'Dari Sistem',
+                'tanggal_pengajuan' => '01 November 2024',
+                'tanggal_terbit' => '15 November 2024',
+                'status' => 'Aktif',
+            ],
+            [
+                'perusahaan' => 'CV. Energi Mandiri',
+                'jenis_izin' => 'SLO',
+                'tanggal_berlaku' => '20 Maret 2025',
+                'sumber_pengajuan' => 'Manual',
+                'tanggal_pengajuan' => '10 Oktober 2024',
+                'tanggal_terbit' => '25 Oktober 2024',
+                'status' => 'Aktif',
+            ],
+            [
+                'perusahaan' => 'PT. Cahaya Timur',
+                'jenis_izin' => 'SKTP',
+                'tanggal_berlaku' => '05 Februari 2025',
+                'sumber_pengajuan' => 'Dari Sistem',
+                'tanggal_pengajuan' => '15 September 2024',
+                'tanggal_terbit' => null,
+                'status' => 'Menunggu Verifikasi',
+            ],
+            [
+                'perusahaan' => 'PT. Borneo Power',
+                'jenis_izin' => 'IUJPTL',
+                'tanggal_berlaku' => '30 Juni 2024',
+                'sumber_pengajuan' => 'Dari Sistem',
+                'tanggal_pengajuan' => '01 Januari 2024',
+                'tanggal_terbit' => '15 Januari 2024',
+                'status' => 'Expired',
+            ],
+        ];
+
+        // Data Permohonan (contoh - nantinya bisa dari database)
+        $permohonanData = [
+            [
+                'perusahaan' => 'Perusahaan A',
+                'jenis_izin' => 'IUJPTL',
+                'tanggal_berlaku' => '10 Desember 2025',
+                'sumber_pengajuan' => 'Dari Sistem / Manual',
+                'tanggal_pengajuan' => '10 Desember 2025',
+                'tanggal_terbit' => null,
+                'status' => 'Aktif / Menunggu Verifikasi',
+            ],
+        ];
+
         return view('admin.permohonan.index', [
-            'title' => 'Manajemen Permohonan',
+            'title' => 'Perizinan dan Permohonan',
             'permohonans' => $permohonans,
+            'perizinanData' => $perizinanData,
+            'permohonanData' => $permohonanData,
         ]);
     }
 
@@ -90,8 +154,10 @@ class PermohonanController extends Controller
                     ]);
 
                     // Create options if tipe requires options (radio, checkbox, select)
-                    if (in_array($questionData['tipe'], ['radio', 'checkbox', 'select']) &&
-                        isset($questionData['options']) && is_array($questionData['options'])) {
+                    if (
+                        in_array($questionData['tipe'], ['radio', 'checkbox', 'select']) &&
+                        isset($questionData['options']) && is_array($questionData['options'])
+                    ) {
                         foreach ($questionData['options'] as $optionData) {
                             PermohonanQuestionOption::create([
                                 'permohonan_question_id' => $question->id,
@@ -121,20 +187,22 @@ class PermohonanController extends Controller
      */
     public function edit(Permohonan $permohonan)
     {
-        $permohonan->load(['questions.options' => function($query) {
-            $query->orderBy('id');
-        }]);
+        $permohonan->load([
+            'questions.options' => function ($query) {
+                $query->orderBy('id');
+            }
+        ]);
         $permohonan->questions = $permohonan->questions->sortBy('urutan')->values();
 
         // Prepare questions data for JavaScript
-        $questionsData = $permohonan->questions->map(function($q) {
+        $questionsData = $permohonan->questions->map(function ($q) {
             return [
                 'id' => $q->id,
                 'urutan' => $q->urutan,
                 'pertanyaan' => $q->pertanyaan,
                 'tipe' => $q->tipe,
                 'wajib' => $q->wajib,
-                'options' => $q->options->map(function($opt) {
+                'options' => $q->options->map(function ($opt) {
                     return [
                         'id' => $opt->id,
                         'opsi' => $opt->opsi,
@@ -213,8 +281,10 @@ class PermohonanController extends Controller
                     }
 
                     // Handle options
-                    if (in_array($questionData['tipe'], ['radio', 'checkbox', 'select']) &&
-                        isset($questionData['options']) && is_array($questionData['options'])) {
+                    if (
+                        in_array($questionData['tipe'], ['radio', 'checkbox', 'select']) &&
+                        isset($questionData['options']) && is_array($questionData['options'])
+                    ) {
 
                         $existingOptionIds = [];
                         foreach ($questionData['options'] as $optionData) {
