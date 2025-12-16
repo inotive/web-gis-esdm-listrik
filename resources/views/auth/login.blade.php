@@ -8,6 +8,7 @@
     <meta charset="utf-8" />
     <title>Login - Dinas ESDM Kalimantan Timur</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
     <style>
         * { -webkit-font-smoothing: antialiased; box-sizing: border-box; }
 
@@ -64,6 +65,7 @@
             right: 24px;
             display: flex;
             align-items: center;
+            justify-content: space-between; /* Pisahkan logo dan tombol kembali */
         }
 
         .footer {
@@ -82,8 +84,18 @@
         .logo-container { display: flex; align-items: center; gap: 16px; }
         .logo { width: 40px; height: 50px; }
         .logo-text { display: flex; flex-direction: column; }
-        .logo-title { font-weight: 700; color: var(--gray-900); font-size: 16px; }
-        .logo-subtitle { font-weight: 400; color: var(--gray-900); font-size: 14px; }
+        .logo-title { font-weight: 700; color: var(--gray-900); font-size: 14px; max-width: 200px; line-height: 1.2; }
+        .logo-subtitle { font-weight: 400; color: var(--gray-900); font-size: 12px; margin-top: 2px; }
+
+        .btn-back {
+            display: flex; align-items: center; gap: 6px;
+            text-decoration: none; color: var(--gray-600);
+            font-size: 14px; font-weight: 500;
+            padding: 8px 12px; border-radius: 8px;
+            transition: var(--transition);
+            background: #f3f4f6;
+        }
+        .btn-back:hover { background: #e5e7eb; color: var(--gray-900); }
 
         .login-content {
             max-width: 400px;
@@ -97,6 +109,17 @@
 
         .form-group { margin-bottom: 20px; }
         .form-label { display: block; font-size: 14px; font-weight: 500; color: var(--gray-700); margin-bottom: 6px; }
+        
+        /* Password wrapper for toggle */
+        .password-wrapper { position: relative; }
+        .password-toggle {
+            position: absolute; right: 12px; top: 50%;
+            transform: translateY(-50%); cursor: pointer;
+            color: var(--gray-500); font-size: 18px;
+            display: grid; place-items: center;
+        }
+        .password-toggle:hover { color: var(--gray-700); }
+
         .form-input {
             width: 100%; padding: 12px 14px; border: 1px solid var(--gray-300);
             border-radius: var(--border-radius); font-size: 16px;
@@ -104,6 +127,8 @@
             box-shadow: var(--shadow-xs);
         }
         .form-input:focus { outline: none; border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(62, 121, 209, 0.1); }
+        /* padding right for password to font overlap icon */
+        input[type="password"], input.password-text-shown { padding-right: 40px; }
 
         .form-options { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
         .remember-me { display: flex; align-items: center; gap: 8px; }
@@ -131,8 +156,9 @@
         @media (max-width: 1024px) {
             .login-container { flex-direction: column; }
             .login-image-section { display: none; }
-            .header { left: 16px; right: 16px; }
+            .header { left: 16px; right: 16px; top: 16px; }
             .footer { width: calc(100% - 32px); }
+            .logo-title { font-size: 13px; }
         }
     </style>
 </head>
@@ -143,10 +169,15 @@
                 <div class="logo-container">
                     <img class="logo" src="{{ asset('assets/media/esdm.png') }}" alt="Logo Dinas ESDM" />
                     <div class="logo-text">
-                        <div class="logo-title">ESDM</div>
+                        <div class="logo-title">Dinas Energi dan Sumber Daya Mineral</div>
                         <div class="logo-subtitle">Provinsi Kalimantan Timur</div>
                     </div>
                 </div>
+                <!-- Tombol kembali ke landing page -->
+                <a href="{{ url('/') }}" class="btn-back">
+                    <i class="ri-arrow-left-line"></i>
+                    <span>Beranda</span>
+                </a>
             </div>
 
             <!-- ⬇️ Form akan berada tepat di tengah -->
@@ -163,13 +194,18 @@
 
                     <div class="form-group">
                         <label class="form-label" for="password">Kata Sandi</label>
-                        <input class="form-input" type="password" id="password" name="password" placeholder="••••••••" required />
+                        <div class="password-wrapper">
+                            <input class="form-input" type="password" id="password" name="password" placeholder="••••••••" required />
+                            <div class="password-toggle" id="togglePassword">
+                                <i class="ri-eye-off-line"></i>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="form-options">
                         <div class="remember-me">
                             <div class="checkbox" id="remember-checkbox"></div>
-                            <span class="remember-text">Ingat saya selama 30 hari</span>
+                            <span class="remember-text">Ingat saya</span>
                         </div>
                         {{-- <a href="#" class="forgot-password">Lupa kata sandi?</a> --}}
                     </div>
@@ -192,9 +228,30 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Remember me checkbox
             const rememberCheckbox = document.getElementById('remember-checkbox');
             rememberCheckbox.addEventListener('click', function() {
                 this.classList.toggle('checked');
+            });
+
+            // Password Toggle
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
+            const icon = togglePassword.querySelector('i');
+
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                
+                if (type === 'text') {
+                    icon.classList.remove('ri-eye-off-line');
+                    icon.classList.add('ri-eye-line');
+                    passwordInput.classList.add('password-text-shown');
+                } else {
+                    icon.classList.remove('ri-eye-line');
+                    icon.classList.add('ri-eye-off-line');
+                    passwordInput.classList.remove('password-text-shown');
+                }
             });
 
             @if(session('logout_success'))
