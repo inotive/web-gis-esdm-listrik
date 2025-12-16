@@ -241,11 +241,7 @@
       renderer: {
         type: "unique-value",
         field: "H_Survei",
-        defaultSymbol: {
-          type: "simple-fill",
-          color: [148, 163, 184, 0.35],
-          outline: { color: [100, 116, 139, 1], width: 1 }
-        },
+        defaultSymbol: null,
         uniqueValueInfos: [
           {
             value: "Belum Terlayani Listrik",
@@ -2004,11 +2000,7 @@
         desaBerlistrikLayer.renderer = {
           type: "unique-value",
           field: "H_Survei",
-          defaultSymbol: {
-            type: "simple-fill",
-            color: [148, 163, 184, 0.35],
-            outline: { color: [100, 116, 139, 1], width: 1 }
-          },
+          defaultSymbol: null,
           uniqueValueInfos: uniqueValueInfos
         };
       }
