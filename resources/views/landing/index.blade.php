@@ -3045,7 +3045,7 @@
   /* Cost calculation panel */
   .cost-panel {
     position: absolute;
-    top: 70px;
+    bottom: 200px;
     right: 16px;
     width: 280px;
     background: rgba(15, 23, 42, 0.94);
@@ -3139,7 +3139,7 @@
     .detail-modal { width: min(340px, 94vw); }
     .dm-row { grid-template-columns: 1fr; }
     .layer-filter { width: 260px; }
-    .cost-panel { width: min(280px, 90vw); right: 10px; }
+    .cost-panel { width: min(280px, 90vw); right: 10px; bottom: 12px; }
   }
 </style>
 @endpush
