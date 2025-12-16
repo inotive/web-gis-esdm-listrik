@@ -99,7 +99,13 @@
 
     const renderDetailContent = (graphic) => {
       const attrs = graphic?.attributes || {};
-      const layerTitle = graphic?.layer?.title || 'Detail Fitur';
+      let layerTitle = graphic?.layer?.title || 'Detail Fitur';
+
+      // Jika layer adalah H_Survei, gunakan nilai H_Survei sebagai judul
+      if (layerTitle === 'H_Survei' && attrs.H_Survei) {
+        layerTitle = attrs.H_Survei;
+      }
+
       const rows = Object.entries(attrs)
         .map(([k, v]) => `<div class="dm-row"><div class="dm-key">${k}</div><div class="dm-val">${v ?? '-'}</div></div>`)
         .join('');
@@ -226,7 +232,7 @@
     // Desa Berlistrik PLN
     const desaBerlistrikLayer = new GeoJSONLayer({
       url: "{{ url('/api/data-berlistrik') }}",
-      title: "Desa Berlistrik PLN",
+      title: "H_Survei",
       outFields: ["*"],
       popupTemplate: {
         title: "{NAMOBJ}",
@@ -1950,6 +1956,25 @@
         <button class="lf-close-btn" title="Tutup panel">×</button>
       </div>
       <div class="lf-body">
+        <div class="lf-wilayah-filter">
+          <div class="lf-wilayah-title">
+            <span class="lf-icon">🗺️</span>
+            <span><strong>Filter Wilayah</strong></span>
+          </div>
+          <div class="lf-wilayah-dropdowns">
+            <select id="lf-filter-regency" class="lf-dropdown">
+              <option value="">Semua Kabupaten/Kota</option>
+            </select>
+            <select id="lf-filter-district" class="lf-dropdown">
+              <option value="">Semua Kecamatan</option>
+            </select>
+            <select id="lf-filter-village" class="lf-dropdown">
+              <option value="">Semua Kelurahan/Desa</option>
+            </select>
+            <button id="lf-reset-filter" class="lf-reset-btn">Reset Filter</button>
+          </div>
+        </div>
+        <div class="lf-divider"></div>
         <label class="lf-row lf-all"><input type="checkbox" id="lf-all"> <span class="lf-icon">📊</span> <span><strong>Semua Layer</strong></span></label>
         <div class="lf-divider"></div>
         ${categoriesHTML}
@@ -2130,6 +2155,178 @@
       // Add click handler to the parent label
       parentLabel.addEventListener('click', handleToggle);
     });
+
+    // ================== WILAYAH FILTER FUNCTIONALITY ==================
+    const regencyDropdown = layerFilter.querySelector('#lf-filter-regency');
+    const districtDropdown = layerFilter.querySelector('#lf-filter-district');
+    const villageDropdown = layerFilter.querySelector('#lf-filter-village');
+    const resetFilterBtn = layerFilter.querySelector('#lf-reset-filter');
+
+    // Store current filter values
+    let currentRegencyId = '';
+    let currentDistrictId = '';
+    let currentVillageId = '';
+
+    // Load Kabupaten/Kota data
+    const loadRegencies = async () => {
+      try {
+        const response = await fetch("{{ url('/api/wilayah/regencies') }}");
+        const data = await response.json();
+
+        regencyDropdown.innerHTML = '<option value="">Semua Kabupaten/Kota</option>';
+        data.forEach(item => {
+          const option = document.createElement('option');
+          option.value = item.id;
+          option.textContent = item.name;
+          regencyDropdown.appendChild(option);
+        });
+      } catch (error) {
+        console.error('Error loading regencies:', error);
+      }
+    };
+
+    // Load Kecamatan data based on Kabupaten/Kota
+    const loadDistricts = async (regencyId = '') => {
+      try {
+        const url = regencyId
+          ? "{{ url('/api/wilayah/districts') }}?regency_id=" + regencyId
+          : "{{ url('/api/wilayah/districts') }}";
+        const response = await fetch(url);
+        const data = await response.json();
+
+        districtDropdown.innerHTML = '<option value="">Semua Kecamatan</option>';
+        data.forEach(item => {
+          const option = document.createElement('option');
+          option.value = item.id;
+          option.textContent = item.name;
+          districtDropdown.appendChild(option);
+        });
+        districtDropdown.disabled = !regencyId;
+      } catch (error) {
+        console.error('Error loading districts:', error);
+      }
+    };
+
+    // Load Kelurahan/Desa data based on Kecamatan
+    const loadVillages = async (districtId = '') => {
+      try {
+        const url = districtId
+          ? "{{ url('/api/wilayah/villages') }}?district_id=" + districtId
+          : "{{ url('/api/wilayah/villages') }}";
+        const response = await fetch(url);
+        const data = await response.json();
+
+        villageDropdown.innerHTML = '<option value="">Semua Kelurahan/Desa</option>';
+        data.forEach(item => {
+          const option = document.createElement('option');
+          option.value = item.id;
+          option.textContent = item.name;
+          villageDropdown.appendChild(option);
+        });
+        villageDropdown.disabled = !districtId;
+      } catch (error) {
+        console.error('Error loading villages:', error);
+      }
+    };
+
+    // Apply filter to layers
+    const applyWilayahFilter = () => {
+      // Filter for LN Batas Desa layer
+      if (currentVillageId) {
+        lnBatasDesaLayer.definitionExpression = `id = '${currentVillageId}'`;
+      } else if (currentDistrictId) {
+        lnBatasDesaLayer.definitionExpression = `district_id = '${currentDistrictId}'`;
+      } else if (currentRegencyId) {
+        lnBatasDesaLayer.definitionExpression = `regency_id = '${currentRegencyId}'`;
+      } else {
+        lnBatasDesaLayer.definitionExpression = null;
+      }
+
+      // Filter for LN Batas Kecamatan layer
+      if (currentDistrictId) {
+        lnBatasKecamatanLayer.definitionExpression = `id = '${currentDistrictId}'`;
+      } else if (currentRegencyId) {
+        lnBatasKecamatanLayer.definitionExpression = `regency_id = '${currentRegencyId}'`;
+      } else {
+        lnBatasKecamatanLayer.definitionExpression = null;
+      }
+
+      // Filter for LN Batas Kab/Kota layer
+      if (currentRegencyId) {
+        lnBatasKabKotaLayer.definitionExpression = `id = '${currentRegencyId}'`;
+      } else {
+        lnBatasKabKotaLayer.definitionExpression = null;
+      }
+
+      // Filter for Data Berlistrik layer
+      if (currentVillageId) {
+        desaBerlistrikLayer.definitionExpression = `id = '${currentVillageId}'`;
+      } else if (currentDistrictId) {
+        desaBerlistrikLayer.definitionExpression = `district_id = '${currentDistrictId}'`;
+      } else if (currentRegencyId) {
+        desaBerlistrikLayer.definitionExpression = `regency_id = '${currentRegencyId}'`;
+      } else {
+        desaBerlistrikLayer.definitionExpression = null;
+      }
+    };
+
+    // Handle Kabupaten/Kota change
+    regencyDropdown.addEventListener('change', async (e) => {
+      currentRegencyId = e.target.value;
+      currentDistrictId = '';
+      currentVillageId = '';
+
+      districtDropdown.value = '';
+      villageDropdown.value = '';
+
+      await loadDistricts(currentRegencyId);
+      villageDropdown.innerHTML = '<option value="">Semua Kelurahan/Desa</option>';
+      villageDropdown.disabled = true;
+
+      applyWilayahFilter();
+    });
+
+    // Handle Kecamatan change
+    districtDropdown.addEventListener('change', async (e) => {
+      currentDistrictId = e.target.value;
+      currentVillageId = '';
+
+      villageDropdown.value = '';
+
+      await loadVillages(currentDistrictId);
+
+      applyWilayahFilter();
+    });
+
+    // Handle Kelurahan/Desa change
+    villageDropdown.addEventListener('change', (e) => {
+      currentVillageId = e.target.value;
+      applyWilayahFilter();
+    });
+
+    // Handle reset filter
+    resetFilterBtn.addEventListener('click', () => {
+      currentRegencyId = '';
+      currentDistrictId = '';
+      currentVillageId = '';
+
+      regencyDropdown.value = '';
+      districtDropdown.value = '';
+      villageDropdown.value = '';
+
+      districtDropdown.innerHTML = '<option value="">Semua Kecamatan</option>';
+      districtDropdown.disabled = true;
+
+      villageDropdown.innerHTML = '<option value="">Semua Kelurahan/Desa</option>';
+      villageDropdown.disabled = true;
+
+      applyWilayahFilter();
+    });
+
+    // Initialize dropdowns
+    loadRegencies();
+    districtDropdown.disabled = true;
+    villageDropdown.disabled = true;
 
     // ================== CLOSE/OPEN PANEL FUNCTIONALITY ==================
     // Create open button (shown when panel is closed)
@@ -2677,6 +2874,80 @@
     max-height: 0;
     opacity: 0;
     margin: 0;
+  }
+
+  /* Wilayah Filter Styles */
+  .lf-wilayah-filter {
+    background: rgba(59,130,246,0.08);
+    border: 1px solid rgba(59,130,246,0.25);
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 4px;
+  }
+  .lf-wilayah-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #93c5fd;
+  }
+  .lf-wilayah-dropdowns {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .lf-dropdown {
+    width: 100%;
+    padding: 6px 8px;
+    font-size: 11px;
+    background: rgba(15,23,42,0.8);
+    color: #e2e8f0;
+    border: 1px solid rgba(148,163,184,0.25);
+    border-radius: 6px;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+  }
+  .lf-dropdown:hover {
+    background: rgba(15,23,42,0.95);
+    border-color: rgba(59,130,246,0.4);
+  }
+  .lf-dropdown:focus {
+    border-color: rgba(59,130,246,0.6);
+    box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
+  }
+  .lf-dropdown:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .lf-dropdown option {
+    background: #0f172a;
+    color: #e2e8f0;
+    padding: 6px;
+  }
+  .lf-reset-btn {
+    width: 100%;
+    padding: 6px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(239,68,68,0.2);
+    color: #fca5a5;
+    border: 1px solid rgba(239,68,68,0.3);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 2px;
+  }
+  .lf-reset-btn:hover {
+    background: rgba(239,68,68,0.35);
+    color: #fee2e2;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(239,68,68,0.25);
+  }
+  .lf-reset-btn:active {
+    transform: translateY(0);
   }
 
   /* Distance measurement button */

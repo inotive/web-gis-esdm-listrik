@@ -52,6 +52,7 @@ use App\Http\Controllers\Api\PtTrafoGarduDistribusiPpuController;
 use App\Http\Controllers\Api\PtTrafoGarduKubarController;
 use App\Http\Controllers\Api\Pt1TrafoGarduPaserController;
 use App\Http\Controllers\Api\Pt2TrafoGarduPaserController;
+use App\Http\Controllers\Api\WilayahController;
 
 // Route::get('/aset', [AssetController::class, 'index']);
 Route::get('/data-berlistrik', [DataBerlistrikController::class, 'index']);
@@ -107,6 +108,11 @@ Route::get('/pt2-trafo-gardu-paser', [Pt2TrafoGarduPaserController::class, 'inde
 Route::get('/ar-batas-kaltim', [ArBatasKaltimFullController::class, 'index']);
 Route::get('/ar-batas-kaltim-kabkota', [ArBatasKaltimKabupatenKotaController::class, 'index']);
 Route::get('/ar-batas-kaltim-kecamatan', [ArBatasKaltimKecamatanController::class, 'index']);
+
+// Wilayah API
+Route::get('/wilayah/regencies', [WilayahController::class, 'getRegencies']);
+Route::get('/wilayah/districts', [WilayahController::class, 'getDistricts']);
+Route::get('/wilayah/villages', [WilayahController::class, 'getVillages']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
