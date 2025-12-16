@@ -1806,7 +1806,47 @@
     // ================== LAYER FILTER PANEL ==================
     // Organize layers into categories with icons
     const layerCategories = {
-      transportasi: [
+      // 3. Titik Aset Jaringan
+      aset: [
+        { label: 'Gardu Induk Kutim', layer: ptGarduIndukKutimLayer, icon: '🏭' },
+        { label: 'Gardu Distribusi Kutim', layer: ptGarduDistribusiKutimLayer, icon: '🏭' },
+        { label: 'Gardu Hubung Kutim', layer: ptGarduHubungKutimLayer, icon: '🏭' },
+        { label: 'Gardu Berau', layer: ptGarduBerauLayer, icon: '🏭' },
+        { label: 'Trafo Berau', layer: ptTrafoBerauLayer, icon: '🔧' },
+        { label: 'Trafo Gardu Distribusi PPU', layer: ptTrafoGarduDistribusiPpuLayer, icon: '🔧' },
+        { label: 'Trafo Gardu Kubar', layer: ptTrafoGarduKubarLayer, icon: '🔧' },
+        { label: 'Trafo Gardu Paser 1', layer: pt1TrafoGarduPaserLayer, icon: '🔧' },
+        { label: 'Trafo Gardu Paser 2', layer: pt2TrafoGarduPaserLayer, icon: '🔧' }
+      ],
+      // 4. Data Jaringan Saluran
+      saluran: [
+        { label: 'LN Transmisi (SUTT/SUTET)', layer: lnTransmisiLayer, icon: '🔋' },
+        { label: 'Sistem Energi Kukar (SUTT)', layer: sistemJaringanEnergiKukarLayer, icon: '⚡' },
+        { label: 'Jaringan Listrik Balikpapan', layer: jaringanListrikBalikpapanLayer, icon: '⚡' },
+        { label: 'Rencana Jaringan Bontang', layer: jaringanListrikBontangLayer, icon: '📋' },
+        { label: 'Sistem Energi Kubar (SUTM)', layer: sistemJaringanEnergiKubarLayer, icon: '⚡' },
+        { label: 'Sistem Energi Kubar UP2KB', layer: sistemJaringanEnergiKubarUP2KBlayer, icon: '⚡' },
+        { label: 'Sistem Energi Kutim (SUTM)', layer: sistemJaringanEnergiKutimLayer, icon: '⚡' },
+        { label: 'Sistem Energi Paser (SUTM)', layer: sistemJaringanEnergiPaserLayer, icon: '⚡' },
+        { label: 'SUTM PPU', layer: sutmPPULayer, icon: '⚡' },
+        { label: 'SUTM Paser', layer: ln2SutmPaserLayer, icon: '⚡' },
+        { label: 'SUTM PPU 2', layer: ln2SutmPPULayer, icon: '⚡' },
+        { label: 'SUTM Berau', layer: sutmBerauLayer, icon: '⚡' },
+        { label: 'Sistem Energi Mahulu (SUTR)', layer: sistemJaringanEnergiMahuluLayer, icon: '⚡' },
+        { label: 'SUTR Kutim', layer: sutrKutimLayer, icon: '⚡' }
+      ],
+      // 5. Data Dasar (Batas Administrasi)
+      administrasi: [
+        { label: 'Batas Desa', layer: lnBatasDesaLayer, icon: '🏘️' },
+        { label: 'Batas Kecamatan', layer: lnBatasKecamatanLayer, icon: '🏛️' },
+        { label: 'Batas Kab/Kota', layer: lnBatasKabKotaLayer, icon: '🏙️' },
+        { label: 'Batas Provinsi', layer: lnBatasProvinsiLayer, icon: '🗺️' },
+        { label: 'Batas Negara', layer: lnBatasNegaraLayer, icon: '🌍' },
+        { label: 'AR Batas Kaltim Full', layer: arBatasKaltimLayer, icon: '📍' },
+        { label: 'AR Batas Kec.', layer: arBatasKecamatanLayer, icon: '📍' }
+      ],
+      // 6. Data Jalan
+      jalan: [
         { label: 'Jalan Nasional', layer: jalanNasionalLayer, icon: '🛣️' },
         { label: 'Jalan Provinsi', layer: jalanProvinsiLayer, icon: '🛤️' },
         { label: 'Jalan Balikpapan', layer: jalanBalikpapanLayer, icon: '🚗' },
@@ -1819,49 +1859,14 @@
         { label: 'Jalan PPU', layer: jalanPPULayer, icon: '🛣️' },
         { label: 'Jalan Samarinda', layer: jalanSamarindaLayer, icon: '🛣️' }
       ],
-      jaringan: [
-        { label: 'Jaringan Listrik Balikpapan', layer: jaringanListrikBalikpapanLayer, icon: '⚡' },
-        { label: 'Rencana Jaringan Listrik Bontang', layer: jaringanListrikBontangLayer, icon: '📋' },
-        { label: 'Sistem Energi Kukar (SUTT)', layer: sistemJaringanEnergiKukarLayer, icon: '🔌' },
-        { label: 'Sistem Energi Mahulu (SUTR)', layer: sistemJaringanEnergiMahuluLayer, icon: '🔌' },
-        { label: 'Sistem Energi Kubar (SUTM)', layer: sistemJaringanEnergiKubarLayer, icon: '🔌' },
-        { label: 'Sistem Energi Kubar UP2KB', layer: sistemJaringanEnergiKubarUP2KBlayer, icon: '🔌' },
-        { label: 'Sistem Energi Kutim (SUTM)', layer: sistemJaringanEnergiKutimLayer, icon: '🔌' },
-        { label: 'Sistem Energi Paser (SUTM)', layer: sistemJaringanEnergiPaserLayer, icon: '🔌' },
-        { label: 'LN SUTM PPU', layer: sutmPPULayer, icon: '⚡' },
-        { label: 'LN SUTR Kutim', layer: sutrKutimLayer, icon: '⚡' },
-        { label: 'LN Transmisi', layer: lnTransmisiLayer, icon: '🔋' },
-        { label: 'LN2 SUTM Paser', layer: ln2SutmPaserLayer, icon: '⚡' },
-        { label: 'LN2 SUTM PPU', layer: ln2SutmPPULayer, icon: '⚡' },
-        { label: 'LN SUTM Berau', layer: sutmBerauLayer, icon: '⚡' }
-      ],
-      infrastruktur: [
-        { label: 'PT Gardu Berau', layer: ptGarduBerauLayer, icon: '🏭' },
-        { label: 'PT Gardu Distribusi Kutim', layer: ptGarduDistribusiKutimLayer, icon: '🏭' },
-        { label: 'PT Gardu Hubung Kutim', layer: ptGarduHubungKutimLayer, icon: '🏭' },
-        { label: 'PT Gardu Induk Kutim', layer: ptGarduIndukKutimLayer, icon: '🏭' },
-        { label: 'PT Trafo Berau', layer: ptTrafoBerauLayer, icon: '🔧' },
-        { label: 'PT Trafo Gardu Distribusi PPU', layer: ptTrafoGarduDistribusiPpuLayer, icon: '🔧' },
-        { label: 'PT Trafo Gardu Kubar', layer: ptTrafoGarduKubarLayer, icon: '🔧' },
-        { label: 'PT1 Trafo Gardu Paser', layer: pt1TrafoGarduPaserLayer, icon: '🔧' },
-        { label: 'PT2 Trafo Gardu Paser', layer: pt2TrafoGarduPaserLayer, icon: '🔧' },
-        { label: 'PT Sistem Energi Balikpapan', layer: ptSistemEnergiBalikpapanLayer, icon: '⚙️' },
-        { label: 'PT Sistem Energi Kukar', layer: ptSistemEnergiKukarLayer, icon: '⚙️' },
-        { label: 'PT Sistem Energi Mahulu', layer: ptSistemEnergiMahuluLayer, icon: '⚙️' },
-        { label: 'PT Sistem Energi Samarinda', layer: ptSistemEnergiSamarindaLayer, icon: '⚙️' }
-      ],
-      pembangkit: [
-        { label: 'PT Pembangkit Eksisting', layer: ptPembangkitEksistingLayer, icon: '🏗️' },
-        { label: 'PT Rencana Pembangkit Bontang', layer: ptRencanaPembangkitBontangLayer, icon: '📐' }
-      ],
-      administrasi: [
-        { label: 'LN Batas Desa', layer: lnBatasDesaLayer, icon: '🏘️' },
-        { label: 'LN Batas Kab/Kota', layer: lnBatasKabKotaLayer, icon: '🏙️' },
-        { label: 'LN Batas Kecamatan', layer: lnBatasKecamatanLayer, icon: '🏛️' },
-        { label: 'LN Batas Negara', layer: lnBatasNegaraLayer, icon: '🌍' },
-        { label: 'LN Batas Provinsi', layer: lnBatasProvinsiLayer, icon: '🗺️' },
-        { label: 'AR Batas Kaltim Full', layer: arBatasKaltimLayer, icon: '📍' },
-        { label: 'AR Batas Kec.', layer: arBatasKecamatanLayer, icon: '📍' }
+      // 7. Lainnya
+      lainnya: [
+        { label: 'Pembangkit Eksisting', layer: ptPembangkitEksistingLayer, icon: '🏗️' },
+        { label: 'Rencana Pembangkit Bontang', layer: ptRencanaPembangkitBontangLayer, icon: '📐' },
+        { label: 'Sistem Energi Balikpapan', layer: ptSistemEnergiBalikpapanLayer, icon: '⚙️' },
+        { label: 'Sistem Energi Kukar', layer: ptSistemEnergiKukarLayer, icon: '⚙️' },
+        { label: 'Sistem Energi Mahulu', layer: ptSistemEnergiMahuluLayer, icon: '⚙️' },
+        { label: 'Sistem Energi Samarinda', layer: ptSistemEnergiSamarindaLayer, icon: '⚙️' }
       ]
     };
 
@@ -1871,82 +1876,82 @@
     // Build category HTML
     let categoriesHTML = '';
 
-    // Status Listrik Desa (special case with custom filter)
+    // 2. Status Listrik (special case with custom filter)
     categoriesHTML += `
       <label class="lf-row lf-parent" data-category="desa">
         <span class="lf-toggle">▼</span>
         <input type="checkbox" id="lf-desa-parent">
-        <span class="lf-icon">🏠</span>
-        <span><strong>Status Listrik Desa</strong></span>
+        <span class="lf-icon">💡</span>
+        <span><strong>2. Status Listrik</strong></span>
       </label>
       <div class="lf-children" data-category="desa">
-        <label class="lf-row lf-child"><input type="checkbox" id="lf-desa-belum"> <span class="lf-icon">🔴</span> <span>Belum Terlayani Listrik</span></label>
         <label class="lf-row lf-child"><input type="checkbox" id="lf-desa-terlayani"> <span class="lf-icon">🟢</span> <span>Terlayani Listrik</span></label>
+        <label class="lf-row lf-child"><input type="checkbox" id="lf-desa-belum"> <span class="lf-icon">🔴</span> <span>Belum Terlayani Listrik</span></label>
       </div>
     `;
 
-    // Transportasi
-    categoriesHTML += `<label class="lf-row lf-parent" data-category="transportasi">
+    // 3. Titik Aset Jaringan
+    categoriesHTML += `<label class="lf-row lf-parent" data-category="aset">
       <span class="lf-toggle">▼</span>
-      <input type="checkbox" id="lf-transportasi-parent">
-      <span class="lf-icon">🚧</span>
-      <span><strong>Data Jalan</strong></span>
-    </label>
-    <div class="lf-children" data-category="transportasi">`;
-    layerCategories.transportasi.forEach((item, idx) => {
-      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-transportasi-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
-    });
-    categoriesHTML += `</div>`;
-
-    // Jaringan Listrik
-    categoriesHTML += `<label class="lf-row lf-parent" data-category="jaringan">
-      <span class="lf-toggle">▼</span>
-      <input type="checkbox" id="lf-jaringan-parent">
-      <span class="lf-icon">⚡</span>
-      <span><strong>Jaringan Listrik</strong></span>
-    </label>
-    <div class="lf-children" data-category="jaringan">`;
-    layerCategories.jaringan.forEach((item, idx) => {
-      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-jaringan-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
-    });
-    categoriesHTML += `</div>`;
-
-    // Infrastruktur Listrik
-    categoriesHTML += `<label class="lf-row lf-parent" data-category="infrastruktur">
-      <span class="lf-toggle">▼</span>
-      <input type="checkbox" id="lf-infrastruktur-parent">
+      <input type="checkbox" id="lf-aset-parent">
       <span class="lf-icon">🏭</span>
-      <span><strong>Infrastruktur Listrik</strong></span>
+      <span><strong>3. Titik Aset Jaringan</strong></span>
     </label>
-    <div class="lf-children" data-category="infrastruktur">`;
-    layerCategories.infrastruktur.forEach((item, idx) => {
-      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-infrastruktur-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
+    <div class="lf-children" data-category="aset">`;
+    layerCategories.aset.forEach((item, idx) => {
+      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-aset-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
     });
     categoriesHTML += `</div>`;
 
-    // Pembangkit
-    categoriesHTML += `<label class="lf-row lf-parent" data-category="pembangkit">
+    // 4. Data Jaringan Saluran
+    categoriesHTML += `<label class="lf-row lf-parent" data-category="saluran">
       <span class="lf-toggle">▼</span>
-      <input type="checkbox" id="lf-pembangkit-parent">
-      <span class="lf-icon">🏗️</span>
-      <span><strong>Pembangkit</strong></span>
+      <input type="checkbox" id="lf-saluran-parent">
+      <span class="lf-icon">⚡</span>
+      <span><strong>4. Data Jaringan Saluran</strong></span>
     </label>
-    <div class="lf-children" data-category="pembangkit">`;
-    layerCategories.pembangkit.forEach((item, idx) => {
-      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-pembangkit-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
+    <div class="lf-children" data-category="saluran">`;
+    layerCategories.saluran.forEach((item, idx) => {
+      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-saluran-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
     });
     categoriesHTML += `</div>`;
 
-    // Administrasi
+    // 5. Data Dasar (Batas Administrasi)
     categoriesHTML += `<label class="lf-row lf-parent" data-category="administrasi">
       <span class="lf-toggle">▼</span>
       <input type="checkbox" id="lf-administrasi-parent">
       <span class="lf-icon">🗺️</span>
-      <span><strong>Administrasi</strong></span>
+      <span><strong>5. Data Dasar (Batas Administrasi)</strong></span>
     </label>
     <div class="lf-children" data-category="administrasi">`;
     layerCategories.administrasi.forEach((item, idx) => {
       categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-administrasi-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
+    });
+    categoriesHTML += `</div>`;
+
+    // 6. Data Jalan
+    categoriesHTML += `<label class="lf-row lf-parent" data-category="jalan">
+      <span class="lf-toggle">▼</span>
+      <input type="checkbox" id="lf-jalan-parent">
+      <span class="lf-icon">🚧</span>
+      <span><strong>6. Data Jalan</strong></span>
+    </label>
+    <div class="lf-children collapsed" data-category="jalan">`;
+    layerCategories.jalan.forEach((item, idx) => {
+      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-jalan-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
+    });
+    categoriesHTML += `</div>`;
+
+    // 7. Lainnya
+    categoriesHTML += `<label class="lf-row lf-parent" data-category="lainnya">
+      <span class="lf-toggle">▼</span>
+      <input type="checkbox" id="lf-lainnya-parent">
+      <span class="lf-icon">📂</span>
+      <span><strong>7. Lainnya</strong></span>
+    </label>
+    <div class="lf-children collapsed" data-category="lainnya">`;
+    layerCategories.lainnya.forEach((item, idx) => {
+      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-lainnya-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
     });
     categoriesHTML += `</div>`;
 
@@ -1959,17 +1964,17 @@
         <div class="lf-wilayah-filter">
           <div class="lf-wilayah-title">
             <span class="lf-icon">🗺️</span>
-            <span><strong>Filter Wilayah</strong></span>
+            <span><strong>1. Filter Wilayah Administratif</strong></span>
           </div>
           <div class="lf-wilayah-dropdowns">
             <select id="lf-filter-regency" class="lf-dropdown">
-              <option value="">Semua Kabupaten/Kota</option>
+              <option value="">Pilih Kabupaten/Kota</option>
             </select>
             <select id="lf-filter-district" class="lf-dropdown">
-              <option value="">Semua Kecamatan</option>
+              <option value="">Pilih Kecamatan</option>
             </select>
             <select id="lf-filter-village" class="lf-dropdown">
-              <option value="">Semua Kelurahan/Desa</option>
+              <option value="">Pilih Kelurahan/Desa</option>
             </select>
             <button id="lf-reset-filter" class="lf-reset-btn">Reset Filter</button>
           </div>
@@ -2061,11 +2066,11 @@
       updateDesaBerlistrikFilter();
 
       // Update all other categories
-      setCategoryCheckboxes('transportasi', isChecked);
-      setCategoryCheckboxes('jaringan', isChecked);
-      setCategoryCheckboxes('infrastruktur', isChecked);
-      setCategoryCheckboxes('pembangkit', isChecked);
+      setCategoryCheckboxes('aset', isChecked);
+      setCategoryCheckboxes('saluran', isChecked);
       setCategoryCheckboxes('administrasi', isChecked);
+      setCategoryCheckboxes('jalan', isChecked);
+      setCategoryCheckboxes('lainnya', isChecked);
     });
 
     // Status Listrik Desa handlers
@@ -2117,11 +2122,11 @@
     };
 
     // Setup all categories
-    setupCategoryHandlers('transportasi');
-    setupCategoryHandlers('jaringan');
-    setupCategoryHandlers('infrastruktur');
-    setupCategoryHandlers('pembangkit');
+    setupCategoryHandlers('aset');
+    setupCategoryHandlers('saluran');
     setupCategoryHandlers('administrasi');
+    setupCategoryHandlers('jalan');
+    setupCategoryHandlers('lainnya');
 
     // ================== EXPAND/COLLAPSE FUNCTIONALITY ==================
     // Add toggle functionality for all parent categories
