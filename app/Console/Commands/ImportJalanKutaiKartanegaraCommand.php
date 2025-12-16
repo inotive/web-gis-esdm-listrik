@@ -20,7 +20,7 @@ class ImportJalanKutaiKartanegaraCommand extends Command
         LN_Jalan_KutaiKartanegara::truncate();
 
         // Path to the GeoJSON file
-        $geoJsonPath = public_path('assets/Jalan/jalan-kabupaten/Kutai Kartanegara.json');
+        $geoJsonPath = public_path('assets/Jalan/jalan-kabupaten/Kukar.json');
 
         if (!File::exists($geoJsonPath)) {
             $this->error('GeoJSON file not found: ' . $geoJsonPath);
