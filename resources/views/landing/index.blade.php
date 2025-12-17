@@ -3139,7 +3139,8 @@
     .detail-modal { width: min(340px, 94vw); }
     .dm-row { grid-template-columns: 1fr; }
     .layer-filter { width: 260px; }
-    .cost-panel { width: min(280px, 90vw); right: 10px; bottom: 12px; }
+    /* Place cost panel right below the measure button on mobile */
+    .cost-panel { width: min(280px, 90vw); right: 10px; top: 110px; bottom: auto; }
   }
 </style>
 @endpush
