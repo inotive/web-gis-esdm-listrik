@@ -56,8 +56,16 @@
 
     /* LAYOUT dengan sidebar (auth) */
     .landing-shell{display:flex;min-height:100vh;background:#f5f7fa;}
-    .landing-main{flex:1;display:flex;flex-direction:column;min-height:100vh;min-width:0;}
-    .sidebar{position:relative;width:var(--sidebar-w);flex:0 0 var(--sidebar-w);background:#fff;border-right:1px solid #E5E7EB;overflow:auto;display:flex;flex-direction:column;box-shadow:0 6px 18px rgba(2,6,23,.06);z-index:100;transition:transform .2s ease;}
+    .landing-main{flex:1;display:flex;flex-direction:column;min-height:100vh;min-width:0;transition:margin-left .2s ease;}
+    .sidebar{
+      position:fixed;top:0;left:0;height:100vh;
+      width:var(--sidebar-w);flex:0 0 var(--sidebar-w);
+      background:#fff;border-right:1px solid #E5E7EB;overflow:auto;display:flex;flex-direction:column;
+      box-shadow:0 6px 18px rgba(2,6,23,.06);z-index:100;transition:transform .2s ease;
+      transform:translateX(-100%);
+    }
+    body.sidebar-open .sidebar{transform:translateX(0);}
+    body.sidebar-open .landing-main{margin-left:var(--sidebar-w);}
     .sidebar-topbar{position:sticky;top:0;z-index:5;height:var(--nav-h);background:#fff;border-bottom:1px solid #E5E7EB;padding:0 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
     .brand{display:flex;align-items:center;gap:12px;min-width:0;}
     .logo{width:40px;height:50px;}
@@ -76,10 +84,8 @@
     .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:95;}
 
     @media (max-width:1024px){
-      .sidebar{position:fixed;top:0;left:0;height:100vh;transform:translateX(-100%);}
-      body.sidebar-open .sidebar{transform:translateX(0);}
       body.sidebar-open .sidebar-overlay{display:block;}
-      #mapWrap{height:calc(100vh - var(--nav-h));}
+      body.sidebar-open .landing-main{margin-left:0;}
     }
     @media (max-width:640px){
       :root{ --panel-w:calc(100vw - 28px); }
@@ -128,7 +134,7 @@
 
   @auth
     <div class="landing-shell">
-      @include('admin.layouts.partials.sidebar', ['shouldShowMenu' => false, 'permohonans' => collect()])
+      @include('landing.layout.sidebar')
       <div class="landing-main">
         @include('landing.layout.header')
         <main id="mapWrap">
@@ -156,6 +162,8 @@
       const toggle = document.getElementById('sidebarToggle');
       const overlay = document.getElementById('sidebarOverlay');
       const close = () => body.classList.remove('sidebar-open');
+      // buka default di desktop
+      if (window.innerWidth > 1024) { body.classList.add('sidebar-open'); }
       toggle?.addEventListener('click', ()=> body.classList.toggle('sidebar-open'));
       overlay?.addEventListener('click', close);
       document.addEventListener('keydown', e=>{ if(e.key==='Escape') close(); });
