@@ -15,16 +15,19 @@
             <div class="modal-body">
                 <form method="POST" action="{{ route('admin.hak-akses.role.store') }}">
                     @csrf
-                        <div class="input-group mb-5">
-                            <div class="col-xl-12 mb-2">
-                                <label for="">Nama Role</label>
-                            </div>
-                            <div class="col-xl-12">
-                                <input type="text" class="form-control" id="inputNamaRole" name="name"
-                                    value="{{ old('name') }}" required placeholder="Masukkan Nama Role"
-                                    aria-label="Username" aria-describedby="basic-addon1" />
-                            </div>
-                        </div>
+                                        <div class="mb-4">
+                                                <label for="inputNamaRole" class="form-label fw-semibold" style="font-size:14px;">Nama Role</label>
+                                                <input
+                                                    type="text"
+                                                    class="form-control form-control-lg"
+                                                    id="inputNamaRole"
+                                                    name="name"
+                                                    value="{{ old('name') }}"
+                                                    required
+                                                    placeholder="Masukkan Nama Role"
+                                                    autocomplete="off"
+                                                />
+                                        </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Kembali</button>
                         <button type="submit" class="btn btn-primary">Simpan</button>

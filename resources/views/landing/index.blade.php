@@ -1957,8 +1957,8 @@
 
     layerFilter.innerHTML = `
       <div class="lf-head">
-        <span>🗂️ Layer Filter</span>
-        <button class="lf-close-btn" title="Tutup panel">×</button>
+        <div class="lf-title">🔍 Filter Peta</div>
+        <button class="lf-toggle-btn" title="Tutup/Buka">▼</button>
       </div>
       <div class="lf-body">
         <div class="lf-wilayah-filter">
@@ -1968,13 +1968,13 @@
           </div>
           <div class="lf-wilayah-dropdowns">
             <select id="lf-filter-regency" class="lf-dropdown">
-              <option value="">Pilih Kabupaten/Kota</option>
+              <option value="">Semua Kabupaten/Kota</option>
             </select>
-            <select id="lf-filter-district" class="lf-dropdown">
-              <option value="">Pilih Kecamatan</option>
+            <select id="lf-filter-district" class="lf-dropdown" disabled>
+              <option value="">Semua Kecamatan</option>
             </select>
-            <select id="lf-filter-village" class="lf-dropdown">
-              <option value="">Pilih Kelurahan/Desa</option>
+            <select id="lf-filter-village" class="lf-dropdown" disabled>
+              <option value="">Semua Kelurahan/Desa</option>
             </select>
             <button id="lf-reset-filter" class="lf-reset-btn">Reset Filter</button>
           </div>
@@ -2391,31 +2391,18 @@
     districtDropdown.disabled = true;
     villageDropdown.disabled = true;
 
-    // ================== CLOSE/OPEN PANEL FUNCTIONALITY ==================
-    // Create open button (shown when panel is closed)
-    const openButton = document.createElement('button');
-    openButton.className = 'lf-open-btn';
-    openButton.innerHTML = '☰<br><span style="font-size: 9px; font-weight: 600;"></span>';
-    openButton.title = 'Buka Layer Filter';
-    openButton.style.display = 'none'; // Hidden by default
+    // ================== TOGGLE PANEL FUNCTIONALITY ==================
+    // Get toggle button
+    const toggleButton = layerFilter.querySelector('.lf-toggle-btn');
+    const filterBody = layerFilter.querySelector('.lf-body');
 
-    // Get close button
-    const closeButton = layerFilter.querySelector('.lf-close-btn');
-
-    // Close panel handler
-    closeButton.addEventListener('click', () => {
-      layerFilter.classList.add('lf-minimized');
-      openButton.style.display = 'flex';
-    });
-
-    // Open panel handler
-    openButton.addEventListener('click', () => {
-      layerFilter.classList.remove('lf-minimized');
-      openButton.style.display = 'none';
+    // Toggle panel handler
+    toggleButton.addEventListener('click', () => {
+      layerFilter.classList.toggle('lf-collapsed');
+      toggleButton.textContent = layerFilter.classList.contains('lf-collapsed') ? '▶' : '▼';
     });
 
     view.ui.add(layerFilter, 'top-left');
-    view.ui.add(openButton, 'top-left');
 
     // ================== WIDGETS ==================
     const bm_osm     = Basemap.fromId("osm");          bm_osm.title     = "Peta (OSM)";
@@ -2781,36 +2768,45 @@
   .dm-val { color: #e2e8f0; word-break: break-word; }
   .dm-empty { color: #94a3b8; font-size: 12px; padding: 8px; }
 
-  /* Layer filter panel */
+  /* Layer filter panel - Light Theme (like welcome.blade.php) */
   .layer-filter {
-    width: 240px;
-    max-height: 440px;
+    width: 340px;
+    max-width: 88vw;
+    max-height: 65vh;
     overflow: hidden;
-    background: rgba(15,23,42,0.92);
-    color: #e2e8f0;
-    border-radius: 14px;
-    box-shadow: 0 12px 32px rgba(0,0,0,0.28);
-    border: 1px solid rgba(226,232,240,0.18);
-    backdrop-filter: blur(8px);
+    background: #fff;
+    color: #111827;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.15);
+    font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
   }
   .lf-head {
-    padding: 10px 12px;
+    padding: 16px;
     font-weight: 700;
-    font-size: 14px;
-    border-bottom: 1px solid rgba(226,232,240,0.16);
-    background: linear-gradient(90deg, rgba(37,99,235,0.24), rgba(15,23,42,0.12));
+    font-size: 16px;
+    border-bottom: 2px solid #e5e7eb;
+    background: #fff;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    color: #111827;
   }
-  .lf-close-btn {
-    background: rgba(239,68,68,0.2);
-    color: #fca5a5;
-    border: 1px solid rgba(239,68,68,0.3);
-    border-radius: 6px;
-    width: 24px;
-    height: 24px;
-    font-size: 20px;
+  .lf-title {
+    font-weight: 700;
+    font-size: 16px;
+    color: #111827;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .lf-toggle-btn {
+    background: #f1f5f9;
+    color: #64748b;
+    border: none;
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
     line-height: 1;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -2819,100 +2815,88 @@
     justify-content: center;
     padding: 0;
   }
-  .lf-close-btn:hover {
-    background: rgba(239,68,68,0.35);
-    color: #fee2e2;
-    transform: scale(1.1);
+  .lf-toggle-btn:hover {
+    background: #e2e8f0;
+    color: #475569;
   }
-  .lf-open-btn {
-    background: rgba(37,99,235,0.92);
-    color: white;
-    border: 1px solid rgba(59,130,246,0.4);
-    border-radius: 10px;
-    width: 50px;
-    height: 60px;
-    font-size: 20px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-    box-shadow: 0 4px 12px rgba(37,99,235,0.35);
-    backdrop-filter: blur(8px);
-    margin-top: -140px;
+  .layer-filter.lf-collapsed .lf-body {
+    display: none;
   }
-  .lf-open-btn:hover {
-    background: rgba(59,130,246,0.95);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(37,99,235,0.45);
-  }
-  .layer-filter.lf-minimized {
-    transform: translateX(-280px);
-    opacity: 0;
-    pointer-events: none;
+  .layer-filter.lf-collapsed {
+    width: auto;
+    padding: 0;
   }
   .layer-filter {
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    transition: all 0.3s ease;
   }
   .lf-body {
-    max-height: 380px;
+    max-height: calc(65vh - 70px);
     overflow-y: auto;
-    padding: 8px 10px 10px;
+    padding: 16px;
     display: grid;
-    gap: 6px;
+    gap: 8px;
   }
   .lf-row {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 12px;
-    padding: 6px 8px;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(148,163,184,0.18);
-    border-radius: 8px;
+    font-size: 13px;
+    padding: 10px 12px;
+    background: #fff;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
     cursor: pointer;
+    transition: all 0.2s;
+    color: #111827;
   }
-  .lf-row input { accent-color: #22c55e; }
+  .lf-row input { accent-color: #3b82f6; }
   .lf-row span { line-height: 1.35; }
   .lf-icon {
     font-size: 14px;
     min-width: 18px;
     text-align: center;
-    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
     transition: transform 0.2s ease;
   }
   .lf-row:hover .lf-icon {
     transform: scale(1.15);
   }
-  .lf-row:hover { background: rgba(34,197,94,0.08); }
+  .lf-row:hover { 
+    border-color: #cbd5e1;
+    background: #f8fafc;
+  }
   .lf-all {
-    background: rgba(37,99,235,0.14) !important;
-    border-color: rgba(59,130,246,0.3) !important;
+    background: #dbeafe !important;
+    border-color: #93c5fd !important;
+    color: #1e40af !important;
   }
-  .lf-all:hover { background: rgba(37,99,235,0.22) !important; }
+  .lf-all:hover { 
+    background: #bfdbfe !important;
+  }
   .lf-parent {
-    background: rgba(34,197,94,0.12) !important;
-    border-color: rgba(34,197,94,0.3) !important;
+    background: #f0fdf4 !important;
+    border-color: #86efac !important;
+    color: #166534 !important;
   }
-  .lf-parent:hover { background: rgba(34,197,94,0.18) !important; }
+  .lf-parent:hover { 
+    background: #dcfce7 !important;
+  }
   .lf-child {
     margin-left: 20px;
-    background: rgba(255,255,255,0.02) !important;
-    border-left: 3px solid rgba(34,197,94,0.4);
-    font-size: 11.5px;
+    background: #fff !important;
+    border-left: 3px solid #22c55e;
+    font-size: 12px;
   }
   .lf-divider {
     height: 1px;
-    background: rgba(148,163,184,0.24);
-    margin: 4px 0;
+    background: #e5e7eb;
+    margin: 8px 0;
   }
   .lf-toggle {
     font-size: 10px;
     margin-right: 4px;
     transition: transform 0.2s ease;
     user-select: none;
+    color: #64748b;
   }
   .lf-children {
     display: grid;
@@ -2928,75 +2912,74 @@
     margin: 0;
   }
 
-  /* Wilayah Filter Styles */
+  /* Wilayah Filter Styles - Light Theme */
   .lf-wilayah-filter {
-    background: rgba(59,130,246,0.08);
-    border: 1px solid rgba(59,130,246,0.25);
-    border-radius: 10px;
-    padding: 10px;
-    margin-bottom: 4px;
+    background: #eff6ff;
+    border: 1.5px solid #93c5fd;
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 8px;
   }
   .lf-wilayah-title {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
-    margin-bottom: 8px;
-    color: #93c5fd;
+    margin-bottom: 10px;
+    color: #1e40af;
   }
   .lf-wilayah-dropdowns {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
   }
   .lf-dropdown {
     width: 100%;
-    padding: 6px 8px;
-    font-size: 11px;
-    background: rgba(15,23,42,0.8);
-    color: #e2e8f0;
-    border: 1px solid rgba(148,163,184,0.25);
-    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 13px;
+    background: #fff;
+    color: #111827;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
     cursor: pointer;
     outline: none;
     transition: all 0.2s ease;
   }
   .lf-dropdown:hover {
-    background: rgba(15,23,42,0.95);
-    border-color: rgba(59,130,246,0.4);
+    border-color: #cbd5e1;
   }
   .lf-dropdown:focus {
-    border-color: rgba(59,130,246,0.6);
-    box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59,130,246,.1);
   }
   .lf-dropdown:disabled {
-    opacity: 0.5;
+    background: #f1f5f9;
     cursor: not-allowed;
+    opacity: 0.6;
   }
   .lf-dropdown option {
-    background: #0f172a;
-    color: #e2e8f0;
-    padding: 6px;
+    background: #fff;
+    color: #111827;
+    padding: 8px;
   }
   .lf-reset-btn {
     width: 100%;
-    padding: 6px 8px;
-    font-size: 11px;
+    padding: 10px 12px;
+    font-size: 13px;
     font-weight: 600;
-    background: rgba(239,68,68,0.2);
-    color: #fca5a5;
-    border: 1px solid rgba(239,68,68,0.3);
-    border-radius: 6px;
+    background: #f8fafc;
+    color: #64748b;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
     cursor: pointer;
     transition: all 0.2s ease;
-    margin-top: 2px;
+    margin-top: 4px;
   }
   .lf-reset-btn:hover {
-    background: rgba(239,68,68,0.35);
-    color: #fee2e2;
+    background: #f1f5f9;
+    color: #475569;
     transform: translateY(-1px);
-    box-shadow: 0 2px 6px rgba(239,68,68,0.25);
   }
   .lf-reset-btn:active {
     transform: translateY(0);
@@ -3124,10 +3107,10 @@
     margin: 4px 0;
   }
 
-  @media (max-width: 640px) {
+  @media (max-width: 768px) {
     .detail-modal { width: min(340px, 94vw); }
     .dm-row { grid-template-columns: 1fr; }
-    .layer-filter { width: 260px; }
+    .layer-filter { width: 280px; }
     /* Place cost panel right below the measure button on mobile */
     .cost-panel { width: min(280px, 90vw); right: 10px; top: 110px; bottom: auto; }
   }

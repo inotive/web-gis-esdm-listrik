@@ -16,16 +16,19 @@
                 <form method="POST" action="{{ route('admin.hak-akses.role.update', $value->id) }}">
                     @method('PUT')
                     @csrf
-                    <div class="input-group mb-5">
-                        <div class="col-xl-12 mb-2">
-                            <label for="">Nama Role</label>
-                        </div>
-                        <div class="col-xl-12">
-                            <input type="text" class="form-control" id="inputNama" name="name"
-                                   value="{{ old('name', $value->name) }}" required placeholder="Masukkan Nama Role"
-                                   aria-label="Username" aria-describedby="basic-addon1" />
-                        </div>
-                    </div>
+                                        <div class="mb-4">
+                                                <label for="inputNamaRoleEdit_{{ $value->id }}" class="form-label fw-semibold" style="font-size:14px;">Nama Role</label>
+                                                <input
+                                                    type="text"
+                                                    class="form-control form-control-lg"
+                                                    id="inputNamaRoleEdit_{{ $value->id }}"
+                                                    name="name"
+                                                    value="{{ old('name', $value->name) }}"
+                                                    required
+                                                    placeholder="Masukkan Nama Role"
+                                                    autocomplete="off"
+                                                />
+                                        </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Kembali</button>
                         <button type="submit" class="btn btn-primary">Simpan</button>

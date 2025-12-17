@@ -24,7 +24,7 @@
   .w-search{ width:250px; }
   .input-group{ display:flex; align-items:center; background:#FCFCFC; border:1px solid #DBDFE9; border-radius:6px; overflow:hidden; height:32px; }
   .input-group-text{ display:flex; align-items:center; justify-content:center; width:32px; height:100%; color:#99A1B7; background:transparent; border:none; padding:0; }
-  .form-control{ height:100%; border:none; background:transparent; padding:0 10px; font-size:11px; color:#78829D; outline:none; width:100%; }
+  .input-group .form-control{ height:100%; border:none; background:transparent; padding:0 10px; font-size:11px; color:#78829D; outline:none; width:100%; }
   .btn-ghost{ height:32px; padding:0 10px; border:1px solid #F1F1F4; background:#fff; border-radius:6px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; font-size:13px; color:#4B5675; transition:.2s; }
   .btn-ghost:hover{ background:#F8FAFC; }
 
@@ -38,7 +38,8 @@
   table.data tbody tr:hover{ background:#FCFCFC; }
 
   .col-no{ width:48px; text-align:center; color:#071437; }
-  .col-user{ min-width:260px; }
+  .col-name{ min-width:170px; }
+  .col-email{ min-width:180px; }
   .col-aksi{ width:120px; text-align:center; vertical-align:middle; }
 
   .btn-ico{ width:24px; height:24px; display:inline-flex; align-items:center; justify-content:center; border:none; background:transparent; cursor:pointer; transition:transform .2s; padding:0; margin:0 6px; vertical-align:middle; }
@@ -46,6 +47,7 @@
 
   /* Footer */
   .table-footer{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px; padding:14px 20px; border-top:1px solid #F1F1F4; background:#fff; }
+  .footer-actions{ display:flex; align-items:center; flex-wrap:wrap; gap:12px; justify-content:flex-end; }
   .summary{ color:#4B5675; font-size:13px; white-space:nowrap; }
   .show-wrap{ display:inline-flex; align-items:center; gap:10px; color:#4B5675; font-size:13px; white-space:nowrap; }
   .show-wrap .form-select{
@@ -79,7 +81,7 @@
       <div class="page-title">Data Pengguna</div>
     </div>
     <div class="page-actions">
-      <div class="date-pill"><i class="ri-calendar-line"></i><span>{{ now()->translatedFormat('F Y') }}</span></div>
+      <!-- <div class="date-pill"><i class="ri-calendar-line"></i><span>{{ now()->translatedFormat('F Y') }}</span></div> -->
       <button class="btn btn-primary btn-add" data-open="#modalCreateUser"><i class="ri-add-line"></i> Tambah Pengguna</button>
     </div>
   </div>
@@ -108,7 +110,8 @@
           <thead>
             <tr>
               <th class="col-no">No</th>
-              <th class="col-user">Nama Pengguna & Email</th>
+              <th class="col-name">Nama Pengguna</th>
+              <th class="col-email">Email</th>
               <th>Username</th>
               <th>Hak Akses</th>
               <th class="col-aksi">Aksi</th>
@@ -118,7 +121,7 @@
             @foreach ($data as $value)
               <tr>
                 <td class="col-no">{{ $loop->iteration }}</td>
-                <td class="col-user">
+                <td class="col-name">
                   <div class="d-flex align-items-center">
                     @if ($value->image)
                       <div class="symbol symbol-50px me-3">
@@ -127,10 +130,10 @@
                     @endif
                     <div class="d-flex justify-content-start flex-column">
                       <strong class="text-gray-900">{{ $value->name }}</strong>
-                      <span class="text-muted fw-semibold d-block fs-7">{{ $value->email }}</span>
                     </div>
                   </div>
                 </td>
+                <td class="col-email">{{ $value->email }}</td>
                 <td><strong>{{ $value->username }}</strong></td>
                 <td>
                   @php $roleNames = $value->getRoleNames(); @endphp
@@ -154,7 +157,6 @@
         </table>
 
         <div class="table-footer">
-          <div class="summary" id="dt-info-area">Menampilkan 0–0 dari 0 data</div>
 
           <div class="show-wrap">
             <span>Show</span>
@@ -166,9 +168,12 @@
             <span>per page</span>
           </div>
 
-          <nav aria-label="Pagination">
-            <ul class="pagination" id="dt-paging-area"></ul>
-          </nav>
+          <div class="footer-actions">
+            <div class="summary" id="dt-info-area">Menampilkan 0–0 dari 0 data</div>
+            <nav aria-label="Pagination">
+              <ul class="pagination" id="dt-paging-area"></ul>
+            </nav>
+          </div>
         </div>
       </div>
     </div>
@@ -200,7 +205,12 @@
 
   (function(){
     const openModal = sel => document.querySelector(sel)?.classList.add('show');
-    const closeModal = m => m?.classList.remove('show');
+    const closeModal = m => {
+      if(!m) return;
+      m.classList.remove('show');
+      const form = m.querySelector('form');
+      if(form) form.reset();
+    };
     document.addEventListener('click', e=>{
       const opener = e.target.closest('[data-open]');
       if(opener){ e.preventDefault(); openModal(opener.getAttribute('data-open')); }
@@ -219,9 +229,10 @@
       columnDefs:[
         {targets:0, width:'48px', className:'text-center'},
         {targets:1, width:'auto'},
-        {targets:2, width:'150px'},
-        {targets:3, width:'180px'},
-        {targets:4, width:'120px', className:'text-center'}
+        {targets:2, width:'auto'},
+        {targets:3, width:'150px'},
+        {targets:4, width:'180px'},
+        {targets:5, width:'120px', className:'text-center'}
       ]
     });
 
