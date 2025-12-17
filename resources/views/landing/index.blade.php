@@ -1882,7 +1882,7 @@
         <span class="lf-toggle">▼</span>
         <input type="checkbox" id="lf-desa-parent">
         <span class="lf-icon">💡</span>
-        <span><strong>2. Status Listrik</strong></span>
+        <span><strong>Status Listrik</strong></span>
       </label>
       <div class="lf-children" data-category="desa">
         <label class="lf-row lf-child"><input type="checkbox" id="lf-desa-terlayani"> <span class="lf-icon">🟢</span> <span>Terlayani Listrik</span></label>
@@ -1895,7 +1895,7 @@
       <span class="lf-toggle">▼</span>
       <input type="checkbox" id="lf-aset-parent">
       <span class="lf-icon">🏭</span>
-      <span><strong>3. Titik Aset Jaringan</strong></span>
+      <span><strong>Titik Aset Jaringan</strong></span>
     </label>
     <div class="lf-children" data-category="aset">`;
     layerCategories.aset.forEach((item, idx) => {
@@ -1908,7 +1908,7 @@
       <span class="lf-toggle">▼</span>
       <input type="checkbox" id="lf-saluran-parent">
       <span class="lf-icon">⚡</span>
-      <span><strong>4. Data Jaringan Saluran</strong></span>
+      <span><strong>Data Jaringan Saluran</strong></span>
     </label>
     <div class="lf-children" data-category="saluran">`;
     layerCategories.saluran.forEach((item, idx) => {
@@ -1921,7 +1921,7 @@
       <span class="lf-toggle">▼</span>
       <input type="checkbox" id="lf-administrasi-parent">
       <span class="lf-icon">🗺️</span>
-      <span><strong>5. Data Dasar (Batas Administrasi)</strong></span>
+      <span><strong>Data Dasar (Batas Administrasi)</strong></span>
     </label>
     <div class="lf-children" data-category="administrasi">`;
     layerCategories.administrasi.forEach((item, idx) => {
@@ -1934,7 +1934,7 @@
       <span class="lf-toggle">▼</span>
       <input type="checkbox" id="lf-jalan-parent">
       <span class="lf-icon">🚧</span>
-      <span><strong>6. Data Jalan</strong></span>
+      <span><strong>Data Jalan</strong></span>
     </label>
     <div class="lf-children collapsed" data-category="jalan">`;
     layerCategories.jalan.forEach((item, idx) => {
@@ -1947,7 +1947,7 @@
       <span class="lf-toggle">▼</span>
       <input type="checkbox" id="lf-lainnya-parent">
       <span class="lf-icon">📂</span>
-      <span><strong>7. Lainnya</strong></span>
+      <span><strong>Lainnya</strong></span>
     </label>
     <div class="lf-children collapsed" data-category="lainnya">`;
     layerCategories.lainnya.forEach((item, idx) => {
@@ -1964,7 +1964,7 @@
         <div class="lf-wilayah-filter">
           <div class="lf-wilayah-title">
             <span class="lf-icon">🗺️</span>
-            <span><strong>1. Filter Wilayah Administratif</strong></span>
+            <span><strong>Filter Wilayah Administratif</strong></span>
           </div>
           <div class="lf-wilayah-dropdowns">
             <select id="lf-filter-regency" class="lf-dropdown">
@@ -2435,18 +2435,7 @@
     const homeLabelDiv = document.createElement('div');
     homeLabelDiv.className = 'esri-component esri-widget';
     homeLabelDiv.innerHTML = `
-      <div style="padding: 10px 12px; display: flex; flex-direction: column; align-items: center; gap: 8px;">
-        <div style="font-weight: 700; font-size: 14px; color: #1e293b;">Beranda</div>
-        <a href="{{ route('login') }}" style="
-          display: inline-flex; justify-content: center; align-items: center;
-          background-color: #0b2a63; color: white; text-decoration: none;
-          font-size: 12px; font-weight: 600; padding: 6px 12px;
-          border-radius: 6px; width: 100%; text-align: center;
-          transition: background-color 0.2s;
-        " onmouseover="this.style.backgroundColor='#1e40af'" onmouseout="this.style.backgroundColor='#0b2a63'">
-          Masuk Sekarang
-        </a>
-      </div>
+    
     `;
     view.ui.add(homeLabelDiv, "top-left");
 

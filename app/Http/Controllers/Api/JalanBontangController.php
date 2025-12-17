@@ -9,7 +9,67 @@ use Illuminate\Http\Request;
 class JalanBontangController extends Controller
 {
     /**
-     * Convert geometry coordinates to WGS84
+     * Convert TM-3° coordinates to WGS84 (latitude/longitude)
+     * Bontang uses TM-3° with CM 117°E, FE: 500000m, FN: 0m
+     */
+    private function tmToLatLng($easting, $northing)
+    {
+        // TM-3° parameters for East Kalimantan
+        $k0 = 0.9999; // Scale factor for TM-3°
+        $a = 6378137.0; // WGS84 equatorial radius
+        $e = 0.081819191; // WGS84 eccentricity
+        $e2 = $e * $e;
+        $e4 = $e2 * $e2;
+        $e6 = $e4 * $e2;
+
+        $centralMeridian = 117.0; // CM for this zone
+        $falseEasting = 500000.0; // False easting
+        $falseNorthing = 0.0; // No false northing
+
+        // Remove false easting and northing
+        $x = $easting - $falseEasting;
+        $y = $northing - $falseNorthing;
+
+        // Calculate footpoint latitude
+        $M = $y / $k0;
+        $mu = $M / ($a * (1 - $e2/4 - 3*$e4/64 - 5*$e6/256));
+
+        $e1 = (1 - sqrt(1 - $e2)) / (1 + sqrt(1 - $e2));
+        $e12 = $e1 * $e1;
+        $e13 = $e12 * $e1;
+        $e14 = $e13 * $e1;
+
+        $phi1 = $mu + (3*$e1/2 - 27*$e13/32) * sin(2*$mu)
+                    + (21*$e12/16 - 55*$e14/32) * sin(4*$mu)
+                    + (151*$e13/96) * sin(6*$mu)
+                    + (1097*$e14/512) * sin(8*$mu);
+
+        $C1 = $e2 * pow(cos($phi1), 2) / (1 - $e2);
+        $T1 = pow(tan($phi1), 2);
+        $N1 = $a / sqrt(1 - $e2 * pow(sin($phi1), 2));
+        $R1 = $a * (1 - $e2) / pow(1 - $e2 * pow(sin($phi1), 2), 1.5);
+        $D = $x / ($N1 * $k0);
+
+        // Calculate latitude
+        $lat = $phi1 - ($N1 * tan($phi1) / $R1) * (
+            $D*$D/2
+            - (5 + 3*$T1 + 10*$C1 - 4*$C1*$C1 - 9*$e2) * pow($D, 4) / 24
+            + (61 + 90*$T1 + 298*$C1 + 45*$T1*$T1 - 252*$e2 - 3*$C1*$C1) * pow($D, 6) / 720
+        );
+
+        // Calculate longitude
+        $lon = ($D - (1 + 2*$T1 + $C1) * pow($D, 3) / 6
+            + (5 - 2*$C1 + 28*$T1 - 3*$C1*$C1 + 8*$e2 + 24*$T1*$T1) * pow($D, 5) / 120)
+            / cos($phi1);
+
+        $latitude = $lat * 180 / M_PI;
+        $longitude = $centralMeridian + $lon * 180 / M_PI;
+
+        return [$longitude, $latitude];
+    }
+
+    /**
+     * Convert geometry coordinates from TM-3° to WGS84
      */
     private function convertGeometryToWGS84($geometry)
     {
@@ -22,23 +82,39 @@ class JalanBontangController extends Controller
 
         switch ($type) {
             case 'Point':
-                // Bontang coordinates are already in WGS84
+                $geometry['coordinates'] = $this->tmToLatLng($coordinates[0], $coordinates[1]);
                 break;
 
             case 'LineString':
-                // Bontang coordinates are already in WGS84
+                $geometry['coordinates'] = array_map(function($coord) {
+                    return $this->tmToLatLng($coord[0], $coord[1]);
+                }, $coordinates);
                 break;
 
             case 'Polygon':
-                // Bontang coordinates are already in WGS84
+                $geometry['coordinates'] = array_map(function($ring) {
+                    return array_map(function($coord) {
+                        return $this->tmToLatLng($coord[0], $coord[1]);
+                    }, $ring);
+                }, $coordinates);
                 break;
 
             case 'MultiLineString':
-                // Bontang coordinates are already in WGS84
+                $geometry['coordinates'] = array_map(function($line) {
+                    return array_map(function($coord) {
+                        return $this->tmToLatLng($coord[0], $coord[1]);
+                    }, $line);
+                }, $coordinates);
                 break;
 
             case 'MultiPolygon':
-                // Bontang coordinates are already in WGS84
+                $geometry['coordinates'] = array_map(function($polygon) {
+                    return array_map(function($ring) {
+                        return array_map(function($coord) {
+                            return $this->tmToLatLng($coord[0], $coord[1]);
+                        }, $ring);
+                    }, $polygon);
+                }, $coordinates);
                 break;
         }
 

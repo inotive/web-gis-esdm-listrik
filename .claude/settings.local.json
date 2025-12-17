@@ -1,11 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(mysql:*)",
-      "Bash(php artisan route:list:*)",
       "Bash(curl:*)",
-      "Bash(php artisan tinker:*)",
-      "Bash(python -m json.tool:*)"
+      "Bash(php -r:*)",
+      "Bash(php artisan tinker:*)"
     ]
   }
 }
