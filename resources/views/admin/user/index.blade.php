@@ -43,6 +43,8 @@
   .col-aksi{ width:120px; text-align:center; vertical-align:middle; }
 
   .btn-ico{ width:24px; height:24px; display:inline-flex; align-items:center; justify-content:center; border:none; background:transparent; cursor:pointer; transition:transform .2s; padding:0; margin:0 6px; vertical-align:middle; }
+  .btn-ico.edit{ color:#f59e0b; }
+  .btn-ico.delete{ color:#ef4444; }
   .btn-ico:hover{ transform:scale(1.1); }
 
   /* Footer */
@@ -90,10 +92,10 @@
     <div class="card-header">
       <div class="card-title">Daftar Pengguna</div>
 
-      <form id="filterForm" class="toolbar" method="GET" action="#">
+      <form id="filterForm" class="toolbar" method="GET" action="#" onsubmit="return false;">
         <div class="input-group w-search">
           <span class="input-group-text"><i class="ri-search-line"></i></span>
-          <input type="text" id="userSearch" value="{{ request('q') }}" class="form-control" placeholder="Cari nama / email / username / role..." aria-label="Cari user" autocomplete="off">
+          <input type="search" id="userSearch" value="{{ request('q') }}" class="form-control" placeholder="Cari nama / email / username / role..." aria-label="Cari user" autocomplete="off" spellcheck="false">
           @if(request('q'))
             <button type="button" class="btn-ghost" id="btnClearSearch" title="Bersihkan"><i class="ri-close-line"></i><span class="d-none d-sm-inline"> Clear</span></button>
           @endif
@@ -122,16 +124,7 @@
               <tr>
                 <td class="col-no">{{ $loop->iteration }}</td>
                 <td class="col-name">
-                  <div class="d-flex align-items-center">
-                    @if ($value->image)
-                      <div class="symbol symbol-50px me-3">
-                        <img src="{{ asset('storage/profile/' . $value->image) }}" alt="" class="rounded">
-                      </div>
-                    @endif
-                    <div class="d-flex justify-content-start flex-column">
-                      <strong class="text-gray-900">{{ $value->name }}</strong>
-                    </div>
-                  </div>
+                  <strong class="text-gray-900">{{ $value->name }}</strong>
                 </td>
                 <td class="col-email">{{ $value->email }}</td>
                 <td><strong>{{ $value->username }}</strong></td>
@@ -148,8 +141,8 @@
                   @endif
                 </td>
                 <td class="col-aksi">
-                  <a href="#" class="btn-ico" title="Edit" data-open="#modalEditUser_{{ $value->id }}"><i class="fa-solid fa-pen-to-square"></i></a>
-                  <button data-route="{{ route('admin.hak-akses.user.destroy', $value->id) }}" class="btn-ico" title="Hapus" onclick="destroyItem(this)"><i class="fa-solid fa-trash"></i></button>
+                  <a href="#" class="btn-ico edit" title="Edit" data-open="#modalEditUser_{{ $value->id }}"><i class="fa-solid fa-pen-to-square"></i></a>
+                  <button data-route="{{ route('admin.hak-akses.user.destroy', $value->id) }}" class="btn-ico delete" title="Hapus" onclick="destroyItem(this)"><i class="fa-solid fa-trash"></i></button>
                 </td>
               </tr>
             @endforeach

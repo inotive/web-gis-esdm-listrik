@@ -109,10 +109,10 @@
     <div class="card-header">
       <div class="card-title">Tabel Daftar Role</div>
 
-      <form id="filterForm" class="toolbar" method="GET" action="#">
+      <form id="filterForm" class="toolbar" method="GET" action="#" onsubmit="return false;">
         <div class="input-group w-search">
           <span class="input-group-text"><i class="ri-search-line"></i></span>
-          <input type="text" id="roleSearch" value="{{ request('q') }}" class="form-control" placeholder="Cari Nama Role..." autocomplete="off">
+          <input type="search" id="roleSearch" value="{{ request('q') }}" class="form-control" placeholder="Cari Nama Role..." autocomplete="off" spellcheck="false">
           @if(request('q'))
             <button type="button" class="btn-ghost" id="btnClearSearch" title="Bersihkan"><i class="ri-close-line"></i><span class="d-none d-sm-inline"> Clear</span></button>
           @endif
