@@ -3,7 +3,9 @@
     "allow": [
       "Bash(curl:*)",
       "Bash(php -r:*)",
-      "Bash(php artisan tinker:*)"
+      "Bash(php artisan tinker:*)",
+      "Bash(php artisan view:clear:*)",
+      "Bash(php artisan:*)"
     ]
   }
 }

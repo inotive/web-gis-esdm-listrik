@@ -18,12 +18,12 @@
 
 <style>
   /* Header / Filter */
-  .card-header{ background:white; border-bottom:1px solid #F1F1F4; padding:8px 20px; }
-  .toolbar{ display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  .card-header{ background:white; border-bottom:1px solid #F1F1F4; padding:8px 20px; position:relative; z-index:2; }
+  .toolbar{ display:flex; align-items:center; gap:16px; flex-wrap:wrap; position:relative; z-index:3; pointer-events:auto; }
   .w-search{ width:250px; }
-  .input-group{ display:flex; align-items:center; background:#FCFCFC; border:1px solid #DBDFE9; border-radius:6px; overflow:hidden; height:32px; }
-  .input-group-text{ display:flex; align-items:center; justify-content:center; width:32px; height:100%; color:#99A1B7; background:transparent; border:none; padding:0; }
-  .input-group .form-control{ height:100%; border:none; background:transparent; padding:0 10px; font-size:11px; color:#78829D; outline:none; width:100%; }
+  .input-group{ display:flex; align-items:center; background:#FCFCFC; border:1px solid #DBDFE9; border-radius:6px; overflow:hidden; height:32px; position:relative; z-index:4; pointer-events:auto; }
+  .input-group-text{ display:flex; align-items:center; justify-content:center; width:32px; height:100%; color:#99A1B7; background:transparent; border:none; padding:0; pointer-events:auto; }
+  .input-group .form-control{ height:100%; border:none; background:transparent; padding:0 10px; font-size:11px; color:#78829D; outline:none; width:100%; pointer-events:auto; position:relative; z-index:3; }
   .btn-ghost{ height:32px; padding:0 10px; border:1px solid #F1F1F4; background:#fff; border-radius:6px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; font-size:13px; color:#4B5675; transition:.2s; }
   .btn-ghost:hover{ background:#F8FAFC; }
 
@@ -40,6 +40,8 @@
   .col-aksi{ width:180px; text-align:center; vertical-align:middle; }
 
   .btn-ico{ width:24px; height:24px; display:inline-flex; align-items:center; justify-content:center; border:none; background:transparent; cursor:pointer; transition:transform .2s; padding:0; margin:0 6px; vertical-align:middle; }
+  .btn-ico.edit{ color:#f59e0b; }
+  .btn-ico.delete{ color:#ef4444; }
   .btn-ico:hover{ transform:scale(1.1); }
 
   .table-footer{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px; padding:14px 20px; border-top:1px solid #F1F1F4; background:#fff; }
@@ -57,6 +59,10 @@
   .pagination .page-link:hover{ background:#F5F5F5; }
   .pagination .page-item.active .page-link{ background:#F1F1F4; color:#252F4A; font-weight:500; }
   .pagination .page-item.disabled .page-link{ opacity:.5; cursor:not-allowed; }
+
+  /* Badge styling */
+  .badge{ display:inline-block; padding:6px 12px; font-size:12px; font-weight:600; border-radius:6px; line-height:1; }
+  .badge-light-primary{ background:#E8FFF4; color:#0F766E; border:1px solid #D1FAE5; }
 
   /* Modal ringan (tanpa mengubah fungsi) */
   .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:1050}
@@ -152,7 +158,7 @@
                   </div>
                 </td>
                 <td>
-                  @php $permCount = $value->permissions_count ?? ($value->permissions ? $value->permissions->count() : 0); @endphp
+                  @php $permCount = $value->permissions_total ?? ($value->permissions_count ?? ($value->permissions ? $value->permissions->count() : 0)); @endphp
                   <span class="badge badge-light-primary fs-7 fw-bold">{{ $permCount }}</span>
                 </td>
                 <td class="col-aksi">
@@ -163,13 +169,13 @@
                   @endcan
 
                   @can('role.edit')
-                    <button class="btn-ico" title="Edit Role" data-modal-target="#kt_modal_{{ $value->id }}">
+                    <button class="btn-ico edit" title="Edit Role" data-modal-target="#kt_modal_{{ $value->id }}">
                       <i class="fas fa-edit fa-icon"></i>
                     </button>
                   @endcan
 
                   @can('role.delete')
-                    <button data-route="{{ route('admin.hak-akses.role.destroy', $value->id) }}" class="btn-ico" title="Hapus" onclick="destroyItem(this)">
+                    <button data-route="{{ route('admin.hak-akses.role.destroy', $value->id) }}" class="btn-ico delete" title="Hapus" onclick="destroyItem(this)">
                       <i class="fas fa-trash fa-icon"></i>
                     </button>
                   @endcan
@@ -279,6 +285,8 @@ if (typeof window.FormElementHelper === 'undefined') {
     // Search
     let searchTimeout;
     const searchEl = document.getElementById('roleSearch');
+    const searchWrap = document.querySelector('.input-group.w-search');
+    searchWrap?.addEventListener('click', ()=> searchEl?.focus());
     searchEl?.addEventListener('input', () => {
       clearTimeout(searchTimeout);
       searchTimeout = setTimeout(()=> dt.search(searchEl.value).draw(), 250);

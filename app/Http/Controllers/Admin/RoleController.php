@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role as SpatieRole;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Log;
@@ -26,7 +27,22 @@ class RoleController extends Controller
             ->when(method_exists(SpatieRole::class, 'users'), function (Builder $query) {
                 return $query->withCount(['users']);
             })
-            ->withCount('permissions')
+            // hitung total permission per role (berdasarkan pivot), filter display_name jika ada
+            ->select('roles.*')
+            ->selectSub(function ($q) {
+                $q->from('role_has_permissions as rhp')
+                    ->join('permissions as p', 'p.id', '=', 'rhp.permission_id')
+                    ->whereColumn('rhp.role_id', 'roles.id')
+                    ->whereNotNull('p.display_name')
+                    ->where('p.display_name', '!=', '')
+                    ->selectRaw('COUNT(*)');
+            }, 'permissions_total')
+            // fallback: total tanpa filter
+            ->selectSub(function ($q) {
+                $q->from('role_has_permissions as rhp')
+                    ->whereColumn('rhp.role_id', 'roles.id')
+                    ->selectRaw('COUNT(*)');
+            }, 'permissions_count')
             ->orderBy('name')
             ->get();
 

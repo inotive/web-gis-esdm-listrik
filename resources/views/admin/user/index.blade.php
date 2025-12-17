@@ -19,12 +19,12 @@
 
 <style>
   /* Header / Filter */
-  .card-header{ background:white; border-bottom:1px solid #F1F1F4; padding:8px 20px; }
-  .toolbar{ display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  .card-header{ background:white; border-bottom:1px solid #F1F1F4; padding:8px 20px; position:relative; z-index:2; }
+  .toolbar{ display:flex; align-items:center; gap:16px; flex-wrap:wrap; position:relative; z-index:3; pointer-events:auto; }
   .w-search{ width:250px; }
-  .input-group{ display:flex; align-items:center; background:#FCFCFC; border:1px solid #DBDFE9; border-radius:6px; overflow:hidden; height:32px; }
-  .input-group-text{ display:flex; align-items:center; justify-content:center; width:32px; height:100%; color:#99A1B7; background:transparent; border:none; padding:0; }
-  .input-group .form-control{ height:100%; border:none; background:transparent; padding:0 10px; font-size:11px; color:#78829D; outline:none; width:100%; }
+  .input-group{ display:flex; align-items:center; background:#FCFCFC; border:1px solid #DBDFE9; border-radius:6px; overflow:hidden; height:32px; position:relative; z-index:4; pointer-events:auto; }
+  .input-group-text{ display:flex; align-items:center; justify-content:center; width:32px; height:100%; color:#99A1B7; background:transparent; border:none; padding:0; pointer-events:auto; }
+  .input-group .form-control{ height:100%; border:none; background:transparent; padding:0 10px; font-size:11px; color:#78829D; outline:none; width:100%; pointer-events:auto; position:relative; z-index:5; }
   .btn-ghost{ height:32px; padding:0 10px; border:1px solid #F1F1F4; background:#fff; border-radius:6px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; font-size:13px; color:#4B5675; transition:.2s; }
   .btn-ghost:hover{ background:#F8FAFC; }
 
@@ -100,9 +100,7 @@
             <button type="button" class="btn-ghost" id="btnClearSearch" title="Bersihkan"><i class="ri-close-line"></i><span class="d-none d-sm-inline"> Clear</span></button>
           @endif
         </div>
-        <button type="button" class="btn-ghost" id="btnReset" title="Reset">
-          <i class="ri-refresh-line"></i><span class="d-none d-sm-inline"> Reset</span>
-        </button>
+        
       </form>
     </div>
 
@@ -270,6 +268,8 @@
 
     // search
     let t; const searchEl = document.getElementById('userSearch');
+    const searchWrap = document.querySelector('.input-group.w-search');
+    searchWrap?.addEventListener('click', ()=> searchEl?.focus());
     searchEl?.addEventListener('input', ()=>{ clearTimeout(t); t=setTimeout(()=> dt.search(searchEl.value).draw(), 300); });
     document.getElementById('btnClearSearch')?.addEventListener('click', ()=>{ if(searchEl){ searchEl.value=''; dt.search('').draw(); } });
     document.getElementById('btnReset')?.addEventListener('click', ()=>{ if(searchEl){ searchEl.value=''; dt.search('').draw(); } });

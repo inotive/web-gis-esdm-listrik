@@ -134,7 +134,7 @@
 
 
         @can('user.view')
-        <a class="menu-item {{ nav_active('admin.hak-akses.user.*', 'admin.hak-akses.role.*', 'admin.hak-akses.permission.*') }}"
+        <a class="menu-item {{ nav_active('admin.hak-akses.user.*', 'admin.hak-akses.user.*', 'admin.hak-akses.permission.*') }}"
             href="{{ route('admin.hak-akses.user.index') }}">
             <span class="menu-icon"><i class="ri-user-settings-line" aria-hidden="true"></i></span>
             <span class="menu-label">Manajemen Pengguna</span>
