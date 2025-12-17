@@ -32,6 +32,7 @@ class PermohonanQuestion extends Model
         'number' => 'Number (Angka)',
         'date' => 'Date (Tanggal)',
         'file' => 'File (Upload Dokumen)',
+        'file_multiple' => 'File Multiple (Upload Banyak Dokumen)',
         'radio' => 'Radio (Pilih Satu)',
         'checkbox' => 'Checkbox (Pilih Banyak)',
         'select' => 'Select (Dropdown)',

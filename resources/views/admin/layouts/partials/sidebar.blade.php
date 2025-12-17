@@ -29,11 +29,13 @@
     <nav class="menu-section" aria-label="Menu Utama Sidebar">
         <div class="menu-title">Menu Utama</div>
 
+        @can('dashboard.view')
         <a class="menu-item {{ nav_active('admin.dashboard') }}" href="{{ route('admin.dashboard') }}"
             @if (nav_active('admin.dashboard')) aria-current="page" @endif>
             <span class="menu-icon"><i class="ri-dashboard-line" aria-hidden="true"></i></span>
             <span class="menu-label">Dashboards</span>
         </a>
+        @endcan
 
         <a class="menu-item {{ request()->routeIs('admin.survey.*') ? 'active' : '' }}"
             href="{{ route('admin.survey.index') }}">
@@ -46,7 +48,8 @@
             <span class="menu-label">Dokumen</span>
         </a>
 
-         <a class="menu-item {{ nav_active('admin.permohonan.*') }}" href="{{ route('admin.permohonan.index') }}">
+
+        <a class="menu-item {{ nav_active('admin.permohonan.*') }}" href="{{ route('admin.permohonan.index') }}">
             <span class="menu-icon"><i class="ri-file-list-3-line" aria-hidden="true"></i></span>
             <span class="menu-label">Perizinan dan Permohonan</span>
         </a>
@@ -55,6 +58,21 @@
             <span class="menu-icon"><i class="ri-file-text-line" aria-hidden="true"></i></span>
             <span class="menu-label">Rekap Data</span>
         </a>
+        @if ($shouldShowMenu ?? false)
+
+            <div class="menu-title">Layanan</div>
+            @foreach ($permohonans as $permohonan)
+                @php
+                    $isActive = request()->routeIs('admin.permohonan-user.*') &&
+                                request()->route('permohonanId') == $permohonan->id;
+                @endphp
+                <a class="menu-item {{ $isActive ? 'active' : '' }}" href="{{ route('admin.permohonan-user.index', $permohonan->id) }}">
+                    <span class="menu-icon"><i class="ri-file-line" aria-hidden="true"></i></span>
+                    <span class="menu-label">{{ $permohonan->nama }}</span>
+                </a>
+            @endforeach
+        @endif
+
 
         {{-- <a class="menu-item {{ nav_active('admin.pemukiman.*') }}" href="{{ route('admin.pemukiman.index') }}">
             <span class="menu-icon"><i class="ri-home-2-line" aria-hidden="true"></i></span>sad
@@ -109,18 +127,25 @@
             <span class="menu-icon"><i class="ri-slideshow-2-line" aria-hidden="true"></i></span>
             <span class="menu-label">Variabel Skoring &amp; Bobot</span>
         </a>
+        <a class="menu-item {{ nav_active('admin.kategori-permohonan.*') }}" href="{{ route('admin.kategori-permohonan.index') }}">
+            <span class="menu-icon"><i class="ri-file-list-3-line" aria-hidden="true"></i></span>
+            <span class="menu-label">Kategori Permohonan</span>
+        </a>
 
-    
 
+        @can('user.view')
         <a class="menu-item {{ nav_active('admin.hak-akses.user.*', 'admin.hak-akses.role.*', 'admin.hak-akses.permission.*') }}"
             href="{{ route('admin.hak-akses.user.index') }}">
             <span class="menu-icon"><i class="ri-user-settings-line" aria-hidden="true"></i></span>
             <span class="menu-label">Manajemen Pengguna</span>
         </a>
+        @endcan
+        @can('role.view')
         <a class="menu-item {{ nav_active('admin.hak-akses.role.*', 'admin.hak-akses.role.*', 'admin.hak-akses.permission.*') }}"
             href="{{ route('admin.hak-akses.role.index') }}">
             <span class="menu-icon"><i class="ri-user-settings-line" aria-hidden="true"></i></span>
             <span class="menu-label">Role</span>
         </a>
+        @endcan
     </nav>
 </aside>

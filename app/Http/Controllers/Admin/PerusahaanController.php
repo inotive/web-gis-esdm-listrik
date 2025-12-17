@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Perusahaan;
+use App\Models\Permohonan;
+use App\Models\PermohonanUser;
 use App\Models\RegVillage;
 use App\Models\RegDistrict;
 use App\Models\RegRegency;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
 
 class PerusahaanController extends Controller
@@ -171,6 +174,42 @@ class PerusahaanController extends Controller
     // DESTROY
     public function destroy(Perusahaan $perusahaan)
     {
+        // Cek apakah perusahaan memiliki relasi ke Permohonan
+        $hasPermohonan = false;
+        try {
+            // Cek jika ada kolom perusahaan_id di tabel permohonans
+            if (Schema::hasColumn('permohonans', 'perusahaan_id')) {
+                $hasPermohonan = Permohonan::where('perusahaan_id', $perusahaan->id)->exists();
+            }
+        } catch (\Exception $e) {
+            // Jika kolom tidak ada, skip pengecekan
+        }
+
+        // Cek apakah perusahaan memiliki relasi ke PermohonanUser
+        $hasPermohonanUser = false;
+        try {
+            // Cek jika ada kolom perusahaan_id di tabel permohonan_users
+            if (Schema::hasColumn('permohonan_users', 'perusahaan_id')) {
+                $hasPermohonanUser = PermohonanUser::where('perusahaan_id', $perusahaan->id)->exists();
+            }
+        } catch (\Exception $e) {
+            // Jika kolom tidak ada, skip pengecekan
+        }
+
+        // Jika ada relasi, tampilkan error
+        if ($hasPermohonan || $hasPermohonanUser) {
+            $messages = [];
+            if ($hasPermohonan) {
+                $messages[] = 'Data perusahaan tidak dapat dihapus karena masih memiliki relasi dengan data Permohonan.';
+            }
+            if ($hasPermohonanUser) {
+                $messages[] = 'Data perusahaan tidak dapat dihapus karena masih memiliki relasi dengan data Permohonan User.';
+            }
+
+            return redirect()->route('admin.perusahaan.index')
+                ->with('error', implode(' ', $messages));
+        }
+
         $perusahaan->delete();
         return redirect()->route('admin.perusahaan.index')->with('success', 'Data perusahaan berhasil dihapus.');
     }

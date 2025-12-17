@@ -4,6 +4,8 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -50,5 +52,20 @@ class User extends Authenticatable
     public function getRoleSelectAttribute()
     {
         return $this->roles->first();
+    }
+
+    public function permohonan(): BelongsToMany
+    {
+        return $this->belongsToMany(Permohonan::class, 'permohonan_users', 'user_id', 'permohonan_id');
+    }
+
+    public function permohonanUsers(): HasMany
+    {
+        return $this->hasMany(PermohonanUser::class, 'user_id');
+    }
+
+    public function permohonanDocuments(): HasMany
+    {
+        return $this->hasMany(PermohonanUserDocument::class, 'user_id');
     }
 }

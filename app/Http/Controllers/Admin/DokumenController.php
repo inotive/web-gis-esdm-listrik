@@ -20,6 +20,7 @@ class DokumenController extends Controller
     {
         $folderId = $request->get('folder');
         $sortBy = $request->get('sort', 'name_asc'); // Default: name ascending
+        $search = $request->get('q', ''); // Search query
         $currentFolder = null;
 
         // Get current folder if navigating into a folder
@@ -30,8 +31,19 @@ class DokumenController extends Controller
         }
 
         // Get documents in current folder (or root if no folder)
+        // If search is active, search in ALL folders recursively
+        if (!empty($search)) {
+            // Search in all folders (ignore current folder restriction when searching)
+            $query = Dokumen::where(function($q) use ($search) {
+                $q->where('nama', 'like', '%' . $search . '%')
+                  ->orWhere('mime_type', 'like', '%' . $search . '%');
+            })
+            ->with(['user', 'children', 'parent']);
+        } else {
+            // Normal view: only show items in current folder
         $query = Dokumen::where('parent_id', $folderId ?: null)
             ->with(['user', 'children']);
+        }
 
         // Apply sorting
         switch ($sortBy) {
@@ -76,6 +88,7 @@ class DokumenController extends Controller
             'breadcrumbs' => $breadcrumbs,
             'sortBy' => $sortBy,
             'folderId' => $folderId,
+            'search' => $search,
         ]);
     }
 
@@ -122,13 +135,17 @@ class DokumenController extends Controller
 
     /**
      * Store a newly uploaded file.
+     * Allowed types: DOC, DOCX, XLSX, JPG, JPEG, PNG, PDF
      */
     public function storeFiles(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'files' => 'required|array',
-            'files.*' => 'file|max:10240', // Max 10MB per file
+            'files.*' => 'file|max:10240|mimes:doc,docx,xlsx,jpg,jpeg,png,pdf', // Max 10MB, allowed types
             'parent_id' => 'nullable|exists:dokumens,id',
+        ], [
+            'files.*.mimes' => 'Tipe file yang diperbolehkan: doc, docx, xlsx, jpg, jpeg, png, pdf.',
+            'files.*.max' => 'Ukuran file maksimal adalah 10MB per file.',
         ]);
 
         if ($validator->fails()) {

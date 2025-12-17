@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Perusahaan extends Model
 {
@@ -30,5 +31,23 @@ class Perusahaan extends Model
     public function village()
     {
         return $this->belongsTo(RegVillage::class, 'village_id', 'id');
+    }
+
+    /**
+     * Relationship: Perusahaan memiliki banyak Permohonan
+     * Note: Relasi ini memerlukan kolom perusahaan_id di tabel permohonans
+     */
+    public function permohonans(): HasMany
+    {
+        return $this->hasMany(Permohonan::class, 'perusahaan_id');
+    }
+
+    /**
+     * Relationship: Perusahaan memiliki banyak PermohonanUser
+     * Note: Relasi ini memerlukan kolom perusahaan_id di tabel permohonan_users
+     */
+    public function permohonanUsers(): HasMany
+    {
+        return $this->hasMany(PermohonanUser::class, 'perusahaan_id');
     }
 }

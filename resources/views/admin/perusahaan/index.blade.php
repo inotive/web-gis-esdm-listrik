@@ -417,6 +417,126 @@
       gap: 12px;
     }
   }
+
+  /* Select2 Custom Styling */
+  .select2-container {
+    width: 100% !important;
+  }
+
+  .select2-container--default .select2-selection--single {
+    height: 32px !important;
+    border: 1px solid #DBDFE9 !important;
+    border-radius: 6px !important;
+    background: #FCFCFC !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 32px !important;
+    padding-left: 10px !important;
+    padding-right: 28px !important;
+    font-size: 11px !important;
+    color: #7c7c7c !important;
+  }
+
+  .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 30px !important;
+    right: 10px !important;
+    top: 1px !important;
+  }
+
+  .select2-container--default .select2-selection--single .select2-selection__arrow b {
+    border-color: #7c7c7c transparent transparent transparent !important;
+    border-width: 5px 4px 0 4px !important;
+    margin-top: -2px !important;
+  }
+
+  .select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
+    border-color: transparent transparent #7c7c7c transparent !important;
+    border-width: 0 4px 5px 4px !important;
+  }
+
+  .select2-container--default .select2-selection--single:focus,
+  .select2-container--default.select2-container--focus .select2-selection--single {
+    border-color: #17C653 !important;
+    outline: none !important;
+  }
+
+  /* Select2 Dropdown */
+  .select2-dropdown {
+    border: 1px solid #DBDFE9 !important;
+    border-radius: 6px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    background: #fff !important;
+    margin-top: 4px !important;
+  }
+
+  .select2-search--dropdown {
+    padding: 8px !important;
+    border-bottom: 1px solid #F1F1F4 !important;
+  }
+
+  .select2-search--dropdown .select2-search__field {
+    border: 1px solid #DBDFE9 !important;
+    border-radius: 6px !important;
+    padding: 6px 10px !important;
+    font-size: 11px !important;
+    color: #252F4A !important;
+    outline: none !important;
+  }
+
+  .select2-search--dropdown .select2-search__field:focus {
+    border-color: #17C653 !important;
+    box-shadow: 0 0 0 3px rgba(23, 198, 83, 0.1) !important;
+  }
+
+  .select2-results {
+    padding: 4px 0 !important;
+  }
+
+  .select2-results__option {
+    padding: 8px 12px !important;
+    font-size: 11px !important;
+    color: #252F4A !important;
+    cursor: pointer !important;
+  }
+
+  .select2-results__option--highlighted {
+    background: #F0FDF4 !important;
+    color: #047857 !important;
+  }
+
+  .select2-results__option[aria-selected="true"] {
+    background: #17C653 !important;
+    color: #fff !important;
+  }
+
+  .select2-results__option[aria-selected="true"]:hover {
+    background: #22C55E !important;
+  }
+
+  .select2-results__option--loading {
+    padding: 8px 12px !important;
+    color: #6b7280 !important;
+    font-size: 11px !important;
+  }
+
+  .select2-results__message {
+    padding: 8px 12px !important;
+    color: #6b7280 !important;
+    font-size: 11px !important;
+  }
+
+  /* Remove default Select2 arrow from input-group */
+  .input-group.has-select::after {
+    display: none !important;
+  }
+
+  /* Ensure Select2 dropdown appears above other elements */
+  .select2-container--open .select2-dropdown {
+    z-index: 9999 !important;
+  }
 </style>
 @endpush
 
@@ -427,10 +547,6 @@
       <div class="page-title">Data Perusahaan</div>
     </div>
     <div class="page-actions">
-      <div class="date-pill">
-        <i class="ri-calendar-line"></i>
-        <span>{{ now()->translatedFormat('F Y') }}</span>
-      </div>
 
       @include('admin.perusahaan.create') {{-- modal create --}}
       @include('admin.perusahaan.edit_modal') {{-- modal edit --}}
@@ -452,27 +568,25 @@
                  placeholder="Cari Nama Perusahaan" autocomplete="off">
         </div>
 
-        {{-- Filter Berdasarkan --}}
+        {{-- Filter Kabupaten/Kota --}}
         <div class="input-group w-filter has-select">
-          <select class="form-select auto-submit" name="regency_id" id="filterRegency">
-            <option value="">Filter Berdasarkan</option>
+          <select class="form-select auto-submit" name="regency_id" id="filterRegency" data-control="select2" data-placeholder="Semua Kota / Kab">
+            <option value="">Semua Kota / Kab</option>
             @foreach($regencies as $rg)
               <option value="{{ $rg->id }}" @selected(request('regency_id')==$rg->id)>{{ $rg->name }}</option>
             @endforeach
           </select>
         </div>
 
-        {{-- Hidden filter untuk maintain state --}}
-        @if(request('regency_id'))
-          <div class="input-group w-filter has-select" style="display: none;">
-            <select class="form-select auto-submit" name="district_id" id="filterDistrict">
+        {{-- Filter Kecamatan (muncul jika kabupaten dipilih) --}}
+        <div class="input-group w-filter has-select" id="filterDistrictWrapper" style="{{ request('regency_id') ? '' : 'display: none;' }}">
+          <select class="form-select auto-submit" name="district_id" id="filterDistrict" data-control="select2" data-placeholder="Semua Kecamatan">
               <option value="">Semua Kecamatan</option>
               @foreach($districts as $dc)
                 <option value="{{ $dc->id }}" @selected(request('district_id')==$dc->id)>{{ $dc->name }}</option>
               @endforeach
             </select>
           </div>
-        @endif
       </form>
     </div>
 
@@ -538,8 +652,8 @@
                 <span>Show</span>
                 <form id="perPageForm" method="GET" action="#">
                     <input type="hidden" name="q" value="{{ request('q') }}">
-                    <input type="hidden" name="by" value="{{ request('by') }}">
-                    <input type="hidden" name="val" value="{{ request('val') }}">
+                    <input type="hidden" name="regency_id" value="{{ request('regency_id') }}">
+                    <input type="hidden" name="district_id" value="{{ request('district_id') }}">
                     <select class="form-select auto-submit" name="per_page"
                         aria-label="Jumlah baris per halaman">
                         @foreach ([5, 10, 25, 50, 100] as $pp)
@@ -561,9 +675,67 @@
   </section>
 @endsection
 
+@push('styles')
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+@endpush
+
 @push('scripts')
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <script>
+  // Wait for jQuery and Select2 to be loaded
+  function initSelect2() {
+    if (typeof jQuery === 'undefined' || !jQuery.fn.select2) {
+      setTimeout(initSelect2, 100);
+      return;
+    }
+
+    // Initialize Select2 for filter dropdowns
+    const selReg = document.getElementById('filterRegency');
+    const selDis = document.getElementById('filterDistrict');
+    const filterDistrictWrapper = document.getElementById('filterDistrictWrapper');
+
+    // Initialize Select2 for regency
+    if (selReg) {
+      jQuery(selReg).select2({
+        placeholder: 'Semua Kota / Kab',
+        width: '100%',
+        language: {
+          noResults: function() {
+            return "Tidak ada hasil";
+          },
+          searching: function() {
+            return "Mencari...";
+          }
+        }
+      });
+    }
+
+    // Initialize Select2 for district if regency is selected
+    if (selDis && filterDistrictWrapper && {{ request('regency_id') ? 'true' : 'false' }}) {
+      jQuery(selDis).select2({
+        placeholder: 'Semua Kecamatan',
+        width: '100%',
+        language: {
+          noResults: function() {
+            return "Tidak ada hasil";
+          },
+          searching: function() {
+            return "Mencari...";
+          }
+        }
+      });
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
+    // Initialize Select2
+    initSelect2();
+
     // ========== SweetAlert Notifications ==========
     @if(session('success'))
       Swal.fire({
@@ -634,8 +806,19 @@
     const filterForm = document.getElementById('filterForm');
     const perPageForm = document.getElementById('perPageForm');
 
-    // Auto submit on change
+    // Auto submit on change (works with both native and Select2)
     document.querySelectorAll('.auto-submit').forEach(el => {
+      // Select2 change event (if Select2 is initialized)
+      if (jQuery && jQuery.fn.select2) {
+        jQuery(el).on('change', function() {
+          if (perPageForm && perPageForm.contains(el)) {
+            perPageForm.submit();
+          } else if (filterForm) {
+            filterForm.submit();
+          }
+        });
+      } else {
+        // Native change event fallback
       el.addEventListener('change', () => {
         if (perPageForm && perPageForm.contains(el)) {
           perPageForm.submit();
@@ -643,6 +826,7 @@
           filterForm.submit();
         }
       });
+      }
     });
 
     // Auto submit on search (with debounce)
@@ -660,13 +844,25 @@
     // Cascading filter: load kecamatan after selecting kabupaten
     const selReg = document.getElementById('filterRegency');
     const selDis = document.getElementById('filterDistrict');
+    const filterDistrictWrapper = document.getElementById('filterDistrictWrapper');
 
-    if (selReg && selDis) {
-      selReg.addEventListener('change', async () => {
+    if (selReg && selDis && filterDistrictWrapper) {
+      // Function to handle regency change
+      const regChangeHandler = async () => {
         const rid = selReg.value;
+
+        // Reset district selection
         selDis.innerHTML = '<option value="">Semua Kecamatan</option>';
 
-        if (!rid) return;
+        // Destroy and reinitialize Select2 for district
+        if (jQuery && jQuery.fn.select2 && jQuery(selDis).hasClass('select2-hidden-accessible')) {
+          jQuery(selDis).select2('destroy');
+        }
+        selDis.value = '';
+
+        // Show/hide district filter based on regency selection
+        if (rid) {
+          filterDistrictWrapper.style.display = '';
 
         try {
           const res = await fetch('{{ route('admin.perusahaan.options.districts') }}?regency_id=' + encodeURIComponent(rid));
@@ -677,10 +873,53 @@
             opt.textContent = r.name;
             selDis.appendChild(opt);
           });
+
+            // Reinitialize Select2 for district
+            if (jQuery && jQuery.fn.select2) {
+              jQuery(selDis).select2({
+                placeholder: 'Semua Kecamatan',
+                width: '100%',
+                language: {
+                  noResults: function() {
+                    return "Tidak ada hasil";
+                  },
+                  searching: function() {
+                    return "Mencari...";
+                  }
+                }
+              });
+            }
+
+            // Restore selected district if exists in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const selectedDistrict = urlParams.get('district_id');
+            if (selectedDistrict) {
+              selDis.value = selectedDistrict;
+              if (jQuery && jQuery.fn.select2) {
+                jQuery(selDis).trigger('change');
+              }
+            }
         } catch (error) {
           console.error('Error loading districts:', error);
         }
-      });
+        } else {
+          // Hide district filter if no regency selected
+          filterDistrictWrapper.style.display = 'none';
+          // Clear district from form to prevent stale filter
+          selDis.value = '';
+          // Destroy Select2 if initialized
+          if (jQuery && jQuery.fn.select2 && jQuery(selDis).hasClass('select2-hidden-accessible')) {
+            jQuery(selDis).select2('destroy');
+          }
+        }
+      };
+
+      // Attach event listener (works with both native and Select2)
+      if (jQuery && jQuery.fn.select2) {
+        jQuery(selReg).on('change', regChangeHandler);
+      } else {
+        selReg.addEventListener('change', regChangeHandler);
+      }
     }
   });
 </script>
