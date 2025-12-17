@@ -29,6 +29,24 @@
             @error('email')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
           </div>
 
+          {{-- Role --}}
+          <div class="form-row">
+            <label class="label" for="role">Role</label>
+            @php
+              $defaultRoleName = old('role');
+              if (!$defaultRoleName) {
+                  $adminRole = $role->first(fn($r) => strtolower($r->name) === 'admin');
+                  $defaultRoleName = $adminRole->name ?? ($role->first()->name ?? '');
+              }
+            @endphp
+            <select class="select @error('role') is-invalid @enderror" name="role" id="role" data-control="select2" required>
+              @foreach ($role as $item)
+                <option value="{{ $item->name }}" {{ $defaultRoleName === $item->name ? 'selected' : '' }}>{{ $item->name }}</option>
+              @endforeach
+            </select>
+            @error('role')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+          </div>
+
           {{-- Nama Lengkap --}}
           <div class="form-row">
             <label class="label" for="inputNama">Nama Lengkap</label>
@@ -49,30 +67,12 @@
             <div class="muted" style="font-size:.85rem;margin-top:6px">Gunakan kombinasi huruf & angka agar lebih aman.</div>
           </div>
 
-          {{-- Role --}}
-          <div class="form-row">
-            <label class="label" for="role">Role</label>
-            @php
-              $defaultRoleName = old('role');
-              if (!$defaultRoleName) {
-                  $adminRole = $role->first(fn($r) => strtolower($r->name) === 'admin');
-                  $defaultRoleName = $adminRole->name ?? ($role->first()->name ?? '');
-              }
-            @endphp
-            <select class="select @error('role') is-invalid @enderror" name="role" id="role" data-control="select2" required>
-              @foreach ($role as $item)
-                <option value="{{ $item->name }}" {{ $defaultRoleName === $item->name ? 'selected' : '' }}>{{ $item->name }}</option>
-              @endforeach
-            </select>
-            @error('role')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
-          </div>
-
           {{-- Avatar (moved to right side of Role) --}}
-          <div class="form-row">
+          <!-- <div class="form-row">
             <label class="label">Foto Profil (opsional)</label>
             <input class="input" type="file" name="image" accept="image/*" id="imageInput"/>
             <div class="muted" style="font-size:.85rem;margin-top:6px">Format JPG/PNG, rasio 1:1, maks 2MB.</div>
-          </div>
+          </div> -->
         </div>
       </form>
     </div>

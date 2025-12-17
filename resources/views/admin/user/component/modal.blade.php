@@ -28,6 +28,19 @@
             <input class="input" type="email" id="email_{{ $value->id }}" name="email" value="{{ $value->email }}" placeholder="nama@email.com" required>
           </div>
 
+          {{-- Role --}}
+          <div class="form-row">
+            <label class="label" for="role_{{ $value->id }}">Role</label>
+            @php
+              $currentRole = $value->getRoleNames()->first() ?? '';
+            @endphp
+            <select class="select" name="role" id="role_{{ $value->id }}" required>
+              @foreach ($role as $item)
+                <option value="{{ $item->name }}" {{ $currentRole === $item->name ? 'selected' : '' }}>{{ $item->name }}</option>
+              @endforeach
+            </select>
+          </div>
+
           {{-- Nama Lengkap --}}
           <div class="form-row">
             <label class="label" for="inputNama_{{ $value->id }}">Nama Lengkap</label>
@@ -46,21 +59,8 @@
             <div class="muted" style="font-size:.85rem;margin-top:6px">Kosongkan jika tidak ingin mengubah password.</div>
           </div>
 
-          {{-- Role --}}
-          <div class="form-row">
-            <label class="label" for="role_{{ $value->id }}">Role</label>
-            @php
-              $currentRole = $value->getRoleNames()->first() ?? '';
-            @endphp
-            <select class="select" name="role" id="role_{{ $value->id }}" required>
-              @foreach ($role as $item)
-                <option value="{{ $item->name }}" {{ $currentRole === $item->name ? 'selected' : '' }}>{{ $item->name }}</option>
-              @endforeach
-            </select>
-          </div>
-
           {{-- Avatar --}}
-          <div class="form-row">
+          <!-- <div class="form-row">
             <label class="label">Foto Profil (opsional)</label>
             @if($value->image)
               <div class="mb-2">
@@ -69,7 +69,7 @@
             @endif
             <input class="input" type="file" name="image" accept="image/*" id="imageInput_{{ $value->id }}"/>
             <div class="muted" style="font-size:.85rem;margin-top:6px">Format JPG/PNG, rasio 1:1, maks 2MB.</div>
-          </div>
+          </div> -->
         </div>
       </form>
     </div>
