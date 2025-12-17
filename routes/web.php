@@ -41,7 +41,15 @@ use App\Http\Controllers\Admin\KategoriPermohonanController;
 Route::get('login', [LoginController::class, 'show'])->middleware('guest')->name('login');
 Route::post('login', [LoginController::class, 'login'])->name('login-post');
 
-Route::get('/', [LandingPageController::class, 'index'])->name('landing');
+// Arahkan root ke halaman login saat pertama kali diakses
+Route::get('/', function () {
+    return redirect()->route('login');
+});
+
+// Landing (peta) wajib login
+Route::get('/landing', [LandingPageController::class, 'index'])
+    ->middleware('auth')
+    ->name('landing');
 
 Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], function () {
 
