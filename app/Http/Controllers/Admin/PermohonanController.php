@@ -7,6 +7,8 @@ use App\Models\Permohonan;
 use App\Models\PermohonanUser;
 use App\Models\PermohonanQuestion;
 use App\Models\PermohonanQuestionOption;
+use App\Models\Perizinan;
+use App\Models\PerizinanDocument;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -34,54 +36,85 @@ class PermohonanController extends Controller
             ->paginate($perPage)
             ->withQueryString();
 
-        // Data Perizinan (contoh - nantinya bisa dari database)
-        $perizinanData = [
-            [
-                'perusahaan' => 'Perusahaan A',
-                'jenis_izin' => 'IUJPTL',
-                'tanggal_berlaku' => '10 Desember 2025',
-                'sumber_pengajuan' => 'Dari Sistem / Manual',
-                'tanggal_pengajuan' => '10 dSE 2025',
-                'tanggal_terbit' => null,
-                'status' => 'Aktif / Menunggu Verifikasi',
-            ],
-            [
-                'perusahaan' => 'PT. Listrik Nusantara',
-                'jenis_izin' => 'IUPTLS',
-                'tanggal_berlaku' => '15 Januari 2026',
-                'sumber_pengajuan' => 'Dari Sistem',
-                'tanggal_pengajuan' => '01 November 2024',
-                'tanggal_terbit' => '15 November 2024',
-                'status' => 'Aktif',
-            ],
-            [
-                'perusahaan' => 'CV. Energi Mandiri',
-                'jenis_izin' => 'SLO',
-                'tanggal_berlaku' => '20 Maret 2025',
-                'sumber_pengajuan' => 'Manual',
-                'tanggal_pengajuan' => '10 Oktober 2024',
-                'tanggal_terbit' => '25 Oktober 2024',
-                'status' => 'Aktif',
-            ],
-            [
-                'perusahaan' => 'PT. Cahaya Timur',
-                'jenis_izin' => 'SKTP',
-                'tanggal_berlaku' => '05 Februari 2025',
-                'sumber_pengajuan' => 'Dari Sistem',
-                'tanggal_pengajuan' => '15 September 2024',
-                'tanggal_terbit' => null,
-                'status' => 'Menunggu Verifikasi',
-            ],
-            [
-                'perusahaan' => 'PT. Borneo Power',
-                'jenis_izin' => 'IUJPTL',
-                'tanggal_berlaku' => '30 Juni 2024',
-                'sumber_pengajuan' => 'Dari Sistem',
-                'tanggal_pengajuan' => '01 Januari 2024',
-                'tanggal_terbit' => '15 Januari 2024',
-                'status' => 'Expired',
-            ],
-        ];
+        // Data Perizinan dari database
+        $perizinans = Perizinan::with(['perusahaan', 'documents'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $perizinanData = $perizinans->map(function ($perizinan) {
+            // Ambil document terbaru berdasarkan tanggal_terbit atau created_at
+            $document = $perizinan->documents
+                ->sortByDesc(function ($doc) {
+                    return $doc->tanggal_terbit ?? $doc->created_at;
+                })
+                ->first();
+
+            // Format tanggal pengajuan
+            $tanggalPengajuan = $perizinan->tanggal
+                ? $perizinan->tanggal->translatedFormat('d F Y')
+                : ($perizinan->created_at ? $perizinan->created_at->translatedFormat('d F Y') : '-');
+
+            // Format tanggal terbit dari document
+            $tanggalTerbit = $document && $document->tanggal_terbit
+                ? $document->tanggal_terbit->translatedFormat('d F Y')
+                : null;
+
+            // Format tanggal berlaku dari document (tanggal_akhir)
+            $tanggalBerlaku = $document && $document->tanggal_akhir
+                ? $document->tanggal_akhir->translatedFormat('d F Y')
+                : '-';
+
+            // Tentukan status berdasarkan document (tanggal_akhir)
+            $status = 'Menunggu Verifikasi';
+            $expiredDays = null;
+            $remainingDays = null;
+            if ($document) {
+                if ($document->tanggal_akhir) {
+                    $now = now();
+                    $tanggalAkhir = \Carbon\Carbon::parse($document->tanggal_akhir);
+                    $diffDays = $now->diffInDays($tanggalAkhir, false);
+
+                    if ($tanggalAkhir->isPast()) {
+                        // Sudah kadaluarsa - hitung jumlah hari kadaluarsa
+                        $status = 'Expired';
+                        $expiredDays = abs($diffDays);
+                    } elseif ($diffDays <= 30) {
+                        // Tersisa <= 30 hari (warning)
+                        $status = 'Akan Kadaluarsa';
+                        $remainingDays = $diffDays;
+                    } elseif ($document->tanggal_terbit) {
+                        // Masih aktif dan tersisa > 30 hari
+                        $status = 'Aktif';
+                        $remainingDays = $diffDays;
+                    } else {
+                        // Ada tanggal akhir tapi belum ada tanggal terbit
+                        $status = 'Menunggu Terbit';
+                    }
+                } elseif ($document->tanggal_terbit) {
+                    // Ada tanggal terbit tapi tidak ada tanggal akhir
+                    $status = 'Aktif';
+                } else {
+                    // Ada dokumen tapi belum ada tanggal terbit dan tanggal akhir
+                    $status = 'Menunggu Terbit';
+                }
+            }
+
+            // Sumber pengajuan (bisa dari catatan atau default)
+            $sumberPengajuan = $perizinan->catatan ?: 'Dari Sistem';
+
+            return [
+                'id' => $perizinan->id,
+                'perusahaan' => $perizinan->perusahaan->nama ?? '-',
+                'jenis_izin' => $perizinan->jenis ?? '-',
+                'tanggal_berlaku' => $tanggalBerlaku,
+                'sumber_pengajuan' => $sumberPengajuan,
+                'tanggal_pengajuan' => $tanggalPengajuan,
+                'tanggal_terbit' => $tanggalTerbit,
+                'status' => $status,
+                'expired_days' => $expiredDays,
+                'remaining_days' => $remainingDays,
+            ];
+        })->toArray();
 
         // Data Permohonan dari PermohonanUser
         $permohonanUsers = PermohonanUser::with(['permohonan', 'user'])
@@ -122,6 +155,7 @@ class PermohonanController extends Controller
 
             return [
                 'id' => $permohonanUser->id,
+                'permohonan_id' => $permohonanUser->permohonan_id,
                 'perusahaan' => $permohonanUser->user->name ?? '-',
                 'jenis_izin' => $permohonanUser->permohonan->nama ?? '-',
                 'tanggal_berlaku' => $tanggalBerlaku,

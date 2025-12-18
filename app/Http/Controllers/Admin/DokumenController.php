@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Helpers\UploadFile;
 use App\Models\Dokumen;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
@@ -22,10 +23,13 @@ class DokumenController extends Controller
         $sortBy = $request->get('sort', 'name_asc'); // Default: name ascending
         $search = $request->get('q', ''); // Search query
         $currentFolder = null;
-
+        $isAdmin = Auth::user()->hasAnyRole(['superadmin', 'admin']) ? true : false;
         // Get current folder if navigating into a folder
         if ($folderId) {
             $currentFolder = Dokumen::where('id', $folderId)
+                ->when(!$isAdmin, function ($query) {
+                    return $query->where('user_id', auth()->id());
+                })
                 ->where('tipe', 'folder')
                 ->firstOrFail();
         }
@@ -34,7 +38,9 @@ class DokumenController extends Controller
         // If search is active, search in ALL folders recursively
         if (!empty($search)) {
             // Search in all folders (ignore current folder restriction when searching)
-            $query = Dokumen::where(function($q) use ($search) {
+            $query = Dokumen::when(!$isAdmin, function ($query) {
+                return $query->where('user_id', auth()->id());
+            })->where(function($q) use ($search) {
                 $q->where('nama', 'like', '%' . $search . '%')
                   ->orWhere('mime_type', 'like', '%' . $search . '%');
             })
@@ -42,6 +48,9 @@ class DokumenController extends Controller
         } else {
             // Normal view: only show items in current folder
         $query = Dokumen::where('parent_id', $folderId ?: null)
+        ->when(!$isAdmin, function ($query) {
+            return $query->where('user_id', auth()->id());
+        })
             ->with(['user', 'children']);
         }
 
@@ -105,6 +114,7 @@ class DokumenController extends Controller
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
+        $isAdmin = Auth::user()->hasAnyRole(['superadmin', 'admin']);
 
         // Check if folder name already exists in same parent
         $existing = Dokumen::where('parent_id', $request->parent_id ?: null)

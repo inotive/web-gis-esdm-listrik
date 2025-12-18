@@ -7,6 +7,7 @@ use App\Models\Permohonan;
 use App\Models\PermohonanUser;
 use App\Models\PermohonanUserDocument;
 use App\Models\PermohonanQuestion;
+use App\Models\Dokumen;
 use App\Helpers\UploadFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -160,8 +161,9 @@ class PermohonanUserController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        // Only show detail if status is selesai
-        if ($permohonanUser->status !== 'selesai') {
+        // Only show detail if status is selesai (for non-admin users)
+        // Admin can see all status
+        if (!$isAdmin && $permohonanUser->status !== 'selesai') {
             return redirect()->route('admin.permohonan-user.index', $permohonanId)
                 ->withErrors(['error' => 'Detail hanya dapat dilihat untuk permohonan yang sudah selesai.']);
         }
@@ -170,7 +172,7 @@ class PermohonanUserController extends Controller
             'permohonan.questions.options' => function($query) {
                 $query->orderBy('id');
             },
-            'documents',
+            'documents.dokumen',
             'user'
         ]);
 
@@ -350,14 +352,28 @@ class PermohonanUserController extends Controller
                     // Only process if both file and nama are provided
                     if (isset($docData['file']) && $docData['file']->isValid() && !empty($docData['nama'])) {
                         $file = $docData['file'];
+
+                        // Upload file dan simpan ke tabel Dokumen
                         $fileName = $this->storeFile($file, 'permohonan-documents');
 
+                        // Simpan dokumen ke tabel Dokumen
+                        $dokumen = Dokumen::create([
+                            'nama' => $file->getClientOriginalName(),
+                            'tipe' => 'file',
+                            'parent_id' => null, // Dokumen permohonan tidak memiliki parent folder
+                            'path' => $fileName,
+                            'mime_type' => $file->getMimeType(),
+                            'size' => $file->getSize(),
+                            'user_id' => Auth::id(),
+                        ]);
+
+                        // Simpan relasi ke PermohonanUserDocument
                         PermohonanUserDocument::create([
                             'user_id' => Auth::id(),
                             'permohonan_user_id' => $permohonanUser->id,
                             'nama' => $docData['nama'],
                             'masa_berlaku' => !empty($docData['masa_berlaku']) ? $docData['masa_berlaku'] : null,
-                            'path' => $fileName,
+                            'dokumen_id' => $dokumen->id,
                         ]);
                     }
                 }
@@ -365,7 +381,7 @@ class PermohonanUserController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.permohonan-user.index', $permohonanId)
+            return redirect()->route('admin.permohonan-user.show', [$permohonanId, $permohonanUser->id])
                 ->with('success', 'Permohonan berhasil disetujui.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -458,5 +474,126 @@ class PermohonanUserController extends Controller
 
         return redirect()->route('admin.permohonan-user.index', $permohonanId)
             ->with('success', 'Permohonan berhasil dibatalkan.');
+    }
+
+    /**
+     * Add document to permohonan user (admin/superadmin only)
+     */
+    public function addDocument(Request $request, $permohonanId, PermohonanUser $permohonanUser)
+    {
+        // Ensure permohonan_id matches
+        if ($permohonanUser->permohonan_id != $permohonanId) {
+            abort(404);
+        }
+
+        // Only admin/superadmin can add document
+        $userRole = Auth::user()->roles()->first()->name ?? null;
+        if (!in_array($userRole, ['admin', 'superadmin'])) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $validated = $request->validate([
+            'nama' => 'required|string|max:255',
+            'file' => 'required|file|max:10240',
+            'masa_berlaku' => 'nullable|date',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $file = $request->file('file');
+
+            // Upload file dan simpan ke tabel Dokumen
+            $fileName = $this->storeFile($file, 'permohonan-documents');
+
+            $folderDocumen = Dokumen::where('nama', 'Dokumen Permohonan')->where('tipe', 'folder')->where('user_id', $permohonanUser->user_id)->first();
+            if (!$folderDocumen) {
+                $folderDocumen = Dokumen::create([
+                    'nama' => 'Dokumen Permohonan',
+                    'tipe' => 'folder',
+                    'parent_id' => null,
+                    'user_id' => $permohonanUser->user_id,
+                ]);
+            }
+            // Simpan dokumen ke tabel Dokumen
+            $dokumen = Dokumen::create([
+                'nama' => $file->getClientOriginalName(),
+                'tipe' => 'file',
+                'parent_id' => $folderDocumen->id,
+                'path' => $fileName,
+                'mime_type' => $file->getMimeType(),
+                'size' => $file->getSize(),
+                'user_id' => $permohonanUser->user_id,
+            ]);
+
+            // Simpan relasi ke PermohonanUserDocument
+            PermohonanUserDocument::create([
+                'user_id' => $permohonanUser->user_id,
+                'permohonan_user_id' => $permohonanUser->id,
+                'nama' => $validated['nama'],
+                'masa_berlaku' => !empty($validated['masa_berlaku']) ? $validated['masa_berlaku'] : null,
+                'dokumen_id' => $dokumen->id,
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('admin.permohonan-user.show', [$permohonanId, $permohonanUser->id])
+                ->with('success', 'Dokumen berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Delete document from permohonan user (admin/superadmin only)
+     */
+    public function deleteDocument($permohonanId, PermohonanUser $permohonanUser, PermohonanUserDocument $document)
+    {
+        // Ensure permohonan_id matches
+        if ($permohonanUser->permohonan_id != $permohonanId) {
+            abort(404);
+        }
+
+        // Ensure document belongs to permohonan user
+        if ($document->permohonan_user_id != $permohonanUser->id) {
+            abort(404);
+        }
+
+        // Only admin/superadmin can delete document
+        $userRole = Auth::user()->roles()->first()->name ?? null;
+        if (!in_array($userRole, ['admin', 'superadmin'])) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        DB::beginTransaction();
+        try {
+            // Delete file from storage if exists
+            if ($document->dokumen && $document->dokumen->path) {
+                // Path sudah relatif ke folder permohonan-documents
+                $filePath = storage_path('app/public/permohonan-documents/' . $document->dokumen->path);
+                if (file_exists($filePath)) {
+                    unlink($filePath);
+                }
+            }
+
+            // Delete dokumen record (will cascade delete permohonan_user_document)
+            if ($document->dokumen) {
+                $document->dokumen->delete();
+            }
+
+            // Delete permohonan user document record
+            $document->delete();
+
+            DB::commit();
+
+            return redirect()->route('admin.permohonan-user.show', [$permohonanId, $permohonanUser->id])
+                ->with('success', 'Dokumen berhasil dihapus.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()
+                ->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+        }
     }
 }
