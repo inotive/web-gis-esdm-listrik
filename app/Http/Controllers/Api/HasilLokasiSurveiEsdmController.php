@@ -131,6 +131,7 @@ class HasilLokasiSurveiEsdmController extends Controller
                         'Kode_L' => $item->Kode_L,
                         'Lokasi_Ke' => $item->Lokasi_Ke,
                         'Kodifikasi' => $item->Kodifikasi,
+                        'link_dokumen' => $item->link_dokumen,
                         'DUSUN' => $item->DUSUN,
                         'JUMLAH_RT' => $item->JUMLAH_RT,
                         'KET_RT' => $item->KET_RT,

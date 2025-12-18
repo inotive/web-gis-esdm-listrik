@@ -25,6 +25,7 @@ class PtHasilLokasiSurveiEsdm extends Model
         'Kode_L',
         'Lokasi_Ke',
         'Kodifikasi',
+        'link_dokumen',
         'DUSUN',
         'JUMLAH_RT',
         'KET_RT',

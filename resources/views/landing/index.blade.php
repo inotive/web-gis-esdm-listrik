@@ -28,6 +28,20 @@
       </div>
     </aside>
   </div>
+
+  <!-- Modal Video 360 -->
+  <div id="video360Modal" class="video360-modal" style="display: none;">
+    <div class="video360-modal-overlay" onclick="closeVideo360Modal()"></div>
+    <div class="video360-modal-content">
+      <div class="video360-modal-header">
+        <h3 id="video360ModalTitle">Video 360</h3>
+        <button class="video360-modal-close" onclick="closeVideo360Modal()">&times;</button>
+      </div>
+      <div class="video360-modal-body">
+        <iframe id="video360Iframe" src="" frameborder="0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; xr-spatial-tracking"></iframe>
+      </div>
+    </div>
+  </div>
 @endsection
 
 @push('scripts')
@@ -1657,24 +1671,44 @@
       },
       popupTemplate: {
         title: "{NAMOBJ}",
-        content: `
-          <b>Nama Objek:</b> {NAMOBJ}<br>
-          <b>Lokasi:</b> {Lokasi}<br>
-          <b>Desa:</b> {WADMKD}<br>
-          <b>Kecamatan:</b> {WADMKC}<br>
-          <b>Kabupaten/Kota:</b> {WADMKK}<br>
-          <b>Provinsi:</b> {WADMPR}<br>
-          <b>Status:</b> {Status}<br>
-          <b>Dusun:</b> {DUSUN}<br>
-          <b>Jumlah KK:</b> {J_KK}<br>
-          <b>Jumlah Penduduk:</b> {J_Pnddk}<br>
-          <b>Jumlah Rumah:</b> {J_BRumah}<br>
-          <b>Koordinat X:</b> {Koor_X}<br>
-          <b>Koordinat Y:</b> {Koor_Y}<br>
-          <b>Potensi:</b> {Potensi}<br>
-          <b>Prioritas:</b> {Priorita_1}<br>
-          <b>Kendala:</b> {KENDALA}
-        `
+        content: function(feature) {
+          const attrs = feature.graphic.attributes;
+
+          // Helper function to escape HTML attributes
+          const escapeAttr = (str) => {
+            if (!str) return '';
+            return String(str).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+          };
+
+          let content = `
+            <b>Nama Objek:</b> ${attrs.NAMOBJ || '-'}<br>
+            <b>Lokasi:</b> ${attrs.Lokasi || '-'}<br>
+            <b>Desa:</b> ${attrs.WADMKD || '-'}<br>
+            <b>Kecamatan:</b> ${attrs.WADMKC || '-'}<br>
+            <b>Kabupaten/Kota:</b> ${attrs.WADMKK || '-'}<br>
+            <b>Provinsi:</b> ${attrs.WADMPR || '-'}<br>
+            <b>Status:</b> ${attrs.Status || '-'}<br>
+            <b>Dusun:</b> ${attrs.DUSUN || '-'}<br>
+            <b>Jumlah KK:</b> ${attrs.J_KK || '-'}<br>
+            <b>Jumlah Penduduk:</b> ${attrs.J_Pnddk || '-'}<br>
+            <b>Jumlah Rumah:</b> ${attrs.J_BRumah || '-'}<br>
+            <b>Koordinat X:</b> ${attrs.Koor_X || '-'}<br>
+            <b>Koordinat Y:</b> ${attrs.Koor_Y || '-'}<br>
+            <b>Potensi:</b> ${attrs.Potensi || '-'}<br>
+            <b>Prioritas:</b> ${attrs.Priorita_1 || '-'}<br>
+            <b>Kendala:</b> ${attrs.KENDALA || '-'}<br>
+            <b>Kodifikasi:</b> ${attrs.Kodifikasi || '-'}<br>
+          `;
+
+          if (attrs.link_dokumen) {
+            const videoUrl = escapeAttr(attrs.link_dokumen);
+            const videoTitle = escapeAttr(attrs.Kodifikasi || 'Video 360');
+            content += `<b>Link Dokumen:</b> <a href="#" class="video360-link" data-video-url="${videoUrl}" data-video-title="${videoTitle}" style="color: #007bff; text-decoration: underline; cursor: pointer;">Lihat Video 360</a><br>`;
+          }
+
+          return content;
+        },
+        actions: []
       }
     });
     map.add(ptHasilLokasiSurveiEsdmLayer);
@@ -2931,6 +2965,67 @@
     });
 
   });
+
+  // Fungsi untuk membuka modal video 360
+  window.openVideo360Modal = function(url, title) {
+    const modal = document.getElementById('video360Modal');
+    const iframe = document.getElementById('video360Iframe');
+    const modalTitle = document.getElementById('video360ModalTitle');
+
+    // Konversi Google Drive URL ke embedded format
+    let embedUrl = url;
+    if (url.includes('drive.google.com/file/d/')) {
+      const fileId = url.match(/\/d\/([^/]+)/)[1];
+      embedUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+    }
+
+    iframe.src = embedUrl;
+    modalTitle.textContent = title || 'Video 360';
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  };
+
+  // Fungsi untuk menutup modal video 360
+  window.closeVideo360Modal = function() {
+    const modal = document.getElementById('video360Modal');
+    const iframe = document.getElementById('video360Iframe');
+
+    modal.style.display = 'none';
+    iframe.src = '';
+    document.body.style.overflow = 'auto';
+  };
+
+  // Tutup modal dengan tombol ESC
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      const modal = document.getElementById('video360Modal');
+      if (modal.style.display === 'flex') {
+        closeVideo360Modal();
+      }
+    }
+  });
+
+  // Event delegation untuk link video 360 di dalam popup
+  document.addEventListener('click', function(e) {
+    // Check if clicked element or its parent is a video360-link
+    let target = e.target;
+    if (target.classList.contains('video360-link') || target.closest('.video360-link')) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      // Get the actual link element
+      const linkElement = target.classList.contains('video360-link') ? target : target.closest('.video360-link');
+
+      const videoUrl = linkElement.getAttribute('data-video-url');
+      const videoTitle = linkElement.getAttribute('data-video-title');
+
+      console.log('Video 360 Link Clicked:', { videoUrl, videoTitle });
+
+      if (videoUrl) {
+        openVideo360Modal(videoUrl, videoTitle);
+      }
+    }
+  }, true); // Use capture phase to catch events earlier
 })();
 </script>
 
@@ -3399,12 +3494,134 @@
     margin: 4px 0;
   }
 
+  /* Video 360 Modal Styles */
+  .video360-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .video360-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(4px);
+  }
+
+  .video360-modal-content {
+    position: relative;
+    background: #1e293b;
+    border-radius: 12px;
+    width: 90vw;
+    max-width: 1200px;
+    height: 80vh;
+    max-height: 800px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    animation: modalSlideIn 0.3s ease-out;
+  }
+
+  @keyframes modalSlideIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95) translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  .video360-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    background: linear-gradient(135deg, #334155, #1e293b);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  }
+
+  .video360-modal-header h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #f1f5f9;
+  }
+
+  .video360-modal-close {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #f87171;
+    font-size: 28px;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    line-height: 1;
+    padding: 0;
+  }
+
+  .video360-modal-close:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.5);
+    transform: rotate(90deg);
+  }
+
+  .video360-modal-body {
+    flex: 1;
+    padding: 0;
+    overflow: hidden;
+    background: #0f172a;
+  }
+
+  .video360-modal-body iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
   @media (max-width: 768px) {
     .detail-modal { width: min(340px, 94vw); }
     .dm-row { grid-template-columns: 1fr; }
     .layer-filter { width: 280px; }
     /* Place cost panel right below the measure button on mobile */
     .cost-panel { width: min(280px, 90vw); right: 10px; top: 110px; bottom: auto; }
+
+    /* Video 360 Modal Responsive */
+    .video360-modal-content {
+      width: 95vw;
+      height: 90vh;
+      border-radius: 8px;
+    }
+
+    .video360-modal-header {
+      padding: 15px 16px;
+    }
+
+    .video360-modal-header h3 {
+      font-size: 16px;
+    }
+
+    .video360-modal-close {
+      width: 36px;
+      height: 36px;
+      font-size: 24px;
+    }
   }
 </style>
 @endpush
