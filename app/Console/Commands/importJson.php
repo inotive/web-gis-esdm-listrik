@@ -96,7 +96,7 @@ class importJson extends Command
             [
                 'name' => 'Desa Berlistrik PLN',
                 'signature' => 'pln:import-desa-berlistrik',
-                'options' => ['--file' => 'assets/data_berlistrik.json']
+                'options' => []
             ],
 
             // Jalan

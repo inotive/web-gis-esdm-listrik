@@ -368,26 +368,48 @@
   /* Modal Styles */
   .modal-overlay {
     position: fixed;
-    inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
     background: rgba(15,23,42,.45);
     display: none;
-    z-index: 1000;
+    z-index: 9999;
     padding: 18px;
-    overflow: auto;
+    overflow-y: auto;
+    align-items: center;
+    justify-content: center;
   }
 
   .modal-overlay.show {
-    display: block;
+    display: flex !important;
   }
 
-  .modal {
+  .modal-overlay .modal {
     max-width: 500px;
-    margin: 20px auto;
-    background: #fff;
-    border: 1px solid var(--line);
+    width: calc(100% - 36px);
+    margin: auto;
+    background: #ffffff !important;
+    border: 1px solid #E2E8F0;
     border-radius: 16px;
-    box-shadow: var(--shadow-2);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     overflow: hidden;
+    position: relative;
+    z-index: 10000;
+    flex-shrink: 0;
+    min-height: 100px;
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: block !important;
+    pointer-events: auto;
+    height: auto;
+  }
+
+  .modal-overlay.show .modal {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 
   .modal-header {
@@ -923,13 +945,30 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function openModal(id) {
-  document.getElementById(id).classList.add('show');
-  document.body.style.overflow = 'hidden';
+  const modal = document.getElementById(id);
+  if (modal) {
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+    // Force browser to apply the display change
+    void modal.offsetHeight;
+    // Ensure modal box is visible
+    const modalBox = modal.querySelector('.modal');
+    if (modalBox) {
+      modalBox.style.display = 'block';
+      modalBox.style.visibility = 'visible';
+      modalBox.style.opacity = '1';
+    }
+  } else {
+    console.error('Modal not found:', id);
+  }
 }
 
 function closeModal(id) {
-  document.getElementById(id).classList.remove('show');
-  document.body.style.overflow = '';
+  const modal = document.getElementById(id);
+  if (modal) {
+    modal.classList.remove('show');
+    document.body.style.overflow = '';
+  }
 }
 
 function openCreateFolderModal() {
@@ -941,9 +980,13 @@ function openUploadModal() {
 }
 
 function openRenameModal(id, nama) {
-  document.getElementById('renameNama').value = nama;
-  document.getElementById('formRename').action = '{{ route("admin.dokumen.update", ":id") }}'.replace(':id', id);
-  openModal('modalRename');
+  const renameInput = document.getElementById('renameNama');
+  const renameForm = document.getElementById('formRename');
+  if (renameInput && renameForm) {
+    renameInput.value = nama;
+    renameForm.action = '{{ route("admin.dokumen.update", ":id") }}'.replace(':id', id);
+    openModal('modalRename');
+  }
 }
 
 function deleteDokumen(id, nama) {
@@ -971,23 +1014,35 @@ function deleteDokumen(id, nama) {
   });
 }
 
-// Close modal on backdrop click
-document.querySelectorAll('.modal-overlay').forEach(overlay => {
-  overlay.addEventListener('click', function(e) {
-    if (e.target === this) {
-      closeModal(this.id);
-    }
-  });
-});
+// Initialize modal event listeners
+(function() {
+  // Close modal on backdrop click
+  function initModalListeners() {
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', function(e) {
+        if (e.target === this) {
+          closeModal(this.id);
+        }
+      });
+    });
 
-// Close on Escape key
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    document.querySelectorAll('.modal-overlay.show').forEach(modal => {
-      closeModal(modal.id);
+    // Close on Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.show').forEach(modal => {
+          closeModal(modal.id);
+        });
+      }
     });
   }
-});
+
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initModalListeners);
+  } else {
+    initModalListeners();
+  }
+})();
 
 @if(session('success'))
   Swal.fire({
