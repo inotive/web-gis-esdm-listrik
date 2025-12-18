@@ -490,7 +490,7 @@
     position: relative;
     color: transparent !important;
     pointer-events: none;
-    opacity: 0.8;
+    opacity: 0.7;
   }
 
   .btn-loading::after {
@@ -515,18 +515,6 @@
     100% {
       transform: rotate(360deg);
     }
-  }
-
-  .form-submitting {
-    pointer-events: none;
-    opacity: 0.7;
-  }
-
-  .form-submitting input,
-  .form-submitting textarea,
-  .form-submitting select,
-  .form-submitting button:not(.btn-loading) {
-    pointer-events: none;
   }
 </style>
 @endpush
@@ -861,60 +849,30 @@
 @push('scripts')
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Loading state management
-    const setLoadingState = (form, isLoading) => {
-      if (!form) return;
+    // Handle form submit - disable button until process complete
+    const formApprove = document.getElementById('formApprove');
+    const formAddDocument = document.getElementById('formAddDocument');
 
-      const submitBtn = form.querySelector('button[type="submit"]');
-      const cancelBtn = form.querySelector('.btn-modal-cancel');
-
-      if (isLoading) {
-        form.classList.add('form-submitting');
-        if (submitBtn) {
-          submitBtn.classList.add('btn-loading');
-          submitBtn.disabled = true;
-        }
-        if (cancelBtn) {
-          cancelBtn.disabled = true;
-        }
-      } else {
-        form.classList.remove('form-submitting');
-        if (submitBtn) {
-          submitBtn.classList.remove('btn-loading');
-          submitBtn.disabled = false;
-        }
-        if (cancelBtn) {
-          cancelBtn.disabled = false;
-        }
-      }
-    };
-
-    // Handle form submit with loading state
     const handleFormSubmit = (form) => {
       if (!form) return;
 
       form.addEventListener('submit', function(e) {
-        // Prevent double submission
-        if (form.classList.contains('form-submitting')) {
-          e.preventDefault();
-          return false;
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const cancelBtn = form.querySelector('.btn-modal-cancel');
+
+        if (submitBtn) {
+          // Disable submit button
+          submitBtn.disabled = true;
+          submitBtn.classList.add('btn-loading');
         }
 
-        // Validate form before showing loading
-        if (!form.checkValidity()) {
-          form.reportValidity();
-          return;
+        if (cancelBtn) {
+          cancelBtn.disabled = true;
         }
-
-        // Set loading state
-        setLoadingState(form, true);
       });
     };
 
     // Initialize form submit handlers
-    const formApprove = document.getElementById('formApprove');
-    const formAddDocument = document.getElementById('formAddDocument');
-
     if (formApprove) {
       handleFormSubmit(formApprove);
     }
@@ -927,10 +885,18 @@
     const openModal = (selector) => {
       const modal = document.querySelector(selector);
       if (modal) {
-        // Reset loading state when opening modal
+        // Reset button state when opening modal
         const form = modal.querySelector('form');
         if (form) {
-          setLoadingState(form, false);
+          const submitBtn = form.querySelector('button[type="submit"]');
+          const cancelBtn = form.querySelector('.btn-modal-cancel');
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('btn-loading');
+          }
+          if (cancelBtn) {
+            cancelBtn.disabled = false;
+          }
         }
 
         modal.classList.add('show');
@@ -951,11 +917,19 @@
       if (modal) {
         modal.classList.remove('show');
         document.body.style.overflow = '';
-        // Reset form and loading state
+        // Reset form and button state
         const form = modal.querySelector('form');
         if (form) {
           form.reset();
-          setLoadingState(form, false);
+          const submitBtn = form.querySelector('button[type="submit"]');
+          const cancelBtn = form.querySelector('.btn-modal-cancel');
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('btn-loading');
+          }
+          if (cancelBtn) {
+            cancelBtn.disabled = false;
+          }
         }
       }
     };
@@ -1017,12 +991,20 @@
 
     // Error notification
     @if(session('error') || $errors->any())
-      // Reset loading state on error
+      // Reset button state on error
       const openModalEl = document.querySelector('.modal-overlay.show');
       if (openModalEl) {
         const form = openModalEl.querySelector('form');
         if (form) {
-          setLoadingState(form, false);
+          const submitBtn = form.querySelector('button[type="submit"]');
+          const cancelBtn = form.querySelector('.btn-modal-cancel');
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('btn-loading');
+          }
+          if (cancelBtn) {
+            cancelBtn.disabled = false;
+          }
         }
       }
 
