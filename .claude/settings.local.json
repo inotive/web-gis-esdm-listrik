@@ -10,7 +10,9 @@
       "Bash(test:*)",
       "Bash(php convert_coordinates.php:*)",
       "Bash(ls -la \"c:\\\\laragon\\\\www\\\\web-gis-esdm-listrik\\\\public\\\\assets\\\\Jaringan-Listrik\"\" | grep -i \"sutm.*ppu \")",
-      "Bash(php check_data.php:*)"
+      "Bash(php check_data.php:*)",
+      "Bash(php artisan config:clear:*)",
+      "Bash(php artisan cache:clear:*)"
     ]
   }
 }

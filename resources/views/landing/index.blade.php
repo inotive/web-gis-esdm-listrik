@@ -1641,6 +1641,44 @@
     });
     map.add(pt2TrafoGarduPaserLayer);
 
+    // 🔹 PT Hasil Lokasi Survei ESDM
+    const ptHasilLokasiSurveiEsdmLayer = new GeoJSONLayer({
+      url: "{{ url('/api/hasil-lokasi-survei-esdm') }}",
+      title: "PT Hasil Lokasi Survei ESDM",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "picture-marker",
+          url: createLocationPinSvg([0, 128, 255], [0, 64, 128]),
+          width: "26px",
+          height: "26px"
+        }
+      },
+      popupTemplate: {
+        title: "{NAMOBJ}",
+        content: `
+          <b>Nama Objek:</b> {NAMOBJ}<br>
+          <b>Lokasi:</b> {Lokasi}<br>
+          <b>Desa:</b> {WADMKD}<br>
+          <b>Kecamatan:</b> {WADMKC}<br>
+          <b>Kabupaten/Kota:</b> {WADMKK}<br>
+          <b>Provinsi:</b> {WADMPR}<br>
+          <b>Status:</b> {Status}<br>
+          <b>Dusun:</b> {DUSUN}<br>
+          <b>Jumlah KK:</b> {J_KK}<br>
+          <b>Jumlah Penduduk:</b> {J_Pnddk}<br>
+          <b>Jumlah Rumah:</b> {J_BRumah}<br>
+          <b>Koordinat X:</b> {Koor_X}<br>
+          <b>Koordinat Y:</b> {Koor_Y}<br>
+          <b>Potensi:</b> {Potensi}<br>
+          <b>Prioritas:</b> {Priorita_1}<br>
+          <b>Kendala:</b> {KENDALA}
+        `
+      }
+    });
+    map.add(ptHasilLokasiSurveiEsdmLayer);
+
     // LN Batas Desa
     const lnBatasDesaLayer = new GeoJSONLayer({
       url: "{{ url('/api/ln-batas-desa') }}",
@@ -1814,6 +1852,7 @@
     ptTrafoGarduKubarLayer.visible = false;
     pt1TrafoGarduPaserLayer.visible = false;
     pt2TrafoGarduPaserLayer.visible = false;
+    ptHasilLokasiSurveiEsdmLayer.visible = false;
     lnBatasDesaLayer.visible = false;
     lnBatasKabKotaLayer.visible = false;
     lnBatasKecamatanLayer.visible = false;
@@ -1883,7 +1922,8 @@
         { label: 'Sistem Energi Balikpapan', layer: ptSistemEnergiBalikpapanLayer, icon: '⚙️' },
         { label: 'Sistem Energi Kukar', layer: ptSistemEnergiKukarLayer, icon: '⚙️' },
         { label: 'Sistem Energi Mahulu', layer: ptSistemEnergiMahuluLayer, icon: '⚙️' },
-        { label: 'Sistem Energi Samarinda', layer: ptSistemEnergiSamarindaLayer, icon: '⚙️' }
+        { label: 'Sistem Energi Samarinda', layer: ptSistemEnergiSamarindaLayer, icon: '⚙️' },
+        { label: 'Hasil Lokasi Survei ESDM', layer: ptHasilLokasiSurveiEsdmLayer, icon: '📍' }
       ]
     };
 
@@ -2500,6 +2540,7 @@
           { layer: ptTrafoGarduKubarLayer,        title: "PT Trafo Gardu Kubar (Arrester)" },
           { layer: pt1TrafoGarduPaserLayer,       title: "PT1 Trafo Gardu Paser" },
           { layer: pt2TrafoGarduPaserLayer,       title: "PT2 Trafo Gardu Paser" },
+          { layer: ptHasilLokasiSurveiEsdmLayer,  title: "PT Hasil Lokasi Survei ESDM" },
           { layer: arBatasKaltimLayer,            title: "AR Batas Kaltim Full KK KC KD" },
           { layer: arBatasKecamatanLayer,         title: "AR Batas Kaltim KK Kecamatan" },
           { layer: sutmBerauLayer,                 title: "LN SUTM Berau" }
