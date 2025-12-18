@@ -346,6 +346,49 @@
       background: #F9FAFB;
       color: #374151;
     }
+
+    /* Sortable column headers */
+    .sortable-header {
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+      padding-right: 20px;
+      transition: background-color 0.2s;
+    }
+
+    .sortable-header:hover {
+      background-color: #F3F4F6;
+    }
+
+    .sortable-header .sort-icon {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      color: #9CA3AF;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .sortable-header:hover .sort-icon,
+    .sortable-header.sorted .sort-icon {
+      opacity: 1;
+    }
+
+    .sortable-header.sorted-asc .sort-icon::before {
+      content: '▲';
+      color: #3B82F6;
+    }
+
+    .sortable-header.sorted-desc .sort-icon::before {
+      content: '▼';
+      color: #3B82F6;
+    }
+
+    .sortable-header.sorted .sort-icon {
+      color: #3B82F6;
+    }
   </style>
 @endpush
 
@@ -611,11 +654,26 @@
           <table class="table-data" id="tablePermohonan">
             <thead>
               <tr>
-                <th class="col-no">No</th>
-                <th>Pengguna</th>
-                <th>Kategori Permohonan</th>
-                <th>Status</th>
-                <th>Tanggal Pengajuan</th>
+                <th class="col-no sortable-header" data-sort="no">
+                  No
+                  <span class="sort-icon"></span>
+                </th>
+                <th class="sortable-header" data-sort="pengguna">
+                  Pengguna
+                  <span class="sort-icon"></span>
+                </th>
+                <th class="sortable-header" data-sort="kategori">
+                  Kategori Permohonan
+                  <span class="sort-icon"></span>
+                </th>
+                <th class="sortable-header" data-sort="status">
+                  Status
+                  <span class="sort-icon"></span>
+                </th>
+                <th class="sortable-header" data-sort="tanggal">
+                  Tanggal Pengajuan
+                  <span class="sort-icon"></span>
+                </th>
                 <th class="col-aksi">Aksi</th>
               </tr>
             </thead>
@@ -749,10 +807,121 @@
 
           row.style.display = (matchSearch && matchStatus) ? '' : 'none';
         });
+
+        // Re-apply sorting after filtering if there's an active sort
+        if (currentSortColumn) {
+          sortTablePermohonan(currentSortColumn, currentSortDirection);
+        }
       }
 
       searchPermohonan?.addEventListener('input', filterTablePermohonan);
       filterStatusPermohonan?.addEventListener('change', filterTablePermohonan);
+
+      // Sorting functionality
+      let currentSortColumn = null;
+      let currentSortDirection = 'asc'; // 'asc' or 'desc'
+
+      const sortableHeaders = tablePermohonan?.querySelectorAll('.sortable-header');
+      sortableHeaders?.forEach(header => {
+        header.addEventListener('click', function() {
+          const sortType = this.getAttribute('data-sort');
+
+          // Toggle sort direction if clicking the same column
+          if (currentSortColumn === sortType) {
+            currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+          } else {
+            currentSortColumn = sortType;
+            currentSortDirection = 'asc';
+          }
+
+          // Update header classes
+          sortableHeaders.forEach(h => {
+            h.classList.remove('sorted', 'sorted-asc', 'sorted-desc');
+          });
+          this.classList.add('sorted', `sorted-${currentSortDirection}`);
+
+          // Sort table
+          sortTablePermohonan(sortType, currentSortDirection);
+        });
+      });
+
+      function sortTablePermohonan(sortType, direction) {
+        const tbody = tablePermohonan?.querySelector('tbody');
+        if (!tbody) return;
+
+        const rows = Array.from(tbody.querySelectorAll('tr')).filter(row => {
+          // Skip empty state row and hidden rows (filtered out)
+          return !row.querySelector('.empty-state') && row.style.display !== 'none';
+        });
+
+        rows.sort((a, b) => {
+          let aValue, bValue;
+
+          switch (sortType) {
+            case 'no':
+              aValue = parseInt(a.cells[0]?.textContent.trim()) || 0;
+              bValue = parseInt(b.cells[0]?.textContent.trim()) || 0;
+              break;
+            case 'pengguna':
+              aValue = (a.cells[1]?.textContent.trim() || '').toLowerCase();
+              bValue = (b.cells[1]?.textContent.trim() || '').toLowerCase();
+              break;
+            case 'kategori':
+              aValue = (a.cells[2]?.textContent.trim() || '').toLowerCase();
+              bValue = (b.cells[2]?.textContent.trim() || '').toLowerCase();
+              break;
+            case 'status':
+              aValue = (a.cells[3]?.textContent.trim() || '').toLowerCase();
+              bValue = (b.cells[3]?.textContent.trim() || '').toLowerCase();
+              break;
+            case 'tanggal':
+              // Parse tanggal format d/m/Y
+              const aDateStr = a.cells[4]?.textContent.trim() || '';
+              const bDateStr = b.cells[4]?.textContent.trim() || '';
+
+              if (aDateStr === '-' && bDateStr === '-') {
+                aValue = 0;
+                bValue = 0;
+              } else if (aDateStr === '-') {
+                aValue = 0;
+                bValue = parseDate(bDateStr);
+              } else if (bDateStr === '-') {
+                aValue = parseDate(aDateStr);
+                bValue = 0;
+              } else {
+                aValue = parseDate(aDateStr);
+                bValue = parseDate(bDateStr);
+              }
+              break;
+            default:
+              return 0;
+          }
+
+          // Compare values
+          if (typeof aValue === 'number' && typeof bValue === 'number') {
+            return direction === 'asc' ? aValue - bValue : bValue - aValue;
+          } else {
+            if (aValue < bValue) return direction === 'asc' ? -1 : 1;
+            if (aValue > bValue) return direction === 'asc' ? 1 : -1;
+            return 0;
+          }
+        });
+
+        // Re-append sorted rows
+        rows.forEach(row => tbody.appendChild(row));
+      }
+
+      function parseDate(dateStr) {
+        // Parse format d/m/Y to timestamp
+        if (!dateStr || dateStr === '-') return 0;
+        const parts = dateStr.split('/');
+        if (parts.length !== 3) return 0;
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
+        const year = parseInt(parts[2], 10);
+        const date = new Date(year, month, day);
+        return date.getTime();
+      }
     });
   </script>
 @endpush
