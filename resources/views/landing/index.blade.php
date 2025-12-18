@@ -1641,6 +1641,44 @@
     });
     map.add(pt2TrafoGarduPaserLayer);
 
+    // 🔹 PT Hasil Lokasi Survei ESDM
+    const ptHasilLokasiSurveiEsdmLayer = new GeoJSONLayer({
+      url: "{{ url('/api/hasil-lokasi-survei-esdm') }}",
+      title: "PT Hasil Lokasi Survei ESDM",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "picture-marker",
+          url: createLocationPinSvg([0, 128, 255], [0, 64, 128]),
+          width: "26px",
+          height: "26px"
+        }
+      },
+      popupTemplate: {
+        title: "{NAMOBJ}",
+        content: `
+          <b>Nama Objek:</b> {NAMOBJ}<br>
+          <b>Lokasi:</b> {Lokasi}<br>
+          <b>Desa:</b> {WADMKD}<br>
+          <b>Kecamatan:</b> {WADMKC}<br>
+          <b>Kabupaten/Kota:</b> {WADMKK}<br>
+          <b>Provinsi:</b> {WADMPR}<br>
+          <b>Status:</b> {Status}<br>
+          <b>Dusun:</b> {DUSUN}<br>
+          <b>Jumlah KK:</b> {J_KK}<br>
+          <b>Jumlah Penduduk:</b> {J_Pnddk}<br>
+          <b>Jumlah Rumah:</b> {J_BRumah}<br>
+          <b>Koordinat X:</b> {Koor_X}<br>
+          <b>Koordinat Y:</b> {Koor_Y}<br>
+          <b>Potensi:</b> {Potensi}<br>
+          <b>Prioritas:</b> {Priorita_1}<br>
+          <b>Kendala:</b> {KENDALA}
+        `
+      }
+    });
+    map.add(ptHasilLokasiSurveiEsdmLayer);
+
     // LN Batas Desa
     const lnBatasDesaLayer = new GeoJSONLayer({
       url: "{{ url('/api/ln-batas-desa') }}",
@@ -1769,92 +1807,6 @@
     });
     map.add(lnBatasProvinsiLayer);
 
-    // 🔹 PT Hasil Lokasi Survei ESDM
-    const ptHasilLokasiSurveiEsdmLayer = new GeoJSONLayer({
-      url: "{{ url('/api/hasil-lokasi-survei-esdm') }}",
-      title: "PT Hasil Lokasi Survei ESDM",
-      outFields: ["*"],
-      renderer: {
-        type: "simple",
-        symbol: {
-          type: "simple-fill",
-          color: [255, 165, 0, 0.4],
-          outline: { color: [255, 140, 0, 1], width: 1.2 }
-        }
-      },
-      popupTemplate: {
-        title: "{Lokasi}",
-        content: `
-          <b>Lokasi:</b> {Lokasi}<br>
-          <b>Nama Objek:</b> {NAMOBJ}<br>
-          <b>Luas (m²):</b> {LUASWH}<br>
-          <b>Tipe Admin:</b> {TIPADM}<br>
-          <b>Kecamatan:</b> {WADMKC}<br>
-          <b>Desa:</b> {WADMKD}<br>
-          <b>Kabupaten:</b> {WADMKK}<br>
-          <b>Provinsi:</b> {WADMPR}<br>
-          <b>Status:</b> {Status}<br>
-          <b>Kode Kota:</b> {Kode_Kota}<br>
-          <b>Kode Lokasi:</b> {Kode_L}<br>
-          <b>Lokasi Ke:</b> {Lokasi_Ke}<br>
-          <b>Kodifikasi:</b> {Kodifikasi}<br>
-          <b>Dusun:</b> {DUSUN}<br>
-          <b>Jumlah RT:</b> {JUMLAH_RT}<br>
-          <b>Keterangan RT:</b> {KET_RT}<br>
-          <b>Jumlah Penduduk:</b> {J_Pnddk}<br>
-          <b>Jumlah KK:</b> {J_KK}<br>
-          <b>Jumlah Rumah:</b> {J_BRumah}<br>
-          <b>Jumlah Fasum:</b> {J_BFasum}<br>
-          <b>Keterangan Fasum:</b> {Ket_BFasum}<br>
-          <b>Sumber Listrik Komersial:</b> {S_L_Kom}<br>
-          <b>Nama Sumber Listrik:</b> {N_S_L}<br>
-          <b>Klasifikasi Sumber Listrik:</b> {K_S_L}<br>
-          <b>Sistem Penyediaan Listrik:</b> {S_P_L}<br>
-          <b>Waktu Nyala:</b> {W_NYALA}<br>
-          <b>Lama Nyala:</b> {L_NYALA}<br>
-          <b>Target Sisa Listrik:</b> {T_SL}<br>
-          <b>Kendala Sumber Listrik:</b> {Knd_S_L}<br>
-          <b>Koordinat X:</b> {Koor_X}<br>
-          <b>Koordinat Y:</b> {Koor_Y}<br>
-          <b>Provinsi Peta:</b> {PR_Prov}<br>
-          <b>Kawasan Hutan:</b> {K_Hutan}<br>
-          <b>Izin Lain:</b> {Izin_Lain}<br>
-          <b>Potensi:</b> {Potensi}<br>
-          <b>Rencana Jaringan Utama:</b> {R_JUTAMA}<br>
-          <b>Rencana Jaringan Listrik:</b> {R_JLISTRIK}<br>
-          <b>Kondisi Jalan:</b> {K_Jalan}<br>
-          <b>Panjang Jalan:</b> {L_Jalan}<br>
-          <b>Panjang Jalan (P):</b> {P_Jalan}<br>
-          <b>Penyulang:</b> {PENYULANG}<br>
-          <b>Rencana Sumber Listrik:</b> {R_S_L}<br>
-          <b>Kendala:</b> {KENDALA}<br>
-          <b>Izin IUPT:</b> {I_IUPT}<br>
-          <b>Izin PPBH:</b> {I_PPBH}<br>
-          <b>Izin IUPK:</b> {I_IUPK}<br>
-          <b>Jumlah Gardu:</b> {J_Gardu}<br>
-          <b>Beban Gardu:</b> {B_Gardu}<br>
-          <b>Sumber Listrik PLN:</b> {S_L_P}<br>
-          <b>Klasifikasi RPLTS:</b> {K_RPLTS}<br>
-          <b>Panjang:</b> {Panjang}<br>
-          <b>Jumlah Tiang:</b> {Tiang}<br>
-          <b>Biaya:</b> {Biaya}<br>
-          <b>Skor A:</b> {Skor_A}<br>
-          <b>Skor J:</b> {Skor_J}<br>
-          <b>Kesesuaian PR:</b> {K_PR}<br>
-          <b>Kesesuaian Izin:</b> {K_Izin}<br>
-          <b>Kesesuaian Hutan:</b> {K_Hutan_1}<br>
-          <b>Skor Arah:</b> {S_Arah}<br>
-          <b>Skor Potensi:</b> {S_Potensi}<br>
-          <b>Skor Jaringan:</b> {S_J_P}<br>
-          <b>Total Skor:</b> {T_S}<br>
-          <b>Cek:</b> {Cek}<br>
-          <b>Prioritas:</b> {Priorita_1}<br>
-          <b>PLTS:</b> {B_PLTS}
-        `
-      }
-    });
-    map.add(ptHasilLokasiSurveiEsdmLayer);
-
     // ================== SET INITIAL LAYER VISIBILITY ==================
     // Hide all layers on initial load
     desaBerlistrikLayer.visible = false;
@@ -1900,44 +1852,53 @@
     ptTrafoGarduKubarLayer.visible = false;
     pt1TrafoGarduPaserLayer.visible = false;
     pt2TrafoGarduPaserLayer.visible = false;
+    ptHasilLokasiSurveiEsdmLayer.visible = false;
     lnBatasDesaLayer.visible = false;
     lnBatasKabKotaLayer.visible = false;
     lnBatasKecamatanLayer.visible = false;
     lnBatasNegaraLayer.visible = false;
     lnBatasProvinsiLayer.visible = false;
-    ptHasilLokasiSurveiEsdmLayer.visible = false;
 
     // ================== LAYER FILTER PANEL ==================
     // Organize layers into categories with icons
     const layerCategories = {
-      // 3. Titik Aset Jaringan
-      aset: [
+      // 3. Titik Aset Jaringan - Now with sub-categories
+      gardu: [
         { label: 'Gardu Induk Kutim', layer: ptGarduIndukKutimLayer, icon: '🏭' },
         { label: 'Gardu Distribusi Kutim', layer: ptGarduDistribusiKutimLayer, icon: '🏭' },
         { label: 'Gardu Hubung Kutim', layer: ptGarduHubungKutimLayer, icon: '🏭' },
-        { label: 'Gardu Berau', layer: ptGarduBerauLayer, icon: '🏭' },
+        { label: 'Gardu Berau', layer: ptGarduBerauLayer, icon: '🏭' }
+      ],
+      trafo: [
         { label: 'Trafo Berau', layer: ptTrafoBerauLayer, icon: '🔧' },
         { label: 'Trafo Gardu Distribusi PPU', layer: ptTrafoGarduDistribusiPpuLayer, icon: '🔧' },
         { label: 'Trafo Gardu Kubar', layer: ptTrafoGarduKubarLayer, icon: '🔧' },
         { label: 'Trafo Gardu Paser 1', layer: pt1TrafoGarduPaserLayer, icon: '🔧' },
         { label: 'Trafo Gardu Paser 2', layer: pt2TrafoGarduPaserLayer, icon: '🔧' }
       ],
-      // 4. Data Jaringan Saluran
-      saluran: [
-        { label: 'LN Transmisi (SUTT/SUTET)', layer: lnTransmisiLayer, icon: '🔋' },
-        { label: 'Sistem Energi Kukar (SUTT)', layer: sistemJaringanEnergiKukarLayer, icon: '⚡' },
-        { label: 'Jaringan Listrik Balikpapan', layer: jaringanListrikBalikpapanLayer, icon: '⚡' },
-        { label: 'Rencana Jaringan Bontang', layer: jaringanListrikBontangLayer, icon: '📋' },
+      // 4. Data Jaringan Saluran - Now with sub-categories Distribusi and Transmisi
+      distribusi: [
         { label: 'Sistem Energi Kubar (SUTM)', layer: sistemJaringanEnergiKubarLayer, icon: '⚡' },
-        { label: 'Sistem Energi Kubar UP2KB', layer: sistemJaringanEnergiKubarUP2KBlayer, icon: '⚡' },
         { label: 'Sistem Energi Kutim (SUTM)', layer: sistemJaringanEnergiKutimLayer, icon: '⚡' },
         { label: 'Sistem Energi Paser (SUTM)', layer: sistemJaringanEnergiPaserLayer, icon: '⚡' },
         { label: 'SUTM PPU', layer: sutmPPULayer, icon: '⚡' },
         { label: 'SUTM Paser', layer: ln2SutmPaserLayer, icon: '⚡' },
         { label: 'SUTM PPU 2', layer: ln2SutmPPULayer, icon: '⚡' },
-        { label: 'SUTM Berau', layer: sutmBerauLayer, icon: '⚡' },
-        { label: 'Sistem Energi Mahulu (SUTR)', layer: sistemJaringanEnergiMahuluLayer, icon: '⚡' },
-        { label: 'SUTR Kutim', layer: sutrKutimLayer, icon: '⚡' }
+        { label: 'SUTM Berau', layer: sutmBerauLayer, icon: '⚡' }
+      ],
+      transmisi: [
+        { label: 'LN Transmisi (SUTT/SUTET)', layer: lnTransmisiLayer, icon: '🔋' },
+        { label: 'Sistem Energi Kukar (SUTT)', layer: sistemJaringanEnergiKukarLayer, icon: '🔋' },
+        { label: 'Jaringan Listrik Balikpapan', layer: jaringanListrikBalikpapanLayer, icon: '🔋' },
+        { label: 'Rencana Jaringan Bontang', layer: jaringanListrikBontangLayer, icon: '📋' },
+        { label: 'Sistem Energi Kubar UP2KB', layer: sistemJaringanEnergiKubarUP2KBlayer, icon: '🔋' },
+        { label: 'Sistem Energi Mahulu (SUTR)', layer: sistemJaringanEnergiMahuluLayer, icon: '🔋' },
+        { label: 'SUTR Kutim', layer: sutrKutimLayer, icon: '🔋' },
+        { label: 'Sistem Energi Balikpapan', layer: ptSistemEnergiBalikpapanLayer, icon: '⚙️' },
+        { label: 'Sistem Energi Kukar', layer: ptSistemEnergiKukarLayer, icon: '⚙️' },
+        { label: 'Sistem Energi Mahulu', layer: ptSistemEnergiMahuluLayer, icon: '⚙️' },
+        { label: 'Sistem Energi Samarinda', layer: ptSistemEnergiSamarindaLayer, icon: '⚙️' },
+       
       ],
       // 5. Data Dasar (Batas Administrasi)
       administrasi: [
@@ -1967,11 +1928,7 @@
       lainnya: [
         { label: 'Pembangkit Eksisting', layer: ptPembangkitEksistingLayer, icon: '🏗️' },
         { label: 'Rencana Pembangkit Bontang', layer: ptRencanaPembangkitBontangLayer, icon: '📐' },
-        { label: 'Sistem Energi Balikpapan', layer: ptSistemEnergiBalikpapanLayer, icon: '⚙️' },
-        { label: 'Sistem Energi Kukar', layer: ptSistemEnergiKukarLayer, icon: '⚙️' },
-        { label: 'Sistem Energi Mahulu', layer: ptSistemEnergiMahuluLayer, icon: '⚙️' },
-        { label: 'Sistem Energi Samarinda', layer: ptSistemEnergiSamarindaLayer, icon: '⚙️' },
-        { label: 'PT Hasil Lokasi Survei ESDM', layer: ptHasilLokasiSurveiEsdmLayer, icon: '📋' }
+        { label: 'Hasil Lokasi Survei ESDM', layer: ptHasilLokasiSurveiEsdmLayer, icon: '📍' }
       ]
     };
 
@@ -1995,34 +1952,75 @@
       </div>
     `;
 
-    // 3. Titik Aset Jaringan
-    categoriesHTML += `<label class="lf-row lf-parent" data-category="aset">
+    // 3. Infrastruktur - with nested Gardu and Trafo sub-categories
+    categoriesHTML += `<label class="lf-row lf-parent" data-category="infrastruktur">
       <span class="lf-toggle">▼</span>
-      <input type="checkbox" id="lf-aset-parent">
+      <input type="checkbox" id="lf-infrastruktur-parent">
       <span class="lf-icon">🏭</span>
-      <span><strong>Titik Aset Jaringan</strong></span>
+      <span><strong>Infrastruktur</strong></span>
     </label>
-    <div class="lf-children" data-category="aset">`;
-    layerCategories.aset.forEach((item, idx) => {
-      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-aset-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
+    <div class="lf-children" data-category="infrastruktur">
+      <!-- Gardu sub-parent -->
+      <label class="lf-row lf-subparent" data-subcategory="gardu">
+        <span class="lf-toggle lf-subtoggle">▼</span>
+        <input type="checkbox" id="lf-gardu-parent">
+        <span class="lf-icon">🏭</span>
+        <span><strong>Gardu</strong></span>
+      </label>
+      <div class="lf-subchildren" data-subcategory="gardu">`;
+    layerCategories.gardu.forEach((item, idx) => {
+      categoriesHTML += `<label class="lf-row lf-subchild"><input type="checkbox" id="lf-gardu-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
     });
-    categoriesHTML += `</div>`;
+    categoriesHTML += `</div>
+      <!-- Trafo sub-parent -->
+      <label class="lf-row lf-subparent" data-subcategory="trafo">
+        <span class="lf-toggle lf-subtoggle">▼</span>
+        <input type="checkbox" id="lf-trafo-parent">
+        <span class="lf-icon">🔧</span>
+        <span><strong>Trafo</strong></span>
+      </label>
+      <div class="lf-subchildren" data-subcategory="trafo">`;
+    layerCategories.trafo.forEach((item, idx) => {
+      categoriesHTML += `<label class="lf-row lf-subchild"><input type="checkbox" id="lf-trafo-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
+    });
+    categoriesHTML += `</div>
+    </div>`;
 
-    // 4. Data Jaringan Saluran
+    // 4. Data Jaringan Saluran - with nested Distribusi and Transmisi sub-categories
     categoriesHTML += `<label class="lf-row lf-parent" data-category="saluran">
       <span class="lf-toggle">▼</span>
       <input type="checkbox" id="lf-saluran-parent">
       <span class="lf-icon">⚡</span>
       <span><strong>Data Jaringan Saluran</strong></span>
     </label>
-    <div class="lf-children" data-category="saluran">`;
-    layerCategories.saluran.forEach((item, idx) => {
-      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-saluran-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
+    <div class="lf-children" data-category="saluran">
+      <!-- Distribusi sub-parent -->
+      <label class="lf-row lf-subparent" data-subcategory="distribusi">
+        <span class="lf-toggle lf-subtoggle">▼</span>
+        <input type="checkbox" id="lf-distribusi-parent">
+        <span class="lf-icon">⚡</span>
+        <span><strong>Distribusi</strong></span>
+      </label>
+      <div class="lf-subchildren" data-subcategory="distribusi">`;
+    layerCategories.distribusi.forEach((item, idx) => {
+      categoriesHTML += `<label class="lf-row lf-subchild"><input type="checkbox" id="lf-distribusi-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
     });
-    categoriesHTML += `</div>`;
+    categoriesHTML += `</div>
+      <!-- Transmisi sub-parent -->
+      <label class="lf-row lf-subparent" data-subcategory="transmisi">
+        <span class="lf-toggle lf-subtoggle">▼</span>
+        <input type="checkbox" id="lf-transmisi-parent">
+        <span class="lf-icon">🔋</span>
+        <span><strong>Transmisi</strong></span>
+      </label>
+      <div class="lf-subchildren" data-subcategory="transmisi">`;
+    layerCategories.transmisi.forEach((item, idx) => {
+      categoriesHTML += `<label class="lf-row lf-subchild"><input type="checkbox" id="lf-transmisi-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
+    });
+    categoriesHTML += `</div>
+    </div>`;
 
-    // 5. Data Dasar (Batas Administrasi) - HIDDEN
-    /*
+    // 5. Data Dasar (Batas Administrasi)
     categoriesHTML += `<label class="lf-row lf-parent" data-category="administrasi">
       <span class="lf-toggle">▼</span>
       <input type="checkbox" id="lf-administrasi-parent">
@@ -2034,10 +2032,8 @@
       categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-administrasi-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
     });
     categoriesHTML += `</div>`;
-    */
 
-    // 6. Data Jalan - HIDDEN
-    /*
+    // 6. Data Jalan
     categoriesHTML += `<label class="lf-row lf-parent" data-category="jalan">
       <span class="lf-toggle">▼</span>
       <input type="checkbox" id="lf-jalan-parent">
@@ -2049,7 +2045,6 @@
       categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-jalan-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
     });
     categoriesHTML += `</div>`;
-    */
 
     // 7. Lainnya
     categoriesHTML += `<label class="lf-row lf-parent" data-category="lainnya">
@@ -2062,7 +2057,6 @@
     layerCategories.lainnya.forEach((item, idx) => {
       categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-lainnya-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
     });
-    categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-lainnya-PT_Hasil_Lokasi_Survei_ESDM"> <span class="lf-icon">📋</span> <span>PT Hasil Lokasi Survei ESDM</span></label>`;
     categoriesHTML += `</div>`;
 
     layerFilter.innerHTML = `
@@ -2090,7 +2084,7 @@
           </div>
         </div>
         <div class="lf-divider"></div>
-        <label class="lf-row lf-all"><input type="checkbox" id="lf-all"> <span class="lf-icon">📊</span> <span><strong>Semua Layer</strong></span></label>
+        <label class="lf-row lf-all"><input type="checkbox" id="lf-all"> <span class="lf-icon">📊</span> <span><strong>Semua Data</strong></span></label>
         <div class="lf-divider"></div>
         ${categoriesHTML}
       </div>
@@ -2176,8 +2170,19 @@
       updateDesaBerlistrikFilter();
 
       // Update all other categories
-      setCategoryCheckboxes('aset', isChecked);
-      setCategoryCheckboxes('saluran', isChecked);
+      // Update Infrastruktur parent and sub-categories
+      const infrastrukturParent = layerFilter.querySelector('#lf-infrastruktur-parent');
+      if (infrastrukturParent) infrastrukturParent.checked = isChecked;
+      setCategoryCheckboxes('gardu', isChecked);
+      setCategoryCheckboxes('trafo', isChecked);
+
+      // Update Saluran parent and sub-categories
+      const saluranParent = layerFilter.querySelector('#lf-saluran-parent');
+      if (saluranParent) saluranParent.checked = isChecked;
+      setCategoryCheckboxes('distribusi', isChecked);
+      setCategoryCheckboxes('transmisi', isChecked);
+
+      // Update other categories
       setCategoryCheckboxes('administrasi', isChecked);
       setCategoryCheckboxes('jalan', isChecked);
       setCategoryCheckboxes('lainnya', isChecked);
@@ -2227,16 +2232,95 @@
           // Update parent checkbox state
           const childIds = layerCategories[categoryName].map((_, i) => `lf-${categoryName}-${i}`);
           updateParentCheckbox(`lf-${categoryName}-parent`, childIds);
+
+          // Update grandparent checkboxes for nested categories
+          if (categoryName === 'gardu' || categoryName === 'trafo') {
+            const garduParent = layerFilter.querySelector('#lf-gardu-parent');
+            const trafoParent = layerFilter.querySelector('#lf-trafo-parent');
+            const infrastrukturParent = layerFilter.querySelector('#lf-infrastruktur-parent');
+            if (infrastrukturParent) {
+              infrastrukturParent.checked = (garduParent?.checked || trafoParent?.checked);
+            }
+          }
+          if (categoryName === 'distribusi' || categoryName === 'transmisi') {
+            const distribusiParent = layerFilter.querySelector('#lf-distribusi-parent');
+            const transmisiParent = layerFilter.querySelector('#lf-transmisi-parent');
+            const saluranParent = layerFilter.querySelector('#lf-saluran-parent');
+            if (saluranParent) {
+              saluranParent.checked = (distribusiParent?.checked || transmisiParent?.checked);
+            }
+          }
         });
       });
     };
 
-    // Setup all categories
-    setupCategoryHandlers('aset');
-    setupCategoryHandlers('saluran');
+    // Setup all categories (including new sub-categories)
+    setupCategoryHandlers('gardu');
+    setupCategoryHandlers('trafo');
+    setupCategoryHandlers('distribusi');
+    setupCategoryHandlers('transmisi');
     setupCategoryHandlers('administrasi');
     setupCategoryHandlers('jalan');
     setupCategoryHandlers('lainnya');
+
+    // Helper function to update grandparent checkbox based on sub-parents
+    const updateGrandparentCheckbox = (grandparentId, subparentIds) => {
+      const grandparent = layerFilter.querySelector(`#${grandparentId}`);
+      const anyChecked = subparentIds.some(id => layerFilter.querySelector(`#${id}`)?.checked);
+      if (grandparent) grandparent.checked = anyChecked;
+    };
+
+    // Infrastruktur parent checkbox - controls Gardu and Trafo
+    const infrastrukturParentCheckbox = layerFilter.querySelector('#lf-infrastruktur-parent');
+    if (infrastrukturParentCheckbox) {
+      infrastrukturParentCheckbox.addEventListener('change', () => {
+        const isChecked = infrastrukturParentCheckbox.checked;
+        setCategoryCheckboxes('gardu', isChecked);
+        setCategoryCheckboxes('trafo', isChecked);
+      });
+    }
+
+    // Gardu parent checkbox - update Infrastruktur parent when changed
+    const garduParentCheckbox = layerFilter.querySelector('#lf-gardu-parent');
+    if (garduParentCheckbox) {
+      garduParentCheckbox.addEventListener('change', () => {
+        updateGrandparentCheckbox('lf-infrastruktur-parent', ['lf-gardu-parent', 'lf-trafo-parent']);
+      });
+    }
+
+    // Trafo parent checkbox - update Infrastruktur parent when changed
+    const trafoParentCheckbox = layerFilter.querySelector('#lf-trafo-parent');
+    if (trafoParentCheckbox) {
+      trafoParentCheckbox.addEventListener('change', () => {
+        updateGrandparentCheckbox('lf-infrastruktur-parent', ['lf-gardu-parent', 'lf-trafo-parent']);
+      });
+    }
+
+    // Saluran parent checkbox - controls Distribusi and Transmisi
+    const saluranParentCheckbox = layerFilter.querySelector('#lf-saluran-parent');
+    if (saluranParentCheckbox) {
+      saluranParentCheckbox.addEventListener('change', () => {
+        const isChecked = saluranParentCheckbox.checked;
+        setCategoryCheckboxes('distribusi', isChecked);
+        setCategoryCheckboxes('transmisi', isChecked);
+      });
+    }
+
+    // Distribusi parent checkbox - update Saluran parent when changed
+    const distribusiParentCheckbox = layerFilter.querySelector('#lf-distribusi-parent');
+    if (distribusiParentCheckbox) {
+      distribusiParentCheckbox.addEventListener('change', () => {
+        updateGrandparentCheckbox('lf-saluran-parent', ['lf-distribusi-parent', 'lf-transmisi-parent']);
+      });
+    }
+
+    // Transmisi parent checkbox - update Saluran parent when changed
+    const transmisiParentCheckbox = layerFilter.querySelector('#lf-transmisi-parent');
+    if (transmisiParentCheckbox) {
+      transmisiParentCheckbox.addEventListener('change', () => {
+        updateGrandparentCheckbox('lf-saluran-parent', ['lf-distribusi-parent', 'lf-transmisi-parent']);
+      });
+    }
 
     // ================== EXPAND/COLLAPSE FUNCTIONALITY ==================
     // Add toggle functionality for all parent categories
@@ -2269,6 +2353,38 @@
 
       // Add click handler to the parent label
       parentLabel.addEventListener('click', handleToggle);
+    });
+
+    // Add toggle functionality for all sub-parent categories (Gardu, Trafo, Distribusi, Transmisi)
+    const subparentLabels = layerFilter.querySelectorAll('.lf-subparent');
+    subparentLabels.forEach(subparentLabel => {
+      const toggle = subparentLabel.querySelector('.lf-subtoggle');
+      const subcategory = subparentLabel.getAttribute('data-subcategory');
+      const subchildrenContainer = layerFilter.querySelector(`.lf-subchildren[data-subcategory="${subcategory}"]`);
+
+      if (!toggle || !subchildrenContainer) return;
+
+      // Click on toggle or sub-parent label (but not checkbox) to collapse/expand
+      const handleSubToggle = (e) => {
+        // Don't toggle if clicking on checkbox
+        if (e.target.type === 'checkbox') return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const isCollapsed = subchildrenContainer.classList.contains('collapsed');
+
+        if (isCollapsed) {
+          subchildrenContainer.classList.remove('collapsed');
+          toggle.textContent = '▼';
+        } else {
+          subchildrenContainer.classList.add('collapsed');
+          toggle.textContent = '▶';
+        }
+      };
+
+      // Add click handler to the sub-parent label
+      subparentLabel.addEventListener('click', handleSubToggle);
     });
 
     // ================== WILAYAH FILTER FUNCTIONALITY ==================
@@ -2593,10 +2709,10 @@
           { layer: ptTrafoGarduKubarLayer,        title: "PT Trafo Gardu Kubar (Arrester)" },
           { layer: pt1TrafoGarduPaserLayer,       title: "PT1 Trafo Gardu Paser" },
           { layer: pt2TrafoGarduPaserLayer,       title: "PT2 Trafo Gardu Paser" },
+          { layer: ptHasilLokasiSurveiEsdmLayer,  title: "PT Hasil Lokasi Survei ESDM" },
           { layer: arBatasKaltimLayer,            title: "AR Batas Kaltim Full KK KC KD" },
           { layer: arBatasKecamatanLayer,         title: "AR Batas Kaltim KK Kecamatan" },
-          { layer: sutmBerauLayer,                 title: "LN SUTM Berau" },
-          { layer: ptHasilLokasiSurveiEsdmLayer,   title: "PT Hasil Lokasi Survei ESDM" }
+          { layer: sutmBerauLayer,                 title: "LN SUTM Berau" }
         ]
       }),
       expanded: false,
@@ -2996,6 +3112,53 @@
     background: #fff !important;
     border-left: 3px solid #22c55e;
     font-size: 12px;
+  }
+  /* Sub-parent styles (Gardu, Trafo, Distribusi, Transmisi) */
+  .lf-subparent {
+    margin-left: 20px;
+    background: #fefce8 !important;
+    border-color: #fde047 !important;
+    color: #854d0e !important;
+    font-size: 12px;
+    border-left: 3px solid #eab308;
+  }
+  .lf-subparent:hover { 
+    background: #fef9c3 !important;
+  }
+  .lf-subtoggle {
+    font-size: 9px;
+    margin-right: 4px;
+    transition: transform 0.2s ease;
+    user-select: none;
+    color: #a16207;
+  }
+  /* Sub-children container styles */
+  .lf-subchildren {
+    display: grid;
+    gap: 4px;
+    max-height: 800px;
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+    opacity: 1;
+    margin-left: 20px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+  }
+  .lf-subchildren.collapsed {
+    max-height: 0;
+    opacity: 0;
+    margin: 0;
+  }
+  /* Sub-child item styles */
+  .lf-subchild {
+    margin-left: 10px;
+    background: #fff !important;
+    border-left: 2px solid #facc15;
+    font-size: 11px;
+    padding: 6px 10px !important;
+  }
+  .lf-subchild:hover {
+    background: #fffbeb !important;
   }
   .lf-divider {
     height: 1px;

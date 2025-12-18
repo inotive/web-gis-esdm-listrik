@@ -172,34 +172,39 @@ class PerizinanListrikSeeder extends Seeder
                     $currentCompany['lokasi'] = $lokasi;
                 }
 
-                // Create PerizinanListrik record
-                $perizinanData = [
-                    'tahun' => 2022,
-                    'kabupaten_kota' => $kabupatenKota,
-                    'nama_pemohon' => $currentCompany['nama_pemohon'],
-                    'kontak' => $currentCompany['kontak'],
-                    'jenis_usaha' => null,
-                    'no_pengajuan' => $currentCompany['no_pengajuan'],
-                    'no_surat_keluar' => $currentCompany['no_surat_keluar'],
-                    'tanggal_perizinan' => $currentCompany['tanggal_perizinan'],
-                    'no_surat_izin' => $currentCompany['no_surat_izin'],
-                    'tanggal_terbit' => $currentCompany['tanggal_terbit'],
-                    'tanggal_akhir' => $currentCompany['tanggal_akhir'],
-                    'lokasi' => $currentCompany['lokasi'],
-                    'koordinat' => $koordinat,
-                    'jumlah_unit' => $jumlahUnit,
-                    'kapasitas' => $kapasitas,
-                    'total_kapasitas' => $totalKapasitas,
-                    'jenis' => $jenisPerizinan, // SKTP, IUPTLS (inherited from company row if not present)
-                    'sifat_penggunaan' => $sifatPenggunaan,
-                    'catatan' => $this->cleanString($this->getValue($row, $columnMap, 'catatan')),
-                ];
+                // Only create PerizinanListrik for NEW company rows (when namaPemohon is not empty)
+                // For sub-rows (empty namaPemohon), we only create PembangkitListrik
+                if (!empty($namaPemohon)) {
+                    // This is a new company row - create PerizinanListrik
+                    $perizinanData = [
+                        'tahun' => 2022,
+                        'kabupaten_kota' => $kabupatenKota,
+                        'nama_pemohon' => $currentCompany['nama_pemohon'],
+                        'kontak' => $currentCompany['kontak'],
+                        'jenis_usaha' => null,
+                        'no_pengajuan' => $currentCompany['no_pengajuan'],
+                        'no_surat_keluar' => $currentCompany['no_surat_keluar'],
+                        'tanggal_perizinan' => $currentCompany['tanggal_perizinan'],
+                        'no_surat_izin' => $currentCompany['no_surat_izin'],
+                        'tanggal_terbit' => $currentCompany['tanggal_terbit'],
+                        'tanggal_akhir' => $currentCompany['tanggal_akhir'],
+                        'lokasi' => $currentCompany['lokasi'],
+                        'koordinat' => $koordinat,
+                        'jumlah_unit' => $jumlahUnit,
+                        'kapasitas' => $kapasitas,
+                        'total_kapasitas' => $totalKapasitas,
+                        'jenis' => $jenisPerizinan, // SKTP, IUPTLS (inherited from company row if not present)
+                        'sifat_penggunaan' => $sifatPenggunaan,
+                        'catatan' => $this->cleanString($this->getValue($row, $columnMap, 'catatan')),
+                    ];
 
-                $currentPerizinan = PerizinanListrik::create($perizinanData);
-                $result['perizinan']++;
+                    $currentPerizinan = PerizinanListrik::create($perizinanData);
+                    $result['perizinan']++;
+                }
 
                 // Create PembangkitListrik if we have pembangkit data and perusahaan
-                if ($hasPembangkitData && $currentPerusahaan) {
+                // This applies to both new company rows AND sub-rows
+                if ($hasPembangkitData && $currentPerusahaan && $currentPerizinan) {
                     PembangkitListrik::create([
                         'perusahaan_id' => $currentPerusahaan->id,
                         'perizinan_listrik_id' => $currentPerizinan->id,
