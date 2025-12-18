@@ -484,6 +484,50 @@
     border-color: #CBD5E1;
     color: #475569;
   }
+
+  /* Loading State */
+  .btn-loading {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+    opacity: 0.8;
+  }
+
+  .btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    top: 50%;
+    left: 50%;
+    margin-left: -9px;
+    margin-top: -9px;
+    border: 2.5px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #ffffff;
+    animation: spinner 0.7s linear infinite;
+  }
+
+  @keyframes spinner {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .form-submitting {
+    pointer-events: none;
+    opacity: 0.7;
+  }
+
+  .form-submitting input,
+  .form-submitting textarea,
+  .form-submitting select,
+  .form-submitting button:not(.btn-loading) {
+    pointer-events: none;
+  }
 </style>
 @endpush
 
@@ -817,10 +861,78 @@
 @push('scripts')
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // Loading state management
+    const setLoadingState = (form, isLoading) => {
+      if (!form) return;
+
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const cancelBtn = form.querySelector('.btn-modal-cancel');
+
+      if (isLoading) {
+        form.classList.add('form-submitting');
+        if (submitBtn) {
+          submitBtn.classList.add('btn-loading');
+          submitBtn.disabled = true;
+        }
+        if (cancelBtn) {
+          cancelBtn.disabled = true;
+        }
+      } else {
+        form.classList.remove('form-submitting');
+        if (submitBtn) {
+          submitBtn.classList.remove('btn-loading');
+          submitBtn.disabled = false;
+        }
+        if (cancelBtn) {
+          cancelBtn.disabled = false;
+        }
+      }
+    };
+
+    // Handle form submit with loading state
+    const handleFormSubmit = (form) => {
+      if (!form) return;
+
+      form.addEventListener('submit', function(e) {
+        // Prevent double submission
+        if (form.classList.contains('form-submitting')) {
+          e.preventDefault();
+          return false;
+        }
+
+        // Validate form before showing loading
+        if (!form.checkValidity()) {
+          form.reportValidity();
+          return;
+        }
+
+        // Set loading state
+        setLoadingState(form, true);
+      });
+    };
+
+    // Initialize form submit handlers
+    const formApprove = document.getElementById('formApprove');
+    const formAddDocument = document.getElementById('formAddDocument');
+
+    if (formApprove) {
+      handleFormSubmit(formApprove);
+    }
+
+    if (formAddDocument) {
+      handleFormSubmit(formAddDocument);
+    }
+
     // Modal functionality
     const openModal = (selector) => {
       const modal = document.querySelector(selector);
       if (modal) {
+        // Reset loading state when opening modal
+        const form = modal.querySelector('form');
+        if (form) {
+          setLoadingState(form, false);
+        }
+
         modal.classList.add('show');
         document.body.style.overflow = 'hidden';
         // Force browser to apply the display change
@@ -839,10 +951,11 @@
       if (modal) {
         modal.classList.remove('show');
         document.body.style.overflow = '';
-        // Reset form
+        // Reset form and loading state
         const form = modal.querySelector('form');
         if (form) {
           form.reset();
+          setLoadingState(form, false);
         }
       }
     };
@@ -904,6 +1017,15 @@
 
     // Error notification
     @if(session('error') || $errors->any())
+      // Reset loading state on error
+      const openModalEl = document.querySelector('.modal-overlay.show');
+      if (openModalEl) {
+        const form = openModalEl.querySelector('form');
+        if (form) {
+          setLoadingState(form, false);
+        }
+      }
+
       Swal.fire({
         icon: 'error',
         title: 'Error!',
