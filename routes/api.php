@@ -6,6 +6,15 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\DataBerlistrikController;
 use App\Http\Controllers\Api\DatajalannasionalController;
 use App\Http\Controllers\Api\DatajalanprovinsiController;
+use App\Http\Controllers\Api\JalanBalikpapanController;
+use App\Http\Controllers\Api\JalanBerauController;
+use App\Http\Controllers\Api\JalanBontangController;
+use App\Http\Controllers\Api\JalanKubarController;
+use App\Http\Controllers\Api\JalanKutaiKartanegaraController;
+use App\Http\Controllers\Api\JalanKutimController;
+use App\Http\Controllers\Api\JalanPaserController;
+use App\Http\Controllers\Api\JalanPPUController;
+use App\Http\Controllers\Api\JalanSamarindaController;
 use App\Http\Controllers\Api\JaringanlistrikbalikpapanController;
 use App\Http\Controllers\Api\JaringanlistrikbontangController;
 use App\Http\Controllers\Api\SistemJaringanEnergiMahuluController;
@@ -43,8 +52,7 @@ use App\Http\Controllers\Api\PtTrafoGarduDistribusiPpuController;
 use App\Http\Controllers\Api\PtTrafoGarduKubarController;
 use App\Http\Controllers\Api\Pt1TrafoGarduPaserController;
 use App\Http\Controllers\Api\Pt2TrafoGarduPaserController;
-use App\Http\Controllers\Api\JalanBalikpapanController;
-use App\Http\Controllers\Api\JalanKabupatenBerauController;
+use App\Http\Controllers\Api\WilayahController;
 
 // Route::get('/aset', [AssetController::class, 'index']);
 Route::get('/data-berlistrik', [DataBerlistrikController::class, 'index']);
@@ -52,7 +60,14 @@ Route::get('/data-berlistrik', [DataBerlistrikController::class, 'index']);
 Route::get('/data-jalan-nasional', [DatajalannasionalController::class, 'index']);
 Route::get('/data-jalan-provinsi', [DatajalanprovinsiController::class, 'index']);
 Route::get('/jalan-balikpapan', [JalanBalikpapanController::class, 'index']);
-Route::get('/jalan-kabupaten-berau', [JalanKabupatenBerauController::class, 'index']);
+Route::get('/jalan-berau', [JalanBerauController::class, 'index']);
+Route::get('/jalan-bontang', [JalanBontangController::class, 'index']);
+Route::get('/jalan-kubar', [JalanKubarController::class, 'index']);
+Route::get('/jalan-kutai-kartanegara', [JalanKutaiKartanegaraController::class, 'index']);
+Route::get('/jalan-kutim', [JalanKutimController::class, 'index']);
+Route::get('/jalan-paser', [JalanPaserController::class, 'index']);
+Route::get('/jalan-ppu', [JalanPPUController::class, 'index']);
+Route::get('/jalan-samarinda', [JalanSamarindaController::class, 'index']);
 
 Route::get('/jaringan-listrik-balikpapan', [JaringanlistrikbalikpapanController::class, 'index']);
 Route::get('/jaringan-listrik-bontang', [JaringanlistrikbontangController::class, 'index']);
@@ -93,6 +108,11 @@ Route::get('/pt2-trafo-gardu-paser', [Pt2TrafoGarduPaserController::class, 'inde
 Route::get('/ar-batas-kaltim', [ArBatasKaltimFullController::class, 'index']);
 Route::get('/ar-batas-kaltim-kabkota', [ArBatasKaltimKabupatenKotaController::class, 'index']);
 Route::get('/ar-batas-kaltim-kecamatan', [ArBatasKaltimKecamatanController::class, 'index']);
+
+// Wilayah API
+Route::get('/wilayah/regencies', [WilayahController::class, 'getRegencies']);
+Route::get('/wilayah/districts', [WilayahController::class, 'getDistricts']);
+Route::get('/wilayah/villages', [WilayahController::class, 'getVillages']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

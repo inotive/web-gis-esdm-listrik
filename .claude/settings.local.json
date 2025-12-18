@@ -1,10 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Bash(mysql:*)",
-      "Bash(php artisan route:list:*)",
       "Bash(curl:*)",
-      "Bash(php artisan tinker:*)"
+      "Bash(php -r:*)",
+      "Bash(php artisan tinker:*)",
+      "Bash(php artisan view:clear:*)",
+      "Bash(php artisan:*)",
+      "Bash(cat:*)",
+      "Bash(test:*)",
+      "Bash(php convert_coordinates.php:*)"
     ]
   }
 }

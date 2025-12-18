@@ -99,7 +99,13 @@
 
     const renderDetailContent = (graphic) => {
       const attrs = graphic?.attributes || {};
-      const layerTitle = graphic?.layer?.title || 'Detail Fitur';
+      let layerTitle = graphic?.layer?.title || 'Detail Fitur';
+
+      // Jika layer adalah H_Survei, gunakan nilai H_Survei sebagai judul
+      if (layerTitle === 'H_Survei' && attrs.H_Survei) {
+        layerTitle = attrs.H_Survei;
+      }
+
       const rows = Object.entries(attrs)
         .map(([k, v]) => `<div class="dm-row"><div class="dm-key">${k}</div><div class="dm-val">${v ?? '-'}</div></div>`)
         .join('');
@@ -198,10 +204,35 @@
 
     // ================== LAYERS ==================
 
+    // Helper function to create location pin SVG with custom color
+    const createLocationPinSvg = (fillColor, strokeColor = '#000000', size = 32) => {
+      // Convert RGBA array to hex if needed
+      const toHex = (color) => {
+        if (Array.isArray(color)) {
+          const [r, g, b] = color;
+          return '#' + [r, g, b].map(x => {
+            const hex = Math.round(x).toString(16);
+            return hex.length === 1 ? '0' + hex : hex;
+          }).join('');
+        }
+        return color;
+      };
+      
+      const fill = toHex(fillColor);
+      const stroke = toHex(strokeColor);
+      
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/>
+        <circle cx="12" cy="9" r="2.5" fill="${stroke}"/>
+      </svg>`;
+      
+      return 'data:image/svg+xml;base64,' + btoa(svg);
+    };
+
     // Desa Berlistrik PLN
     const desaBerlistrikLayer = new GeoJSONLayer({
       url: "{{ url('/api/data-berlistrik') }}",
-      title: "Desa Berlistrik PLN",
+      title: "H_Survei",
       outFields: ["*"],
       popupTemplate: {
         title: "{NAMOBJ}",
@@ -216,12 +247,7 @@
       renderer: {
         type: "unique-value",
         field: "H_Survei",
-        defaultLabel: "Status tidak diketahui",
-        defaultSymbol: {
-          type: "simple-fill",
-          color: [148, 163, 184, 0.35],
-          outline: { color: [100, 116, 139, 1], width: 1 }
-        },
+        defaultSymbol: null,
         uniqueValueInfos: [
           {
             value: "Belum Terlayani Listrik",
@@ -336,6 +362,397 @@
       }
     });
     map.add(jalanBalikpapanLayer);
+
+    // Jalan Berau
+    const jalanBerauLayer = new GeoJSONLayer({
+      url: "{{ url('/api/jalan-berau') }}",
+      title: "Jalan Berau",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-line",
+          color: [255, 165, 0, 1], // orange
+          width: 2
+        }
+      },
+      popupTemplate: {
+        title: "{NAMA_RUAS}",
+        content: `
+          <b>No. Ruas:</b> {NO_RUAS}<br>
+          <b>Nama Ruas:</b> {NAMA_RUAS}<br>
+          <b>Kab/Kota:</b> {KAB_KOTA}<br>
+          <b>Titik Awal:</b> {TTK_PNGKAL}<br>
+          <b>Titik Akhir:</b> {TTK_AKHIR}<br>
+          <b>Panjang:</b> {PANJANG} km<br>
+          <b>Jumlah Jalur (2):</b> {JKP_2}<br>
+          <b>Jumlah Jalur (3):</b> {JKP_3}<br>
+          <b>Jumlah Jalur (4):</b> {JKP_4}<br>
+          <b>Jumlah Lajur Perjalanan:</b> {JLP}<br>
+          <b>Jalan Lingkar Propinsi:</b> {Jling_P}<br>
+          <b>Jumlah Akses Struktur:</b> {JAS}<br>
+          <b>Jumlah Konektivitas Struktur:</b> {JKS}<br>
+          <b>Jumlah Lintas Struktur:</b> {JLS}<br>
+          <b>Jalan Lingkar Struktur:</b> {Jling_S}<br>
+          <b>Fungsi:</b> {FUNGSI}<br>
+          <b>Status:</b> {STATUS}<br>
+          <b>Panjang (Shape_Leng):</b> {Shape_Leng} m
+        `
+      }
+    });
+    map.add(jalanBerauLayer);
+
+    // Jalan Bontang
+    const jalanBontangLayer = new GeoJSONLayer({
+      url: "{{ url('/api/jalan-bontang') }}",
+      title: "Jalan Bontang",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-line",
+          color: [0, 0, 255, 1], // biru
+          width: 2
+        }
+      },
+      popupTemplate: {
+        title: "{Nm_Ruas}",
+        content: `
+          <b>Klasifikasi Data Dasar:</b> {Kl_Dat_Das}<br>
+          <b>Nama Ruas:</b> {Nm_Ruas}<br>
+          <b>Tahun Data:</b> {Thn_Data}<br>
+          <b>Status:</b> {Status}<br>
+          <b>Fungsi:</b> {Fungsi}<br>
+          <b>Mendukung:</b> {Mendukung}<br>
+          <b>Uraian Dukung:</b> {Ura_Dukung}<br>
+          <b>Kode Bangunan PU:</b> {Kd_Bd_PU}<br>
+          <b>Kode Jenis Infrastruktur:</b> {Kd_Jns_Inf}<br>
+          <b>Kode Infrastruktur:</b> {Kd_Inf}<br>
+          <b>Provinsi:</b> {Propinsi}<br>
+          <b>Kabupaten/Kota:</b> {Kab_Kota}<br>
+          <b>Kecamatan:</b> {Kecamatan}<br>
+          <b>Desa/Kelurahan:</b> {Desa_Kel}<br>
+          <b>Titik Ruas Awal:</b> {Tk_Ruas_Aw}<br>
+          <b>Titik Ruas Akhir:</b> {Tk_Ruas_Ak}<br>
+          <b>Kode Patok:</b> {Kd_Patok}<br>
+          <b>Kilometer Awal:</b> {Km_Awal}<br>
+          <b>Kilometer Akhir:</b> {Km_Akhir}<br>
+          <b>Nama Lintas:</b> {Nm_Lintas}<br>
+          <b>Kondisi Baik (%):</b> {Kon_Baik}<br>
+          <b>Kondisi Sedang (%):</b> {Kon_Sdg}<br>
+          <b>Kondisi Renggang (%):</b> {Kon_Rgn}<br>
+          <b>Kondisi Rusak (%):</b> {Kon_Rusak}<br>
+          <b>Kondisi Mantap (%):</b> {Kon_Mntp}<br>
+          <b>Kondisi Tidak Mantap (%):</b> {Kon_T_Mntp}<br>
+          <b>Panjang (km):</b> {Panjang}<br>
+          <b>Lebar Keras (m):</b> {Lbr_Keras}<br>
+          <b>LHRT:</b> {LHRT}<br>
+          <b>VCR:</b> {VCR}<br>
+          <b>Tipe Jalan:</b> {Tipe_Jln}<br>
+          <b>MST:</b> {MST}<br>
+          <b>Tipe Keras:</b> {Tipe_Keras}<br>
+          <b>Tanah Krikil (%):</b> {Tanah_Kri}<br>
+          <b>Macadam (%):</b> {Macadam}<br>
+          <b>Aspal (%):</b> {Aspal}<br>
+          <b>Rigid (%):</b> {Rigid}<br>
+          <b>Tahun Penanganan Akhir:</b> {Thn_Pen_Ak}<br>
+          <b>Jenis Penanganan:</b> {Jns_Pen}<br>
+          <b>Koordinat X Awal:</b> {Koord_X_Aw}<br>
+          <b>Koordinat Y Awal:</b> {Koord_Y_Aw}<br>
+          <b>Koordinat X Akhir:</b> {Koord_X_Ak}<br>
+          <b>Koordinat Y Akhir:</b> {Koord_Y_Ak}
+        `
+      }
+    });
+    map.add(jalanBontangLayer);
+
+    // Jalan Kubar
+    const jalanKubarLayer = new GeoJSONLayer({
+      url: "{{ url('/api/jalan-kubar') }}",
+      title: "Jalan Kubar",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-line",
+          color: [255, 255, 0, 1], // kuning
+          width: 2
+        }
+      },
+      popupTemplate: {
+        title: "{Nm_Ruas}",
+        content: `
+          <b>Nama Ruas:</b> {Nm_Ruas}<br>
+          <b>Fungsi:</b> {Fungsi}<br>
+          <b>Panjang (km):</b> {Panjang}
+        `
+      }
+    });
+    map.add(jalanKubarLayer);
+
+    // Jalan Kutai Kartanegara
+    const jalanKutaiKartanegaraLayer = new GeoJSONLayer({
+      url: "{{ url('/api/jalan-kutai-kartanegara') }}",
+      title: "Jalan Kutai Kartanegara",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-line",
+          color: [255, 165, 100, 1], // orange
+          width: 2
+        }
+      },
+      popupTemplate: {
+        title: "{NAMA_BARU}",
+        content: `
+          <b>No. Lama:</b> {NO_LAMA}<br>
+          <b>No. Baru:</b> {NO_BARU}<br>
+          <b>Nama Lama:</b> {NAMA_LAMA}<br>
+          <b>Nama Baru:</b> {NAMA_BARU}<br>
+          <b>Panjang (P_Km):</b> {P_Km}<br>
+          <b>Kecamatan:</b> {KECAMATAN}<br>
+          <b>Urutan:</b> {URUT}<br>
+          <b>Pangkal:</b> {PANGKAL}<br>
+          <b>Ujung:</b> {UJUNG}<br>
+          <b>Koordinat Pangkal:</b> {KOOR_PANGK}<br>
+          <b>Koordinat Ujung:</b> {KOOR_UJUNG}<br>
+          <b>Lebar (m):</b> {LEBAR_M}<br>
+          <b>Fungsi:</b> {FUNGSI}<br>
+          <b>History:</b> {HISTORY}<br>
+          <b>Panjang:</b> {Panjang}
+        `
+      }
+    });
+    map.add(jalanKutaiKartanegaraLayer);
+
+    // Jalan Kutim
+    const jalanKutimLayer = new GeoJSONLayer({
+      url: "{{ url('/api/jalan-kutim') }}",
+      title: "Jalan Kutim",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-line",
+          color: [148, 0, 211, 1], // violet
+          width: 2
+        }
+      },
+      popupTemplate: {
+        title: "{Nm_Ruas}",
+        content: `
+          <b>Klasifikasi Data Dasar:</b> {Kl_Dat_Das}<br>
+          <b>No. Ruas:</b> {No_Ruas}<br>
+          <b>Nama Ruas:</b> {Nm_Ruas}<br>
+          <b>Fungsi:</b> {Fungsi}<br>
+          <b>Kecamatan:</b> {Kecamatan}<br>
+          <b>Desa/Kelurahan:</b> {Desa_Kel}<br>
+          <b>Titik Ruas Awal:</b> {Tk_Ruas_Aw}<br>
+          <b>Titik Ruas Akhir:</b> {Tk_Ruas_Ak}<br>
+          <b>Panjang:</b> {Panjang}<br>
+          <b>Koordinat X Awal:</b> {Koord_X_Aw}<br>
+          <b>Koordinat Y Awal:</b> {Koord_Y_Aw}<br>
+          <b>Koordinat X Akhir:</b> {Koord_X_Ak}<br>
+          <b>Koordinat Y Akhir:</b> {Koord_Y_Ak}
+        `
+      }
+    });
+    map.add(jalanKutimLayer);
+
+    // Jalan Paser
+    const jalanPaserLayer = new GeoJSONLayer({
+      url: "{{ url('/api/jalan-paser') }}",
+      title: "Jalan Paser",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-line",
+          color: [0, 100, 0, 1], // dark green
+          width: 2
+        }
+      },
+      popupTemplate: {
+        title: "{Nm_Ruas}",
+        content: `
+          <b>OBJECTID_1:</b> {OBJECTID_1}<br>
+          <b>OBJECTID_2:</b> {OBJECTID_2}<br>
+          <b>OBJECTID:</b> {OBJECTID}<br>
+          <b>Klasifikasi Data Dasar:</b> {Kl_Dat_Das}<br>
+          <b>Nama Ruas:</b> {Nm_Ruas}<br>
+          <b>Tahun Data:</b> {Thn_Data}<br>
+          <b>Status:</b> {Status}<br>
+          <b>Fungsi:</b> {Fungsi}<br>
+          <b>Mendukung:</b> {Mendukung}<br>
+          <b>Uraian Dukung:</b> {Ura_Dukung}<br>
+          <b>Kode Bidang PU:</b> {Kd_Bd_PU}<br>
+          <b>Kode Jenis Infrastruktur:</b> {Kd_Jns_inf}<br>
+          <b>Kode Infrastruktur:</b> {Kd_Inf}<br>
+          <b>Propinsi:</b> {Propinsi}<br>
+          <b>Kabupaten/Kota:</b> {Kab_Kot}<br>
+          <b>Kecamatan:</b> {Kecamatan}<br>
+          <b>Desa/Kelurahan:</b> {Desa_Kel}<br>
+          <b>Titik Ruas Awal:</b> {Tk_Ruas_Aw}<br>
+          <b>Titik Ruas Akhir:</b> {Tk_Ruas_Ak}<br>
+          <b>Kode Patok:</b> {Kd_Patok}<br>
+          <b>Nama Lintas:</b> {Nm_Lintas}<br>
+          <b>Kilometer Awal:</b> {Km_Awal}<br>
+          <b>Kilometer Akhir:</b> {Km_Akhir}<br>
+          <b>Kondisi Baik (%):</b> {Kon_Baik}<br>
+          <b>Kondisi Sedang (%):</b> {Kon_Sdg}<br>
+          <b>Kondisi Renggang (%):</b> {Kon_Rgn}<br>
+          <b>Kondisi Rusak (%):</b> {Kon_Rusak}<br>
+          <b>Kondisi Mantap (%):</b> {Kon_Mntp}<br>
+          <b>Kondisi Tidak Mantap (%):</b> {Kon_T_Mntp}<br>
+          <b>Panjang (km):</b> {Panjang}<br>
+          <b>Lebar Keras (m):</b> {Lbr_Keras}<br>
+          <b>LHRT:</b> {LHRT}<br>
+          <b>VCR:</b> {VCR}<br>
+          <b>Tipe Jalan:</b> {Tipe_Jln}<br>
+          <b>MST:</b> {MST}<br>
+          <b>Tipe Keras:</b> {Tipe_Keras}<br>
+          <b>Tanah Krikil (%):</b> {Tanah_Kri}<br>
+          <b>Macadam (%):</b> {Macadam}<br>
+          <b>Aspal (%):</b> {Aspal}<br>
+          <b>Rigid (%):</b> {Rigid}<br>
+          <b>Tahun Penanganan Akhir:</b> {Thn_Pen_Ak}<br>
+          <b>Jenis Penanganan:</b> {Jns_Pen}<br>
+          <b>Panjang (pnj):</b> {pnj}<br>
+          <b>ID:</b> {Id}<br>
+          <b>Panjang (Shape_Leng):</b> {Shape_Leng}<br>
+          <b>Koordinat X Akhir:</b> {X_Ak}<br>
+          <b>Koordinat Y Akhir:</b> {Y_Ak}<br>
+          <b>Koordinat X Awal:</b> {X_Aw}<br>
+          <b>Koordinat Y Awal:</b> {Y_Aw}<br>
+          <b>No:</b> {No}
+        `
+      }
+    });
+    map.add(jalanPaserLayer);
+
+    // Jalan PPU
+    const jalanPPULayer = new GeoJSONLayer({
+      url: "{{ url('/api/jalan-ppu') }}",
+      title: "Jalan PPU",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-line",
+          color: [75, 0, 130, 1], // purple
+          width: 2
+        }
+      },
+      popupTemplate: {
+        title: "{Name}",
+        content: `
+          <b>OID:</b> {OID_}<br>
+          <b>Nama:</b> {Name}<br>
+          <b>Folder Path:</b> {FolderPath}<br>
+          <b>Symbol ID:</b> {SymbolID}<br>
+          <b>Clamped:</b> {Clamped}<br>
+          <b>Panjang (Shape_Leng):</b> {Shape_Leng}
+        `
+      }
+    });
+    map.add(jalanPPULayer);
+
+    // Jalan Samarinda
+    const jalanSamarindaLayer = new GeoJSONLayer({
+      url: "{{ url('/api/jalan-samarinda') }}",
+      title: "Jalan Samarinda",
+      outFields: ["*"],
+      renderer: {
+        type: "simple",
+        symbol: {
+          type: "simple-line",
+          color: [0, 255, 255, 1], // cyan
+          width: 2
+        }
+      },
+      popupTemplate: {
+        title: "{NAME}",
+        content: `
+          <b>Nama:</b> {NAME}<br>
+          <b>Layer:</b> {LAYER}<br>
+          <b>OBJECTID_1:</b> {OBJECTID_1}<br>
+          <b>OBJECTID:</b> {OBJECTID}<br>
+          <b>Klasifikasi Data Dasar:</b> {Kl_Dat_Das}<br>
+          <b>Nama Ruas:</b> {Nm_Ruas}<br>
+          <b>Tahun Data:</b> {Thn_Data}<br>
+          <b>Status:</b> {Status}<br>
+          <b>Fungsi:</b> {Fungsi}<br>
+          <b>Mendukung:</b> {Mendukung}<br>
+          <b>Uraian Dukung:</b> {Ura_Dukung}<br>
+          <b>Kode Bangunan PU:</b> {Kd_Bd_PU}<br>
+          <b>Kode Jenis Infrastruktur:</b> {Kd_Jns_Inf}<br>
+          <b>Kode Infrastruktur:</b> {Kd_Inf}<br>
+          <b>Propinsi:</b> {Propinsi}<br>
+          <b>Kabupaten/Kota:</b> {Kab_Kot}<br>
+          <b>Kecamatan:</b> {Kecamatan}<br>
+          <b>Desa/Kelurahan:</b> {Desa_Kel}<br>
+          <b>Titik Ruas Awal:</b> {Tk_Ruas_Aw}<br>
+          <b>Titik Ruas Akhir:</b> {Tk_Ruas_Ak}<br>
+          <b>Kode Patok:</b> {Kd_Patok}<br>
+          <b>Kilometer Awal:</b> {Km_Awal}<br>
+          <b>Kilometer Akhir:</b> {Km_Akhir}<br>
+          <b>Nama Lintas:</b> {Nm_Lintas}<br>
+          <b>Kondisi Baik (%):</b> {Kon_Baik}<br>
+          <b>Kondisi Sedang (%):</b> {Kon_Sdg}<br>
+          <b>Kondisi Renggang (%):</b> {Kon_Rgn}<br>
+          <b>Kondisi Rusak (%):</b> {Kon_Rusak}<br>
+          <b>Kondisi Mantap (%):</b> {Kon_Mntp}<br>
+          <b>Kondisi Tidak Mantap (%):</b> {Kon_T_Mntp}<br>
+          <b>Panjang (km):</b> {Panjang}<br>
+          <b>Lebar Keras (m):</b> {Lbr_Keras}<br>
+          <b>LHRT:</b> {LHRT}<br>
+          <b>VCR:</b> {VCR}<br>
+          <b>Tipe Jalan:</b> {Tipe_Jln}<br>
+          <b>MST:</b> {MST}<br>
+          <b>Tanah Krikil (%):</b> {Tanah_Kri}<br>
+          <b>Macadam (%):</b> {Macadam}<br>
+          <b>Aspal (%):</b> {Aspal}<br>
+          <b>Rigid (%):</b> {Rigid}<br>
+          <b>Tahun Penanganan Akhir:</b> {Thn_Pen_Ak}<br>
+          <b>Jenis Penanganan:</b> {Jns_Pen}<br>
+          <b>Koordinat X Awal:</b> {Koord_X_Aw}<br>
+          <b>Koordinat Y Awal:</b> {Koord_Y_Aw}<br>
+          <b>Koordinat X Akhir:</b> {Koord_X_Ak}<br>
+          <b>Koordinat Y Akhir:</b> {Koord_Y_Ak}<br>
+          <b>Panjang (Shape_Leng):</b> {Shape_Leng}<br>
+          <b>Panjang (Shape_Le_1):</b> {Shape_Le_1}<br>
+          <b>Length:</b> {LENGTH}<br>
+          <b>Length 3D:</b> {LENGTH_3D}<br>
+          <b>Bearing:</b> {BEARING}<br>
+          <b>Line Style:</b> {LINE_STYLE}<br>
+          <b>Line Color:</b> {LINE_COLOR}<br>
+          <b>Line Width:</b> {LINE_WIDTH}<br>
+          <b>Font Size:</b> {FONT_SIZE}<br>
+          <b>Font Color:</b> {FONT_COLOR}<br>
+          <b>Font Chars:</b> {FONT_CHARS}<br>
+          <b>Font Weight:</b> {FONT_WEIGH}<br>
+          <b>Elevation:</b> {ELEVATION}<br>
+          <b>Map Name:</b> {MAP_NAME}<br>
+          <b>GM Layer:</b> {GM_LAYER}<br>
+          <b>GM Type:</b> {GM_TYPE}<br>
+          <b>Version:</b> {version}<br>
+          <b>Highway:</b> {highway}<br>
+          <b>OSM ID:</b> {osm_id}<br>
+          <b>Oneway:</b> {oneway}<br>
+          <b>Boat:</b> {boat}<br>
+          <b>Smoothness:</b> {smoothness}<br>
+          <b>Start Time:</b> {START_TIME}<br>
+          <b>End Time:</b> {END_TIME}<br>
+          <b>Koordinat X Awal:</b> {Kord_X_Awa}<br>
+          <b>Koordinat X Akhir:</b> {Kord_X_Akh}<br>
+          <b>Koordinat Y Awal:</b> {Kord_Y_Awa}<br>
+          <b>Koordinat Y Akhir:</b> {Kord_Y_Akh}<br>
+          <b>Koordinat Y Akhir 1:</b> {Kord_Y_a_1}
+        `
+      }
+    });
+    map.add(jalanSamarindaLayer);
 
     // Jaringan Listrik Balikpapan
     const jaringanListrikBalikpapanLayer = new GeoJSONLayer({
@@ -767,10 +1184,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [255, 165, 0, 0.8], // oranye
-          size: 8,
-          outline: { color: [0, 0, 0, 0.6], width: 0.5 }
+          type: "picture-marker",
+          url: createLocationPinSvg([255, 165, 0], [139, 69, 19]),
+          width: "24px",
+          height: "24px"
         }
       },
       popupTemplate: {
@@ -798,10 +1215,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [0, 191, 255, 0.85], // biru muda
-          size: 8,
-          outline: { color: [0, 0, 0, 0.6], width: 0.5 }
+          type: "picture-marker",
+          url: createLocationPinSvg([0, 191, 255], [0, 100, 140]),
+          width: "24px",
+          height: "24px"
         }
       },
       popupTemplate: {
@@ -823,10 +1240,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [186, 85, 211, 0.85], // ungu muda
-          size: 9,
-          outline: { color: [0, 0, 0, 0.6], width: 0.6 }
+          type: "picture-marker",
+          url: createLocationPinSvg([186, 85, 211], [128, 0, 128]),
+          width: "24px",
+          height: "24px"
         }
       },
       popupTemplate: {
@@ -847,10 +1264,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [255, 99, 132, 0.9], // merah muda cerah
-          size: 9,
-          outline: { color: [0, 0, 0, 0.6], width: 0.6 }
+          type: "picture-marker",
+          url: createLocationPinSvg([255, 99, 132], [180, 50, 80]),
+          width: "24px",
+          height: "24px"
         }
       },
       popupTemplate: {
@@ -871,10 +1288,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [0, 255, 127, 0.85], // spring green
-          size: 10,
-          outline: { color: [0, 0, 0, 0.7], width: 0.6 }
+          type: "picture-marker",
+          url: createLocationPinSvg([0, 255, 127], [0, 128, 64]),
+          width: "26px",
+          height: "26px"
         }
       },
       popupTemplate: {
@@ -898,10 +1315,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [255, 215, 0, 0.9], // emas
-          size: 10,
-          outline: { color: [0, 0, 0, 0.7], width: 0.6 }
+          type: "picture-marker",
+          url: createLocationPinSvg([255, 215, 0], [184, 134, 11]),
+          width: "26px",
+          height: "26px"
         }
       },
       popupTemplate: {
@@ -925,10 +1342,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [30, 144, 255, 0.9], // dodger blue
-          size: 10,
-          outline: { color: [0, 0, 0, 0.7], width: 0.6 }
+          type: "picture-marker",
+          url: createLocationPinSvg([30, 144, 255], [0, 90, 180]),
+          width: "26px",
+          height: "26px"
         }
       },
       popupTemplate: {
@@ -952,10 +1369,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [255, 0, 0, 0.9], // merah
-          size: 11,
-          outline: { color: [0, 0, 0, 0.8], width: 0.7 }
+          type: "picture-marker",
+          url: createLocationPinSvg([255, 0, 0], [139, 0, 0]),
+          width: "28px",
+          height: "28px"
         }
       },
       popupTemplate: {
@@ -985,10 +1402,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [255, 165, 0, 0.9], // oranye
-          size: 11,
-          outline: { color: [0, 0, 0, 0.8], width: 0.7 }
+          type: "picture-marker",
+          url: createLocationPinSvg([255, 165, 0], [200, 100, 0]),
+          width: "28px",
+          height: "28px"
         }
       },
       popupTemplate: {
@@ -1018,10 +1435,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [0, 255, 255, 0.9], // cyan
-          size: 11,
-          outline: { color: [0, 0, 0, 0.8], width: 0.7 }
+          type: "picture-marker",
+          url: createLocationPinSvg([0, 255, 255], [0, 139, 139]),
+          width: "28px",
+          height: "28px"
         }
       },
       popupTemplate: {
@@ -1051,10 +1468,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [128, 0, 128, 0.9], // ungu
-          size: 11,
-          outline: { color: [0, 0, 0, 0.8], width: 0.7 }
+          type: "picture-marker",
+          url: createLocationPinSvg([128, 0, 128], [75, 0, 75]),
+          width: "28px",
+          height: "28px"
         }
       },
       popupTemplate: {
@@ -1087,10 +1504,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [255, 192, 203, 0.9], // pink
-          size: 9,
-          outline: { color: [0, 0, 0, 0.8], width: 0.6 }
+          type: "picture-marker",
+          url: createLocationPinSvg([255, 192, 203], [199, 21, 133]),
+          width: "24px",
+          height: "24px"
         }
       },
       popupTemplate: {
@@ -1122,10 +1539,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [255, 140, 0, 0.9], // oranye
-          size: 9,
-          outline: { color: [0, 0, 0, 0.8], width: 0.6 }
+          type: "picture-marker",
+          url: createLocationPinSvg([255, 140, 0], [205, 92, 0]),
+          width: "24px",
+          height: "24px"
         }
       },
       popupTemplate: {
@@ -1154,10 +1571,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [0, 128, 0, 0.9], // hijau
-          size: 10,
-          outline: { color: [0, 0, 0, 0.8], width: 0.6 }
+          type: "picture-marker",
+          url: createLocationPinSvg([0, 128, 0], [0, 80, 0]),
+          width: "26px",
+          height: "26px"
         }
       },
       popupTemplate: {
@@ -1185,10 +1602,10 @@
       renderer: {
         type: "simple",
         symbol: {
-          type: "simple-marker",
-          color: [255, 0, 0, 0.9], // merah
-          size: 10,
-          outline: { color: [0, 0, 0, 0.8], width: 0.6 }
+          type: "picture-marker",
+          url: createLocationPinSvg([255, 0, 0], [139, 0, 0]),
+          width: "26px",
+          height: "26px"
         }
       },
       popupTemplate: {
@@ -1340,6 +1757,15 @@
     desaBerlistrikLayer.visible = false;
     jalanNasionalLayer.visible = false;
     jalanProvinsiLayer.visible = false;
+    jalanBalikpapanLayer.visible = false;
+    jalanBerauLayer.visible = false;
+    jalanBontangLayer.visible = false;
+    jalanKubarLayer.visible = false;
+    jalanKutaiKartanegaraLayer.visible = false;
+    jalanKutimLayer.visible = false;
+    jalanPaserLayer.visible = false;
+    jalanPPULayer.visible = false;
+    jalanSamarindaLayer.visible = false;
     jaringanListrikBalikpapanLayer.visible = false;
     jaringanListrikBontangLayer.visible = false;
     sistemJaringanEnergiKukarLayer.visible = false;
@@ -1378,56 +1804,69 @@
     lnBatasProvinsiLayer.visible = false;
 
     // ================== LAYER FILTER PANEL ==================
-    // Organize layers into categories
+    // Organize layers into categories with icons
     const layerCategories = {
-      transportasi: [
-        { label: 'Jalan Nasional', layer: jalanNasionalLayer },
-        { label: 'Jalan Provinsi', layer: jalanProvinsiLayer },
-        { label: 'Jalan Balikpapan', layer: jalanBalikpapanLayer }
+      // 3. Titik Aset Jaringan
+      aset: [
+        { label: 'Gardu Induk Kutim', layer: ptGarduIndukKutimLayer, icon: '🏭' },
+        { label: 'Gardu Distribusi Kutim', layer: ptGarduDistribusiKutimLayer, icon: '🏭' },
+        { label: 'Gardu Hubung Kutim', layer: ptGarduHubungKutimLayer, icon: '🏭' },
+        { label: 'Gardu Berau', layer: ptGarduBerauLayer, icon: '🏭' },
+        { label: 'Trafo Berau', layer: ptTrafoBerauLayer, icon: '🔧' },
+        { label: 'Trafo Gardu Distribusi PPU', layer: ptTrafoGarduDistribusiPpuLayer, icon: '🔧' },
+        { label: 'Trafo Gardu Kubar', layer: ptTrafoGarduKubarLayer, icon: '🔧' },
+        { label: 'Trafo Gardu Paser 1', layer: pt1TrafoGarduPaserLayer, icon: '🔧' },
+        { label: 'Trafo Gardu Paser 2', layer: pt2TrafoGarduPaserLayer, icon: '🔧' }
       ],
-      jaringan: [
-        { label: 'Jaringan Listrik Balikpapan', layer: jaringanListrikBalikpapanLayer },
-        { label: 'Rencana Jaringan Listrik Bontang', layer: jaringanListrikBontangLayer },
-        { label: 'Sistem Energi Kukar (SUTT)', layer: sistemJaringanEnergiKukarLayer },
-        { label: 'Sistem Energi Mahulu (SUTR)', layer: sistemJaringanEnergiMahuluLayer },
-        { label: 'Sistem Energi Kubar (SUTM)', layer: sistemJaringanEnergiKubarLayer },
-        { label: 'Sistem Energi Kubar UP2KB', layer: sistemJaringanEnergiKubarUP2KBlayer },
-        { label: 'Sistem Energi Kutim (SUTM)', layer: sistemJaringanEnergiKutimLayer },
-        { label: 'Sistem Energi Paser (SUTM)', layer: sistemJaringanEnergiPaserLayer },
-        { label: 'LN SUTM PPU', layer: sutmPPULayer },
-        { label: 'LN SUTR Kutim', layer: sutrKutimLayer },
-        { label: 'LN Transmisi', layer: lnTransmisiLayer },
-        { label: 'LN2 SUTM Paser', layer: ln2SutmPaserLayer },
-        { label: 'LN2 SUTM PPU', layer: ln2SutmPPULayer },
-        { label: 'LN SUTM Berau', layer: sutmBerauLayer }
+      // 4. Data Jaringan Saluran
+      saluran: [
+        { label: 'LN Transmisi (SUTT/SUTET)', layer: lnTransmisiLayer, icon: '🔋' },
+        { label: 'Sistem Energi Kukar (SUTT)', layer: sistemJaringanEnergiKukarLayer, icon: '⚡' },
+        { label: 'Jaringan Listrik Balikpapan', layer: jaringanListrikBalikpapanLayer, icon: '⚡' },
+        { label: 'Rencana Jaringan Bontang', layer: jaringanListrikBontangLayer, icon: '📋' },
+        { label: 'Sistem Energi Kubar (SUTM)', layer: sistemJaringanEnergiKubarLayer, icon: '⚡' },
+        { label: 'Sistem Energi Kubar UP2KB', layer: sistemJaringanEnergiKubarUP2KBlayer, icon: '⚡' },
+        { label: 'Sistem Energi Kutim (SUTM)', layer: sistemJaringanEnergiKutimLayer, icon: '⚡' },
+        { label: 'Sistem Energi Paser (SUTM)', layer: sistemJaringanEnergiPaserLayer, icon: '⚡' },
+        { label: 'SUTM PPU', layer: sutmPPULayer, icon: '⚡' },
+        { label: 'SUTM Paser', layer: ln2SutmPaserLayer, icon: '⚡' },
+        { label: 'SUTM PPU 2', layer: ln2SutmPPULayer, icon: '⚡' },
+        { label: 'SUTM Berau', layer: sutmBerauLayer, icon: '⚡' },
+        { label: 'Sistem Energi Mahulu (SUTR)', layer: sistemJaringanEnergiMahuluLayer, icon: '⚡' },
+        { label: 'SUTR Kutim', layer: sutrKutimLayer, icon: '⚡' }
       ],
-      infrastruktur: [
-        { label: 'PT Gardu Berau', layer: ptGarduBerauLayer },
-        { label: 'PT Gardu Distribusi Kutim', layer: ptGarduDistribusiKutimLayer },
-        { label: 'PT Gardu Hubung Kutim', layer: ptGarduHubungKutimLayer },
-        { label: 'PT Gardu Induk Kutim', layer: ptGarduIndukKutimLayer },
-        { label: 'PT Trafo Berau', layer: ptTrafoBerauLayer },
-        { label: 'PT Trafo Gardu Distribusi PPU', layer: ptTrafoGarduDistribusiPpuLayer },
-        { label: 'PT Trafo Gardu Kubar', layer: ptTrafoGarduKubarLayer },
-        { label: 'PT1 Trafo Gardu Paser', layer: pt1TrafoGarduPaserLayer },
-        { label: 'PT2 Trafo Gardu Paser', layer: pt2TrafoGarduPaserLayer },
-        { label: 'PT Sistem Energi Balikpapan', layer: ptSistemEnergiBalikpapanLayer },
-        { label: 'PT Sistem Energi Kukar', layer: ptSistemEnergiKukarLayer },
-        { label: 'PT Sistem Energi Mahulu', layer: ptSistemEnergiMahuluLayer },
-        { label: 'PT Sistem Energi Samarinda', layer: ptSistemEnergiSamarindaLayer }
-      ],
-      pembangkit: [
-        { label: 'PT Pembangkit Eksisting', layer: ptPembangkitEksistingLayer },
-        { label: 'PT Rencana Pembangkit Bontang', layer: ptRencanaPembangkitBontangLayer }
-      ],
+      // 5. Data Dasar (Batas Administrasi)
       administrasi: [
-        { label: 'LN Batas Desa', layer: lnBatasDesaLayer },
-        { label: 'LN Batas Kab/Kota', layer: lnBatasKabKotaLayer },
-        { label: 'LN Batas Kecamatan', layer: lnBatasKecamatanLayer },
-        { label: 'LN Batas Negara', layer: lnBatasNegaraLayer },
-        { label: 'LN Batas Provinsi', layer: lnBatasProvinsiLayer },
-        { label: 'AR Batas Kaltim Full', layer: arBatasKaltimLayer },
-        { label: 'AR Batas Kec.', layer: arBatasKecamatanLayer }
+        { label: 'Batas Desa', layer: lnBatasDesaLayer, icon: '🏘️' },
+        { label: 'Batas Kecamatan', layer: lnBatasKecamatanLayer, icon: '🏛️' },
+        { label: 'Batas Kab/Kota', layer: lnBatasKabKotaLayer, icon: '🏙️' },
+        { label: 'Batas Provinsi', layer: lnBatasProvinsiLayer, icon: '🗺️' },
+        { label: 'Batas Negara', layer: lnBatasNegaraLayer, icon: '🌍' },
+        { label: 'AR Batas Kaltim Full', layer: arBatasKaltimLayer, icon: '📍' },
+        { label: 'AR Batas Kec.', layer: arBatasKecamatanLayer, icon: '📍' }
+      ],
+      // 6. Data Jalan
+      jalan: [
+        { label: 'Jalan Nasional', layer: jalanNasionalLayer, icon: '🛣️' },
+        { label: 'Jalan Provinsi', layer: jalanProvinsiLayer, icon: '🛤️' },
+        { label: 'Jalan Balikpapan', layer: jalanBalikpapanLayer, icon: '🚗' },
+        { label: 'Jalan Berau', layer: jalanBerauLayer, icon: '🚚' },
+        { label: 'Jalan Bontang', layer: jalanBontangLayer, icon: '🚛' },
+        { label: 'Jalan Kubar', layer: jalanKubarLayer, icon: '🛣️' },
+        { label: 'Jalan Kutai Kartanegara', layer: jalanKutaiKartanegaraLayer, icon: '🛣️' },
+        { label: 'Jalan Kutim', layer: jalanKutimLayer, icon: '🛣️' },
+        { label: 'Jalan Paser', layer: jalanPaserLayer, icon: '🛣️' },
+        { label: 'Jalan PPU', layer: jalanPPULayer, icon: '🛣️' },
+        { label: 'Jalan Samarinda', layer: jalanSamarindaLayer, icon: '🛣️' }
+      ],
+      // 7. Lainnya
+      lainnya: [
+        { label: 'Pembangkit Eksisting', layer: ptPembangkitEksistingLayer, icon: '🏗️' },
+        { label: 'Rencana Pembangkit Bontang', layer: ptRencanaPembangkitBontangLayer, icon: '📐' },
+        { label: 'Sistem Energi Balikpapan', layer: ptSistemEnergiBalikpapanLayer, icon: '⚙️' },
+        { label: 'Sistem Energi Kukar', layer: ptSistemEnergiKukarLayer, icon: '⚙️' },
+        { label: 'Sistem Energi Mahulu', layer: ptSistemEnergiMahuluLayer, icon: '⚙️' },
+        { label: 'Sistem Energi Samarinda', layer: ptSistemEnergiSamarindaLayer, icon: '⚙️' }
       ]
     };
 
@@ -1437,86 +1876,115 @@
     // Build category HTML
     let categoriesHTML = '';
 
-    // Status Listrik Desa (special case with custom filter)
+    // 2. Status Listrik (special case with custom filter)
     categoriesHTML += `
       <label class="lf-row lf-parent" data-category="desa">
         <span class="lf-toggle">▼</span>
         <input type="checkbox" id="lf-desa-parent">
-        <span><strong>Status Listrik Desa</strong></span>
+        <span class="lf-icon">💡</span>
+        <span><strong>Status Listrik</strong></span>
       </label>
       <div class="lf-children" data-category="desa">
-        <label class="lf-row lf-child"><input type="checkbox" id="lf-desa-belum"> <span>Belum Terlayani Listrik</span></label>
-        <label class="lf-row lf-child"><input type="checkbox" id="lf-desa-terlayani"> <span>Terlayani Listrik</span></label>
+        <label class="lf-row lf-child"><input type="checkbox" id="lf-desa-terlayani"> <span class="lf-icon">🟢</span> <span>Terlayani Listrik</span></label>
+        <label class="lf-row lf-child"><input type="checkbox" id="lf-desa-belum"> <span class="lf-icon">🔴</span> <span>Belum Terlayani Listrik</span></label>
       </div>
     `;
 
-    // Transportasi
-    categoriesHTML += `<label class="lf-row lf-parent" data-category="transportasi">
+    // 3. Titik Aset Jaringan
+    categoriesHTML += `<label class="lf-row lf-parent" data-category="aset">
       <span class="lf-toggle">▼</span>
-      <input type="checkbox" id="lf-transportasi-parent">
-      <span><strong>Data Jalan</strong></span>
+      <input type="checkbox" id="lf-aset-parent">
+      <span class="lf-icon">🏭</span>
+      <span><strong>Titik Aset Jaringan</strong></span>
     </label>
-    <div class="lf-children" data-category="transportasi">`;
-    layerCategories.transportasi.forEach((item, idx) => {
-      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-transportasi-${idx}"> <span>${item.label}</span></label>`;
+    <div class="lf-children" data-category="aset">`;
+    layerCategories.aset.forEach((item, idx) => {
+      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-aset-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
     });
     categoriesHTML += `</div>`;
 
-    // Jaringan Listrik
-    categoriesHTML += `<label class="lf-row lf-parent" data-category="jaringan">
+    // 4. Data Jaringan Saluran
+    categoriesHTML += `<label class="lf-row lf-parent" data-category="saluran">
       <span class="lf-toggle">▼</span>
-      <input type="checkbox" id="lf-jaringan-parent">
-      <span><strong>Jaringan Listrik</strong></span>
+      <input type="checkbox" id="lf-saluran-parent">
+      <span class="lf-icon">⚡</span>
+      <span><strong>Data Jaringan Saluran</strong></span>
     </label>
-    <div class="lf-children" data-category="jaringan">`;
-    layerCategories.jaringan.forEach((item, idx) => {
-      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-jaringan-${idx}"> <span>${item.label}</span></label>`;
+    <div class="lf-children" data-category="saluran">`;
+    layerCategories.saluran.forEach((item, idx) => {
+      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-saluran-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
     });
     categoriesHTML += `</div>`;
 
-    // Infrastruktur Listrik
-    categoriesHTML += `<label class="lf-row lf-parent" data-category="infrastruktur">
-      <span class="lf-toggle">▼</span>
-      <input type="checkbox" id="lf-infrastruktur-parent">
-      <span><strong>Infrastruktur Listrik</strong></span>
-    </label>
-    <div class="lf-children" data-category="infrastruktur">`;
-    layerCategories.infrastruktur.forEach((item, idx) => {
-      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-infrastruktur-${idx}"> <span>${item.label}</span></label>`;
-    });
-    categoriesHTML += `</div>`;
-
-    // Pembangkit
-    categoriesHTML += `<label class="lf-row lf-parent" data-category="pembangkit">
-      <span class="lf-toggle">▼</span>
-      <input type="checkbox" id="lf-pembangkit-parent">
-      <span><strong>Pembangkit</strong></span>
-    </label>
-    <div class="lf-children" data-category="pembangkit">`;
-    layerCategories.pembangkit.forEach((item, idx) => {
-      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-pembangkit-${idx}"> <span>${item.label}</span></label>`;
-    });
-    categoriesHTML += `</div>`;
-
-    // Administrasi
+    // 5. Data Dasar (Batas Administrasi) - HIDDEN
+    /*
     categoriesHTML += `<label class="lf-row lf-parent" data-category="administrasi">
       <span class="lf-toggle">▼</span>
       <input type="checkbox" id="lf-administrasi-parent">
-      <span><strong>Administrasi</strong></span>
+      <span class="lf-icon">🗺️</span>
+      <span><strong>Data Dasar (Batas Administrasi)</strong></span>
     </label>
     <div class="lf-children" data-category="administrasi">`;
     layerCategories.administrasi.forEach((item, idx) => {
-      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-administrasi-${idx}"> <span>${item.label}</span></label>`;
+      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-administrasi-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
+    });
+    categoriesHTML += `</div>`;
+    */
+
+    // 6. Data Jalan - HIDDEN
+    /*
+    categoriesHTML += `<label class="lf-row lf-parent" data-category="jalan">
+      <span class="lf-toggle">▼</span>
+      <input type="checkbox" id="lf-jalan-parent">
+      <span class="lf-icon">🚧</span>
+      <span><strong>Data Jalan</strong></span>
+    </label>
+    <div class="lf-children collapsed" data-category="jalan">`;
+    layerCategories.jalan.forEach((item, idx) => {
+      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-jalan-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
+    });
+    categoriesHTML += `</div>`;
+    */
+
+    // 7. Lainnya
+    categoriesHTML += `<label class="lf-row lf-parent" data-category="lainnya">
+      <span class="lf-toggle">▼</span>
+      <input type="checkbox" id="lf-lainnya-parent">
+      <span class="lf-icon">📂</span>
+      <span><strong>Lainnya</strong></span>
+    </label>
+    <div class="lf-children collapsed" data-category="lainnya">`;
+    layerCategories.lainnya.forEach((item, idx) => {
+      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-lainnya-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
     });
     categoriesHTML += `</div>`;
 
     layerFilter.innerHTML = `
       <div class="lf-head">
-        <span>Layer Filter</span>
-        <button class="lf-close-btn" title="Tutup panel">×</button>
+        <div class="lf-title">🔍 Filter Peta</div>
+        <button class="lf-toggle-btn" title="Tutup/Buka">▼</button>
       </div>
       <div class="lf-body">
-        <label class="lf-row lf-all"><input type="checkbox" id="lf-all"> <span><strong>Semua Layer</strong></span></label>
+        <div class="lf-wilayah-filter">
+          <div class="lf-wilayah-title">
+            <span class="lf-icon">🗺️</span>
+            <span><strong>Filter Wilayah Administratif</strong></span>
+          </div>
+          <div class="lf-wilayah-dropdowns">
+            <select id="lf-filter-regency" class="lf-dropdown">
+              <option value="">Semua Kabupaten/Kota</option>
+            </select>
+            <select id="lf-filter-district" class="lf-dropdown" disabled>
+              <option value="">Semua Kecamatan</option>
+            </select>
+            <select id="lf-filter-village" class="lf-dropdown" disabled>
+              <option value="">Semua Kelurahan/Desa</option>
+            </select>
+            <button id="lf-reset-filter" class="lf-reset-btn">Reset Filter</button>
+          </div>
+        </div>
+        <div class="lf-divider"></div>
+        <label class="lf-row lf-all"><input type="checkbox" id="lf-all"> <span class="lf-icon">📊</span> <span><strong>Semua Layer</strong></span></label>
         <div class="lf-divider"></div>
         ${categoriesHTML}
       </div>
@@ -1566,12 +2034,7 @@
         desaBerlistrikLayer.renderer = {
           type: "unique-value",
           field: "H_Survei",
-          defaultLabel: "Status tidak diketahui",
-          defaultSymbol: {
-            type: "simple-fill",
-            color: [148, 163, 184, 0.35],
-            outline: { color: [100, 116, 139, 1], width: 1 }
-          },
+          defaultSymbol: null,
           uniqueValueInfos: uniqueValueInfos
         };
       }
@@ -1607,11 +2070,11 @@
       updateDesaBerlistrikFilter();
 
       // Update all other categories
-      setCategoryCheckboxes('transportasi', isChecked);
-      setCategoryCheckboxes('jaringan', isChecked);
-      setCategoryCheckboxes('infrastruktur', isChecked);
-      setCategoryCheckboxes('pembangkit', isChecked);
+      setCategoryCheckboxes('aset', isChecked);
+      setCategoryCheckboxes('saluran', isChecked);
       setCategoryCheckboxes('administrasi', isChecked);
+      setCategoryCheckboxes('jalan', isChecked);
+      setCategoryCheckboxes('lainnya', isChecked);
     });
 
     // Status Listrik Desa handlers
@@ -1663,11 +2126,11 @@
     };
 
     // Setup all categories
-    setupCategoryHandlers('transportasi');
-    setupCategoryHandlers('jaringan');
-    setupCategoryHandlers('infrastruktur');
-    setupCategoryHandlers('pembangkit');
+    setupCategoryHandlers('aset');
+    setupCategoryHandlers('saluran');
     setupCategoryHandlers('administrasi');
+    setupCategoryHandlers('jalan');
+    setupCategoryHandlers('lainnya');
 
     // ================== EXPAND/COLLAPSE FUNCTIONALITY ==================
     // Add toggle functionality for all parent categories
@@ -1702,31 +2165,248 @@
       parentLabel.addEventListener('click', handleToggle);
     });
 
-    // ================== CLOSE/OPEN PANEL FUNCTIONALITY ==================
-    // Create open button (shown when panel is closed)
-    const openButton = document.createElement('button');
-    openButton.className = 'lf-open-btn';
-    openButton.innerHTML = '☰<br><span style="font-size: 9px; font-weight: 600;"></span>';
-    openButton.title = 'Buka Layer Filter';
-    openButton.style.display = 'none'; // Hidden by default
+    // ================== WILAYAH FILTER FUNCTIONALITY ==================
+    const regencyDropdown = layerFilter.querySelector('#lf-filter-regency');
+    const districtDropdown = layerFilter.querySelector('#lf-filter-district');
+    const villageDropdown = layerFilter.querySelector('#lf-filter-village');
+    const resetFilterBtn = layerFilter.querySelector('#lf-reset-filter');
 
-    // Get close button
-    const closeButton = layerFilter.querySelector('.lf-close-btn');
+    // Store current filter values
+    let currentRegencyId = '';
+    let currentDistrictId = '';
+    let currentVillageId = '';
 
-    // Close panel handler
-    closeButton.addEventListener('click', () => {
-      layerFilter.classList.add('lf-minimized');
-      openButton.style.display = 'flex';
+    // Load Kabupaten/Kota data
+    const loadRegencies = async () => {
+      try {
+        const response = await fetch("{{ url('/api/wilayah/regencies') }}");
+        const data = await response.json();
+
+        regencyDropdown.innerHTML = '<option value="">Semua Kabupaten/Kota</option>';
+        data.forEach(item => {
+          const option = document.createElement('option');
+          option.value = item.id;
+          option.textContent = item.name;
+          regencyDropdown.appendChild(option);
+        });
+      } catch (error) {
+        console.error('Error loading regencies:', error);
+      }
+    };
+
+    // Load Kecamatan data based on Kabupaten/Kota
+    const loadDistricts = async (regencyId = '') => {
+      try {
+        const url = regencyId
+          ? "{{ url('/api/wilayah/districts') }}?regency_id=" + regencyId
+          : "{{ url('/api/wilayah/districts') }}";
+        const response = await fetch(url);
+        const data = await response.json();
+
+        districtDropdown.innerHTML = '<option value="">Semua Kecamatan</option>';
+        data.forEach(item => {
+          const option = document.createElement('option');
+          option.value = item.id;
+          option.textContent = item.name;
+          districtDropdown.appendChild(option);
+        });
+        districtDropdown.disabled = !regencyId;
+      } catch (error) {
+        console.error('Error loading districts:', error);
+      }
+    };
+
+    // Load Kelurahan/Desa data based on Kecamatan
+    const loadVillages = async (districtId = '') => {
+      try {
+        const url = districtId
+          ? "{{ url('/api/wilayah/villages') }}?district_id=" + districtId
+          : "{{ url('/api/wilayah/villages') }}";
+        const response = await fetch(url);
+        const data = await response.json();
+
+        villageDropdown.innerHTML = '<option value="">Semua Kelurahan/Desa</option>';
+        data.forEach(item => {
+          const option = document.createElement('option');
+          option.value = item.id;
+          option.textContent = item.name;
+          villageDropdown.appendChild(option);
+        });
+        villageDropdown.disabled = !districtId;
+      } catch (error) {
+        console.error('Error loading villages:', error);
+      }
+    };
+
+    // Apply filter to layers and zoom to extent
+    const applyWilayahFilter = async () => {
+      let targetLayer = null;
+      let whereClause = '';
+
+      console.log('Applying filter:', { currentRegencyId, currentDistrictId, currentVillageId });
+
+      // Filter for LN Batas Desa layer
+      if (currentVillageId) {
+        lnBatasDesaLayer.definitionExpression = `WADMKD = '${currentVillageId}'`;
+        targetLayer = lnBatasDesaLayer;
+        whereClause = `WADMKD = '${currentVillageId}'`;
+      } else if (currentDistrictId) {
+        lnBatasDesaLayer.definitionExpression = `WADMKC = '${currentDistrictId}'`;
+      } else if (currentRegencyId) {
+        lnBatasDesaLayer.definitionExpression = `WADMKK = '${currentRegencyId}'`;
+      } else {
+        lnBatasDesaLayer.definitionExpression = null;
+      }
+
+      // Filter for LN Batas Kecamatan layer
+      if (currentDistrictId) {
+        lnBatasKecamatanLayer.definitionExpression = `WADMKC = '${currentDistrictId}'`;
+        if (!targetLayer) {
+          targetLayer = lnBatasKecamatanLayer;
+          whereClause = `WADMKC = '${currentDistrictId}'`;
+        }
+      } else if (currentRegencyId) {
+        lnBatasKecamatanLayer.definitionExpression = `WADMKK = '${currentRegencyId}'`;
+      } else {
+        lnBatasKecamatanLayer.definitionExpression = null;
+      }
+
+      // Filter for LN Batas Kab/Kota layer
+      if (currentRegencyId) {
+        lnBatasKabKotaLayer.definitionExpression = `WADMKK = '${currentRegencyId}'`;
+        if (!targetLayer) {
+          targetLayer = lnBatasKabKotaLayer;
+          whereClause = `WADMKK = '${currentRegencyId}'`;
+        }
+      } else {
+        lnBatasKabKotaLayer.definitionExpression = null;
+      }
+
+      // Filter for Data Berlistrik layer
+      if (currentVillageId) {
+        desaBerlistrikLayer.definitionExpression = `WADMKD = '${currentVillageId}'`;
+      } else if (currentDistrictId) {
+        desaBerlistrikLayer.definitionExpression = `WADMKC = '${currentDistrictId}'`;
+      } else if (currentRegencyId) {
+        desaBerlistrikLayer.definitionExpression = `WADMKK = '${currentRegencyId}'`;
+      } else {
+        desaBerlistrikLayer.definitionExpression = null;
+      }
+
+      // Zoom to selected area
+      if (targetLayer && whereClause) {
+        console.log('Zooming to:', targetLayer.title, 'with clause:', whereClause);
+        try {
+          // Wait for layer to load if not already loaded
+          await targetLayer.load();
+
+          const query = targetLayer.createQuery();
+          query.where = whereClause;
+          query.returnGeometry = true;
+
+          const results = await targetLayer.queryFeatures(query);
+          console.log('Query results:', results.features.length, 'features found');
+
+          if (results.features.length > 0) {
+            // Calculate extent from all features
+            let extent = null;
+            results.features.forEach(feature => {
+              if (feature.geometry) {
+                if (!extent) {
+                  extent = feature.geometry.extent;
+                } else {
+                  extent = extent.union(feature.geometry.extent);
+                }
+              }
+            });
+
+            if (extent) {
+              console.log('Zooming to extent:', extent);
+              // Zoom to extent with some padding
+              await view.goTo({
+                target: extent.expand(1.2),
+                duration: 1000
+              });
+            }
+          } else {
+            console.warn('No features found for query');
+          }
+        } catch (error) {
+          console.error('Error querying features for zoom:', error);
+        }
+      }
+    };
+
+    // Handle Kabupaten/Kota change
+    regencyDropdown.addEventListener('change', async (e) => {
+      currentRegencyId = e.target.value;
+      currentDistrictId = '';
+      currentVillageId = '';
+
+      districtDropdown.value = '';
+      villageDropdown.value = '';
+
+      await loadDistricts(currentRegencyId);
+      villageDropdown.innerHTML = '<option value="">Semua Kelurahan/Desa</option>';
+      villageDropdown.disabled = true;
+
+      await applyWilayahFilter();
     });
 
-    // Open panel handler
-    openButton.addEventListener('click', () => {
-      layerFilter.classList.remove('lf-minimized');
-      openButton.style.display = 'none';
+    // Handle Kecamatan change
+    districtDropdown.addEventListener('change', async (e) => {
+      currentDistrictId = e.target.value;
+      currentVillageId = '';
+
+      villageDropdown.value = '';
+
+      await loadVillages(currentDistrictId);
+
+      await applyWilayahFilter();
+    });
+
+    // Handle Kelurahan/Desa change
+    villageDropdown.addEventListener('change', async (e) => {
+      currentVillageId = e.target.value;
+      await applyWilayahFilter();
+    });
+
+    // Handle reset filter
+    resetFilterBtn.addEventListener('click', async () => {
+      currentRegencyId = '';
+      currentDistrictId = '';
+      currentVillageId = '';
+
+      regencyDropdown.value = '';
+      districtDropdown.value = '';
+      villageDropdown.value = '';
+
+      districtDropdown.innerHTML = '<option value="">Semua Kecamatan</option>';
+      districtDropdown.disabled = true;
+
+      villageDropdown.innerHTML = '<option value="">Semua Kelurahan/Desa</option>';
+      villageDropdown.disabled = true;
+
+      await applyWilayahFilter();
+    });
+
+    // Initialize dropdowns
+    loadRegencies();
+    districtDropdown.disabled = true;
+    villageDropdown.disabled = true;
+
+    // ================== TOGGLE PANEL FUNCTIONALITY ==================
+    // Get toggle button
+    const toggleButton = layerFilter.querySelector('.lf-toggle-btn');
+    const filterBody = layerFilter.querySelector('.lf-body');
+
+    // Toggle panel handler
+    toggleButton.addEventListener('click', () => {
+      layerFilter.classList.toggle('lf-collapsed');
+      toggleButton.textContent = layerFilter.classList.contains('lf-collapsed') ? '▶' : '▼';
     });
 
     view.ui.add(layerFilter, 'top-left');
-    view.ui.add(openButton, 'top-left');
 
     // ================== WIDGETS ==================
     const bm_osm     = Basemap.fromId("osm");          bm_osm.title     = "Peta (OSM)";
@@ -1742,8 +2422,16 @@
       basemaps: [bm_osm, bm_sat, bm_hybrid, bm_terrain, bm_topo, bm_gray, bm_dark, bm_street]
     });
 
-    const homeWidget = new Home({ view: view });
-    view.ui.add(homeWidget, "top-left");
+    // Custom Home Label & Login Button
+    const homeLabelDiv = document.createElement('div');
+    homeLabelDiv.className = 'esri-component esri-widget';
+    homeLabelDiv.innerHTML = `
+    
+    `;
+    view.ui.add(homeLabelDiv, "top-left");
+
+    // const homeWidget = new Home({ view: view });
+    // view.ui.add(homeWidget, "top-left");
 
     const searchWidget = new Search({
       view: view,
@@ -2084,36 +2772,45 @@
   .dm-val { color: #e2e8f0; word-break: break-word; }
   .dm-empty { color: #94a3b8; font-size: 12px; padding: 8px; }
 
-  /* Layer filter panel */
+  /* Layer filter panel - Light Theme (like welcome.blade.php) */
   .layer-filter {
-    width: 240px;
-    max-height: 440px;
+    width: 340px;
+    max-width: 88vw;
+    max-height: 65vh;
     overflow: hidden;
-    background: rgba(15,23,42,0.92);
-    color: #e2e8f0;
-    border-radius: 14px;
-    box-shadow: 0 12px 32px rgba(0,0,0,0.28);
-    border: 1px solid rgba(226,232,240,0.18);
-    backdrop-filter: blur(8px);
+    background: #fff;
+    color: #111827;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.15);
+    font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
   }
   .lf-head {
-    padding: 10px 12px;
+    padding: 16px;
     font-weight: 700;
-    font-size: 14px;
-    border-bottom: 1px solid rgba(226,232,240,0.16);
-    background: linear-gradient(90deg, rgba(37,99,235,0.24), rgba(15,23,42,0.12));
+    font-size: 16px;
+    border-bottom: 2px solid #e5e7eb;
+    background: #fff;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    color: #111827;
   }
-  .lf-close-btn {
-    background: rgba(239,68,68,0.2);
-    color: #fca5a5;
-    border: 1px solid rgba(239,68,68,0.3);
-    border-radius: 6px;
-    width: 24px;
-    height: 24px;
-    font-size: 20px;
+  .lf-title {
+    font-weight: 700;
+    font-size: 16px;
+    color: #111827;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .lf-toggle-btn {
+    background: #f1f5f9;
+    color: #64748b;
+    border: none;
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
     line-height: 1;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -2122,90 +2819,88 @@
     justify-content: center;
     padding: 0;
   }
-  .lf-close-btn:hover {
-    background: rgba(239,68,68,0.35);
-    color: #fee2e2;
-    transform: scale(1.1);
+  .lf-toggle-btn:hover {
+    background: #e2e8f0;
+    color: #475569;
   }
-  .lf-open-btn {
-    background: rgba(37,99,235,0.92);
-    color: white;
-    border: 1px solid rgba(59,130,246,0.4);
-    border-radius: 10px;
-    width: 50px;
-    height: 60px;
-    font-size: 20px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-    box-shadow: 0 4px 12px rgba(37,99,235,0.35);
-    backdrop-filter: blur(8px);
-    margin-top: -140px;
+  .layer-filter.lf-collapsed .lf-body {
+    display: none;
   }
-  .lf-open-btn:hover {
-    background: rgba(59,130,246,0.95);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(37,99,235,0.45);
-  }
-  .layer-filter.lf-minimized {
-    transform: translateX(-280px);
-    opacity: 0;
-    pointer-events: none;
+  .layer-filter.lf-collapsed {
+    width: auto;
+    padding: 0;
   }
   .layer-filter {
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    transition: all 0.3s ease;
   }
   .lf-body {
-    max-height: 380px;
+    max-height: calc(65vh - 70px);
     overflow-y: auto;
-    padding: 8px 10px 10px;
+    padding: 16px;
     display: grid;
-    gap: 6px;
+    gap: 8px;
   }
   .lf-row {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 12px;
-    padding: 6px 8px;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(148,163,184,0.18);
-    border-radius: 8px;
+    font-size: 13px;
+    padding: 10px 12px;
+    background: #fff;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
     cursor: pointer;
+    transition: all 0.2s;
+    color: #111827;
   }
-  .lf-row input { accent-color: #22c55e; }
+  .lf-row input { accent-color: #3b82f6; }
   .lf-row span { line-height: 1.35; }
-  .lf-row:hover { background: rgba(34,197,94,0.08); }
+  .lf-icon {
+    font-size: 14px;
+    min-width: 18px;
+    text-align: center;
+    transition: transform 0.2s ease;
+  }
+  .lf-row:hover .lf-icon {
+    transform: scale(1.15);
+  }
+  .lf-row:hover { 
+    border-color: #cbd5e1;
+    background: #f8fafc;
+  }
   .lf-all {
-    background: rgba(37,99,235,0.14) !important;
-    border-color: rgba(59,130,246,0.3) !important;
+    background: #dbeafe !important;
+    border-color: #93c5fd !important;
+    color: #1e40af !important;
   }
-  .lf-all:hover { background: rgba(37,99,235,0.22) !important; }
+  .lf-all:hover { 
+    background: #bfdbfe !important;
+  }
   .lf-parent {
-    background: rgba(34,197,94,0.12) !important;
-    border-color: rgba(34,197,94,0.3) !important;
+    background: #f0fdf4 !important;
+    border-color: #86efac !important;
+    color: #166534 !important;
   }
-  .lf-parent:hover { background: rgba(34,197,94,0.18) !important; }
+  .lf-parent:hover { 
+    background: #dcfce7 !important;
+  }
   .lf-child {
     margin-left: 20px;
-    background: rgba(255,255,255,0.02) !important;
-    border-left: 3px solid rgba(34,197,94,0.4);
-    font-size: 11.5px;
+    background: #fff !important;
+    border-left: 3px solid #22c55e;
+    font-size: 12px;
   }
   .lf-divider {
     height: 1px;
-    background: rgba(148,163,184,0.24);
-    margin: 4px 0;
+    background: #e5e7eb;
+    margin: 8px 0;
   }
   .lf-toggle {
     font-size: 10px;
     margin-right: 4px;
     transition: transform 0.2s ease;
     user-select: none;
+    color: #64748b;
   }
   .lf-children {
     display: grid;
@@ -2219,6 +2914,79 @@
     max-height: 0;
     opacity: 0;
     margin: 0;
+  }
+
+  /* Wilayah Filter Styles - Light Theme */
+  .lf-wilayah-filter {
+    background: #eff6ff;
+    border: 1.5px solid #93c5fd;
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 8px;
+  }
+  .lf-wilayah-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #1e40af;
+  }
+  .lf-wilayah-dropdowns {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .lf-dropdown {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 13px;
+    background: #fff;
+    color: #111827;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+  }
+  .lf-dropdown:hover {
+    border-color: #cbd5e1;
+  }
+  .lf-dropdown:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59,130,246,.1);
+  }
+  .lf-dropdown:disabled {
+    background: #f1f5f9;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+  .lf-dropdown option {
+    background: #fff;
+    color: #111827;
+    padding: 8px;
+  }
+  .lf-reset-btn {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    background: #f8fafc;
+    color: #64748b;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 4px;
+  }
+  .lf-reset-btn:hover {
+    background: #f1f5f9;
+    color: #475569;
+    transform: translateY(-1px);
+  }
+  .lf-reset-btn:active {
+    transform: translateY(0);
   }
 
   /* Distance measurement button */
@@ -2253,7 +3021,7 @@
   /* Cost calculation panel */
   .cost-panel {
     position: absolute;
-    top: 70px;
+    bottom: 200px;
     right: 16px;
     width: 280px;
     background: rgba(15, 23, 42, 0.94);
@@ -2343,11 +3111,12 @@
     margin: 4px 0;
   }
 
-  @media (max-width: 640px) {
+  @media (max-width: 768px) {
     .detail-modal { width: min(340px, 94vw); }
     .dm-row { grid-template-columns: 1fr; }
-    .layer-filter { width: 260px; }
-    .cost-panel { width: min(280px, 90vw); right: 10px; }
+    .layer-filter { width: 280px; }
+    /* Place cost panel right below the measure button on mobile */
+    .cost-panel { width: min(280px, 90vw); right: 10px; top: 110px; bottom: auto; }
   }
 </style>
 @endpush

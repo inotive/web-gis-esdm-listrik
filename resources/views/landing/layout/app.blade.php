@@ -7,6 +7,7 @@
 
   {{-- ArcGIS CSS --}}
   <link rel="stylesheet" href="https://js.arcgis.com/4.29/esri/themes/light/main.css">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
 
   <style>
     :root{
@@ -18,6 +19,7 @@
       --bd:#e5e7eb;
       --panel-gap:12px;    /* jarak panel dari navbar */
       --panel-w:300px;     /* lebar panel detail (kecil) */
+      --sidebar-w:270px;
     }
 
     *{box-sizing:border-box}
@@ -25,7 +27,7 @@
 
     /* NAVBAR */
     .navbar{
-      position:sticky;top:0;z-index:50;height:var(--nav-h);
+      position:sticky;top:0;z-index:90;height:var(--nav-h);
       display:flex;align-items:center;justify-content:space-between;
       padding:0 18px;background:#0b2a63;color:#fff;
       box-shadow:0 2px 10px rgba(0,0,0,.15)
@@ -34,16 +36,62 @@
     .brand-logo{width:40px;height:40px;border-radius:50%;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;background:#ffffff1a}
     .brand-logo img{width:100%;height:100%;object-fit:contain}
     .brand-title{font-weight:800;letter-spacing:.3px;font-size:18px;white-space:nowrap}
+    .nav-burger{
+      width:42px;height:42px;border-radius:10px;border:1px solid rgba(255,255,255,.3);
+      background:rgba(255,255,255,.08);color:#fff;cursor:pointer;display:grid;place-items:center;
+      transition:background .2s,border-color .2s,transform .1s;
+    }
+    .nav-burger:hover{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.45);transform:translateY(-1px)}
     .nav-right a{
       display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 14px;border-radius:10px;
       text-decoration:none;color:#0b2a63;background:#fff;font-weight:700;
       box-shadow:0 2px 6px rgba(0,0,0,.15)
     }
     .nav-right a:hover{filter:brightness(.96)}
+    .nav-user{font-weight:700;font-size:14px}
 
     /* MAP WRAP */
-    #mapWrap{height:calc(100vh - var(--nav-h));width:100%;background:#f3f4f6}
+    #mapWrap{height:calc(100vh - var(--nav-h));width:100%;background:#f3f4f6;flex:1;}
     #viewDiv{height:100%;width:100%}
+
+    /* LAYOUT dengan sidebar (auth) */
+    .landing-shell{display:flex;min-height:100vh;background:#f5f7fa;}
+    .landing-main{flex:1;display:flex;flex-direction:column;min-height:100vh;min-width:0;transition:margin-left .2s ease;}
+    .sidebar{
+      position:fixed;top:0;left:0;height:100vh;
+      width:var(--sidebar-w);flex:0 0 var(--sidebar-w);
+      background:#fff;border-right:1px solid #E5E7EB;overflow:auto;display:flex;flex-direction:column;
+      box-shadow:0 6px 18px rgba(2,6,23,.06);z-index:100;transition:transform .2s ease;
+      transform:translateX(-100%);
+    }
+    body.sidebar-open .sidebar{transform:translateX(0);}
+    body.sidebar-open .landing-main{margin-left:var(--sidebar-w);}
+    .sidebar-topbar{position:sticky;top:0;z-index:5;height:var(--nav-h);background:#fff;border-bottom:1px solid #E5E7EB;padding:0 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+    .brand{display:flex;align-items:center;gap:12px;min-width:0;}
+    .logo{width:40px;height:50px;}
+    .brand-text strong{display:block;font-size:14px;line-height:1.1}
+    .brand-text span{display:block;font-size:12px;color:#6B7280}
+    .menu-section{padding:6px 12px 10px;display:block;}
+    .menu-title{font-size:12px;color:#9CA3AF;text-transform:uppercase;letter-spacing:.4px;padding:8px 10px 6px;font-weight:600;}
+    .menu-item{display:flex;align-items:center;gap:12px;padding:10px 12px;margin:6px 0;border-radius:10px;color:#374151;text-decoration:none;transition:background .18s,transform .12s,color .12s;}
+    .menu-item:hover{background:#F5F7FA;transform:translateX(2px);color:#0F172A;}
+    .menu-icon{width:36px;height:36px;display:grid;place-items:center;border-radius:8px;background:#F6F7F9;color:#0F766E;flex-shrink:0;font-size:18px;}
+    .menu-item .menu-label{font-weight:600;font-size:14px;}
+    .menu-item.active{background:#ECFDF5;color:#0F5132;font-weight:700;position:relative;padding-left:14px;}
+    .menu-item.active::before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:4px;border-radius:6px;background:linear-gradient(180deg,#10B981,#22C55E);}
+    .menu-item.active .menu-icon{background:linear-gradient(180deg,#E8FFF4,#ECFDF5);color:#10B981;}
+    .menu-sep{border:none;height:1px;background:linear-gradient(90deg, rgba(0,0,0,0.03), rgba(0,0,0,0));margin:6px 12px;}
+    .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:95;}
+
+    @media (max-width:1024px){
+      body.sidebar-open .sidebar-overlay{display:block;}
+      body.sidebar-open .landing-main{margin-left:0;}
+    }
+    @media (max-width:640px){
+      :root{ --panel-w:calc(100vw - 28px); }
+      .detail-panel{ left:14px; right:14px; }
+      .dp-grid{grid-template-columns:1fr}
+    }
 
     /* DETAIL PANEL – kecil & tidak menembus header */
     .detail-panel{
@@ -82,18 +130,46 @@
 
   @stack('styles')
 </head>
-<body>
+<body class="{{ auth()->check() ? 'is-auth' : 'is-guest' }}">
 
-  {{-- HEADER --}}
-  @include('landing.layout.header')
+  @auth
+    <div class="landing-shell">
+      @include('landing.layout.sidebar')
+      <div class="landing-main">
+        @include('landing.layout.header')
+        <main id="mapWrap">
+          @yield('content')
+        </main>
+      </div>
+      <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    </div>
+  @endauth
 
-  {{-- MAIN CONTENT --}}
-  <main id="mapWrap">
-    @yield('content')
-  </main>
+  @guest
+    @include('landing.layout.header')
+    <main id="mapWrap">
+      @yield('content')
+    </main>
+  @endguest
 
   {{-- ArcGIS JS --}}
   <script src="https://js.arcgis.com/4.29/"></script>
+
+  @auth
+  <script>
+    (function(){
+      const body = document.body;
+      const toggle = document.getElementById('sidebarToggle');
+      const overlay = document.getElementById('sidebarOverlay');
+      const close = () => body.classList.remove('sidebar-open');
+      // buka default di desktop
+      if (window.innerWidth > 1024) { body.classList.add('sidebar-open'); }
+      toggle?.addEventListener('click', ()=> body.classList.toggle('sidebar-open'));
+      overlay?.addEventListener('click', close);
+      document.addEventListener('keydown', e=>{ if(e.key==='Escape') close(); });
+    })();
+  </script>
+  @endauth
 
   @stack('scripts')
 </body>
