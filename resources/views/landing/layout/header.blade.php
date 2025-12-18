@@ -9,7 +9,7 @@
       {{-- Ganti file logo sesuai lokasi Anda di public/ --}}
       <img src="{{ asset('assets/media/logos/logo.png') }}" alt="Logo" onerror="this.style.display='none'">
     </span>
-    <span class="brand-title">ESDM</span>
+    <span class="brand-title">Dinas Energi dan Sumber Daya Mineral</span>
   </div>
   <div class="nav-right">
     @guest

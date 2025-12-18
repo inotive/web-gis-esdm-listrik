@@ -1916,7 +1916,8 @@
     });
     categoriesHTML += `</div>`;
 
-    // 5. Data Dasar (Batas Administrasi)
+    // 5. Data Dasar (Batas Administrasi) - HIDDEN
+    /*
     categoriesHTML += `<label class="lf-row lf-parent" data-category="administrasi">
       <span class="lf-toggle">▼</span>
       <input type="checkbox" id="lf-administrasi-parent">
@@ -1928,8 +1929,10 @@
       categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-administrasi-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
     });
     categoriesHTML += `</div>`;
+    */
 
-    // 6. Data Jalan
+    // 6. Data Jalan - HIDDEN
+    /*
     categoriesHTML += `<label class="lf-row lf-parent" data-category="jalan">
       <span class="lf-toggle">▼</span>
       <input type="checkbox" id="lf-jalan-parent">
@@ -1941,6 +1944,7 @@
       categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-jalan-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
     });
     categoriesHTML += `</div>`;
+    */
 
     // 7. Lainnya
     categoriesHTML += `<label class="lf-row lf-parent" data-category="lainnya">
