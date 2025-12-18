@@ -142,7 +142,6 @@
             background-color: var(--primary-dark);
         }
 
-        /* Hero Section Revamp */
         .hero {
             background-color: var(--primary);
             color: var(--white);
@@ -153,7 +152,20 @@
             align-items: center;
             width: 100%;
             padding: 120px 0 60px;
-            /* Account for navbar */
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("{{ asset('assets/Kaltim.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            opacity: 0.2;
+            z-index: 0;
         }
 
         /* Abstract Background Shapes */
@@ -369,7 +381,6 @@
             height: 300px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -831,7 +842,7 @@
             <div class="logo-area">
                 <img src="{{ asset('assets/media/logos/logo.png') }}" alt="Logo ESDM" class="logo-img">
                 <div class="logo-text">
-                    <span class="logo-title">Dinas Energi Dan Sumber Daya Mineral</span>
+                    <span class="logo-title">Dinas Energi dan Sumber Daya Mineral</span>
                     <span class="logo-subtitle">Provinsi Kalimantan Timur</span>
                 </div>
             </div>
@@ -854,26 +865,26 @@
         <div class="hero-container">
             <div class="hero-text-content">
                 <div class="hero-badge">
-                    <i class="ri-government-line"></i> Dinas Energi Dan Sumber Daya Mineral
+                    <i class="ri-government-line"></i> Dinas Energi dan Sumber Daya Mineral
                 </div>
                 <h1 class="hero-title">
                     Sistem Informasi <br>
                     <span class="text-highlight">Geografis ESDM</span>
                 </h1>
                 <p class="hero-desc">
-                    Portal terpadu untuk pemetaan infrastruktur energi dan layanan permohonan kelistrikan di Kalimantan
-                    Timur. Transparan, terpercaya, dan mudah diakses.
+                    Portal terpadu data dan pemetaan infrastruktur energi serta layanan permohonan kelistrikan di
+                    Kalimantan Timur. Transparan, terpercaya, dan mudah diakses.
                 </p>
                 <div class="hero-actions">
                     {{-- <a href="#alur" class="btn-hero-primary">
                         Alur <i class="ri-arrow-right-line"></i>
                     </a> --}}
-                    {{-- <a href="#alur" class="btn-hero-secondary">
-                        <i class="ri-play-circle-line"></i> Alur
-                    </a> --}}
+                    <a href="#alur" class="btn-hero-secondary">
+                        <i class="ri-map-2-line"></i> Peta
+                    </a>
                 </div>
 
-                {{-- <div class="hero-stats">
+                <div class="hero-stats">
                     <div class="stat-item">
                         <span class="stat-value">10K+</span>
                         <span class="stat-label">Data Titik</span>
@@ -886,7 +897,7 @@
                         <span class="stat-value">100%</span>
                         <span class="stat-label">Transparan</span>
                     </div>
-                </div> --}}
+                </div>
             </div>
 
             <div class="hero-visual">
@@ -900,7 +911,7 @@
                 <!-- Floating Cards -->
                 <div class="floating-card fc-1">
                     <i class="ri-map-2-line"></i>
-                    <div style="font-size: 14px;">
+                    <div style="font-size: 13px;">
                         <div>Website Interaktif</div>
                         {{-- <div style="font-size: 12px; color: var(--gray-500); font-weight: normal;">Real-time GIS</div> --}}
                     </div>
@@ -908,15 +919,15 @@
 
                 <div class="floating-card fc-2">
                     <i class="ri-flashlight-line"></i>
-                    <div style="font-size: 14px;">
-                        <div>Infrastruktur Listrik</div>
+                    <div style="font-size: 13px;">
+                        <div>Data Ketenagalistrikan</div>
                         {{-- <div style="font-size: 12px; color: var(--gray-500); font-weight: normal;">Layanan Terpadu</div> --}}
                     </div>
                 </div>
 
                 <div class="floating-card fc-3">
                     <i class="ri-shield-check-line"></i>
-                    <div style="font-size: 14px;">
+                    <div style="font-size: 13px;">
                         <div>Permohonan Dan Perizinan</div>
                         {{-- <div style="font-size: 12px; color: var(--gray-500); font-weight: normal;">Data Valid</div> --}}
                     </div>
