@@ -147,11 +147,13 @@
             color: var(--white);
             position: relative;
             overflow: hidden;
-            min-height: 80vh;
+            min-height: 55vh;
+            /* Further reduced */
             display: flex;
             align-items: center;
             width: 100%;
-            padding: 120px 0 60px;
+            padding: 85px 0 60px;
+            /* Further reduced padding */
         }
 
         .hero::before {
@@ -229,11 +231,12 @@
         .hero-badge {
             background-color: rgba(255, 255, 255, 0.15);
             color: var(--white);
-            padding: 8px 20px;
+            padding: 6px 16px;
             border-radius: 50px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
-            margin-bottom: 32px;
+            margin-bottom: 16px;
+            /* Reduced margin */
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -247,9 +250,10 @@
         }
 
         .hero-title {
-            font-size: 56px;
+            font-size: 42px;
+            /* Reduced from 56px */
             font-weight: 800;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
             line-height: 1.1;
             letter-spacing: -0.03em;
             text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -360,7 +364,8 @@
         /* Hero Visual (Right Side) */
         .hero-visual {
             position: relative;
-            height: 500px;
+            height: 400px;
+            /* Reduced derived height */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -368,8 +373,9 @@
 
         .visual-circle {
             position: absolute;
-            width: 450px;
-            height: 450px;
+            width: 280px;
+            /* Reduced size to prevent overlap */
+            height: 280px;
             border-radius: 50%;
             border: 2px dashed rgba(255, 255, 255, 0.2);
             animation: spin 60s linear infinite;
@@ -377,8 +383,9 @@
 
         .visual-circle-inner {
             position: absolute;
-            width: 300px;
-            height: 300px;
+            width: 180px;
+            /* Reduced size */
+            height: 180px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.05);
             display: flex;
@@ -388,7 +395,8 @@
         }
 
         .visual-logo {
-            width: 120px;
+            width: 80px;
+            /* Reduced logo size */
             height: auto;
             filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.2));
             animation: float 6s ease-in-out infinite;
@@ -399,6 +407,7 @@
             background: rgba(255, 255, 255, 0.95);
             color: var(--gray-900);
             padding: 16px 20px;
+            /* Restored size */
             border-radius: 16px;
             display: flex;
             align-items: center;
@@ -408,35 +417,35 @@
             animation: float 5s ease-in-out infinite;
             z-index: 5;
             max-width: 200px;
+            font-size: 13px;
         }
 
         .floating-card i {
-            font-size: 24px;
+            font-size: 20px;
             color: var(--primary);
             background: #ecfdf5;
-            padding: 8px;
-            border-radius: 10px;
+            padding: 6px;
+            border-radius: 8px;
         }
 
         .fc-1 {
-            top: 50px;
-            left: 0;
+            top: 87px;
+            left: -10px;
             animation-delay: 0s;
         }
 
         .fc-2 {
-            bottom: 80px;
-            right: 20px;
+            bottom: 20px;
+            right: 40px;
             animation-delay: -2.5s;
         }
 
         .fc-3 {
             top: 40%;
-            right: -40px;
+            right: -80px;
             animation-delay: -1s;
         }
 
-        /* Animations */
         @keyframes float {
 
             0%,
@@ -880,7 +889,7 @@
                         Alur <i class="ri-arrow-right-line"></i>
                     </a> --}}
                     <a href="#alur" class="btn-hero-secondary">
-                        <i class="ri-map-2-line"></i> Peta
+                        <i class="ri-map-2-line"></i> Telusuri Peta Interaktif
                     </a>
                 </div>
 
