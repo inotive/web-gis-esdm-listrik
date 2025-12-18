@@ -296,17 +296,23 @@
   /* Modal Styling */
   .modal-overlay {
     position: fixed;
-    inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
     background: rgba(15, 23, 42, 0.45);
     display: none;
-    z-index: 1000;
+    z-index: 9999;
     padding: 18px;
-    overflow: auto;
+    overflow-y: auto;
+    align-items: center;
+    justify-content: center;
     backdrop-filter: blur(2px);
   }
 
   .modal-overlay.show {
-    display: block;
+    display: flex !important;
     animation: fadeIn 0.2s ease;
   }
 
@@ -319,15 +325,31 @@
     }
   }
 
-  .modal {
+  .modal-overlay .modal {
     max-width: 600px;
-    margin: 20px auto;
-    background: #fff;
+    width: calc(100% - 36px);
+    margin: auto;
+    background: #ffffff !important;
     border: 1px solid #E2E8F0;
     border-radius: 16px;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     overflow: hidden;
+    position: relative;
+    z-index: 10000;
+    flex-shrink: 0;
+    min-height: 100px;
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: block !important;
+    pointer-events: auto;
+    height: auto;
     animation: slideDown 0.3s ease;
+  }
+
+  .modal-overlay.show .modal {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 
   @keyframes slideDown {
@@ -461,6 +483,38 @@
     background: #F8FAFC;
     border-color: #CBD5E1;
     color: #475569;
+  }
+
+  /* Loading State */
+  .btn-loading {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+    opacity: 0.7;
+  }
+
+  .btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    top: 50%;
+    left: 50%;
+    margin-left: -9px;
+    margin-top: -9px;
+    border: 2.5px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #ffffff;
+    animation: spinner 0.7s linear infinite;
+  }
+
+  @keyframes spinner {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 </style>
 @endpush
@@ -795,12 +849,67 @@
 @push('scripts')
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // Handle form submit - disable button until process complete
+    const formApprove = document.getElementById('formApprove');
+    const formAddDocument = document.getElementById('formAddDocument');
+
+    const handleFormSubmit = (form) => {
+      if (!form) return;
+
+      form.addEventListener('submit', function(e) {
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const cancelBtn = form.querySelector('.btn-modal-cancel');
+
+        if (submitBtn) {
+          // Disable submit button
+          submitBtn.disabled = true;
+          submitBtn.classList.add('btn-loading');
+        }
+
+        if (cancelBtn) {
+          cancelBtn.disabled = true;
+        }
+      });
+    };
+
+    // Initialize form submit handlers
+    if (formApprove) {
+      handleFormSubmit(formApprove);
+    }
+
+    if (formAddDocument) {
+      handleFormSubmit(formAddDocument);
+    }
+
     // Modal functionality
     const openModal = (selector) => {
       const modal = document.querySelector(selector);
       if (modal) {
+        // Reset button state when opening modal
+        const form = modal.querySelector('form');
+        if (form) {
+          const submitBtn = form.querySelector('button[type="submit"]');
+          const cancelBtn = form.querySelector('.btn-modal-cancel');
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('btn-loading');
+          }
+          if (cancelBtn) {
+            cancelBtn.disabled = false;
+          }
+        }
+
         modal.classList.add('show');
         document.body.style.overflow = 'hidden';
+        // Force browser to apply the display change
+        void modal.offsetHeight;
+        // Ensure modal box is visible
+        const modalBox = modal.querySelector('.modal');
+        if (modalBox) {
+          modalBox.style.display = 'block';
+          modalBox.style.visibility = 'visible';
+          modalBox.style.opacity = '1';
+        }
       }
     };
 
@@ -808,10 +917,19 @@
       if (modal) {
         modal.classList.remove('show');
         document.body.style.overflow = '';
-        // Reset form
+        // Reset form and button state
         const form = modal.querySelector('form');
         if (form) {
           form.reset();
+          const submitBtn = form.querySelector('button[type="submit"]');
+          const cancelBtn = form.querySelector('.btn-modal-cancel');
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('btn-loading');
+          }
+          if (cancelBtn) {
+            cancelBtn.disabled = false;
+          }
         }
       }
     };
@@ -823,12 +941,22 @@
         e.preventDefault();
         const modalSelector = opener.getAttribute('data-open');
         openModal(modalSelector);
+        return;
       }
 
-      // Close modal
-      if (e.target.hasAttribute('data-close') || e.target.classList.contains('modal-overlay')) {
-        const modal = e.target.closest('.modal-overlay') || document.querySelector('.modal-overlay.show');
+      // Close modal on backdrop click
+      if (e.target.classList.contains('modal-overlay')) {
+        const modal = e.target;
         closeModal(modal);
+        return;
+      }
+
+      // Close modal on close button
+      if (e.target.hasAttribute('data-close') || e.target.closest('[data-close]')) {
+        const modal = e.target.closest('.modal-overlay') || document.querySelector('.modal-overlay.show');
+        if (modal) {
+          closeModal(modal);
+        }
       }
     });
 
@@ -863,6 +991,23 @@
 
     // Error notification
     @if(session('error') || $errors->any())
+      // Reset button state on error
+      const openModalEl = document.querySelector('.modal-overlay.show');
+      if (openModalEl) {
+        const form = openModalEl.querySelector('form');
+        if (form) {
+          const submitBtn = form.querySelector('button[type="submit"]');
+          const cancelBtn = form.querySelector('.btn-modal-cancel');
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('btn-loading');
+          }
+          if (cancelBtn) {
+            cancelBtn.disabled = false;
+          }
+        }
+      }
+
       Swal.fire({
         icon: 'error',
         title: 'Error!',
