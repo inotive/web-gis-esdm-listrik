@@ -253,6 +253,7 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
     // Rekap Data
     Route::group(['as' => 'rekap-data.', 'prefix' => 'rekap-data'], function () {
         Route::get('/', [RekapDataController::class, 'index'])->name('index');
+        Route::get('/detail/{kabupaten}', [RekapDataController::class, 'detail'])->name('detail');
     });
 });
 

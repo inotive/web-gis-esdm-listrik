@@ -7,8 +7,8 @@ use App\Models\Permohonan;
 use App\Models\PermohonanUser;
 use App\Models\PermohonanQuestion;
 use App\Models\PermohonanQuestionOption;
-use App\Models\Perizinan;
-use App\Models\PerizinanDocument;
+use App\Models\PerizinanListrik;
+use App\Models\Perusahaan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -21,6 +21,9 @@ class PermohonanController extends Controller
     {
         $perPage = (int) $request->get('per_page', 10);
         $q = $request->get('q');
+        $tab = $request->get('tab', 'perizinan');
+        $status = $request->get('status', '');
+        $jenis = $request->get('jenis', '');
 
         $query = Permohonan::withCount('questions');
 
@@ -33,144 +36,126 @@ class PermohonanController extends Controller
         }
 
         $permohonans = $query->orderBy('created_at', 'desc')
-            ->paginate($perPage)
+            ->paginate($perPage, ['*'], 'page_permohonan')
             ->withQueryString();
 
-        // Data Perizinan dari database
-        $perizinans = Perizinan::with(['perusahaan', 'documents'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        // =========================================
+        // TAB 1: Data Perizinan (dari database perizinan_listriks)
+        // =========================================
+        $queryPerizinan = PerizinanListrik::query();
 
-        $perizinanData = $perizinans->map(function ($perizinan) {
-            // Ambil document terbaru berdasarkan tanggal_terbit atau created_at
-            $document = $perizinan->documents
-                ->sortByDesc(function ($doc) {
-                    return $doc->tanggal_terbit ?? $doc->created_at;
-                })
-                ->first();
+        // Search
+        if ($q && $tab === 'perizinan') {
+            $queryPerizinan->where(function ($qry) use ($q) {
+                $qry->where('nama_pemohon', 'like', "%{$q}%")
+                    ->orWhere('kabupaten_kota', 'like', "%{$q}%")
+                    ->orWhere('no_surat_izin', 'like', "%{$q}%")
+                    ->orWhere('jenis', 'like', "%{$q}%");
+            });
+        }
 
-            // Format tanggal pengajuan
-            $tanggalPengajuan = $perizinan->tanggal
-                ? $perizinan->tanggal->translatedFormat('d F Y')
-                : ($perizinan->created_at ? $perizinan->created_at->translatedFormat('d F Y') : '-');
-
-            // Format tanggal terbit dari document
-            $tanggalTerbit = $document && $document->tanggal_terbit
-                ? $document->tanggal_terbit->translatedFormat('d F Y')
-                : null;
-
-            // Format tanggal berlaku dari document (tanggal_akhir)
-            $tanggalBerlaku = $document && $document->tanggal_akhir
-                ? $document->tanggal_akhir->translatedFormat('d F Y')
-                : '-';
-
-            // Tentukan status berdasarkan document (tanggal_akhir)
-            $status = 'Menunggu Verifikasi';
-            $expiredDays = null;
-            $remainingDays = null;
-            if ($document) {
-                if ($document->tanggal_akhir) {
-                    $now = now();
-                    $tanggalAkhir = \Carbon\Carbon::parse($document->tanggal_akhir);
-                    $diffDays = $now->diffInDays($tanggalAkhir, false);
-
-                    if ($tanggalAkhir->isPast()) {
-                        // Sudah kadaluarsa - hitung jumlah hari kadaluarsa
-                        $status = 'Expired';
-                        $expiredDays = abs($diffDays);
-                    } elseif ($diffDays <= 30) {
-                        // Tersisa <= 30 hari (warning)
-                        $status = 'Akan Kadaluarsa';
-                        $remainingDays = $diffDays;
-                    } elseif ($document->tanggal_terbit) {
-                        // Masih aktif dan tersisa > 30 hari
-                        $status = 'Aktif';
-                        $remainingDays = $diffDays;
-                    } else {
-                        // Ada tanggal akhir tapi belum ada tanggal terbit
-                        $status = 'Menunggu Terbit';
-                    }
-                } elseif ($document->tanggal_terbit) {
-                    // Ada tanggal terbit tapi tidak ada tanggal akhir
-                    $status = 'Aktif';
-                } else {
-                    // Ada dokumen tapi belum ada tanggal terbit dan tanggal akhir
-                    $status = 'Menunggu Terbit';
-                }
+        // Filter by status (berdasarkan tanggal_akhir)
+        if ($status) {
+            $today = now();
+            if ($status === 'aktif') {
+                $queryPerizinan->whereNotNull('tanggal_akhir')
+                    ->where('tanggal_akhir', '>=', $today)
+                    ->where('tanggal_akhir', '>', '1901-01-01');
+            } elseif ($status === 'expired') {
+                $queryPerizinan->whereNotNull('tanggal_akhir')
+                    ->where('tanggal_akhir', '<', $today)
+                    ->where('tanggal_akhir', '>', '1901-01-01');
+            } elseif ($status === 'menunggu') {
+                $queryPerizinan->whereNull('tanggal_terbit')
+                    ->orWhere('tanggal_terbit', '<', '1901-01-01');
             }
+        }
 
-            // Sumber pengajuan (bisa dari catatan atau default)
-            $sumberPengajuan = $perizinan->catatan ?: 'Dari Sistem';
+        // Filter by jenis
+        if ($jenis) {
+            $queryPerizinan->where('jenis', 'like', "%{$jenis}%");
+        }
 
-            return [
-                'id' => $perizinan->id,
-                'perusahaan' => $perizinan->perusahaan->nama ?? '-',
-                'jenis_izin' => $perizinan->jenis ?? '-',
-                'tanggal_berlaku' => $tanggalBerlaku,
-                'sumber_pengajuan' => $sumberPengajuan,
-                'tanggal_pengajuan' => $tanggalPengajuan,
-                'tanggal_terbit' => $tanggalTerbit,
-                'status' => $status,
-                'expired_days' => $expiredDays,
-                'remaining_days' => $remainingDays,
-            ];
-        })->toArray();
+        $perizinanItems = $queryPerizinan
+            ->orderBy('tanggal_terbit', 'desc')
+            ->paginate($perPage, ['*'], 'page_perizinan')
+            ->withQueryString();
 
-        // Data Permohonan dari PermohonanUser
+        // Get jenis options for filter
+        $jenisOptions = PerizinanListrik::select('jenis')
+            ->distinct()
+            ->whereNotNull('jenis')
+            ->where('jenis', '!=', '')
+            ->where('jenis', '!=', '5') // Exclude invalid "5" values
+            ->pluck('jenis')
+            ->filter()
+            ->values();
+
+        // =========================================
+        // Calculate Statistics for Metric Cards
+        // =========================================
+        $today = now();
+        $thirtyDaysLater = $today->copy()->addDays(30);
+
+        // Total Perizinan
+        $totalPerizinan = PerizinanListrik::count();
+
+        // Count by Jenis
+        $totalIUPTLS = PerizinanListrik::where('jenis', 'IUPTLS')->count();
+        $totalSKTP = PerizinanListrik::where('jenis', 'SKTP')->count();
+
+        // Count by Status
+        // Aktif: tanggal_akhir > today + 30 days
+        $countAktif = PerizinanListrik::whereNotNull('tanggal_akhir')
+            ->where('tanggal_akhir', '>', $thirtyDaysLater)
+            ->where('tanggal_akhir', '>', '1901-01-01')
+            ->count();
+
+        // Mau Berakhir: tanggal_akhir between today and today + 30 days
+        $countMauBerakhir = PerizinanListrik::whereNotNull('tanggal_akhir')
+            ->where('tanggal_akhir', '>=', $today)
+            ->where('tanggal_akhir', '<=', $thirtyDaysLater)
+            ->where('tanggal_akhir', '>', '1901-01-01')
+            ->count();
+
+        // Berakhir: tanggal_akhir < today
+        $countBerakhir = PerizinanListrik::whereNotNull('tanggal_akhir')
+            ->where('tanggal_akhir', '<', $today)
+            ->where('tanggal_akhir', '>', '1901-01-01')
+            ->count();
+
+        // Total kapasitas
+        $totalKapasitas = PerizinanListrik::sum('kapasitas');
+
+        $perizinanStats = [
+            'total' => $totalPerizinan,
+            'iuptls' => $totalIUPTLS,
+            'sktp' => $totalSKTP,
+            'aktif' => $countAktif,
+            'mau_berakhir' => $countMauBerakhir,
+            'berakhir' => $countBerakhir,
+            'total_kapasitas' => $totalKapasitas,
+        ];
+
+        // =========================================
+        // TAB 2: Data Permohonan dari PermohonanUser
+        // =========================================
         $permohonanUsers = PermohonanUser::with(['permohonan', 'user'])
             ->orderBy('created_at', 'desc')
-            ->get();
-
-        $permohonanData = $permohonanUsers->map(function ($permohonanUser) {
-            $statusText = ucfirst($permohonanUser->status);
-
-            // Mapping status ke format yang lebih user-friendly
-            $statusMap = [
-                'pending' => 'Menunggu Verifikasi',
-                'diproses' => 'Sedang Diproses',
-                'selesai' => 'Aktif',
-                'ditolak' => 'Ditolak',
-                'expired' => 'Expired',
-            ];
-
-            $statusText = $statusMap[$permohonanUser->status] ?? $statusText;
-
-            // Format tanggal
-            $tanggalPengajuan = $permohonanUser->created_at
-                ? $permohonanUser->created_at->translatedFormat('d F Y')
-                : '-';
-
-            $tanggalTerbit = null;
-            if ($permohonanUser->status === 'selesai' && $permohonanUser->updated_at) {
-                $tanggalTerbit = $permohonanUser->updated_at->translatedFormat('d F Y');
-            }
-
-            // Tanggal berlaku (default ke 1 tahun dari tanggal pengajuan atau updated_at jika selesai)
-            $tanggalBerlaku = '-';
-            if ($permohonanUser->status === 'selesai' && $permohonanUser->updated_at) {
-                $tanggalBerlaku = $permohonanUser->updated_at->copy()->addYear()->translatedFormat('d F Y');
-            } elseif ($permohonanUser->created_at) {
-                $tanggalBerlaku = $permohonanUser->created_at->copy()->addYear()->translatedFormat('d F Y');
-            }
-
-            return [
-                'id' => $permohonanUser->id,
-                'permohonan_id' => $permohonanUser->permohonan_id,
-                'perusahaan' => $permohonanUser->user->name ?? '-',
-                'jenis_izin' => $permohonanUser->permohonan->nama ?? '-',
-                'tanggal_berlaku' => $tanggalBerlaku,
-                'sumber_pengajuan' => 'Dari Sistem',
-                'tanggal_pengajuan' => $tanggalPengajuan,
-                'tanggal_terbit' => $tanggalTerbit,
-                'status' => $statusText,
-            ];
-        })->toArray();
+            ->paginate($perPage, ['*'], 'page_permohonan_user')
+            ->withQueryString();
 
         return view('admin.permohonan.index', [
             'title' => 'Perizinan dan Permohonan',
             'permohonans' => $permohonans,
-            'perizinanData' => $perizinanData,
-            'permohonanData' => $permohonanData,
+            'perizinanItems' => $perizinanItems,
+            'permohonanUsers' => $permohonanUsers,
+            'jenisOptions' => $jenisOptions,
+            'perizinanStats' => $perizinanStats,
+            'tab' => $tab,
+            'q' => $q,
+            'status' => $status,
+            'jenis' => $jenis,
         ]);
     }
 

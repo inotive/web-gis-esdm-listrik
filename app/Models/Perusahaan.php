@@ -7,23 +7,24 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Perusahaan extends Model
 {
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
     protected $table = 'perusahaans';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'nama',
         'alamat',
         'village_id',
+        'kontak',
+        'jenis_usaha',
+        'kabupaten_kota',
     ];
+
+    /**
+     * Relationship: Perusahaan memiliki banyak PembangkitListrik
+     */
+    public function pembangkitListriks(): HasMany
+    {
+        return $this->hasMany(PembangkitListrik::class, 'perusahaan_id');
+    }
 
     /**
      * Relationship: Perusahaan belongs to Village (Desa)
