@@ -42,7 +42,6 @@ use App\Http\Controllers\Admin\PerizinanController;
 Route::get('login', [LoginController::class, 'show'])->middleware('guest')->name('login');
 Route::post('login', [LoginController::class, 'login'])->name('login-post');
 
-// Arahkan root ke halaman login saat pertama kali diakses
 Route::get('/', function () {
     return view('home');
 });

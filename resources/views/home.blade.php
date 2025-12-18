@@ -147,9 +147,12 @@
             background-color: var(--primary);
             /* Solid Green Background */
             color: var(--white);
-            padding: 80px 0;
             position: relative;
             overflow: hidden;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            width: 100%;
         }
 
         /* Decorative circles for Hero */
@@ -536,10 +539,10 @@
                 </div>
             </div>
             <div class="nav-links">
-                <a href="#home" class="nav-link">Beranda</a>
+                {{-- <a href="#home" class="nav-link">Beranda</a>
                 <a href="#alur" class="nav-link">Alur Permohonan</a>
-                <a href="#faq" class="nav-link">FAQ</a>
-                <a href="{{ route('login') }}" class="btn-login">Masuk / Daftar</a>
+                <a href="#faq" class="nav-link">FAQ</a> --}}
+                <a href="{{ route('login') }}" class="btn-login">Masuk</a>
             </div>
         </div>
     </nav>
@@ -571,48 +574,49 @@
                 <div class="step-card">
                     <div class="step-icon-container">
                         <div class="step-icon-wrapper">
-                            <i class="ri-user-add-line"></i>
+                            <i class="ri-login-circle-line"></i>
                         </div>
                         <div class="step-number">1</div>
                     </div>
-                    <h3 class="step-title">Registrasi Akun</h3>
-                    <p class="step-text">Buat akun baru atau masuk jika sudah memiliki akun untuk mengakses layanan.</p>
+                    {{-- <h3 class="step-title">Masuk ke sistem</h3> --}}
+                    <p class="step-text">Pengguna melakukan login sebagai Desa/Perusahaan untuk mengakses fitur
+                        permohonan layanan ESDM.</p>
                 </div>
 
                 <!-- Step 2 -->
                 <div class="step-card">
                     <div class="step-icon-container">
                         <div class="step-icon-wrapper">
-                            <i class="ri-file-list-3-line"></i>
+                            <i class="ri-cursor-line"></i>
                         </div>
                         <div class="step-number">2</div>
                     </div>
-                    <h3 class="step-title">Isi Formulir</h3>
-                    <p class="step-text">Lengkapi data permohonan dan unggah dokumen persyaratan yang dibutuhkan.</p>
+                    {{-- <h3 class="step-title">Isi Formulir</h3> --}}
+                    <p class="step-text">Pilih layanan ESDM.</p>
                 </div>
 
                 <!-- Step 3 -->
                 <div class="step-card">
                     <div class="step-icon-container">
                         <div class="step-icon-wrapper">
-                            <i class="ri-search-eye-line"></i>
+                            <i class="ri-file-edit-line"></i>
                         </div>
                         <div class="step-number">3</div>
                     </div>
-                    <h3 class="step-title">Verifikasi</h3>
-                    <p class="step-text">Tim kami akan memverifikasi data dan dokumen yang telah Anda kirimkan.</p>
+                    {{-- <h3 class="step-title">Verifikasi</h3> --}}
+                    <p class="step-text">Isi data permohonan lalu simpan</p>
                 </div>
 
                 <!-- Step 4 -->
                 <div class="step-card">
                     <div class="step-icon-container">
                         <div class="step-icon-wrapper">
-                            <i class="ri-check-double-line"></i>
+                            <i class="ri-checkbox-circle-line"></i>
                         </div>
                         <div class="step-number">4</div>
                     </div>
-                    <h3 class="step-title">Selesai</h3>
-                    <p class="step-text">Permohonan disetujui dan Anda dapat mengunduh dokumen hasil layanan.</p>
+                    {{-- <h3 class="step-title">Selesai</h3> --}}
+                    <p class="step-text">Selamat permohonan Anda berhasil diajukan</p>
                 </div>
             </div>
         </div>
@@ -628,7 +632,7 @@
             </div>
 
             <div class="faq-container">
-                <div class="faq-item">
+                {{-- <div class="faq-item">
                     <button class="faq-question">
                         Apa saja persyaratan dokumen yang dibutuhkan?
                         <i class="ri-arrow-down-s-line"></i>
@@ -638,7 +642,7 @@
                             NPWP, dan dokumen legalitas perusahaan jika mewakili badan usaha. Detail lengkap dapat
                             dilihat pada formulir permohonan.</p>
                     </div>
-                </div>
+                </div> --}}
 
                 <div class="faq-item">
                     <button class="faq-question">
@@ -667,39 +671,11 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-brand">
-                    <h3>
-                        <img src="{{ asset('assets/media/logos/logo.png') }}" alt="Logo"
-                            style="height: 32px; filter: brightness(0) invert(1);">
-                        Dinas ESDM Kaltim
-                    </h3>
-                    <p>Dinas Energi dan Sumber Daya Mineral Provinsi Kalimantan Timur. Melayani dengan hati, mengelola
-                        energi untuk masa depan.</p>
-                </div>
-                <div>
-                    <h4 class="footer-title">Tautan Cepat</h4>
-                    <ul class="footer-links">
-                        <li><a href="#home">Beranda</a></li>
-                        <li><a href="#alur">Alur Permohonan</a></li>
-                        <li><a href="#faq">FAQ</a></li>
-                        <li><a href="{{ route('login') }}">Masuk</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="footer-title">Kontak Kami</h4>
-                    <ul class="footer-links">
-                        <li><a href="#">Jl. MT. Haryono, Samarinda</a></li>
-                        <li><a href="#">(0541) 123456</a></li>
-                        <li><a href="#">esdm@kaltimprov.go.id</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                &copy; {{ date('Y') }} Dinas ESDM Provinsi Kalimantan Timur. All rights reserved.
-            </div>
+
+        <div class="footer-bottom">
+            &copy; {{ date('Y') }} Dinas ESDM Provinsi Kalimantan Timur. All rights reserved.
         </div>
+
     </footer>
 
     <script>
