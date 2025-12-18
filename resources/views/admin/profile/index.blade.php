@@ -60,7 +60,7 @@
                                 class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow"
                                 data-kt-image-input-action="cancel" data-bs-toggle="tooltip" data-bs-dismiss="click"
                                 title="Cancel avatar">
-                                <i class="ki-outline ki-cross fs-3"></i>
+                                <i class="fa-solid fa-xmark fs-2"></i>
                             </span>
                             <!--end::Cancel button-->
 
@@ -69,7 +69,7 @@
                                 class="btn btn-icon btn-circle btn-color-muted btn-active-color-primary w-25px h-25px bg-body shadow"
                                 data-kt-image-input-action="remove" data-bs-toggle="tooltip" data-bs-dismiss="click"
                                 title="Remove avatar">
-                                <i class="ki-outline ki-cross fs-3"></i>
+                                <i class="fa-solid fa-xmark fs-2"></i>
                             </span>
                             <!--end::Remove button-->
                         </div>

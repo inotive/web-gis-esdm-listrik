@@ -13,35 +13,19 @@
       @method('PUT')
 
       <div class="modal-body">
-        {{-- Kabupaten/Kota --}}
-        <div class="form-group">
-          <label class="label">Kabupaten/Kota</label>
-          <div class="control">
-            <select name="regency_id" id="edit_regency_id" class="input" data-control="select2" data-placeholder="Pilih Kabupaten/Kota" required></select>
-          </div>
-        </div>
-
-        {{-- Kecamatan --}}
-        <div class="form-group">
-          <label class="label">Kecamatan</label>
-          <div class="control">
-            <select name="district_id" id="edit_district_id" class="input" data-control="select2" data-placeholder="Pilih Kecamatan" required></select>
-          </div>
-        </div>
-
-        {{-- Desa/Kelurahan --}}
-        <div class="form-group">
-          <label class="label">Desa/Kelurahan</label>
-          <div class="control">
-            <select name="village_id" id="edit_village_id" class="input" data-control="select2" data-placeholder="Pilih Desa/Kelurahan" required></select>
-          </div>
-        </div>
-
         {{-- Nama Perusahaan --}}
         <div class="form-group">
-          <label class="label">Nama Perusahaan</label>
+          <label class="label">Nama Perusahaan <span style="color:#ef4444">*</span></label>
           <div class="control">
             <input type="text" name="nama" id="edit_nama" class="input" placeholder="Masukkan nama perusahaan" required>
+          </div>
+        </div>
+
+        {{-- Kontak --}}
+        <div class="form-group">
+          <label class="label">Kontak</label>
+          <div class="control">
+            <input type="text" name="kontak" id="edit_kontak" class="input" placeholder="Masukkan nomor telepon/email">
           </div>
         </div>
 
@@ -49,7 +33,48 @@
         <div class="form-group">
           <label class="label">Alamat</label>
           <div class="control">
-            <textarea name="alamat" id="edit_alamat" class="input" rows="3" placeholder="Masukkan alamat perusahaan"></textarea>
+            <textarea name="alamat" id="edit_alamat" class="input" rows="3"
+              placeholder="Masukkan alamat perusahaan"></textarea>
+          </div>
+        </div>
+
+        {{-- Kabupaten/Kota (Text Input) --}}
+        <div class="form-group">
+          <label class="label">Kabupaten/Kota</label>
+          <div class="control">
+            <input type="text" name="kabupaten_kota" id="edit_kabupaten_kota" class="input"
+              placeholder="Contoh: Kota Samarinda">
+          </div>
+        </div>
+
+        <hr style="border:none;border-top:1px solid #E2E8F0;margin:16px 0;">
+        <p style="font-size:12px;color:#64748B;margin-bottom:12px;"><i class="ri-information-line"></i> Opsional: Pilih
+          lokasi detail (Kabupaten → Kecamatan → Desa)</p>
+
+        {{-- Kabupaten/Kota (Dropdown) --}}
+        <div class="form-group">
+          <label class="label">Kabupaten/Kota (Pilih)</label>
+          <div class="control">
+            <select name="regency_id" id="edit_regency_id" class="input" data-control="select2"
+              data-placeholder="Pilih Kabupaten/Kota"></select>
+          </div>
+        </div>
+
+        {{-- Kecamatan --}}
+        <div class="form-group">
+          <label class="label">Kecamatan</label>
+          <div class="control">
+            <select name="district_id" id="edit_district_id" class="input" data-control="select2"
+              data-placeholder="Pilih Kecamatan"></select>
+          </div>
+        </div>
+
+        {{-- Desa/Kelurahan --}}
+        <div class="form-group">
+          <label class="label">Desa/Kelurahan</label>
+          <div class="control">
+            <select name="village_id" id="edit_village_id" class="input" data-control="select2"
+              data-placeholder="Pilih Desa/Kelurahan"></select>
           </div>
         </div>
       </div>
@@ -66,26 +91,147 @@
 
 @push('styles')
   <style>
-    .modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;z-index:1000;padding:18px;overflow:auto;}
-    .modal-overlay.show{display:block;}
-    .modal{max-width:520px;margin:20px auto;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-2);overflow:hidden;}
-    .modal-header{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid var(--line);}
-    .modal-header h3{margin:0;font-weight:800;font-size:20px;letter-spacing:-.2px;}
-    .btn-x{width:36px;height:36px;display:grid;place-items:center;border:1px solid #E2E8F0;background:#fff;border-radius:10px;cursor:pointer;}
-    .btn-x:hover{background:#F8FAFC;}
-    .modal-body{padding:18px 20px 6px;}
-    .modal-footer{padding:14px 20px 18px;display:flex;gap:10px;justify-content:flex-end;}
-    .btn-cancel{height:44px;padding:0 20px;border:1px solid #E2E8F0;border-radius:10px;font-weight:600;color:#64748B;background:#fff;cursor:pointer;}
-    .btn-cancel:hover{background:#F8FAFC;}
-    .btn-save{height:44px;padding:0 20px;border:none;border-radius:10px;font-weight:700;color:#fff;background:var(--accent-2);box-shadow:0 10px 22px rgba(34,197,94,.22);cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
-    .btn-save:hover{filter:brightness(.95);}
-    .form-group{margin-bottom:16px;}
-    .label{display:block;font-size:14px;color:#374151;margin:6px 0 8px;font-weight:600;}
-    .control{position:relative;}
-    .input{width:100%;height:44px;padding:0 12px;border:1px solid #E2E8F0;border-radius:10px;background:#FCFCFD;outline:none;font:inherit;color:#111827;}
-    .input::placeholder{color:#94A3B8;}
-    .input:focus{border-color:#CBD5E1;box-shadow:0 0 0 3px rgba(16,185,129,.12);}
-    .control textarea{min-height:80px;padding:12px;resize:vertical;}
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, .45);
+      display: none;
+      z-index: 1000;
+      padding: 18px;
+      overflow: auto;
+    }
+
+    .modal-overlay.show {
+      display: block;
+    }
+
+    .modal {
+      max-width: 520px;
+      margin: 20px auto;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: var(--shadow-2);
+      overflow: hidden;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      font-weight: 800;
+      font-size: 20px;
+      letter-spacing: -.2px;
+    }
+
+    .btn-x {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border: 1px solid #E2E8F0;
+      background: #fff;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .btn-x:hover {
+      background: #F8FAFC;
+    }
+
+    .modal-body {
+      padding: 18px 20px 6px;
+    }
+
+    .modal-footer {
+      padding: 14px 20px 18px;
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .btn-cancel {
+      height: 44px;
+      padding: 0 20px;
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      font-weight: 600;
+      color: #64748B;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .btn-cancel:hover {
+      background: #F8FAFC;
+    }
+
+    .btn-save {
+      height: 44px;
+      padding: 0 20px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      color: #fff;
+      background: var(--accent-2);
+      box-shadow: 0 10px 22px rgba(34, 197, 94, .22);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-save:hover {
+      filter: brightness(.95);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .label {
+      display: block;
+      font-size: 14px;
+      color: #374151;
+      margin: 6px 0 8px;
+      font-weight: 600;
+    }
+
+    .control {
+      position: relative;
+    }
+
+    .input {
+      width: 100%;
+      height: 44px;
+      padding: 0 12px;
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      background: #FCFCFD;
+      outline: none;
+      font: inherit;
+      color: #111827;
+    }
+
+    .input::placeholder {
+      color: #94A3B8;
+    }
+
+    .input:focus {
+      border-color: #CBD5E1;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, .12);
+    }
+
+    .control textarea {
+      min-height: 80px;
+      padding: 12px;
+      resize: vertical;
+    }
 
     /* Select2 Styling for Modal */
     .modal .select2-container {
@@ -118,13 +264,13 @@
     .modal .select2-container--default .select2-selection--single:focus,
     .modal .select2-container--default.select2-container--focus .select2-selection--single {
       border-color: #CBD5E1 !important;
-      box-shadow: 0 0 0 3px rgba(16,185,129,.12) !important;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, .12) !important;
     }
 
     .modal .select2-dropdown {
       border: 1px solid #E2E8F0 !important;
       border-radius: 10px !important;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
       margin-top: 4px !important;
       z-index: 10001 !important;
     }
@@ -145,7 +291,7 @@
 
     .modal .select2-search--dropdown .select2-search__field:focus {
       border-color: #CBD5E1 !important;
-      box-shadow: 0 0 0 3px rgba(16,185,129,.12) !important;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, .12) !important;
     }
 
     .modal .select2-results__option {
@@ -172,16 +318,16 @@
       // Close any open modals first
       document.querySelectorAll('.modal-overlay.show').forEach(m => m.classList.remove('show'));
       const o = document.getElementById(id);
-      if(o){
+      if (o) {
         o.classList.add('show');
-        document.body.style.overflow='hidden';
+        document.body.style.overflow = 'hidden';
       }
     };
     window.__closeModal = id => {
       const o = document.getElementById(id);
-      if(o){
+      if (o) {
         o.classList.remove('show');
-        document.body.style.overflow='';
+        document.body.style.overflow = '';
 
         // Destroy Select2 instances in modal
         if (jQuery && jQuery.fn.select2) {
@@ -199,16 +345,16 @@
 
     document.addEventListener('DOMContentLoaded', function () {
       // Close modal on backdrop click
-      document.getElementById('modalEditPerusahaan')?.addEventListener('click', e=>{
-        if(e.target.id==='modalEditPerusahaan') __closeModal('modalEditPerusahaan');
+      document.getElementById('modalEditPerusahaan')?.addEventListener('click', e => {
+        if (e.target.id === 'modalEditPerusahaan') __closeModal('modalEditPerusahaan');
       });
 
       // Close on Escape key
-      document.addEventListener('keydown', function(e) {
-        if(e.key === 'Escape') {
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
           document.querySelectorAll('.modal-overlay.show').forEach(m => {
             m.classList.remove('show');
-            document.body.style.overflow='';
+            document.body.style.overflow = '';
           });
         }
       });
@@ -228,15 +374,15 @@
             placeholder: placeholder,
             width: '100%',
             language: {
-              noResults: function() { return "Tidak ada hasil"; },
-              searching: function() { return "Mencari..."; }
+              noResults: function () { return "Tidak ada hasil"; },
+              searching: function () { return "Mencari..."; }
             }
           });
         }
       }
 
       if (selRegEdit && selDisEdit) {
-        const regChangeHandler = async function() {
+        const regChangeHandler = async function () {
           const rid = this.value;
           selDisEdit.innerHTML = '';
           selVilEdit.innerHTML = '';
@@ -273,7 +419,7 @@
       }
 
       if (selDisEdit && selVilEdit) {
-        const disChangeHandler = async function() {
+        const disChangeHandler = async function () {
           const did = this.value;
           selVilEdit.innerHTML = '';
 
@@ -307,10 +453,12 @@
 
       // Edit button handlers
       document.querySelectorAll('.btn-edit-perusahaan').forEach(btn => {
-        btn.addEventListener('click', async function() {
+        btn.addEventListener('click', async function () {
           const id = this.getAttribute('data-id');
           const nama = this.getAttribute('data-nama');
           const alamat = this.getAttribute('data-alamat') || '';
+          const kontak = this.getAttribute('data-kontak') || '';
+          const kabupatenKota = this.getAttribute('data-kabupaten-kota') || '';
           const regencyId = this.getAttribute('data-regency-id');
           const districtId = this.getAttribute('data-district-id');
           const villageId = this.getAttribute('data-village-id');
@@ -318,9 +466,11 @@
           // Set form action
           document.getElementById('formEditPerusahaan').action = '{{ route("admin.perusahaan.update", ":id") }}'.replace(':id', id);
 
-          // Set nama and alamat
+          // Set nama, kontak, alamat, and kabupaten_kota
           document.getElementById('edit_nama').value = nama;
+          document.getElementById('edit_kontak').value = kontak;
           document.getElementById('edit_alamat').value = alamat;
+          document.getElementById('edit_kabupaten_kota').value = kabupatenKota;
 
           // Load regencies
           const selReg = document.getElementById('edit_regency_id');

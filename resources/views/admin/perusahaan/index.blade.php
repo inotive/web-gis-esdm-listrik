@@ -598,8 +598,7 @@
               <th class="col-no">No</th>
               <th>Nama Perusahaan</th>
               <th>Alamat</th>
-              <th>Desa</th>
-              <th>Kecamatan</th>
+              <th>Kontak</th>
               <th>Kabupaten/Kota</th>
               <th class="col-aksi">Aksi</th>
             </tr>
@@ -610,17 +609,18 @@
                 <td class="col-no">{{ $perusahaans->firstItem() + $i }}</td>
                 <td><strong>{{ $perusahaan->nama }}</strong></td>
                 <td>{{ $perusahaan->alamat ?? '-' }}</td>
-                <td>{{ $perusahaan->village->name ?? '-' }}</td>
-                <td>{{ $perusahaan->village->district->name ?? '-' }}</td>
-                <td>{{ $perusahaan->village->district->regency->name ?? '-' }}</td>
+                <td>{{ $perusahaan->kontak ?? '-' }}</td>
+                <td>{{ $perusahaan->kabupaten_kota ?? ($perusahaan->village->district->regency->name ?? '-') }}</td>
                 <td class="col-aksi">
                   <button type="button" class="btn-ico edit btn-edit-perusahaan"
                     data-id="{{ $perusahaan->id }}"
                     data-nama="{{ $perusahaan->nama }}"
                     data-alamat="{{ $perusahaan->alamat ?? '' }}"
+                    data-kontak="{{ $perusahaan->kontak ?? '' }}"
+                    data-kabupaten-kota="{{ $perusahaan->kabupaten_kota ?? '' }}"
                     data-regency-id="{{ $perusahaan->village->district->regency_id ?? '' }}"
                     data-district-id="{{ $perusahaan->village->district_id ?? '' }}"
-                    data-village-id="{{ $perusahaan->village_id }}"
+                    data-village-id="{{ $perusahaan->village_id ?? '' }}"
                     title="Edit">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <circle cx="12" cy="12" r="2" fill="#DFA000"/>
@@ -638,7 +638,7 @@
                 </td>
               </tr>
             @empty
-              <tr><td colspan="7" class="text-center" style="text-align:center;color:#64748B;padding:40px;">Belum ada data</td></tr>
+              <tr><td colspan="6" class="text-center" style="text-align:center;color:#64748B;padding:40px;">Belum ada data</td></tr>
             @endforelse
           </tbody>
         </table>

@@ -298,6 +298,54 @@
       font-size: 14px;
       margin: 0;
     }
+
+    /* Jenis Badge */
+    .jenis-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      background: #DBEAFE;
+      color: #1E40AF;
+    }
+
+    .jenis-badge.iuptls {
+      background: #D1FAE5;
+      color: #065F46;
+    }
+
+    .jenis-badge.sktp {
+      background: #FEF3C7;
+      color: #92400E;
+    }
+
+    /* Kapasitas column */
+    .kapasitas-value {
+      font-weight: 600;
+      color: #059669;
+    }
+
+    /* Reset button */
+    .btn-reset {
+      padding: 6px 12px;
+      border: 1px solid #E5E7EB;
+      border-radius: 6px;
+      font-size: 12px;
+      background: white;
+      color: #6B7280;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-reset:hover {
+      background: #F9FAFB;
+      color: #374151;
+    }
   </style>
 @endpush
 
@@ -308,55 +356,58 @@
       <div class="page-title">Perizinan dan Permohonan</div>
     </div>
     <div class="page-actions">
-      <a href="{{ route('admin.permohonan.create') }}" class="btn btn-primary" id="btnTambahPermohonan" style="display: none;">
+      <a href="#" class="btn btn-primary" id="btnTambahPermohonan" style="display: none;">
         <i class="ri-add-line"></i>
         Tambah Permohonan
-      </a>
-      <a href="{{ route('admin.perizinan.create') }}" class="btn btn-primary" id="btnTambahPerizinan">
-        <i class="ri-add-line"></i>
-        Tambah Perizinan
       </a>
     </div>
   </div>
 
   <!-- Tab Navigation -->
   <div class="tab-navigation">
-    <button class="tab-btn active" data-tab="perizinan">
+    <button class="tab-btn {{ $tab === 'perizinan' ? 'active' : '' }}" data-tab="perizinan">
       <i class="ri-file-shield-2-line"></i>
       <span>Data Perizinan</span>
-      <span class="badge">{{ count($perizinanData) }}</span>
+      <span class="badge">{{ $perizinanItems->total() }}</span>
     </button>
-    <button class="tab-btn" data-tab="permohonan">
+    <button class="tab-btn {{ $tab === 'permohonan' ? 'active' : '' }}" data-tab="permohonan">
       <i class="ri-file-list-3-line"></i>
       <span>Manajemen Permohonan</span>
-      <span class="badge">{{ count($permohonanData) }}</span>
+      <span class="badge">{{ $permohonanUsers->total() }}</span>
     </button>
   </div>
 
   <!-- Tab 1: Data Perizinan -->
-  <div class="tab-content active" id="tab-perizinan">
+  <div class="tab-content {{ $tab === 'perizinan' ? 'active' : '' }}" id="tab-perizinan">
     <section class="card">
       <div class="card-header">
-        <div class="filter-row">
-          <div class="input-group w-search">
-            <span class="input-group-text"><i class="ri-search-line"></i></span>
-            <input type="text" id="searchPerizinan" class="form-control" placeholder="Cari Perusahaan atau Jenis Izin"
-              autocomplete="off">
+        <form method="GET" action="{{ route('admin.permohonan.index') }}" id="filterFormPerizinan">
+          <input type="hidden" name="tab" value="perizinan">
+          <div class="filter-row">
+            <div class="input-group w-search">
+              <span class="input-group-text"><i class="ri-search-line"></i></span>
+              <input type="text" name="q" value="{{ $q }}" class="form-control" placeholder="Cari Perusahaan, No. Izin..."
+                autocomplete="off">
+            </div>
+            <select class="filter-select" name="status" onchange="this.form.submit()">
+              <option value="">Semua Status</option>
+              <option value="aktif" {{ $status === 'aktif' ? 'selected' : '' }}>Aktif</option>
+              <option value="menunggu" {{ $status === 'menunggu' ? 'selected' : '' }}>Menunggu Verifikasi</option>
+              <option value="expired" {{ $status === 'expired' ? 'selected' : '' }}>Expired</option>
+            </select>
+            <select class="filter-select" name="jenis" onchange="this.form.submit()">
+              <option value="">Semua Jenis Izin</option>
+              @foreach($jenisOptions as $jenisOption)
+                <option value="{{ $jenisOption }}" {{ $jenis === $jenisOption ? 'selected' : '' }}>{{ $jenisOption }}</option>
+              @endforeach
+            </select>
+            @if($q || $status || $jenis)
+              <a href="{{ route('admin.permohonan.index', ['tab' => 'perizinan']) }}" class="btn-reset">
+                <i class="ri-refresh-line"></i> Reset
+              </a>
+            @endif
           </div>
-          <select class="filter-select" id="filterStatus">
-            <option value="">Semua Status</option>
-            <option value="aktif">Aktif</option>
-            <option value="menunggu">Menunggu Verifikasi</option>
-            <option value="expired">Expired</option>
-          </select>
-          <select class="filter-select" id="filterJenisIzin">
-            <option value="">Semua Jenis Izin</option>
-            <option value="IUJPTL">IUJPTL</option>
-            <option value="IUPTLS">IUPTLS</option>
-            <option value="SLO">SLO</option>
-            <option value="SKTP">SKTP</option>
-          </select>
-        </div>
+        </form>
       </div>
 
       <div class="card-body" style="padding:0;">
@@ -365,74 +416,64 @@
             <thead>
               <tr>
                 <th class="col-no">No</th>
-                <th>Perusahaan</th>
-                <th>Jenis Izin</th>
-                <th>Tanggal Berlaku</th>
-                <th>Sumber Pengajuan</th>
-                <th>Tanggal Pengajuan</th>
+                <th>Nama Pemohon</th>
+                <th>Kabupaten/Kota</th>
+                <th>Jenis</th>
+                <th>No. Surat Izin</th>
                 <th>Tanggal Terbit</th>
+                <th>Tanggal Akhir</th>
                 <th>Status</th>
-                <th class="col-aksi">Aksi</th>
+                <th style="text-align: right;">Kapasitas</th>
               </tr>
             </thead>
             <tbody>
-              @forelse($perizinanData as $i => $izin)
-                <tr>
-                  <td class="col-no">{{ $i + 1 }}</td>
-                  <td><strong>{{ $izin['perusahaan'] }}</strong></td>
-                  <td>{{ $izin['jenis_izin'] }}</td>
-                  <td class="date-text">{{ $izin['tanggal_berlaku'] }}</td>
-                  <td>{{ $izin['sumber_pengajuan'] }}</td>
-                  <td class="date-text">{{ $izin['tanggal_pengajuan'] }}</td>
-                  <td class="date-text">{{ $izin['tanggal_terbit'] ?? '-' }}</td>
-                  <td>
-                    @php
-                      $statusText = $izin['status'];
-                      $statusClass = 'status-aktif';
+              @forelse($perizinanItems as $i => $izin)
+                @php
+                  // Determine status based on tanggal_terbit and tanggal_akhir
+                  $statusText = 'Menunggu Verifikasi';
+                  $statusClass = 'status-menunggu';
 
-                      // Mapping status berdasarkan dokumen
-                      if (str_contains(strtolower($statusText), 'expired')) {
-                        $statusClass = 'status-expired';
-                        // Tambahkan jumlah hari kadaluarsa jika ada
-                        if (isset($izin['expired_days']) && $izin['expired_days'] !== null) {
-                          $statusText = 'Expired (' . $izin['expired_days'] . ' hari)';
-                        }
-                      } elseif (str_contains(strtolower($statusText), 'akan kadaluarsa')) {
-                        $statusClass = 'status-akan-kadaluarsa';
-                        // Tambahkan sisa hari jika ada
-                        if (isset($izin['remaining_days']) && $izin['remaining_days'] !== null) {
-                          $statusText = 'Akan Kadaluarsa (' . $izin['remaining_days'] . ' hari)';
-                        }
-                      } elseif (str_contains(strtolower($statusText), 'menunggu verifikasi')) {
-                        $statusClass = 'status-menunggu';
-                      } elseif (str_contains(strtolower($statusText), 'menunggu terbit')) {
-                        $statusClass = 'status-menunggu-terbit';
-                      } elseif (str_contains(strtolower($statusText), 'aktif')) {
-                        $statusClass = 'status-aktif';
-                        // Tambahkan sisa hari jika ada
-                        if (isset($izin['remaining_days']) && $izin['remaining_days'] !== null) {
-                          $statusText = 'Aktif (' . $izin['remaining_days'] . ' hari)';
-                        }
-                      } elseif (str_contains(strtolower($statusText), 'ditolak')) {
-                        $statusClass = 'status-ditolak';
-                      }
-                    @endphp
-                    <span class="status-badge {{ $statusClass }}">{{ $statusText }}</span>
+                  if ($izin->tanggal_terbit && $izin->tanggal_akhir) {
+                    $today = now();
+                    $tanggalAkhir = \Carbon\Carbon::parse($izin->tanggal_akhir);
+
+                    if ($tanggalAkhir->isPast()) {
+                      $statusText = 'Expired';
+                      $statusClass = 'status-expired';
+                    } else {
+                      $statusText = 'Aktif';
+                      $statusClass = 'status-aktif';
+                    }
+                  } elseif ($izin->tanggal_terbit) {
+                    $statusText = 'Aktif';
+                    $statusClass = 'status-aktif';
+                  }
+
+                  // Jenis badge class
+                  $jenisClass = '';
+                  if (strtoupper($izin->jenis) === 'IUPTLS') {
+                    $jenisClass = 'iuptls';
+                  } elseif (strtoupper($izin->jenis) === 'SKTP') {
+                    $jenisClass = 'sktp';
+                  }
+                @endphp
+                <tr>
+                  <td class="col-no">{{ $perizinanItems->firstItem() + $i }}</td>
+                  <td><strong>{{ $izin->nama_pemohon ?? '-' }}</strong></td>
+                  <td>{{ $izin->kabupaten_kota ?? '-' }}</td>
+                  <td>
+                    @if($izin->jenis)
+                      <span class="jenis-badge {{ $jenisClass }}">{{ $izin->jenis }}</span>
+                    @else
+                      -
+                    @endif
                   </td>
-                  <td class="col-aksi">
-                    <a href="{{ route('admin.perizinan.show', $izin['id']) }}" class="btn-ico view" title="Lihat Detail">
-                      <i class="ri-eye-line"></i>
-                    </a>
-                    <a href="{{ route('admin.perizinan.edit', $izin['id']) }}" class="btn-ico edit" title="Edit">
-                      <i class="ri-edit-line"></i>
-                    </a>
-                    <form action="{{ route('admin.perizinan.destroy', $izin['id']) }}" method="POST" class="d-inline form-delete-perizinan" data-name="{{ $izin['perusahaan'] }}">
-                      @csrf
-                      @method('DELETE')
-                      <button type="button" class="btn-ico danger btn-delete-perizinan" title="Hapus">
-                        <i class="ri-delete-bin-line"></i>
-                      </button>
-                    </form>
+                  <td>{{ $izin->no_surat_izin ?? '-' }}</td>
+                  <td class="date-text">{{ $izin->tanggal_terbit ? $izin->tanggal_terbit->format('d/m/Y') : '-' }}</td>
+                  <td class="date-text">{{ $izin->tanggal_akhir ? $izin->tanggal_akhir->format('d/m/Y') : '-' }}</td>
+                  <td><span class="status-badge {{ $statusClass }}">{{ $statusText }}</span></td>
+                  <td style="text-align: right;">
+                    <span class="kapasitas-value">{{ number_format($izin->kapasitas ?? 0, 2) }}</span> kVA
                   </td>
                 </tr>
               @empty
@@ -450,8 +491,13 @@
         </div>
 
         <div class="table-footer">
-          <div class="summary">Menampilkan <strong>1–{{ count($perizinanData) }}</strong> dari
-            <strong>{{ count($perizinanData) }}</strong> data
+          <div class="summary">
+            Menampilkan <strong>{{ $perizinanItems->firstItem() ?? 0 }}–{{ $perizinanItems->lastItem() ?? 0 }}</strong>
+            dari
+            <strong>{{ $perizinanItems->total() }}</strong> data
+          </div>
+          <div>
+            {{ $perizinanItems->links() }}
           </div>
         </div>
       </div>
@@ -459,14 +505,14 @@
   </div>
 
   <!-- Tab 2: Manajemen Permohonan -->
-  <div class="tab-content" id="tab-permohonan">
+  <div class="tab-content {{ $tab === 'permohonan' ? 'active' : '' }}" id="tab-permohonan">
     <section class="card">
       <div class="card-header">
         <div class="filter-row">
           <div class="input-group w-search">
             <span class="input-group-text"><i class="ri-search-line"></i></span>
-            <input type="text" id="searchPermohonan" class="form-control" placeholder="Cari Pengguna atau Kategori Permohonan"
-              autocomplete="off">
+            <input type="text" id="searchPermohonan" class="form-control"
+              placeholder="Cari Pengguna atau Kategori Permohonan" autocomplete="off">
           </div>
           <select class="filter-select" id="filterStatusPermohonan">
             <option value="">Semua Status</option>
@@ -489,53 +535,45 @@
                 <th>Kategori Permohonan</th>
                 <th>Status</th>
                 <th>Tanggal Pengajuan</th>
-                <th>Tanggal Terbit</th>
-                <th>Tanggal Berlaku</th>
                 <th class="col-aksi">Aksi</th>
               </tr>
             </thead>
             <tbody>
-              @forelse($permohonanData as $i => $item)
+              @forelse($permohonanUsers as $i => $item)
+                @php
+                  $statusClass = 'status-aktif';
+                  $statusText = ucfirst($item->status);
+
+                  // Mapping status ke format yang lebih user-friendly
+                  $statusMap = [
+                    'pending' => ['text' => 'Menunggu Verifikasi', 'class' => 'status-menunggu'],
+                    'diproses' => ['text' => 'Sedang Diproses', 'class' => 'status-menunggu'],
+                    'selesai' => ['text' => 'Aktif', 'class' => 'status-aktif'],
+                    'ditolak' => ['text' => 'Ditolak', 'class' => 'status-ditolak'],
+                    'expired' => ['text' => 'Expired', 'class' => 'status-expired'],
+                  ];
+
+                  if (isset($statusMap[$item->status])) {
+                    $statusText = $statusMap[$item->status]['text'];
+                    $statusClass = $statusMap[$item->status]['class'];
+                  }
+                @endphp
                 <tr>
-                  <td class="col-no">{{ $i + 1 }}</td>
-                  <td><strong>{{ $item['perusahaan'] }}</strong></td>
-                  <td>{{ $item['jenis_izin'] }}</td>
-                  <td>
-                    @php
-                      $statusClass = 'status-aktif';
-                      $statusText = $item['status'];
-                      // Mapping status berdasarkan teks yang ada
-                      if (str_contains(strtolower($item['status']), 'menunggu')) {
-                        $statusClass = 'status-menunggu';
-                      } elseif (str_contains(strtolower($item['status']), 'diproses')) {
-                        $statusClass = 'status-menunggu';
-                      } elseif (str_contains(strtolower($item['status']), 'expired')) {
-                        $statusClass = 'status-expired';
-                      } elseif (str_contains(strtolower($item['status']), 'ditolak')) {
-                        $statusClass = 'status-ditolak';
-                      } elseif (str_contains(strtolower($item['status']), 'aktif') || str_contains(strtolower($item['status']), 'selesai')) {
-                        $statusClass = 'status-aktif';
-                      }
-                    @endphp
-                    <span class="status-badge {{ $statusClass }}">{{ $statusText }}</span>
-                  </td>
-                  <td class="date-text">{{ $item['tanggal_pengajuan'] }}</td>
-                  <td class="date-text">{{ $item['tanggal_terbit'] ?? '-' }}</td>
-                  <td class="date-text">{{ $item['tanggal_berlaku'] }}</td>
+                  <td class="col-no">{{ $permohonanUsers->firstItem() + $i }}</td>
+                  <td><strong>{{ $item->user->name ?? '-' }}</strong></td>
+                  <td>{{ $item->permohonan->nama ?? '-' }}</td>
+                  <td><span class="status-badge {{ $statusClass }}">{{ $statusText }}</span></td>
+                  <td class="date-text">{{ $item->created_at ? $item->created_at->format('d/m/Y') : '-' }}</td>
                   <td class="col-aksi">
-                    <a href="{{ route('admin.permohonan-user.show', [$item['permohonan_id'], $item['id']]) }}" class="btn-ico view" title="Lihat Detail">
+                    <a href="{{ route('admin.permohonan-user.show', [$item->permohonan_id, $item->id]) }}"
+                      class="btn-ico view" title="Lihat Detail">
                       <i class="ri-eye-line"></i>
                     </a>
-                    @if($item['status'] !== 'Aktif' && !str_contains(strtolower($item['status']), 'ditolak'))
-                      <a href="{{ route('admin.permohonan-user.edit', [$item['permohonan_id'], $item['id']]) }}" class="btn-ico edit" title="Edit">
-                        <i class="ri-edit-line"></i>
-                      </a>
-                    @endif
                   </td>
                 </tr>
               @empty
                 <tr>
-                  <td colspan="8">
+                  <td colspan="6">
                     <div class="empty-state">
                       <i class="ri-file-list-3-line"></i>
                       <p>Belum ada data permohonan</p>
@@ -549,8 +587,11 @@
 
         <div class="table-footer">
           <div class="summary">Menampilkan
-            <strong>1–{{ count($permohonanData) }}</strong> dari
-            <strong>{{ count($permohonanData) }}</strong> data
+            <strong>{{ $permohonanUsers->firstItem() ?? 0 }}–{{ $permohonanUsers->lastItem() ?? 0 }}</strong> dari
+            <strong>{{ $permohonanUsers->total() }}</strong> data
+          </div>
+          <div>
+            {{ $permohonanUsers->links() }}
           </div>
         </div>
       </div>
@@ -572,26 +613,8 @@
           tabContents.forEach(content => content.classList.remove('active'));
           this.classList.add('active');
           document.getElementById('tab-' + tabId).classList.add('active');
-
-          // Toggle button visibility
-          const btnTambahPermohonan = document.getElementById('btnTambahPermohonan');
-          const btnTambahPerizinan = document.getElementById('btnTambahPerizinan');
-          if (tabId === 'perizinan') {
-            btnTambahPermohonan.style.display = 'none';
-            btnTambahPerizinan.style.display = 'inline-flex';
-          } else {
-            // Tab permohonan aktif - sembunyikan tombol tambah permohonan
-            btnTambahPermohonan.style.display = 'none';
-            btnTambahPerizinan.style.display = 'none';
-          }
         });
       });
-
-      // Set initial button visibility
-      const btnTambahPermohonan = document.getElementById('btnTambahPermohonan');
-      const btnTambahPerizinan = document.getElementById('btnTambahPerizinan');
-      btnTambahPermohonan.style.display = 'none';
-      btnTambahPerizinan.style.display = 'inline-flex';
 
       // Success notification
       @if(session('success'))
@@ -607,96 +630,16 @@
         });
       @endif
 
-      // Delete confirmation for permohonan
-      document.querySelectorAll('.btn-delete-permohonan').forEach(btn => {
-        btn.addEventListener('click', function (e) {
-          e.preventDefault();
-          const form = this.closest('.form-delete-permohonan');
-          const name = form.dataset.name;
-
-          Swal.fire({
-            title: 'Konfirmasi Hapus',
-            html: `Apakah Anda yakin ingin menghapus permohonan <strong>${name}</strong>?<br><small class="text-muted">Data yang dihapus tidak dapat dikembalikan.</small>`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#94a3b8',
-            confirmButtonText: '<i class="ri-delete-bin-line"></i> Ya, Hapus!',
-            cancelButtonText: 'Batal',
-            reverseButtons: true,
-          }).then((result) => {
-            if (result.isConfirmed) {
-              form.submit();
-            }
-          });
-        });
-      });
-
-      // Delete confirmation for perizinan
-      document.querySelectorAll('.btn-delete-perizinan').forEach(btn => {
-        btn.addEventListener('click', function (e) {
-          e.preventDefault();
-          const form = this.closest('.form-delete-perizinan');
-          const name = form.dataset.name;
-
-          Swal.fire({
-            title: 'Konfirmasi Hapus',
-            html: `Apakah Anda yakin ingin menghapus perizinan <strong>${name}</strong>?<br><small class="text-muted">Data yang dihapus tidak dapat dikembalikan.</small>`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#94a3b8',
-            confirmButtonText: '<i class="ri-delete-bin-line"></i> Ya, Hapus!',
-            cancelButtonText: 'Batal',
-            reverseButtons: true,
-          }).then((result) => {
-            if (result.isConfirmed) {
-              form.submit();
-            }
-          });
-        });
-      });
-
-      // Auto submit on search for permohonan
-      const searchInput = document.querySelector('input[name="q"]');
+        // Auto submit search on enter
+        const searchInput = document.querySelector('#filterFormPerizinan input[name="q"]');
       if (searchInput) {
-        let timeout;
-        searchInput.addEventListener('input', function () {
-          clearTimeout(timeout);
-          timeout = setTimeout(() => {
-            document.getElementById('filterForm').submit();
-          }, 500);
+        searchInput.addEventListener('keypress', function (e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('filterFormPerizinan').submit();
+          }
         });
       }
-
-      // Simple filter for perizinan table (client-side)
-      const searchPerizinan = document.getElementById('searchPerizinan');
-      const filterStatus = document.getElementById('filterStatus');
-      const filterJenisIzin = document.getElementById('filterJenisIzin');
-      const tablePerizinan = document.getElementById('tablePerizinan');
-
-      function filterTable() {
-        const searchTerm = searchPerizinan?.value.toLowerCase() || '';
-        const statusFilter = filterStatus?.value.toLowerCase() || '';
-        const jenisFilter = filterJenisIzin?.value || '';
-
-        const rows = tablePerizinan?.querySelectorAll('tbody tr') || [];
-        rows.forEach(row => {
-          const perusahaan = row.cells[1]?.textContent.toLowerCase() || '';
-          const jenisIzin = row.cells[2]?.textContent || '';
-          const status = row.cells[7]?.textContent.toLowerCase() || '';
-
-          const matchSearch = perusahaan.includes(searchTerm) || jenisIzin.toLowerCase().includes(searchTerm);
-          const matchStatus = !statusFilter || status.includes(statusFilter);
-          const matchJenis = !jenisFilter || jenisIzin === jenisFilter;
-
-          row.style.display = (matchSearch && matchStatus && matchJenis) ? '' : 'none';
-        });
-      }
-
-      searchPerizinan?.addEventListener('input', filterTable);
-      filterStatus?.addEventListener('change', filterTable);
-      filterJenisIzin?.addEventListener('change', filterTable);
 
       // Filter for permohonan table (client-side)
       const searchPermohonan = document.getElementById('searchPermohonan');
@@ -709,6 +652,8 @@
 
         const rows = tablePermohonan?.querySelectorAll('tbody tr') || [];
         rows.forEach(row => {
+          if (row.querySelector('.empty-state')) return;
+
           const pengguna = row.cells[1]?.textContent.toLowerCase() || '';
           const kategori = row.cells[2]?.textContent.toLowerCase() || '';
           const status = row.cells[3]?.textContent.toLowerCase() || '';

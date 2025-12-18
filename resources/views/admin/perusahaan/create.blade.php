@@ -12,35 +12,19 @@
       @csrf
 
       <div class="modal-body">
-        {{-- Kabupaten/Kota --}}
-        <div class="form-group">
-          <label class="label">Kabupaten/Kota</label>
-          <div class="control">
-            <select name="regency_id" id="cRegency" class="input" data-control="select2" data-placeholder="Pilih Kabupaten/Kota" required></select>
-          </div>
-        </div>
-
-        {{-- Kecamatan --}}
-        <div class="form-group">
-          <label class="label">Kecamatan</label>
-          <div class="control">
-            <select name="district_id" id="cDistrict" class="input" data-control="select2" data-placeholder="Pilih Kecamatan" required></select>
-          </div>
-        </div>
-
-        {{-- Desa/Kelurahan --}}
-        <div class="form-group">
-          <label class="label">Desa/Kelurahan</label>
-          <div class="control">
-            <select name="village_id" id="cVillage" class="input" data-control="select2" data-placeholder="Pilih Desa/Kelurahan" required></select>
-          </div>
-        </div>
-
         {{-- Nama Perusahaan --}}
         <div class="form-group">
-          <label class="label">Nama Perusahaan</label>
+          <label class="label">Nama Perusahaan <span style="color:#ef4444">*</span></label>
           <div class="control">
             <input type="text" name="nama" id="cNama" class="input" placeholder="Masukkan nama perusahaan" required>
+          </div>
+        </div>
+
+        {{-- Kontak --}}
+        <div class="form-group">
+          <label class="label">Kontak</label>
+          <div class="control">
+            <input type="text" name="kontak" id="cKontak" class="input" placeholder="Masukkan nomor telepon/email">
           </div>
         </div>
 
@@ -48,7 +32,48 @@
         <div class="form-group">
           <label class="label">Alamat</label>
           <div class="control">
-            <textarea name="alamat" id="cAlamat" class="input" rows="3" placeholder="Masukkan alamat perusahaan"></textarea>
+            <textarea name="alamat" id="cAlamat" class="input" rows="3"
+              placeholder="Masukkan alamat perusahaan"></textarea>
+          </div>
+        </div>
+
+        {{-- Kabupaten/Kota (Text Input) --}}
+        <div class="form-group">
+          <label class="label">Kabupaten/Kota</label>
+          <div class="control">
+            <input type="text" name="kabupaten_kota" id="cKabupatenKota" class="input"
+              placeholder="Contoh: Kota Samarinda">
+          </div>
+        </div>
+
+        <hr style="border:none;border-top:1px solid #E2E8F0;margin:16px 0;">
+        <p style="font-size:12px;color:#64748B;margin-bottom:12px;"><i class="ri-information-line"></i> Opsional: Pilih
+          lokasi detail (Kabupaten → Kecamatan → Desa)</p>
+
+        {{-- Kabupaten/Kota (Dropdown) --}}
+        <div class="form-group">
+          <label class="label">Kabupaten/Kota (Pilih)</label>
+          <div class="control">
+            <select name="regency_id" id="cRegency" class="input" data-control="select2"
+              data-placeholder="Pilih Kabupaten/Kota"></select>
+          </div>
+        </div>
+
+        {{-- Kecamatan --}}
+        <div class="form-group">
+          <label class="label">Kecamatan</label>
+          <div class="control">
+            <select name="district_id" id="cDistrict" class="input" data-control="select2"
+              data-placeholder="Pilih Kecamatan"></select>
+          </div>
+        </div>
+
+        {{-- Desa/Kelurahan --}}
+        <div class="form-group">
+          <label class="label">Desa/Kelurahan</label>
+          <div class="control">
+            <select name="village_id" id="cVillage" class="input" data-control="select2"
+              data-placeholder="Pilih Desa/Kelurahan"></select>
           </div>
         </div>
       </div>
@@ -62,24 +87,126 @@
 
 @push('styles')
   <style>
-    .modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;z-index:1000;padding:18px;overflow:auto;}
-    .modal-overlay.show{display:block;}
-    .modal{max-width:520px;margin:20px auto;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-2);overflow:hidden;}
-    .modal-header{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid var(--line);}
-    .modal-header h3{margin:0;font-weight:800;font-size:20px;letter-spacing:-.2px;}
-    .btn-x{width:36px;height:36px;display:grid;place-items:center;border:1px solid #E2E8F0;background:#fff;border-radius:10px;cursor:pointer;}
-    .btn-x:hover{background:#F8FAFC;}
-    .modal-body{padding:18px 20px 6px;}
-    .modal-footer{padding:14px 20px 18px;}
-    .btn-save{width:100%;height:44px;border:none;border-radius:10px;font-weight:700;color:#fff;background:var(--accent-2);box-shadow:0 10px 22px rgba(34,197,94,.22);cursor:pointer;}
-    .btn-save:hover{filter:brightness(.95);}
-    .form-group{margin-bottom:16px;}
-    .label{display:block;font-size:14px;color:#374151;margin:6px 0 8px;font-weight:600;}
-    .control{position:relative;}
-    .input{width:100%;height:44px;padding:0 12px;border:1px solid #E2E8F0;border-radius:10px;background:#FCFCFD;outline:none;font:inherit;color:#111827;}
-    .input::placeholder{color:#94A3B8;}
-    .input:focus{border-color:#CBD5E1;box-shadow:0 0 0 3px rgba(16,185,129,.12);}
-    .control textarea{min-height:80px;padding:12px;resize:vertical;}
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, .45);
+      display: none;
+      z-index: 1000;
+      padding: 18px;
+      overflow: auto;
+    }
+
+    .modal-overlay.show {
+      display: block;
+    }
+
+    .modal {
+      max-width: 520px;
+      margin: 20px auto;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: var(--shadow-2);
+      overflow: hidden;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      font-weight: 800;
+      font-size: 20px;
+      letter-spacing: -.2px;
+    }
+
+    .btn-x {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border: 1px solid #E2E8F0;
+      background: #fff;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .btn-x:hover {
+      background: #F8FAFC;
+    }
+
+    .modal-body {
+      padding: 18px 20px 6px;
+    }
+
+    .modal-footer {
+      padding: 14px 20px 18px;
+    }
+
+    .btn-save {
+      width: 100%;
+      height: 44px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      color: #fff;
+      background: var(--accent-2);
+      box-shadow: 0 10px 22px rgba(34, 197, 94, .22);
+      cursor: pointer;
+    }
+
+    .btn-save:hover {
+      filter: brightness(.95);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .label {
+      display: block;
+      font-size: 14px;
+      color: #374151;
+      margin: 6px 0 8px;
+      font-weight: 600;
+    }
+
+    .control {
+      position: relative;
+    }
+
+    .input {
+      width: 100%;
+      height: 44px;
+      padding: 0 12px;
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      background: #FCFCFD;
+      outline: none;
+      font: inherit;
+      color: #111827;
+    }
+
+    .input::placeholder {
+      color: #94A3B8;
+    }
+
+    .input:focus {
+      border-color: #CBD5E1;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, .12);
+    }
+
+    .control textarea {
+      min-height: 80px;
+      padding: 12px;
+      resize: vertical;
+    }
 
     /* Select2 Styling for Modal */
     .modal .select2-container {
@@ -112,13 +239,13 @@
     .modal .select2-container--default .select2-selection--single:focus,
     .modal .select2-container--default.select2-container--focus .select2-selection--single {
       border-color: #CBD5E1 !important;
-      box-shadow: 0 0 0 3px rgba(16,185,129,.12) !important;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, .12) !important;
     }
 
     .modal .select2-dropdown {
       border: 1px solid #E2E8F0 !important;
       border-radius: 10px !important;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
       margin-top: 4px !important;
       z-index: 10001 !important;
     }
@@ -139,7 +266,7 @@
 
     .modal .select2-search--dropdown .select2-search__field:focus {
       border-color: #CBD5E1 !important;
-      box-shadow: 0 0 0 3px rgba(16,185,129,.12) !important;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, .12) !important;
     }
 
     .modal .select2-results__option {
@@ -210,19 +337,19 @@
             width: '100%',
             dropdownParent: jQuery(modalElement), // Ensure dropdown is rendered inside modal
             language: {
-              noResults: function() { return "Tidak ada hasil"; },
-              searching: function() { return "Mencari..."; }
+              noResults: function () { return "Tidak ada hasil"; },
+              searching: function () { return "Mencari..."; }
             }
           });
 
           // Attach event listener after Select2 initialization
           // Use setTimeout to ensure Select2 is fully initialized
-          setTimeout(function() {
+          setTimeout(function () {
             // Remove all existing event listeners
             jQuery(selReg).off('change select2:select select2:clear');
 
             // Handle when user selects an option - this is the primary event
-            jQuery(selReg).on('select2:select', function(e) {
+            jQuery(selReg).on('select2:select', function (e) {
               const regencyId = e.params.data.id;
               const regencyName = e.params.data.text;
               console.log('Regency selected:', regencyId, regencyName);
@@ -248,7 +375,7 @@
               $select.trigger('change');
 
               // Double check after a short delay
-              setTimeout(function() {
+              setTimeout(function () {
                 const checkText = $rendered.text().trim();
                 console.log('Rendered text check:', checkText);
                 if (checkText !== regencyName && checkText !== '') {
@@ -265,7 +392,7 @@
             });
 
             // Handle change event as fallback (for programmatic changes)
-            jQuery(selReg).on('change', function() {
+            jQuery(selReg).on('change', function () {
               const regencyId = jQuery(this).val();
               console.log('Regency changed via change event:', regencyId);
               if (regencyId) {
@@ -286,7 +413,7 @@
             });
 
             // Handle clear event
-            jQuery(selReg).on('select2:clear', function() {
+            jQuery(selReg).on('select2:clear', function () {
               console.log('Regency cleared');
               // Clear district and village if regency is cleared
               selDis.innerHTML = '';
@@ -347,18 +474,18 @@
             width: '100%',
             dropdownParent: jQuery(modalElement), // Ensure dropdown is rendered inside modal
             language: {
-              noResults: function() { return "Tidak ada hasil"; },
-              searching: function() { return "Mencari..."; }
+              noResults: function () { return "Tidak ada hasil"; },
+              searching: function () { return "Mencari..."; }
             }
           });
 
           // Reattach event listener after Select2 initialization
-          setTimeout(function() {
+          setTimeout(function () {
             // Remove all existing event listeners
             jQuery(selDis).off('change select2:select select2:clear');
 
             // Handle when user selects an option
-            jQuery(selDis).on('select2:select', function(e) {
+            jQuery(selDis).on('select2:select', function (e) {
               const districtId = e.params.data.id;
               const districtName = e.params.data.text;
               console.log('District selected:', districtId, districtName);
@@ -385,7 +512,7 @@
             });
 
             // Handle change event as fallback
-            jQuery(selDis).on('change', function() {
+            jQuery(selDis).on('change', function () {
               const districtId = jQuery(this).val();
               console.log('District changed via change event:', districtId);
               if (districtId) {
@@ -401,7 +528,7 @@
             });
 
             // Handle clear event
-            jQuery(selDis).on('select2:clear', function() {
+            jQuery(selDis).on('select2:clear', function () {
               console.log('District cleared');
               selVil.innerHTML = '';
               option(selVil, '', 'Pilih Desa/Kelurahan');
@@ -439,15 +566,15 @@
             width: '100%',
             dropdownParent: jQuery(modalElement), // Ensure dropdown is rendered inside modal
             language: {
-              noResults: function() { return "Tidak ada hasil"; },
-              searching: function() { return "Mencari..."; }
+              noResults: function () { return "Tidak ada hasil"; },
+              searching: function () { return "Mencari..."; }
             }
           });
 
           // Attach event listener to ensure value is displayed
-          setTimeout(function() {
+          setTimeout(function () {
             jQuery(selVil).off('select2:select');
-            jQuery(selVil).on('select2:select', function(e) {
+            jQuery(selVil).on('select2:select', function (e) {
               const villageId = e.params.data.id;
               const villageName = e.params.data.text;
               console.log('Village selected:', villageId, villageName);

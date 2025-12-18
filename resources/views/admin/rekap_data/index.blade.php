@@ -435,9 +435,14 @@
 
         <div class="action-bar">
             <select class="year-select" id="tahunSelect">
-                @for($y = 2018; $y <= 2025; $y++)
+                @php
+                    $years = isset($availableYears) && $availableYears->isNotEmpty()
+                        ? $availableYears->merge(collect(range(2018, 2025)))->unique()->sortDesc()
+                        : collect(range(2018, 2025))->sortDesc();
+                @endphp
+                @foreach($years as $y)
                     <option value="{{ $y }}" {{ $tahun == $y ? 'selected' : '' }}>Tahun {{ $y }}</option>
-                @endfor
+                @endforeach
             </select>
             <div class="action-buttons">
                 <button class="btn-export excel"><i class="ri-file-excel-2-line"></i> Export Excel</button>
@@ -538,30 +543,34 @@
 
     <!-- Tab 2: Infrastruktur -->
     <div class="tab-content" id="tab-infrastruktur">
-        <div class="summary-cards three-cols">
+        <div class="summary-cards">
             <div class="summary-card">
                 <div class="summary-card-icon"><i class="ri-file-list-3-line"></i></div>
-                <div class="summary-card-value">{{ number_format($totalInfra['jumlah_iuptls']) }}</div>
+                <div class="summary-card-value">{{ number_format($totalInfra['jumlah_perizinan'] ?? 0) }}</div>
+                <div class="summary-card-label">Total Perizinan</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-card-icon"><i class="ri-shield-check-line"></i></div>
+                <div class="summary-card-value">{{ number_format($totalInfra['jumlah_iuptls'] ?? 0) }}</div>
                 <div class="summary-card-label">Total IUPTLS</div>
             </div>
             <div class="summary-card">
                 <div class="summary-card-icon"><i class="ri-file-shield-2-line"></i></div>
-                <div class="summary-card-value">{{ number_format($totalInfra['rekomtek_sktp']) }}</div>
+                <div class="summary-card-value">{{ number_format($totalInfra['rekomtek_sktp'] ?? 0) }}</div>
                 <div class="summary-card-label">Total Rekomtek SKTP</div>
             </div>
             <div class="summary-card">
                 <div class="summary-card-icon"><i class="ri-flashlight-fill"></i></div>
-                <div class="summary-card-value">{{ number_format($totalInfra['jumlah_kapasitas'], 2) }}</div>
+                <div class="summary-card-value">{{ number_format($totalInfra['jumlah_kapasitas'] ?? 0, 2) }}</div>
                 <div class="summary-card-label">Total Kapasitas (kVA)</div>
             </div>
         </div>
 
         <div class="action-bar">
-            <select class="year-select" id="tahunSelectInfra">
-                @for($y = 2018; $y <= 2025; $y++)
-                    <option value="{{ $y }}" {{ $tahun == $y ? 'selected' : '' }}>Tahun {{ $y }}</option>
-                @endfor
-            </select>
+            <div style="display:flex;align-items:center;gap:10px;">
+                <span style="color:#6B7280;font-size:13px;"><i class="ri-database-2-line"></i> Data dari Database
+                    Perizinan</span>
+            </div>
             <div class="action-buttons">
                 <button class="btn-export excel"><i class="ri-file-excel-2-line"></i> Export Excel</button>
                 <button class="btn-export pdf"><i class="ri-file-pdf-2-line"></i> Export PDF</button>
@@ -572,7 +581,7 @@
         <div class="report-header">
             <div class="report-title">DATA INFRASTRUKTUR KETENAGALISTRIKAN</div>
             <div class="report-subtitle">PER KABUPATEN/KOTA KALIMANTAN TIMUR</div>
-            <div class="report-year">Tahun {{ $tahun }}</div>
+            <div class="report-year">Rekap Perizinan</div>
         </div>
 
         <div class="table-container">
@@ -582,30 +591,55 @@
                         <tr>
                             <th>No.</th>
                             <th>Kota/Kabupaten</th>
-                            <th>Jumlah IUPTLS</th>
+                            <th>Jumlah Perizinan</th>
+                            <th>IUPTLS</th>
                             <th>Rekomtek SKTP</th>
-                            <th>Jumlah Kapasitas (kVA)</th>
+                            <th>Kapasitas (kVA)</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($infrastrukturData as $index => $data)
+                        @forelse($infrastrukturData as $data)
                             <tr>
-                                <td class="col-no">{{ $index + 1 }}</td>
+                                <td class="col-no">{{ $data['no'] }}</td>
                                 <td class="col-kabkota">{{ $data['kabupaten_kota'] }}</td>
+                                <td class="col-number">
+                                    <span
+                                        style="background:#E0F2FE;color:#0369A1;padding:4px 12px;border-radius:12px;font-weight:600;">
+                                        {{ number_format($data['jumlah_perizinan']) }}
+                                    </span>
+                                </td>
                                 <td class="col-number">{{ number_format($data['jumlah_iuptls']) }}</td>
                                 <td class="col-number">{{ number_format($data['rekomtek_sktp']) }}</td>
                                 <td class="col-number">{{ number_format($data['jumlah_kapasitas'], 2) }}</td>
+                                <td>
+                                    <a href="{{ route('admin.rekap-data.detail', ['kabupaten' => urlencode($data['kabupaten_kota'])]) }}"
+                                        class="btn-ico" title="Lihat Detail" style="color:#059669;">
+                                        <i class="ri-eye-line"></i>
+                                    </a>
+                                </td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="7" style="text-align:center;padding:40px;color:#6B7280;">
+                                    <i class="ri-file-list-3-line" style="font-size:48px;color:#D1D5DB;"></i>
+                                    <p style="margin-top:8px;">Belum ada data perizinan</p>
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan="2" class="total-label">TOTAL KALTIM</td>
-                            <td>{{ number_format($totalInfra['jumlah_iuptls']) }}</td>
-                            <td>{{ number_format($totalInfra['rekomtek_sktp']) }}</td>
-                            <td>{{ number_format($totalInfra['jumlah_kapasitas'], 2) }}</td>
-                        </tr>
-                    </tfoot>
+                    @if(count($infrastrukturData) > 0)
+                        <tfoot>
+                            <tr>
+                                <td colspan="2" class="total-label">TOTAL KALTIM</td>
+                                <td>{{ number_format($totalInfra['jumlah_perizinan'] ?? 0) }}</td>
+                                <td>{{ number_format($totalInfra['jumlah_iuptls'] ?? 0) }}</td>
+                                <td>{{ number_format($totalInfra['rekomtek_sktp'] ?? 0) }}</td>
+                                <td>{{ number_format($totalInfra['jumlah_kapasitas'] ?? 0, 2) }}</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    @endif
                 </table>
             </div>
         </div>

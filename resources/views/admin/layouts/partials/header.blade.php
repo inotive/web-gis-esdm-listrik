@@ -12,25 +12,73 @@
     <button class="btn-icon" title="Notifikasi"><i class="ri-notification-3-line"></i></button>
     <button class="btn-icon" title="Bantuan"><i class="ri-question-line"></i></button>
 
-    {{-- Avatar = Trigger Modal --}}
-    <img
-      class="avatar"
-      src="{{ auth()->user()?->image ? asset('storage/profile/'.auth()->user()->image) : 'https://i.pravatar.cc/80?img=22' }}"
-      alt="Profil {{ auth()->user()?->name ?? 'Pengguna' }}"
-      id="avatarTrigger"
-      style="cursor:pointer"
-    >
+    @php
+        $authUser = Auth::user();
+        $profileImage = $authUser?->image
+            ? asset('storage/profile/' . $authUser->image)
+            : 'https://i.pravatar.cc/80?img=22';
+    @endphp
+
+    {{-- Avatar = Trigger Modal Quick Profile --}}
+    <div class="user-profile-btn" id="userProfileBtn" title="{{ $authUser?->name ?? 'User' }}">
+        <img src="{{ $profileImage }}" alt="user" class="avatar" />
+    </div>
   </div>
 </header>
 
-{{-- ===================== MODAL QUICK PROFILE ===================== --}}
-<div id="modalProfile" class="pm-modal" role="dialog" aria-modal="true" aria-labelledby="pmTitle">
+{{-- ===================== MODAL QUICK PROFILE (Menu) ===================== --}}
+<div class="profile-modal-overlay" id="profileModalOverlay">
+    <div class="profile-modal" onclick="event.stopPropagation()">
+        <div class="profile-modal-header">
+            <button class="profile-modal-close" id="closeProfileModal">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="profile-info">
+                <div class="profile-avatar">
+                    <img src="{{ $profileImage }}" alt="user" />
+                </div>
+                <div class="profile-details">
+                    <h3>{{ $authUser?->name ?? 'User' }}</h3>
+                    <p class="profile-email">{{ $authUser?->email ?? 'user@example.com' }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-modal-body">
+            <a href="javascript:void(0)" class="profile-menu-item" data-bs-toggle="modal" data-bs-target="#modalEditProfile" onclick="closeProfileModalFunc()">
+                <div class="profile-menu-icon">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="profile-menu-text">
+                    <h4>Profil Saya</h4>
+                    <p>Lihat dan edit profil Anda</p>
+                </div>
+            </a>
+
+            <form action="{{ route('logout') }}" method="POST" id="logout-form-modal">
+                @csrf
+                <a href="#" class="profile-menu-item danger" onclick="event.preventDefault(); document.getElementById('logout-form-modal').submit();">
+                    <div class="profile-menu-icon">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </div>
+                    <div class="profile-menu-text">
+                        <h4>Keluar</h4>
+                        <p>Keluar dari akun Anda</p>
+                    </div>
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{-- ===================== MODAL EDIT PROFILE ===================== --}}
+<div id="modalEditProfile" class="pm-modal" role="dialog" aria-modal="true" aria-labelledby="pmTitle">
   <div class="pm-backdrop" data-close></div>
 
   <div class="pm-card">
     <div class="pm-head">
-      <div class="pm-title" id="pmTitle">Profil Saya</div>
-      <button class="pm-ghost" data-close aria-label="Tutup"><i class="ri-close-line"></i></button>
+      <div class="pm-title" id="pmTitle">Edit Profil Saya</div>
+    <button class="pm-ghost" type="button" data-close aria-label="Tutup"><i class="ri-close-line"></i></button>
     </div>
 
     <div class="pm-body">
@@ -100,24 +148,210 @@
         <i class="ri-save-3-line"></i> Simpan
       </button>
 
-      <form id="logoutForm" action="{{ route('logout') }}" method="POST" class="d-inline">
-        @csrf
-        <button type="submit" class="pm-btn pm-danger">
-          <i class="ri-logout-box-r-line"></i> Keluar
-        </button>
-      </form>
-
-      <button class="pm-btn pm-ghost" data-close>Batalkan</button>
+     
     </div>
   </div>
 </div>
 
 {{-- ===================== STYLE KHUSUS MODAL ===================== --}}
 <style>
-  .pm-modal{position:fixed;inset:0;display:none;z-index:1050}
-  .pm-modal.show{display:flex;align-items:center;justify-content:center}
+  /* Profile Modal Quick Menu Styles (from welcome.blade.php) */
+  .user-profile-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      overflow: hidden;
+      cursor: pointer;
+      border: 2px solid #10b981;
+      transition: all 0.2s;
+      position: relative;
+  }
+
+  .user-profile-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  }
+
+  .user-profile-btn img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+  }
+
+  .profile-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+      display: none;
+      animation: fadeIn 0.2s ease-in-out;
+  }
+
+  .profile-modal-overlay.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+  }
+
+  .profile-modal {
+      background-color: white;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      animation: slideUp 0.3s ease-out;
+      overflow: hidden;
+  }
+
+  .profile-modal-header {
+      padding: 24px;
+      border-bottom: 1px solid #e5e7eb;
+      background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+  }
+
+  .profile-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+  }
+
+  .profile-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 3px solid white;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .profile-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+  }
+
+  .profile-details h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 4px;
+  }
+
+  .profile-email {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.8);
+  }
+
+  .profile-modal-body {
+      padding: 0;
+  }
+
+  .profile-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 24px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-bottom: 1px solid #f3f4f6;
+      text-decoration: none;
+      color: #1f2937;
+  }
+
+  .profile-menu-item:hover {
+      background-color: #f9fafb;
+  }
+
+  .profile-menu-item:last-child {
+      border-bottom: none;
+  }
+
+  .profile-menu-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background-color: #f3f4f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #6b7280;
+  }
+
+  .profile-menu-item.danger .profile-menu-icon {
+      background-color: #fee2e2;
+      color: #ef4444;
+  }
+
+  .profile-menu-text {
+      flex: 1;
+  }
+
+  .profile-menu-text h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 2px;
+  }
+
+  .profile-menu-text p {
+      font-size: 12px;
+      color: #6b7280;
+  }
+
+  .profile-menu-item.danger .profile-menu-text h4 {
+      color: #ef4444;
+  }
+
+  .profile-modal-close {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      color: white;
+  }
+
+  .profile-modal-close:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      transform: rotate(90deg);
+  }
+
+  @keyframes fadeIn {
+      from {
+          opacity: 0;
+      }
+      to {
+          opacity: 1;
+      }
+  }
+
+  @keyframes slideUp {
+      from {
+          transform: translateY(20px);
+          opacity: 0;
+      }
+      to {
+          transform: translateY(0);
+          opacity: 1;
+      }
+  }
+
+  /* Edit Profile Modal Styles */
+    .pm-modal{position:fixed;inset:0;display:none;z-index:10000;align-items:center;justify-content:center}
+    .pm-modal.show{display:flex;align-items:center;justify-content:center}
   .pm-backdrop{position:absolute;inset:0;background:rgba(15,23,42,.45)}
-  .pm-card{position:relative;z-index:1;background:#fff;border:1px solid #E5E7EB;border-radius:16px;width:min(96vw,880px);max-height:92vh;box-shadow:0 18px 44px -18px rgba(2,6,23,.45);display:flex;flex-direction:column}
+    .pm-card{position:relative;z-index:1;background:#fff;border:1px solid #E5E7EB;border-radius:16px;width:min(96vw,880px);max-height:92vh;box-shadow:0 18px 44px -18px rgba(2,6,23,.45);display:flex;flex-direction:column;margin:0 auto}
   .pm-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #EDF2F7}
   .pm-title{font-weight:800;font-size:18px}
   .pm-body{padding:16px;overflow:auto}
@@ -145,23 +379,127 @@
   .pm-avatar-wrap{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
   .pm-avatar{width:84px;height:84px;border-radius:999px;object-fit:cover;border:1px solid #E5E7EB;background:#fff}
   .pm-file{display:none}
+
+  @media (max-width: 768px) {
+      .profile-modal {
+          width: 95%;
+          margin: 0 10px;
+      }
+  }
 </style>
 
-{{-- ===================== SCRIPT: buka/preview/toggle pwd ===================== --}}
+{{-- ===================== SCRIPT: Modal Quick Profile & Edit Profile ===================== --}}
 <script>
   (function(){
-    const modal  = document.getElementById('modalProfile');
-    const open   = () => modal?.classList.add('show');
-    const close  = () => modal?.classList.remove('show');
+    // Profile Quick Modal Functions
+    const userProfileBtn = document.getElementById('userProfileBtn');
+    const profileModalOverlay = document.getElementById('profileModalOverlay');
+    const closeProfileModal = document.getElementById('closeProfileModal');
 
-    // Open by avatar
-    document.getElementById('avatarTrigger')?.addEventListener('click', open);
+    function openProfileModal() {
+        profileModalOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
 
-    // Close by [data-close] or backdrop
-    modal?.addEventListener('click', e=>{
-      if (e.target.hasAttribute('data-close') || e.target.classList.contains('pm-backdrop')) close();
+    function closeProfileModalFunc() {
+        profileModalOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // Open modal when clicking profile button
+    userProfileBtn?.addEventListener('click', openProfileModal);
+
+    // Close modal when clicking close button
+    closeProfileModal?.addEventListener('click', closeProfileModalFunc);
+
+    // Close modal when clicking overlay
+    profileModalOverlay?.addEventListener('click', function(e) {
+        if (e.target === profileModalOverlay) {
+            closeProfileModalFunc();
+        }
     });
-    document.addEventListener('keydown', e=>{ if(e.key==='Escape') close(); });
+
+    // Close modal with ESC key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && profileModalOverlay?.classList.contains('active')) {
+            closeProfileModalFunc();
+        }
+    });
+
+    // Make closeProfileModalFunc globally accessible
+    window.closeProfileModalFunc = closeProfileModalFunc;
+
+    let editProfileModalOpenFunction = null;
+    let editProfileModalCloseFunction = null;
+
+    // Edit Profile Modal Functions
+        function initializeEditProfileModal() {
+            const modal = document.getElementById('modalEditProfile');
+            if (!modal) return;
+
+            const open = () => {
+                modal.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            };
+            const close = () => {
+                modal.classList.remove('show');
+                document.body.style.overflow = '';
+            };
+
+            // Store references to open and close functions
+            editProfileModalOpenFunction = open;
+            editProfileModalCloseFunction = close;
+
+            // Close by [data-close] buttons
+            const closeButtons = modal.querySelectorAll('[data-close]');
+            closeButtons.forEach(btn => {
+                // Remove any existing listeners to prevent duplicates
+                btn.removeEventListener('click', closeModalHandler);
+
+                // Define handler function
+                function closeModalHandler(ev) {
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    close();
+                }
+
+                // Add event listener
+                btn.addEventListener('click', closeModalHandler);
+            });
+
+            // Close by clicking backdrop
+            modal.addEventListener('click', function(e){
+                if (e.target.classList.contains('pm-backdrop')) {
+                    close();
+                }
+            });
+        }
+
+        // Initialize after DOM is loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeEditProfileModal);
+        } else {
+            initializeEditProfileModal();
+        }
+
+        // Open edit profile modal when menu item clicked
+        document.querySelector('[data-bs-target="#modalEditProfile"]')?.addEventListener('click', function(e){
+            e.preventDefault();
+            closeProfileModalFunc();
+            if (editProfileModalOpenFunction) {
+                editProfileModalOpenFunction();
+            }
+        });
+
+        // Handle Escape key for edit modal
+        document.addEventListener('keydown', function(e) {
+            if(e.key==='Escape') {
+                const editModal = document.getElementById('modalEditProfile');
+                if (editModal && editModal.classList.contains('show') && editProfileModalCloseFunction) {
+                    editProfileModalCloseFunction();
+                }
+            }
+        });
 
     // Preview avatar
     const file = document.getElementById('pmImage');

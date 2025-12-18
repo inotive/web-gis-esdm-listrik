@@ -23,15 +23,25 @@ class PerusahaanController extends Controller
         $regencyId = $request->get('regency_id');
         $districtId = $request->get('district_id');
         $villageId = $request->get('village_id');
+        $kabupatenKota = $request->get('kabupaten_kota');
 
+        // Optional eager loading - village may be null for imported data
         $query = Perusahaan::with(['village.district.regency']);
 
-        // Search by name
+        // Search by name or kontak
         if ($q) {
-            $query->where('nama', 'like', '%' . $q . '%');
+            $query->where(function ($query) use ($q) {
+                $query->where('nama', 'like', '%' . $q . '%')
+                    ->orWhere('kontak', 'like', '%' . $q . '%');
+            });
         }
 
-        // Filter by regency
+        // Filter by kabupaten_kota (string) for imported data
+        if ($kabupatenKota) {
+            $query->where('kabupaten_kota', 'like', '%' . $kabupatenKota . '%');
+        }
+
+        // Filter by regency (from village relationship)
         if ($regencyId) {
             $query->whereHas('village.district', function ($q) use ($regencyId) {
                 $q->where('regency_id', $regencyId);
@@ -124,12 +134,14 @@ class PerusahaanController extends Controller
     {
         $data = $this->validatedData($request);
 
-        // Cek bahwa village_id valid
-        $village = RegVillage::find($data['village_id']);
-        if (!$village) {
-            throw ValidationException::withMessages([
-                'village_id' => ['Desa tidak ditemukan.']
-            ]);
+        // Cek bahwa village_id valid jika diberikan
+        if (!empty($data['village_id'])) {
+            $village = RegVillage::find($data['village_id']);
+            if (!$village) {
+                throw ValidationException::withMessages([
+                    'village_id' => ['Desa tidak ditemukan.']
+                ]);
+            }
         }
 
         Perusahaan::create($data);
@@ -158,12 +170,14 @@ class PerusahaanController extends Controller
     {
         $data = $this->validatedData($request);
 
-        // Cek bahwa village_id valid
-        $village = RegVillage::find($data['village_id']);
-        if (!$village) {
-            throw ValidationException::withMessages([
-                'village_id' => ['Desa tidak ditemukan.']
-            ]);
+        // Cek bahwa village_id valid jika diberikan
+        if (!empty($data['village_id'])) {
+            $village = RegVillage::find($data['village_id']);
+            if (!$village) {
+                throw ValidationException::withMessages([
+                    'village_id' => ['Desa tidak ditemukan.']
+                ]);
+            }
         }
 
         $perusahaan->update($data);
@@ -218,13 +232,17 @@ class PerusahaanController extends Controller
     private function validatedData(Request $request): array
     {
         return $request->validate([
-            'village_id' => ['required', 'exists:reg_villages,id'],
+            'village_id' => ['nullable', 'exists:reg_villages,id'],
             'nama' => ['required', 'string', 'max:255'],
             'alamat' => ['nullable', 'string'],
+            'kontak' => ['nullable', 'string', 'max:255'],
+            'kabupaten_kota' => ['nullable', 'string', 'max:255'],
         ], [], [
             'village_id' => 'Desa',
             'nama' => 'Nama Perusahaan',
             'alamat' => 'Alamat',
+            'kontak' => 'Kontak',
+            'kabupaten_kota' => 'Kabupaten/Kota',
         ]);
     }
 

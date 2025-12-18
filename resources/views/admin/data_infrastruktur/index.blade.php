@@ -399,8 +399,9 @@
                         <div class="input-group w-search">
                             <span class="input-group-text"><i class="ri-search-line"></i></span>
                             <input type="text" name="q_jaringan" value="{{ $qJaringan }}" class="form-control"
-                                placeholder="Cari Jenis/Jaringan..." autocomplete="off">
+                                placeholder="Cari Jaringan..." autocomplete="off">
                         </div>
+                        @if(!$useGisJaringan)
                         <div class="input-group w-filter has-select">
                             <select class="form-select" name="jaringan" onchange="this.form.submit()">
                                 <option value="">Semua Jaringan</option>
@@ -410,14 +411,12 @@
                                 @endforeach
                             </select>
                         </div>
+                        @endif
                         <button type="button" class="btn-ghost"
                             onclick="window.location.href='{{ route('admin.data-infrastruktur.index') }}?tab=jaringan'">
                             <i class="ri-refresh-line"></i> Reset
                         </button>
                     </form>
-                    <a href="{{ route('admin.infrastruktur.index') }}" class="btn btn-primary" style="margin-left:auto;">
-                        <i class="ri-add-line"></i> Tambah Infrastruktur
-                    </a>
                 </div>
             </div>
 
@@ -427,10 +426,18 @@
                         <thead>
                             <tr>
                                 <th class="col-no">No</th>
-                                <th>Jaringan</th>
-                                <th>Jenis</th>
-                                <th>Panjang (km)</th>
-                                <th class="col-aksi">Aksi</th>
+                                @if($useGisJaringan)
+                                    <th>Nama Objek</th>
+                                    <th>Keterangan</th>
+                                    <th>Wilayah</th>
+                                    <th>Status</th>
+                                    <th style="text-align:right;">Panjang (km)</th>
+                                @else
+                                    <th>Jaringan</th>
+                                    <th>Jenis</th>
+                                    <th>Panjang (km)</th>
+                                    <th class="col-aksi">Aksi</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
@@ -438,25 +445,53 @@
                                 <tr>
                                     <td class="col-no">
                                         {{ ($jaringanItems->currentPage() - 1) * $jaringanItems->perPage() + $i + 1 }}</td>
-                                    <td>{{ ucfirst($it->jaringan) }}</td>
-                                    <td><strong>{{ $it->jenis }}</strong></td>
-                                    <td>{{ number_format($it->panjang_jaringan, 2) }}</td>
-                                    <td class="col-aksi">
-                                        <a href="{{ route('admin.infrastruktur.index') }}" class="btn-ico edit" title="Edit">
-                                            <i class="ri-edit-line"></i>
-                                        </a>
-                                        <form action="{{ route('admin.infrastruktur.destroy', $it) }}" method="POST"
-                                            style="display:inline;" onsubmit="return confirm('Hapus data ini?')">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" class="btn-ico danger" title="Hapus">
-                                                <i class="ri-delete-bin-line"></i>
-                                            </button>
-                                        </form>
-                                    </td>
+                                    @if($useGisJaringan)
+                                        <td><strong>{{ $it->namobj ?? 'Jaringan Transmisi' }}</strong></td>
+                                        <td>
+                                            @if($it->remark)
+                                                <span style="background:#E0F2FE;color:#0369A1;padding:3px 10px;border-radius:12px;font-size:12px;">
+                                                    {{ $it->remark }}
+                                                </span>
+                                            @else
+                                                <span style="color:#6B7280;">-</span>
+                                            @endif
+                                        </td>
+                                        <td>{{ $it->wadmpr ?? '-' }}</td>
+                                        <td>
+                                            @if($it->stsjrn == 1)
+                                                <span style="background:#DCFCE7;color:#166534;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:500;">Eksisting</span>
+                                            @else
+                                                <span style="background:#FEF3C7;color:#92400E;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:500;">Rencana</span>
+                                            @endif
+                                        </td>
+                                        <td style="text-align:right;">
+                                            @php
+                                                // shape_leng dalam derajat, 1 derajat ≈ 111 km
+                                                $panjangKm = ($it->shape_leng ?? 0) * 111;
+                                            @endphp
+                                            <strong>{{ number_format($panjangKm, 2) }}</strong> km
+                                        </td>
+                                    @else
+                                        <td>{{ ucfirst($it->jaringan) }}</td>
+                                        <td><strong>{{ $it->jenis }}</strong></td>
+                                        <td>{{ number_format($it->panjang_jaringan, 2) }}</td>
+                                        <td class="col-aksi">
+                                            <a href="{{ route('admin.infrastruktur.index') }}" class="btn-ico edit" title="Edit">
+                                                <i class="ri-edit-line"></i>
+                                            </a>
+                                            <form action="{{ route('admin.infrastruktur.destroy', $it) }}" method="POST"
+                                                style="display:inline;" onsubmit="return confirm('Hapus data ini?')">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="btn-ico danger" title="Hapus">
+                                                    <i class="ri-delete-bin-line"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    @endif
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5">
+                                    <td colspan="{{ $useGisJaringan ? 6 : 5 }}">
                                         <div class="empty-state">
                                             <i class="ri-git-branch-line"></i>
                                             <p>Belum ada data infrastruktur jaringan</p>
@@ -472,6 +507,9 @@
                             Menampilkan
                             <strong>{{ $jaringanItems->firstItem() ?? 0 }}–{{ $jaringanItems->lastItem() ?? 0 }}</strong>
                             dari <strong>{{ $jaringanItems->total() }}</strong> data
+                            @if($useGisJaringan)
+                                <span style="color:#6B7280;font-size:12px;">(Data GIS Transmisi)</span>
+                            @endif
                         </div>
                         {{ $jaringanItems->links() }}
                     </div>
@@ -480,7 +518,7 @@
         </section>
     </div>
 
-    <!-- ===================== TAB 2: DATA GARDU ===================== -->
+    <!-- ===================== TAB 2: JARINGAN DISTRIBUSI (SUTM) ===================== -->
     <div class="tab-content {{ $tab === 'gardu' ? 'active' : '' }}" id="tab-gardu">
         <section class="card">
             <div class="card-header">
@@ -491,8 +529,9 @@
                         <div class="input-group w-search">
                             <span class="input-group-text"><i class="ri-search-line"></i></span>
                             <input type="text" name="q_gardu" value="{{ $qGardu }}" class="form-control"
-                                placeholder="Cari Nama/Lokasi..." autocomplete="off">
+                                placeholder="Cari..." autocomplete="off">
                         </div>
+                        @if(count($jenisGarduOptions) > 0)
                         <div class="input-group w-filter has-select">
                             <select class="form-select" name="jenis_gardu" onchange="this.form.submit()">
                                 <option value="">Semua Jenis</option>
@@ -502,14 +541,12 @@
                                 @endforeach
                             </select>
                         </div>
+                        @endif
                         <button type="button" class="btn-ghost"
                             onclick="window.location.href='{{ route('admin.data-infrastruktur.index') }}?tab=gardu'">
                             <i class="ri-refresh-line"></i> Reset
                         </button>
                     </form>
-                    <a href="{{ route('admin.gardu.index') }}" class="btn btn-primary" style="margin-left:auto;">
-                        <i class="ri-add-line"></i> Tambah Gardu
-                    </a>
                 </div>
             </div>
 
@@ -519,38 +556,64 @@
                         <thead>
                             <tr>
                                 <th class="col-no">No</th>
-                                <th>Nama Gardu</th>
-                                <th>Jenis</th>
-                                <th>Lokasi</th>
-                                <th class="col-aksi">Aksi</th>
+                                @if($useGisGardu)
+                                    <th>Penyulang</th>
+                                    <th>Deskripsi</th>
+                                    <th>Lokasi</th>
+                                    <th>Fasa</th>
+                                    <th>Tegangan</th>
+                                    <th>Panjang (km)</th>
+                                @else
+                                    <th>Nama Gardu</th>
+                                    <th>Jenis</th>
+                                    <th>Lokasi</th>
+                                    <th class="col-aksi">Aksi</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($garduItems as $i => $g)
                                 <tr>
                                     <td class="col-no">{{ ($garduItems->currentPage() - 1) * $garduItems->perPage() + $i + 1 }}</td>
-                                    <td><strong>{{ $g->nama }}</strong></td>
-                                    <td>{{ $g->jenis_gardu_distribusi }}</td>
-                                    <td>{{ $g->lokasi_lengkap }}</td>
-                                    <td class="col-aksi">
-                                        <a href="{{ route('admin.gardu.index') }}" class="btn-ico edit" title="Edit">
-                                            <i class="ri-edit-line"></i>
-                                        </a>
-                                        <form action="{{ route('admin.gardu.destroy', $g) }}" method="POST"
-                                            style="display:inline;" onsubmit="return confirm('Hapus data ini?')">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" class="btn-ico danger" title="Hapus">
-                                                <i class="ri-delete-bin-line"></i>
-                                            </button>
-                                        </form>
-                                    </td>
+                                    @if($useGisGardu)
+                                        <td><strong>{{ $g->penyulang ?? '-' }}</strong></td>
+                                        <td>{{ $g->descriptio ?? '-' }}</td>
+                                        <td>{{ $g->location ?? '-' }}</td>
+                                        <td>{{ $g->fasa_jarin ?? '-' }}</td>
+                                        <td>
+                                            @if($g->tegangan_j)
+                                                <span style="background:#E0F2FE;color:#0369A1;padding:3px 10px;border-radius:12px;font-size:12px;">
+                                                    {{ $g->tegangan_j }}
+                                                </span>
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                        <td>{{ number_format(($g->panjang_ha ?? 0) / 1000, 2) }} km</td>
+                                    @else
+                                        <td><strong>{{ $g->nama }}</strong></td>
+                                        <td>{{ $g->jenis_gardu_distribusi }}</td>
+                                        <td>{{ $g->lokasi_lengkap }}</td>
+                                        <td class="col-aksi">
+                                            <a href="{{ route('admin.gardu.index') }}" class="btn-ico edit" title="Edit">
+                                                <i class="ri-edit-line"></i>
+                                            </a>
+                                            <form action="{{ route('admin.gardu.destroy', $g) }}" method="POST"
+                                                style="display:inline;" onsubmit="return confirm('Hapus data ini?')">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="btn-ico danger" title="Hapus">
+                                                    <i class="ri-delete-bin-line"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    @endif
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5">
+                                    <td colspan="{{ $useGisGardu ? 7 : 5 }}">
                                         <div class="empty-state">
                                             <i class="ri-building-4-line"></i>
-                                            <p>Belum ada data gardu</p>
+                                            <p>Belum ada data jaringan distribusi</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -563,6 +626,9 @@
                             Menampilkan
                             <strong>{{ $garduItems->firstItem() ?? 0 }}–{{ $garduItems->lastItem() ?? 0 }}</strong> dari
                             <strong>{{ $garduItems->total() }}</strong> data
+                            @if($useGisGardu)
+                                <span style="color:#6B7280;font-size:12px;">(Data GIS SUTM Berau)</span>
+                            @endif
                         </div>
                         {{ $garduItems->links() }}
                     </div>
@@ -571,7 +637,7 @@
         </section>
     </div>
 
-    <!-- ===================== TAB 3: PEMBANGKIT LOKAL ===================== -->
+    <!-- ===================== TAB 3: PEMBANGKIT LISTRIK ===================== -->
     <div class="tab-content {{ $tab === 'pembangkit' ? 'active' : '' }}" id="tab-pembangkit">
         <section class="card">
             <div class="card-header">
@@ -582,16 +648,13 @@
                         <div class="input-group w-search">
                             <span class="input-group-text"><i class="ri-search-line"></i></span>
                             <input type="text" name="q_pembangkit" value="{{ $qPembangkit }}" class="form-control"
-                                placeholder="Cari Lokasi/Kapasitas..." autocomplete="off">
+                                placeholder="Cari Pembangkit..." autocomplete="off">
                         </div>
                         <button type="button" class="btn-ghost"
                             onclick="window.location.href='{{ route('admin.data-infrastruktur.index') }}?tab=pembangkit'">
                             <i class="ri-refresh-line"></i> Reset
                         </button>
                     </form>
-                    <a href="{{ route('admin.pembangkit.index') }}" class="btn btn-primary" style="margin-left:auto;">
-                        <i class="ri-add-line"></i> Tambah Pembangkit
-                    </a>
                 </div>
             </div>
 
@@ -601,9 +664,17 @@
                         <thead>
                             <tr>
                                 <th class="col-no">No</th>
-                                <th>Lokasi</th>
-                                <th>Kapasitas Gardu</th>
-                                <th class="col-aksi">Aksi</th>
+                                @if($useGisPembangkit)
+                                    <th>Nama Pembangkit</th>
+                                    <th>Jenis</th>
+                                    <th>Wilayah</th>
+                                    <th>Status</th>
+                                    <th>Sumber Data</th>
+                                @else
+                                    <th>Lokasi</th>
+                                    <th>Kapasitas Gardu</th>
+                                    <th class="col-aksi">Aksi</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
@@ -611,27 +682,48 @@
                                 <tr>
                                     <td class="col-no">
                                         {{ ($pembangkitItems->currentPage() - 1) * $pembangkitItems->perPage() + $i + 1 }}</td>
-                                    <td><strong>{{ $p->lokasi_lengkap }}</strong></td>
-                                    <td>{{ $p->kapasitas_gardu }}</td>
-                                    <td class="col-aksi">
-                                        <a href="{{ route('admin.pembangkit.index') }}" class="btn-ico edit" title="Edit">
-                                            <i class="ri-edit-line"></i>
-                                        </a>
-                                        <form action="{{ route('admin.pembangkit.destroy', $p) }}" method="POST"
-                                            style="display:inline;" onsubmit="return confirm('Hapus data ini?')">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" class="btn-ico danger" title="Hapus">
-                                                <i class="ri-delete-bin-line"></i>
-                                            </button>
-                                        </form>
-                                    </td>
+                                    @if($useGisPembangkit)
+                                        <td><strong>{{ $p->namobj ?? '-' }}</strong></td>
+                                        <td>
+                                            @php
+                                                $jenisPembangkit = $p->j_pmbngkt ?? '-';
+                                            @endphp
+                                            <span style="background:#FEF3C7;color:#92400E;padding:3px 10px;border-radius:12px;font-size:12px;">
+                                                {{ $jenisPembangkit }}
+                                            </span>
+                                        </td>
+                                        <td>{{ $p->wadmpr ?? '-' }}</td>
+                                        <td>
+                                            @if($p->stsjrn == 1)
+                                                <span style="background:#DCFCE7;color:#166534;padding:3px 10px;border-radius:12px;font-size:12px;">Eksisting</span>
+                                            @else
+                                                <span style="background:#E0F2FE;color:#0369A1;padding:3px 10px;border-radius:12px;font-size:12px;">Rencana</span>
+                                            @endif
+                                        </td>
+                                        <td>{{ $p->sbdata ?? '-' }}</td>
+                                    @else
+                                        <td><strong>{{ $p->lokasi_lengkap }}</strong></td>
+                                        <td>{{ $p->kapasitas_gardu }}</td>
+                                        <td class="col-aksi">
+                                            <a href="{{ route('admin.pembangkit.index') }}" class="btn-ico edit" title="Edit">
+                                                <i class="ri-edit-line"></i>
+                                            </a>
+                                            <form action="{{ route('admin.pembangkit.destroy', $p) }}" method="POST"
+                                                style="display:inline;" onsubmit="return confirm('Hapus data ini?')">
+                                                @csrf @method('DELETE')
+                                                <button type="submit" class="btn-ico danger" title="Hapus">
+                                                    <i class="ri-delete-bin-line"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    @endif
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4">
+                                    <td colspan="{{ $useGisPembangkit ? 6 : 4 }}">
                                         <div class="empty-state">
                                             <i class="ri-flashlight-line"></i>
-                                            <p>Belum ada data pembangkit lokal</p>
+                                            <p>Belum ada data pembangkit listrik</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -644,6 +736,9 @@
                             Menampilkan
                             <strong>{{ $pembangkitItems->firstItem() ?? 0 }}–{{ $pembangkitItems->lastItem() ?? 0 }}</strong>
                             dari <strong>{{ $pembangkitItems->total() }}</strong> data
+                            @if($useGisPembangkit)
+                                <span style="color:#6B7280;font-size:12px;">(Data GIS Pembangkit Eksisting)</span>
+                            @endif
                         </div>
                         {{ $pembangkitItems->links() }}
                     </div>

@@ -53,6 +53,7 @@ use App\Http\Controllers\Api\PtTrafoGarduKubarController;
 use App\Http\Controllers\Api\Pt1TrafoGarduPaserController;
 use App\Http\Controllers\Api\Pt2TrafoGarduPaserController;
 use App\Http\Controllers\Api\WilayahController;
+use App\Http\Controllers\Api\HasilLokasiSurveiEsdmController;
 
 // Route::get('/aset', [AssetController::class, 'index']);
 Route::get('/data-berlistrik', [DataBerlistrikController::class, 'index']);
@@ -113,6 +114,9 @@ Route::get('/ar-batas-kaltim-kecamatan', [ArBatasKaltimKecamatanController::clas
 Route::get('/wilayah/regencies', [WilayahController::class, 'getRegencies']);
 Route::get('/wilayah/districts', [WilayahController::class, 'getDistricts']);
 Route::get('/wilayah/villages', [WilayahController::class, 'getVillages']);
+
+// PT Hasil Lokasi Survei ESDM
+Route::get('/hasil-lokasi-survei-esdm', [HasilLokasiSurveiEsdmController::class, 'index']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
