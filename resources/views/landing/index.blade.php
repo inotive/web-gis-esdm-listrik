@@ -1769,92 +1769,6 @@
     });
     map.add(lnBatasProvinsiLayer);
 
-    // 🔹 PT Hasil Lokasi Survei ESDM
-    const ptHasilLokasiSurveiEsdmLayer = new GeoJSONLayer({
-      url: "{{ url('/api/hasil-lokasi-survei-esdm') }}",
-      title: "PT Hasil Lokasi Survei ESDM",
-      outFields: ["*"],
-      renderer: {
-        type: "simple",
-        symbol: {
-          type: "simple-fill",
-          color: [255, 165, 0, 0.4],
-          outline: { color: [255, 140, 0, 1], width: 1.2 }
-        }
-      },
-      popupTemplate: {
-        title: "{Lokasi}",
-        content: `
-          <b>Lokasi:</b> {Lokasi}<br>
-          <b>Nama Objek:</b> {NAMOBJ}<br>
-          <b>Luas (m²):</b> {LUASWH}<br>
-          <b>Tipe Admin:</b> {TIPADM}<br>
-          <b>Kecamatan:</b> {WADMKC}<br>
-          <b>Desa:</b> {WADMKD}<br>
-          <b>Kabupaten:</b> {WADMKK}<br>
-          <b>Provinsi:</b> {WADMPR}<br>
-          <b>Status:</b> {Status}<br>
-          <b>Kode Kota:</b> {Kode_Kota}<br>
-          <b>Kode Lokasi:</b> {Kode_L}<br>
-          <b>Lokasi Ke:</b> {Lokasi_Ke}<br>
-          <b>Kodifikasi:</b> {Kodifikasi}<br>
-          <b>Dusun:</b> {DUSUN}<br>
-          <b>Jumlah RT:</b> {JUMLAH_RT}<br>
-          <b>Keterangan RT:</b> {KET_RT}<br>
-          <b>Jumlah Penduduk:</b> {J_Pnddk}<br>
-          <b>Jumlah KK:</b> {J_KK}<br>
-          <b>Jumlah Rumah:</b> {J_BRumah}<br>
-          <b>Jumlah Fasum:</b> {J_BFasum}<br>
-          <b>Keterangan Fasum:</b> {Ket_BFasum}<br>
-          <b>Sumber Listrik Komersial:</b> {S_L_Kom}<br>
-          <b>Nama Sumber Listrik:</b> {N_S_L}<br>
-          <b>Klasifikasi Sumber Listrik:</b> {K_S_L}<br>
-          <b>Sistem Penyediaan Listrik:</b> {S_P_L}<br>
-          <b>Waktu Nyala:</b> {W_NYALA}<br>
-          <b>Lama Nyala:</b> {L_NYALA}<br>
-          <b>Target Sisa Listrik:</b> {T_SL}<br>
-          <b>Kendala Sumber Listrik:</b> {Knd_S_L}<br>
-          <b>Koordinat X:</b> {Koor_X}<br>
-          <b>Koordinat Y:</b> {Koor_Y}<br>
-          <b>Provinsi Peta:</b> {PR_Prov}<br>
-          <b>Kawasan Hutan:</b> {K_Hutan}<br>
-          <b>Izin Lain:</b> {Izin_Lain}<br>
-          <b>Potensi:</b> {Potensi}<br>
-          <b>Rencana Jaringan Utama:</b> {R_JUTAMA}<br>
-          <b>Rencana Jaringan Listrik:</b> {R_JLISTRIK}<br>
-          <b>Kondisi Jalan:</b> {K_Jalan}<br>
-          <b>Panjang Jalan:</b> {L_Jalan}<br>
-          <b>Panjang Jalan (P):</b> {P_Jalan}<br>
-          <b>Penyulang:</b> {PENYULANG}<br>
-          <b>Rencana Sumber Listrik:</b> {R_S_L}<br>
-          <b>Kendala:</b> {KENDALA}<br>
-          <b>Izin IUPT:</b> {I_IUPT}<br>
-          <b>Izin PPBH:</b> {I_PPBH}<br>
-          <b>Izin IUPK:</b> {I_IUPK}<br>
-          <b>Jumlah Gardu:</b> {J_Gardu}<br>
-          <b>Beban Gardu:</b> {B_Gardu}<br>
-          <b>Sumber Listrik PLN:</b> {S_L_P}<br>
-          <b>Klasifikasi RPLTS:</b> {K_RPLTS}<br>
-          <b>Panjang:</b> {Panjang}<br>
-          <b>Jumlah Tiang:</b> {Tiang}<br>
-          <b>Biaya:</b> {Biaya}<br>
-          <b>Skor A:</b> {Skor_A}<br>
-          <b>Skor J:</b> {Skor_J}<br>
-          <b>Kesesuaian PR:</b> {K_PR}<br>
-          <b>Kesesuaian Izin:</b> {K_Izin}<br>
-          <b>Kesesuaian Hutan:</b> {K_Hutan_1}<br>
-          <b>Skor Arah:</b> {S_Arah}<br>
-          <b>Skor Potensi:</b> {S_Potensi}<br>
-          <b>Skor Jaringan:</b> {S_J_P}<br>
-          <b>Total Skor:</b> {T_S}<br>
-          <b>Cek:</b> {Cek}<br>
-          <b>Prioritas:</b> {Priorita_1}<br>
-          <b>PLTS:</b> {B_PLTS}
-        `
-      }
-    });
-    map.add(ptHasilLokasiSurveiEsdmLayer);
-
     // ================== SET INITIAL LAYER VISIBILITY ==================
     // Hide all layers on initial load
     desaBerlistrikLayer.visible = false;
@@ -1905,7 +1819,6 @@
     lnBatasKecamatanLayer.visible = false;
     lnBatasNegaraLayer.visible = false;
     lnBatasProvinsiLayer.visible = false;
-    ptHasilLokasiSurveiEsdmLayer.visible = false;
 
     // ================== LAYER FILTER PANEL ==================
     // Organize layers into categories with icons
@@ -1970,8 +1883,7 @@
         { label: 'Sistem Energi Balikpapan', layer: ptSistemEnergiBalikpapanLayer, icon: '⚙️' },
         { label: 'Sistem Energi Kukar', layer: ptSistemEnergiKukarLayer, icon: '⚙️' },
         { label: 'Sistem Energi Mahulu', layer: ptSistemEnergiMahuluLayer, icon: '⚙️' },
-        { label: 'Sistem Energi Samarinda', layer: ptSistemEnergiSamarindaLayer, icon: '⚙️' },
-        { label: 'PT Hasil Lokasi Survei ESDM', layer: ptHasilLokasiSurveiEsdmLayer, icon: '📋' }
+        { label: 'Sistem Energi Samarinda', layer: ptSistemEnergiSamarindaLayer, icon: '⚙️' }
       ]
     };
 
@@ -2021,8 +1933,7 @@
     });
     categoriesHTML += `</div>`;
 
-    // 5. Data Dasar (Batas Administrasi) - HIDDEN
-    /*
+    // 5. Data Dasar (Batas Administrasi)
     categoriesHTML += `<label class="lf-row lf-parent" data-category="administrasi">
       <span class="lf-toggle">▼</span>
       <input type="checkbox" id="lf-administrasi-parent">
@@ -2034,10 +1945,8 @@
       categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-administrasi-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
     });
     categoriesHTML += `</div>`;
-    */
 
-    // 6. Data Jalan - HIDDEN
-    /*
+    // 6. Data Jalan
     categoriesHTML += `<label class="lf-row lf-parent" data-category="jalan">
       <span class="lf-toggle">▼</span>
       <input type="checkbox" id="lf-jalan-parent">
@@ -2049,7 +1958,6 @@
       categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-jalan-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
     });
     categoriesHTML += `</div>`;
-    */
 
     // 7. Lainnya
     categoriesHTML += `<label class="lf-row lf-parent" data-category="lainnya">
@@ -2062,7 +1970,6 @@
     layerCategories.lainnya.forEach((item, idx) => {
       categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-lainnya-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
     });
-    categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-lainnya-PT_Hasil_Lokasi_Survei_ESDM"> <span class="lf-icon">📋</span> <span>PT Hasil Lokasi Survei ESDM</span></label>`;
     categoriesHTML += `</div>`;
 
     layerFilter.innerHTML = `
@@ -2595,8 +2502,7 @@
           { layer: pt2TrafoGarduPaserLayer,       title: "PT2 Trafo Gardu Paser" },
           { layer: arBatasKaltimLayer,            title: "AR Batas Kaltim Full KK KC KD" },
           { layer: arBatasKecamatanLayer,         title: "AR Batas Kaltim KK Kecamatan" },
-          { layer: sutmBerauLayer,                 title: "LN SUTM Berau" },
-          { layer: ptHasilLokasiSurveiEsdmLayer,   title: "PT Hasil Lokasi Survei ESDM" }
+          { layer: sutmBerauLayer,                 title: "LN SUTM Berau" }
         ]
       }),
       expanded: false,

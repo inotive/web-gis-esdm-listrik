@@ -8,7 +8,8 @@
       "Bash(php artisan:*)",
       "Bash(cat:*)",
       "Bash(test:*)",
-      "Bash(php convert_coordinates.php:*)"
+      "Bash(php convert_coordinates.php:*)",
+      "Bash(ls -la \"c:\\\\laragon\\\\www\\\\web-gis-esdm-listrik\\\\public\\\\assets\\\\Jaringan-Listrik\"\" | grep -i \"sutm.*ppu \")"
     ]
   }
 }
