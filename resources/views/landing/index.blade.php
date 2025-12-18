@@ -1893,7 +1893,12 @@
         { label: 'Rencana Jaringan Bontang', layer: jaringanListrikBontangLayer, icon: '📋' },
         { label: 'Sistem Energi Kubar UP2KB', layer: sistemJaringanEnergiKubarUP2KBlayer, icon: '🔋' },
         { label: 'Sistem Energi Mahulu (SUTR)', layer: sistemJaringanEnergiMahuluLayer, icon: '🔋' },
-        { label: 'SUTR Kutim', layer: sutrKutimLayer, icon: '🔋' }
+        { label: 'SUTR Kutim', layer: sutrKutimLayer, icon: '🔋' },
+        { label: 'Sistem Energi Balikpapan', layer: ptSistemEnergiBalikpapanLayer, icon: '⚙️' },
+        { label: 'Sistem Energi Kukar', layer: ptSistemEnergiKukarLayer, icon: '⚙️' },
+        { label: 'Sistem Energi Mahulu', layer: ptSistemEnergiMahuluLayer, icon: '⚙️' },
+        { label: 'Sistem Energi Samarinda', layer: ptSistemEnergiSamarindaLayer, icon: '⚙️' },
+       
       ],
       // 5. Data Dasar (Batas Administrasi)
       administrasi: [
@@ -1923,10 +1928,6 @@
       lainnya: [
         { label: 'Pembangkit Eksisting', layer: ptPembangkitEksistingLayer, icon: '🏗️' },
         { label: 'Rencana Pembangkit Bontang', layer: ptRencanaPembangkitBontangLayer, icon: '📐' },
-        { label: 'Sistem Energi Balikpapan', layer: ptSistemEnergiBalikpapanLayer, icon: '⚙️' },
-        { label: 'Sistem Energi Kukar', layer: ptSistemEnergiKukarLayer, icon: '⚙️' },
-        { label: 'Sistem Energi Mahulu', layer: ptSistemEnergiMahuluLayer, icon: '⚙️' },
-        { label: 'Sistem Energi Samarinda', layer: ptSistemEnergiSamarindaLayer, icon: '⚙️' },
         { label: 'Hasil Lokasi Survei ESDM', layer: ptHasilLokasiSurveiEsdmLayer, icon: '📍' }
       ]
     };
