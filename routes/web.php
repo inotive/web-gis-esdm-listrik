@@ -44,8 +44,13 @@ Route::post('login', [LoginController::class, 'login'])->name('login-post');
 
 // Arahkan root ke halaman login saat pertama kali diakses
 Route::get('/', function () {
-    return redirect()->route('login');
+    return view('home');
 });
+
+Route::get('/home', function () {
+    return view('home');
+});
+
 
 // Landing (peta) wajib login
 Route::get('/landing', [LandingPageController::class, 'index'])
