@@ -106,9 +106,27 @@
         layerTitle = attrs.H_Survei;
       }
 
-      const rows = Object.entries(attrs)
-        .map(([k, v]) => `<div class="dm-row"><div class="dm-key">${k}</div><div class="dm-val">${v ?? '-'}</div></div>`)
-        .join('');
+      let rows = '';
+
+      // Khusus untuk layer Status Listrik (H_Survei)
+      if (layerTitle === 'H_Survei' || attrs.H_Survei) {
+        // Tampilkan hanya field tertentu dengan urutan dan label yang ditentukan
+        const fieldsToShow = [
+          { key: 'WADMKD', label: 'Desa' },
+          { key: 'WADMKC', label: 'Kecamatan' },
+          { key: 'WADMKK', label: 'Kab/Kota' },
+          { key: 'H_Survei', label: 'Status' }
+        ];
+
+        rows = fieldsToShow
+          .map(({ key, label }) => `<div class="dm-row"><div class="dm-key">${label}</div><div class="dm-val">${attrs[key] ?? '-'}</div></div>`)
+          .join('');
+      } else {
+        // Untuk layer lain, tampilkan semua attributes
+        rows = Object.entries(attrs)
+          .map(([k, v]) => `<div class="dm-row"><div class="dm-key">${k}</div><div class="dm-val">${v ?? '-'}</div></div>`)
+          .join('');
+      }
 
       dmContent.innerHTML = `
         <div class="dm-head">${layerTitle}</div>
@@ -237,11 +255,10 @@
       popupTemplate: {
         title: "{NAMOBJ}",
         content: `
-          <b>Status Listrik:</b> {H_Survei}<br>
-          <b>Kecamatan:</b> {WADMKC}<br>
           <b>Desa:</b> {WADMKD}<br>
-          <b>Kabupaten:</b> {WADMKK}<br>
-          <b>Provinsi:</b> {WADMPR}
+          <b>Kecamatan:</b> {WADMKC}<br>
+          <b>Kab/Kota:</b> {WADMKK}<br>
+          <b>Status:</b> {H_Survei}
         `
       },
       renderer: {
