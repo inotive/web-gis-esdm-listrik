@@ -142,21 +142,32 @@
             background-color: var(--primary-dark);
         }
 
-        /* Hero Section Revamp */
         .hero {
             background-color: var(--primary);
             color: var(--white);
             position: relative;
             overflow: hidden;
-            min-height: 80vh;
+            min-height: calc(100vh - 160px);
             display: flex;
             align-items: center;
             width: 100%;
-            padding: 120px 0 60px;
-            /* Account for navbar */
+            padding: 85px 0 20px;
         }
 
-        /* Abstract Background Shapes */
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("{{ asset('assets/Kaltim.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            opacity: 0.2;
+            z-index: 0;
+        }
+
         .hero-shape {
             position: absolute;
             border-radius: 50%;
@@ -217,11 +228,12 @@
         .hero-badge {
             background-color: rgba(255, 255, 255, 0.15);
             color: var(--white);
-            padding: 8px 20px;
+            padding: 6px 16px;
             border-radius: 50px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
-            margin-bottom: 32px;
+            margin-bottom: 16px;
+            /* Reduced margin */
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -235,9 +247,10 @@
         }
 
         .hero-title {
-            font-size: 56px;
+            font-size: 42px;
+            /* Reduced from 56px */
             font-weight: 800;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
             line-height: 1.1;
             letter-spacing: -0.03em;
             text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -348,7 +361,8 @@
         /* Hero Visual (Right Side) */
         .hero-visual {
             position: relative;
-            height: 500px;
+            height: 400px;
+            /* Reduced derived height */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -356,8 +370,9 @@
 
         .visual-circle {
             position: absolute;
-            width: 450px;
-            height: 450px;
+            width: 280px;
+            /* Reduced size to prevent overlap */
+            height: 280px;
             border-radius: 50%;
             border: 2px dashed rgba(255, 255, 255, 0.2);
             animation: spin 60s linear infinite;
@@ -365,11 +380,11 @@
 
         .visual-circle-inner {
             position: absolute;
-            width: 300px;
-            height: 300px;
+            width: 180px;
+            /* Reduced size */
+            height: 180px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -377,7 +392,8 @@
         }
 
         .visual-logo {
-            width: 120px;
+            width: 80px;
+            /* Reduced logo size */
             height: auto;
             filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.2));
             animation: float 6s ease-in-out infinite;
@@ -388,6 +404,7 @@
             background: rgba(255, 255, 255, 0.95);
             color: var(--gray-900);
             padding: 16px 20px;
+            /* Restored size */
             border-radius: 16px;
             display: flex;
             align-items: center;
@@ -397,35 +414,35 @@
             animation: float 5s ease-in-out infinite;
             z-index: 5;
             max-width: 200px;
+            font-size: 13px;
         }
 
         .floating-card i {
-            font-size: 24px;
+            font-size: 20px;
             color: var(--primary);
             background: #ecfdf5;
-            padding: 8px;
-            border-radius: 10px;
+            padding: 6px;
+            border-radius: 8px;
         }
 
         .fc-1 {
-            top: 50px;
-            left: 0;
+            top: 87px;
+            left: -10px;
             animation-delay: 0s;
         }
 
         .fc-2 {
-            bottom: 80px;
-            right: 20px;
+            bottom: 20px;
+            right: 40px;
             animation-delay: -2.5s;
         }
 
         .fc-3 {
             top: 40%;
-            right: -40px;
+            right: -80px;
             animation-delay: -1s;
         }
 
-        /* Animations */
         @keyframes float {
 
             0%,
@@ -435,18 +452,6 @@
 
             50% {
                 transform: translateY(-20px);
-            }
-        }
-
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-                opacity: 0.6;
-            }
-
-            100% {
-                transform: scale(1.1);
-                opacity: 0.4;
             }
         }
 
@@ -460,7 +465,31 @@
             }
         }
 
-        /* Mobile Responsive for Hero */
+        @media (min-width: 1024px) and (max-width: 1440px) {
+            .hero-container {
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+            }
+
+            .hero-text-content {
+                padding-right: 20px;
+            }
+
+            .hero-title {
+                font-size: 36px;
+            }
+
+            .hero-desc {
+                font-size: 16px;
+                margin-bottom: 32px;
+            }
+
+            .hero-visual {
+                transform: scale(0.85);
+                transform-origin: center right;
+            }
+        }
+
         @media (max-width: 1024px) {
             .hero-title {
                 font-size: 48px;
@@ -816,8 +845,12 @@
             }
 
             .nav-links {
+                display: flex;
+                gap: 12px;
+            }
+
+            .nav-link {
                 display: none;
-                /* Add mobile menu logic if needed, hiding for now */
             }
         }
     </style>
@@ -831,7 +864,7 @@
             <div class="logo-area">
                 <img src="{{ asset('assets/media/logos/logo.png') }}" alt="Logo ESDM" class="logo-img">
                 <div class="logo-text">
-                    <span class="logo-title">Dinas Energi Dan Sumber Daya Mineral</span>
+                    <span class="logo-title">Dinas Energi dan Sumber Daya Mineral</span>
                     <span class="logo-subtitle">Provinsi Kalimantan Timur</span>
                 </div>
             </div>
@@ -854,39 +887,39 @@
         <div class="hero-container">
             <div class="hero-text-content">
                 <div class="hero-badge">
-                    <i class="ri-government-line"></i> Dinas Energi Dan Sumber Daya Mineral
+                    <i class="ri-government-line"></i> Dinas Energi dan Sumber Daya Mineral
                 </div>
                 <h1 class="hero-title">
                     Sistem Informasi <br>
                     <span class="text-highlight">Geografis ESDM</span>
                 </h1>
                 <p class="hero-desc">
-                    Portal terpadu untuk pemetaan infrastruktur energi dan layanan permohonan kelistrikan di Kalimantan
-                    Timur. Transparan, terpercaya, dan mudah diakses.
+                    Portal terpadu data dan pemetaan infrastruktur energi serta layanan permohonan kelistrikan di
+                    Kalimantan Timur. Transparan, terpercaya, dan mudah diakses.
                 </p>
                 <div class="hero-actions">
                     {{-- <a href="#alur" class="btn-hero-primary">
                         Alur <i class="ri-arrow-right-line"></i>
                     </a> --}}
-                    {{-- <a href="#alur" class="btn-hero-secondary">
-                        <i class="ri-play-circle-line"></i> Alur
-                    </a> --}}
+                    <a href="#alur" class="btn-hero-secondary">
+                        <i class="ri-map-2-line"></i> Telusuri Peta Interaktif
+                    </a>
                 </div>
 
-                {{-- <div class="hero-stats">
+                <div class="hero-stats">
                     <div class="stat-item">
-                        <span class="stat-value">10K+</span>
-                        <span class="stat-label">Data Titik</span>
+                        <span class="stat-value">0</span>
+                        <span class="stat-label">Data Infrastruktur Jaringan</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-value">24/7</span>
-                        <span class="stat-label">Akses Online</span>
+                        <span class="stat-value">0</span>
+                        <span class="stat-label">Data Gardu</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-value">100%</span>
-                        <span class="stat-label">Transparan</span>
+                        <span class="stat-value">0</span>
+                        <span class="stat-label">Pembangkit Lokal</span>
                     </div>
-                </div> --}}
+                </div>
             </div>
 
             <div class="hero-visual">
@@ -900,7 +933,7 @@
                 <!-- Floating Cards -->
                 <div class="floating-card fc-1">
                     <i class="ri-map-2-line"></i>
-                    <div style="font-size: 14px;">
+                    <div style="font-size: 13px;">
                         <div>Website Interaktif</div>
                         {{-- <div style="font-size: 12px; color: var(--gray-500); font-weight: normal;">Real-time GIS</div> --}}
                     </div>
@@ -908,15 +941,15 @@
 
                 <div class="floating-card fc-2">
                     <i class="ri-flashlight-line"></i>
-                    <div style="font-size: 14px;">
-                        <div>Infrastruktur Listrik</div>
+                    <div style="font-size: 13px;">
+                        <div>Data Ketenagalistrikan</div>
                         {{-- <div style="font-size: 12px; color: var(--gray-500); font-weight: normal;">Layanan Terpadu</div> --}}
                     </div>
                 </div>
 
                 <div class="floating-card fc-3">
                     <i class="ri-shield-check-line"></i>
-                    <div style="font-size: 14px;">
+                    <div style="font-size: 13px;">
                         <div>Permohonan Dan Perizinan</div>
                         {{-- <div style="font-size: 12px; color: var(--gray-500); font-weight: normal;">Data Valid</div> --}}
                     </div>
