@@ -886,16 +886,16 @@
 
                 <div class="hero-stats">
                     <div class="stat-item">
-                        <span class="stat-value">10K+</span>
-                        <span class="stat-label">Data Titik</span>
+                        <span class="stat-value">0</span>
+                        <span class="stat-label">Data Infrastruktur Jaringan</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-value">24/7</span>
-                        <span class="stat-label">Akses Online</span>
+                        <span class="stat-value">0</span>
+                        <span class="stat-label">Data Gardu</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-value">100%</span>
-                        <span class="stat-label">Transparan</span>
+                        <span class="stat-value">0</span>
+                        <span class="stat-label">Pembangkit Lokal</span>
                     </div>
                 </div>
             </div>
