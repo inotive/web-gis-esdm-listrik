@@ -164,7 +164,7 @@
 </div>
 
 <section class="card">
-  <form method="POST" action="{{ route('admin.permohonan.update', $permohonan) }}" id="formPermohonan">
+  <form method="POST" action="{{ route('admin.kategori-permohonan.update', $permohonan) }}" id="formPermohonan">
     @csrf
     @method('PUT')
 

@@ -4,7 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Permohonan;
+use App\Models\PermohonanQuestion;
+use App\Models\PermohonanQuestionOption;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class KategoriPermohonanController extends Controller
 {
@@ -42,7 +45,7 @@ class KategoriPermohonanController extends Controller
      */
     public function create()
     {
-        return view('admin.permohonan.create', [
+        return view('admin.kategori-permohonan.create', [
             'title' => 'Tambah Permohonan',
         ]);
     }
@@ -106,7 +109,7 @@ class KategoriPermohonanController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.permohonan.index')
+            return redirect()->route('admin.kategori-permohonan.index')
                 ->with('success', 'Permohonan berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -147,7 +150,7 @@ class KategoriPermohonanController extends Controller
             ];
         })->toArray();
 
-        return view('admin.permohonan.edit', [
+        return view('admin.kategori-permohonan.edit', [
             'title' => 'Edit Permohonan',
             'permohonan' => $permohonan,
             'questionsData' => $questionsData,
@@ -264,7 +267,7 @@ class KategoriPermohonanController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.permohonan.index')
+            return redirect()->route('admin.kategori-permohonan.index')
                 ->with('success', 'Permohonan berhasil diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -281,7 +284,7 @@ class KategoriPermohonanController extends Controller
     {
         $permohonan->delete();
 
-        return redirect()->route('admin.permohonan.index')
+        return redirect()->route('admin.kategori-permohonan.index')
             ->with('success', 'Permohonan berhasil dihapus.');
     }
 }

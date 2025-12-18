@@ -218,9 +218,9 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
         Route::get('/', [KategoriPermohonanController::class, 'index'])->name('index');
         Route::get('/create', [KategoriPermohonanController::class, 'create'])->name('create');
         Route::post('/', [KategoriPermohonanController::class, 'store'])->name('store');
-        Route::get('/{kategori-permohonan}/edit', [KategoriPermohonanController::class, 'edit'])->name('edit');
-        Route::put('/{kategori-permohonan}', [KategoriPermohonanController::class, 'update'])->name('update');
-        Route::delete('/{kategori-permohonan}', [KategoriPermohonanController::class, 'destroy'])->name('destroy');
+        Route::get('/{permohonan}/edit', [KategoriPermohonanController::class, 'edit'])->name('edit');
+        Route::put('/{permohonan}', [KategoriPermohonanController::class, 'update'])->name('update');
+        Route::delete('/{permohonan}', [KategoriPermohonanController::class, 'destroy'])->name('destroy');
     });
 
     // Permohonan User

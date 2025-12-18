@@ -133,10 +133,6 @@
       <div class="page-title">Manajemen Kategori Permohonan</div>
     </div>
     <div class="page-actions">
-      <div class="date-pill">
-        <i class="ri-calendar-line"></i>
-        <span>{{ now()->translatedFormat('F Y') }}</span>
-      </div>
 
       <a href="{{ route('admin.kategori-permohonan.create') }}" class="btn btn-primary">
         <i class="ri-add-line"></i>
