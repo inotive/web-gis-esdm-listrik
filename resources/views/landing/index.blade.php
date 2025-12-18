@@ -1927,7 +1927,10 @@
       // 7. Lainnya
       lainnya: [
         { label: 'Pembangkit Eksisting', layer: ptPembangkitEksistingLayer, icon: '🏗️' },
-        { label: 'Rencana Pembangkit Bontang', layer: ptRencanaPembangkitBontangLayer, icon: '📐' },
+        { label: 'Rencana Pembangkit Bontang', layer: ptRencanaPembangkitBontangLayer, icon: '📐' }
+      ],
+      // 8. Survei Video 360
+      surveiVideo360: [
         { label: 'Hasil Lokasi Survei ESDM', layer: ptHasilLokasiSurveiEsdmLayer, icon: '📍' }
       ]
     };
@@ -1951,6 +1954,19 @@
         <label class="lf-row lf-child"><input type="checkbox" id="lf-desa-belum"> <span class="lf-icon">🔴</span> <span>Belum Terlayani Listrik</span></label>
       </div>
     `;
+
+    // 8. Survei Video 360
+    categoriesHTML += `<label class="lf-row lf-parent" data-category="surveiVideo360">
+      <span class="lf-toggle">▼</span>
+      <input type="checkbox" id="lf-surveiVideo360-parent">
+      <span class="lf-icon">🎥</span>
+      <span><strong>Survei Video 360</strong></span>
+    </label>
+    <div class="lf-children" data-category="surveiVideo360">`;
+    layerCategories.surveiVideo360.forEach((item, idx) => {
+      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-surveiVideo360-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
+    });
+    categoriesHTML += `</div>`;
 
     // 3. Infrastruktur - with nested Gardu and Trafo sub-categories
     categoriesHTML += `<label class="lf-row lf-parent" data-category="infrastruktur">
@@ -2051,7 +2067,7 @@
       <span class="lf-toggle">▼</span>
       <input type="checkbox" id="lf-lainnya-parent">
       <span class="lf-icon">📂</span>
-      <span><strong>Lainnya</strong></span>
+      <span><strong>Pembangkit</strong></span>
     </label>
     <div class="lf-children collapsed" data-category="lainnya">`;
     layerCategories.lainnya.forEach((item, idx) => {
@@ -2186,6 +2202,7 @@
       setCategoryCheckboxes('administrasi', isChecked);
       setCategoryCheckboxes('jalan', isChecked);
       setCategoryCheckboxes('lainnya', isChecked);
+      setCategoryCheckboxes('surveiVideo360', isChecked);
     });
 
     // Status Listrik Desa handlers
@@ -2262,6 +2279,7 @@
     setupCategoryHandlers('administrasi');
     setupCategoryHandlers('jalan');
     setupCategoryHandlers('lainnya');
+    setupCategoryHandlers('surveiVideo360');
 
     // Helper function to update grandparent checkbox based on sub-parents
     const updateGrandparentCheckbox = (grandparentId, subparentIds) => {
