@@ -301,16 +301,33 @@
                   <li class="page-item"><a class="page-link" href="{{ $jalan->previousPageUrl() }}"><i class="ri-arrow-left-s-line"></i></a></li>
                 @endif
 
-                {{-- Pages --}}
-                @foreach ($jalan->getUrlRange(1, $jalan->lastPage()) as $page => $url)
-                  @if ($page == $jalan->currentPage())
+                {{-- Pages: Show max 3 buttons around current page --}}
+                @php
+                  $currentPage = $jalan->currentPage();
+                  $lastPage = $jalan->lastPage();
+
+                  // Calculate range to show max 3 pages
+                  if ($lastPage <= 3) {
+                    $startPage = 1;
+                    $endPage = $lastPage;
+                  } else {
+                    $startPage = max(1, $currentPage - 1);
+                    $endPage = min($lastPage, $startPage + 2);
+
+                    // Adjust if we're near the end
+                    if ($endPage - $startPage < 2) {
+                      $startPage = max(1, $endPage - 2);
+                    }
+                  }
+                @endphp
+
+                @for ($page = $startPage; $page <= $endPage; $page++)
+                  @if ($page == $currentPage)
                     <li class="page-item active"><span class="page-link">{{ $page }}</span></li>
                   @else
-                    <li class="page-item {{ $page > 3 && $page < $jalan->lastPage() - 2 ? 'd-none d-sm-block' : '' }}">
-                      <a class="page-link" href="{{ $url }}">{{ $page }}</a>
-                    </li>
+                    <li class="page-item"><a class="page-link" href="{{ $jalan->url($page) }}">{{ $page }}</a></li>
                   @endif
-                @endforeach
+                @endfor
 
                 {{-- Next --}}
                 @if ($jalan->hasMorePages())
