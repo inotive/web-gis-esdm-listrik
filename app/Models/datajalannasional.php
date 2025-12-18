@@ -13,6 +13,8 @@ class DataJalanNasional extends Model
 
     protected $fillable = [
         'objectid',
+        'kabupaten_kota',
+        'kecamatan',
         'fungsi_jal',
         'nama_jln',
         'sumber',

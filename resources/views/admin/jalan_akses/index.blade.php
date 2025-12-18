@@ -116,9 +116,10 @@
   .table-wilayah tbody tr:hover{ background:#FCFCFC; }
 
   .col-no{ width:48px; text-align:center; color:#071437; }
-  .col-kon{ width:140px; }
-  .col-pan{ width:140px; }
-  .col-jen{ width:140px; }
+  .col-kab{ width:160px; }
+  .col-kec{ width:140px; }
+  .col-fungsi{ width:160px; }
+  .col-sumber{ width:140px; }
   .col-aksi{ width:120px; text-align:center; vertical-align:middle; }
 
   .btn-ico{ width:24px; height:24px; display:inline-flex; align-items:center; justify-content:center; border:none; background:transparent; cursor:pointer; transition:transform .2s; padding:0; margin:0 6px; vertical-align:middle; }
@@ -182,19 +183,37 @@
         </div>
 
         <div class="input-group w-filter has-select">
-          <select class="form-select auto-submit" name="kondisi">
-            <option value="">Semua Kondisi</option>
-            @foreach(['Baik','Sedang','Rusak'] as $k)
-              <option {{ request('kondisi')===$k ? 'selected':'' }}>{{ $k }}</option>
+          <select class="form-select auto-submit" name="kabupaten">
+            <option value="">Semua Kab/Kota</option>
+            @foreach($kabupatenList as $kab)
+              <option value="{{ $kab }}" {{ request('kabupaten')===$kab ? 'selected':'' }}>{{ $kab }}</option>
             @endforeach
           </select>
         </div>
 
         <div class="input-group w-filter has-select">
-          <select class="form-select auto-submit" name="jenis">
-            <option value="">Semua Jenis Akses</option>
-            @foreach(['Darat','Air','Udara'] as $j)
-              <option {{ request('jenis')===$j ? 'selected':'' }}>{{ $j }}</option>
+          <select class="form-select auto-submit" name="kecamatan">
+            <option value="">Semua Kecamatan</option>
+            @foreach($kecamatanList as $kec)
+              <option value="{{ $kec }}" {{ request('kecamatan')===$kec ? 'selected':'' }}>{{ $kec }}</option>
+            @endforeach
+          </select>
+        </div>
+
+        <div class="input-group w-filter has-select">
+          <select class="form-select auto-submit" name="fungsi">
+            <option value="">Semua Fungsi</option>
+            @foreach($fungsiFungsi as $f)
+              <option value="{{ $f }}" {{ request('fungsi')===$f ? 'selected':'' }}>{{ $f }}</option>
+            @endforeach
+          </select>
+        </div>
+
+        <div class="input-group w-filter has-select">
+          <select class="form-select auto-submit" name="sumber">
+            <option value="">Semua Sumber</option>
+            @foreach($sumberList as $s)
+              <option value="{{ $s }}" {{ request('sumber')===$s ? 'selected':'' }}>{{ $s }}</option>
             @endforeach
           </select>
         </div>
@@ -209,28 +228,23 @@
           <thead>
             <tr>
               <th class="col-no">No</th>
-              <th>Nama Jalan/Akses</th>
-              <th class="col-kon">Kondisi</th>
-              <th class="col-pan">Panjang (km)</th>
-              <th class="col-jen">Jenis</th>
+              <th class="col-kab">Kabupaten/Kota</th>
+              <th class="col-kec">Kecamatan</th>
+              <th>Nama Jalan</th>
+              <th class="col-fungsi">Fungsi Jalan</th>
+              <th class="col-sumber">Sumber</th>
               <th class="col-aksi">Aksi</th>
             </tr>
           </thead>
           <tbody>
-            @php $rows = [
-              ['Jalan Poros Utama','Baik','12.5','Darat'],
-              ['Sungai Hulu','Sedang','23.0','Air'],
-              ['Landasan Perintis','Rusak','1.2','Udara'],
-              ['Jalan Desa Timur','Sedang','5.8','Darat'],
-              ['Rawa Selatan','Baik','7.0','Air'],
-            ]; @endphp
-            @foreach ($rows as $i => $r)
+            @forelse ($jalan as $index => $item)
               <tr>
-                <td class="col-no">{{ $i+1 }}</td>
-                <td><strong>{{ $r[0] }}</strong></td>
-                <td class="col-kon">{{ $r[1] }}</td>
-                <td class="col-pan">{{ $r[2] }}</td>
-                <td class="col-jen">{{ $r[3] }}</td>
+                <td class="col-no">{{ $jalan->firstItem() + $index }}</td>
+                <td class="col-kab">{{ $item->kabupaten_kota ?? '-' }}</td>
+                <td class="col-kec">{{ $item->kecamatan ?? '-' }}</td>
+                <td><strong>{{ $item->nama_jln ?? '-' }}</strong></td>
+                <td class="col-fungsi">{{ $item->fungsi_jal ?? '-' }}</td>
+                <td class="col-sumber">{{ $item->sumber ?? '-' }}</td>
                 <td class="col-aksi">
                   <a href="#" class="btn-ico" title="Pengaturan">
                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="#4B5675" stroke-width="1.5"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1 .6 1.65 1.65 0 0 0-.33 1.82l.02.05a2 2 0 1 1-3.38 0l.02-.05a1.65 1.65 0 0 0-.33-1.82 1.65 1.65 0 0 0-1-.6 1.65 1.65 0 0 0-1.82.33l-.06.06A2 2 0 1 1 3.3 17l.06-.06A1.65 1.65 0 0 0 4 15a1.65 1.65 0 0 0-.6-1 1.65 1.65 0 0 0-1.82-.33l-.05.02a2 2 0 1 1 0-3.38l.05.02A1.65 1.65 0 0 0 4 9a1.65 1.65 0 0 0-.6-1 1.65 1.65 0 0 0-1.82-.33l-.06.02A2 2 0 1 1 3.3 2.6l.06.06A1.65 1.65 0 0 0 5 4.6c.27 0 .53-.05.77-.16.29-.12.55-.3.73-.56l.02-.03a2 2 0 1 1 3.38 0l.02.03c.18.26.44.44.73.56.24.11.5.16.77.16.5 0 .98-.2 1.34-.56l.06-.06A2 2 0 1 1 20.7 4.6l-.06.06c-.36.36-.56.84-.56 1.34 0 .27.05.53.16.77.12.29.3.55.56.73l.03.02a2 2 0 1 1 0 3.38l-.03.02c-.26.18-.44.44-.56.73-.11.24-.16.5-.16.77Z" stroke="#4B5675" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -240,18 +254,34 @@
                   </button>
                 </td>
               </tr>
-            @endforeach
+            @empty
+              <tr>
+                <td colspan="7" style="text-align:center; padding:40px 20px; color:#94A3B8;">
+                  <i class="ri-inbox-line" style="font-size:48px; display:block; margin-bottom:8px;"></i>
+                  Tidak ada data jalan ditemukan
+                </td>
+              </tr>
+            @endforelse
           </tbody>
         </table>
 
         <div class="table-footer">
-          <div class="summary">Menampilkan <strong>1–5</strong> dari <strong>19</strong> data</div>
+          @if($jalan->total() > 0)
+            <div class="summary">
+              Menampilkan <strong>{{ $jalan->firstItem() }}–{{ $jalan->lastItem() }}</strong> dari <strong>{{ $jalan->total() }}</strong> data
+            </div>
+          @else
+            <div class="summary">Tidak ada data</div>
+          @endif
+
           <div class="show-wrap">
             <span>Show</span>
             <form id="perPageForm" method="GET" action="#">
               <input type="hidden" name="q" value="{{ request('q') }}">
-              <input type="hidden" name="kondisi" value="{{ request('kondisi') }}">
-              <input type="hidden" name="jenis" value="{{ request('jenis') }}">
+              <input type="hidden" name="kabupaten" value="{{ request('kabupaten') }}">
+              <input type="hidden" name="kecamatan" value="{{ request('kecamatan') }}">
+              <input type="hidden" name="fungsi" value="{{ request('fungsi') }}">
+              <input type="hidden" name="sumber" value="{{ request('sumber') }}">
               <select class="form-select auto-submit" name="per_page">
                 @foreach([5,10,25,50,100] as $pp)
                   <option value="{{ $pp }}" {{ (string)request('per_page','10')===(string)$pp ? 'selected':'' }}>{{ $pp }}</option>
@@ -260,16 +290,37 @@
             </form>
             <span>per page</span>
           </div>
-          <nav aria-label="Pagination">
-            <ul class="pagination">
-              <li class="page-item disabled"><span class="page-link"><i class="ri-arrow-left-s-line"></i></span></li>
-              <li class="page-item"><a class="page-link" href="#">1</a></li>
-              <li class="page-item active"><span class="page-link">2</span></li>
-              <li class="page-item"><a class="page-link" href="#">3</a></li>
-              <li class="page-item d-none d-sm-block"><a class="page-link" href="#">4</a></li>
-              <li class="page-item"><a class="page-link" href="#"><i class="ri-arrow-right-s-line"></i></a></li>
-            </ul>
-          </nav>
+
+          @if($jalan->hasPages())
+            <nav aria-label="Pagination">
+              <ul class="pagination">
+                {{-- Previous --}}
+                @if ($jalan->onFirstPage())
+                  <li class="page-item disabled"><span class="page-link"><i class="ri-arrow-left-s-line"></i></span></li>
+                @else
+                  <li class="page-item"><a class="page-link" href="{{ $jalan->previousPageUrl() }}"><i class="ri-arrow-left-s-line"></i></a></li>
+                @endif
+
+                {{-- Pages --}}
+                @foreach ($jalan->getUrlRange(1, $jalan->lastPage()) as $page => $url)
+                  @if ($page == $jalan->currentPage())
+                    <li class="page-item active"><span class="page-link">{{ $page }}</span></li>
+                  @else
+                    <li class="page-item {{ $page > 3 && $page < $jalan->lastPage() - 2 ? 'd-none d-sm-block' : '' }}">
+                      <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                    </li>
+                  @endif
+                @endforeach
+
+                {{-- Next --}}
+                @if ($jalan->hasMorePages())
+                  <li class="page-item"><a class="page-link" href="{{ $jalan->nextPageUrl() }}"><i class="ri-arrow-right-s-line"></i></a></li>
+                @else
+                  <li class="page-item disabled"><span class="page-link"><i class="ri-arrow-right-s-line"></i></span></li>
+                @endif
+              </ul>
+            </nav>
+          @endif
         </div>
 
       </div>
