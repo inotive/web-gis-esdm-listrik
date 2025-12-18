@@ -50,4 +50,12 @@ class Perusahaan extends Model
     {
         return $this->hasMany(PermohonanUser::class, 'perusahaan_id');
     }
+
+    /**
+     * Relationship: Perusahaan memiliki banyak Perizinan
+     */
+    public function perizinans(): HasMany
+    {
+        return $this->hasMany(Perizinan::class, 'perusahaan_id');
+    }
 }

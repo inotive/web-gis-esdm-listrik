@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('permohonan_user_documents', function (Blueprint $table) {
+        Schema::create('perizinan_documents', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users');
-            $table->foreignId('permohonan_user_id')->constrained('permohonan_users');
-            $table->string('nama');
-            $table->date('masa_berlaku')->nullable();
+            $table->foreignId('perizinan_id')->constrained('perizinans')->onDelete('cascade');
             $table->foreignId('dokumen_id')->constrained('dokumens')->onDelete('cascade');
+            $table->string('nama');
+            $table->string('no_surat_izin_terbit')->nullable();
+            $table->date('tanggal_terbit')->nullable();
+            $table->date('tanggal_akhir')->nullable();
             $table->timestamps();
         });
     }
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('permohonan_user_documents');
+        Schema::dropIfExists('perizinan_documents');
     }
 };

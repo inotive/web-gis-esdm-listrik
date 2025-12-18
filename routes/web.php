@@ -31,6 +31,7 @@ use App\Http\Controllers\Admin\DokumenController;
 use App\Http\Controllers\Admin\RekapDataController;
 use App\Http\Controllers\Admin\DataInfrastrukturController;
 use App\Http\Controllers\Admin\KategoriPermohonanController;
+use App\Http\Controllers\Admin\PerizinanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -200,13 +201,26 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
         Route::delete('/{permohonan}', [PermohonanController::class, 'destroy'])->name('destroy');
     });
 
+    // Perizinan
+    Route::group(['as' => 'perizinan.', 'prefix' => 'perizinan'], function () {
+        Route::get('/', [PerizinanController::class, 'index'])->name('index');
+        Route::get('/create', [PerizinanController::class, 'create'])->name('create');
+        Route::post('/', [PerizinanController::class, 'store'])->name('store');
+        Route::get('/{perizinan}', [PerizinanController::class, 'show'])->name('show');
+        Route::get('/{perizinan}/edit', [PerizinanController::class, 'edit'])->name('edit');
+        Route::put('/{perizinan}', [PerizinanController::class, 'update'])->name('update');
+        Route::delete('/{perizinan}', [PerizinanController::class, 'destroy'])->name('destroy');
+        Route::post('/{perizinan}/document', [PerizinanController::class, 'addDocument'])->name('document.add');
+        Route::delete('/{perizinan}/document/{document}', [PerizinanController::class, 'deleteDocument'])->name('document.delete');
+    });
+
     Route::group(['as' => 'kategori-permohonan.', 'prefix' => 'kategori-permohonan'], function () {
         Route::get('/', [KategoriPermohonanController::class, 'index'])->name('index');
         Route::get('/create', [KategoriPermohonanController::class, 'create'])->name('create');
         Route::post('/', [KategoriPermohonanController::class, 'store'])->name('store');
-        Route::get('/{kategori-permohonan}/edit', [KategoriPermohonanController::class, 'edit'])->name('edit');
-        Route::put('/{kategori-permohonan}', [KategoriPermohonanController::class, 'update'])->name('update');
-        Route::delete('/{kategori-permohonan}', [KategoriPermohonanController::class, 'destroy'])->name('destroy');
+        Route::get('/{permohonan}/edit', [KategoriPermohonanController::class, 'edit'])->name('edit');
+        Route::put('/{permohonan}', [KategoriPermohonanController::class, 'update'])->name('update');
+        Route::delete('/{permohonan}', [KategoriPermohonanController::class, 'destroy'])->name('destroy');
     });
 
     // Permohonan User
@@ -222,6 +236,8 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
         Route::post('/{permohonanId}/{permohonanUser}/reject', [PermohonanUserController::class, 'reject'])->name('reject');
         Route::post('/{permohonanId}/{permohonanUser}/progress', [PermohonanUserController::class, 'progress'])->name('progress');
         Route::post('/{permohonanId}/{permohonanUser}/cancel', [PermohonanUserController::class, 'cancel'])->name('cancel');
+        Route::post('/{permohonanId}/{permohonanUser}/document', [PermohonanUserController::class, 'addDocument'])->name('document.add');
+        Route::delete('/{permohonanId}/{permohonanUser}/document/{document}', [PermohonanUserController::class, 'deleteDocument'])->name('document.delete');
     });
 
     // Dokumen

@@ -191,6 +191,16 @@
       color: #64748B;
     }
 
+    .status-akan-kadaluarsa {
+      background: #FEF3C7;
+      color: #D97706;
+    }
+
+    .status-menunggu-terbit {
+      background: #DBEAFE;
+      color: #1E40AF;
+    }
+
     /* Action Buttons */
     .btn-ico {
       width: 28px;
@@ -298,13 +308,13 @@
       <div class="page-title">Perizinan dan Permohonan</div>
     </div>
     <div class="page-actions">
-      <div class="date-pill">
-        <i class="ri-calendar-line"></i>
-        <span>{{ now()->translatedFormat('F Y') }}</span>
-      </div>
-      <a href="{{ route('admin.permohonan.create') }}" class="btn btn-primary">
+      <a href="{{ route('admin.permohonan.create') }}" class="btn btn-primary" id="btnTambahPermohonan" style="display: none;">
         <i class="ri-add-line"></i>
         Tambah Permohonan
+      </a>
+      <a href="{{ route('admin.perizinan.create') }}" class="btn btn-primary" id="btnTambahPerizinan">
+        <i class="ri-add-line"></i>
+        Tambah Perizinan
       </a>
     </div>
   </div>
@@ -377,22 +387,52 @@
                   <td class="date-text">{{ $izin['tanggal_terbit'] ?? '-' }}</td>
                   <td>
                     @php
-                      $statusClass = 'status-aktif';
                       $statusText = $izin['status'];
-                      if (str_contains(strtolower($izin['status']), 'menunggu')) {
-                        $statusClass = 'status-menunggu';
-                      } elseif (str_contains(strtolower($izin['status']), 'expired') || str_contains(strtolower($izin['status']), 'tidak')) {
+                      $statusClass = 'status-aktif';
+
+                      // Mapping status berdasarkan dokumen
+                      if (str_contains(strtolower($statusText), 'expired')) {
                         $statusClass = 'status-expired';
-                      } elseif (str_contains(strtolower($izin['status']), 'ditolak')) {
+                        // Tambahkan jumlah hari kadaluarsa jika ada
+                        if (isset($izin['expired_days']) && $izin['expired_days'] !== null) {
+                          $statusText = 'Expired (' . $izin['expired_days'] . ' hari)';
+                        }
+                      } elseif (str_contains(strtolower($statusText), 'akan kadaluarsa')) {
+                        $statusClass = 'status-akan-kadaluarsa';
+                        // Tambahkan sisa hari jika ada
+                        if (isset($izin['remaining_days']) && $izin['remaining_days'] !== null) {
+                          $statusText = 'Akan Kadaluarsa (' . $izin['remaining_days'] . ' hari)';
+                        }
+                      } elseif (str_contains(strtolower($statusText), 'menunggu verifikasi')) {
+                        $statusClass = 'status-menunggu';
+                      } elseif (str_contains(strtolower($statusText), 'menunggu terbit')) {
+                        $statusClass = 'status-menunggu-terbit';
+                      } elseif (str_contains(strtolower($statusText), 'aktif')) {
+                        $statusClass = 'status-aktif';
+                        // Tambahkan sisa hari jika ada
+                        if (isset($izin['remaining_days']) && $izin['remaining_days'] !== null) {
+                          $statusText = 'Aktif (' . $izin['remaining_days'] . ' hari)';
+                        }
+                      } elseif (str_contains(strtolower($statusText), 'ditolak')) {
                         $statusClass = 'status-ditolak';
                       }
                     @endphp
                     <span class="status-badge {{ $statusClass }}">{{ $statusText }}</span>
                   </td>
                   <td class="col-aksi">
-                    <button class="btn-ico view" title="Lihat Detail"><i class="ri-eye-line"></i></button>
-                    <button class="btn-ico edit" title="Edit"><i class="ri-edit-line"></i></button>
-                    <button class="btn-ico danger" title="Hapus"><i class="ri-delete-bin-line"></i></button>
+                    <a href="{{ route('admin.perizinan.show', $izin['id']) }}" class="btn-ico view" title="Lihat Detail">
+                      <i class="ri-eye-line"></i>
+                    </a>
+                    <a href="{{ route('admin.perizinan.edit', $izin['id']) }}" class="btn-ico edit" title="Edit">
+                      <i class="ri-edit-line"></i>
+                    </a>
+                    <form action="{{ route('admin.perizinan.destroy', $izin['id']) }}" method="POST" class="d-inline form-delete-perizinan" data-name="{{ $izin['perusahaan'] }}">
+                      @csrf
+                      @method('DELETE')
+                      <button type="button" class="btn-ico danger btn-delete-perizinan" title="Hapus">
+                        <i class="ri-delete-bin-line"></i>
+                      </button>
+                    </form>
                   </td>
                 </tr>
               @empty
@@ -425,21 +465,16 @@
         <div class="filter-row">
           <div class="input-group w-search">
             <span class="input-group-text"><i class="ri-search-line"></i></span>
-            <input type="text" id="searchPermohonan" class="form-control" placeholder="Cari Nama atau Jenis Permohonan"
+            <input type="text" id="searchPermohonan" class="form-control" placeholder="Cari Pengguna atau Kategori Permohonan"
               autocomplete="off">
           </div>
           <select class="filter-select" id="filterStatusPermohonan">
             <option value="">Semua Status</option>
-            <option value="aktif">Aktif</option>
-            <option value="menunggu">Menunggu Verifikasi</option>
+            <option value="pending">Menunggu Verifikasi</option>
+            <option value="diproses">Sedang Diproses</option>
+            <option value="selesai">Aktif</option>
+            <option value="ditolak">Ditolak</option>
             <option value="expired">Expired</option>
-          </select>
-          <select class="filter-select" id="filterJenisPermohonan">
-            <option value="">Semua Jenis Izin</option>
-            <option value="IUJPTL">IUJPTL</option>
-            <option value="IUPTLS">IUPTLS</option>
-            <option value="SLO">SLO</option>
-            <option value="SKTP">SKTP</option>
           </select>
         </div>
       </div>
@@ -450,13 +485,12 @@
             <thead>
               <tr>
                 <th class="col-no">No</th>
-                <th>Perusahaan</th>
-                <th>Jenis Izin</th>
-                <th>Tanggal Berlaku</th>
-                <th>Sumber Pengajuan</th>
+                <th>Pengguna</th>
+                <th>Kategori Permohonan</th>
+                <th>Status</th>
                 <th>Tanggal Pengajuan</th>
                 <th>Tanggal Terbit</th>
-                <th>Status</th>
+                <th>Tanggal Berlaku</th>
                 <th class="col-aksi">Aksi</th>
               </tr>
             </thead>
@@ -466,36 +500,45 @@
                   <td class="col-no">{{ $i + 1 }}</td>
                   <td><strong>{{ $item['perusahaan'] }}</strong></td>
                   <td>{{ $item['jenis_izin'] }}</td>
-                  <td class="date-text">{{ $item['tanggal_berlaku'] }}</td>
-                  <td>{{ $item['sumber_pengajuan'] }}</td>
-                  <td class="date-text">{{ $item['tanggal_pengajuan'] }}</td>
-                  <td class="date-text">{{ $item['tanggal_terbit'] ?? '-' }}</td>
                   <td>
                     @php
                       $statusClass = 'status-aktif';
                       $statusText = $item['status'];
+                      // Mapping status berdasarkan teks yang ada
                       if (str_contains(strtolower($item['status']), 'menunggu')) {
                         $statusClass = 'status-menunggu';
-                      } elseif (str_contains(strtolower($item['status']), 'expired') || str_contains(strtolower($item['status']), 'tidak')) {
+                      } elseif (str_contains(strtolower($item['status']), 'diproses')) {
+                        $statusClass = 'status-menunggu';
+                      } elseif (str_contains(strtolower($item['status']), 'expired')) {
                         $statusClass = 'status-expired';
                       } elseif (str_contains(strtolower($item['status']), 'ditolak')) {
                         $statusClass = 'status-ditolak';
+                      } elseif (str_contains(strtolower($item['status']), 'aktif') || str_contains(strtolower($item['status']), 'selesai')) {
+                        $statusClass = 'status-aktif';
                       }
                     @endphp
                     <span class="status-badge {{ $statusClass }}">{{ $statusText }}</span>
                   </td>
+                  <td class="date-text">{{ $item['tanggal_pengajuan'] }}</td>
+                  <td class="date-text">{{ $item['tanggal_terbit'] ?? '-' }}</td>
+                  <td class="date-text">{{ $item['tanggal_berlaku'] }}</td>
                   <td class="col-aksi">
-                    <button class="btn-ico view" title="Lihat Detail"><i class="ri-eye-line"></i></button>
-                    <button class="btn-ico edit" title="Edit"><i class="ri-edit-line"></i></button>
-                    <button class="btn-ico danger" title="Hapus"><i class="ri-delete-bin-line"></i></button>
+                    <a href="{{ route('admin.permohonan-user.show', [$item['permohonan_id'], $item['id']]) }}" class="btn-ico view" title="Lihat Detail">
+                      <i class="ri-eye-line"></i>
+                    </a>
+                    @if($item['status'] !== 'Aktif' && !str_contains(strtolower($item['status']), 'ditolak'))
+                      <a href="{{ route('admin.permohonan-user.edit', [$item['permohonan_id'], $item['id']]) }}" class="btn-ico edit" title="Edit">
+                        <i class="ri-edit-line"></i>
+                      </a>
+                    @endif
                   </td>
                 </tr>
               @empty
                 <tr>
-                  <td colspan="9">
+                  <td colspan="8">
                     <div class="empty-state">
                       <i class="ri-file-list-3-line"></i>
-                      <p>Belum ada data</p>
+                      <p>Belum ada data permohonan</p>
                     </div>
                   </td>
                 </tr>
@@ -529,8 +572,26 @@
           tabContents.forEach(content => content.classList.remove('active'));
           this.classList.add('active');
           document.getElementById('tab-' + tabId).classList.add('active');
+
+          // Toggle button visibility
+          const btnTambahPermohonan = document.getElementById('btnTambahPermohonan');
+          const btnTambahPerizinan = document.getElementById('btnTambahPerizinan');
+          if (tabId === 'perizinan') {
+            btnTambahPermohonan.style.display = 'none';
+            btnTambahPerizinan.style.display = 'inline-flex';
+          } else {
+            // Tab permohonan aktif - sembunyikan tombol tambah permohonan
+            btnTambahPermohonan.style.display = 'none';
+            btnTambahPerizinan.style.display = 'none';
+          }
         });
       });
+
+      // Set initial button visibility
+      const btnTambahPermohonan = document.getElementById('btnTambahPermohonan');
+      const btnTambahPerizinan = document.getElementById('btnTambahPerizinan');
+      btnTambahPermohonan.style.display = 'none';
+      btnTambahPerizinan.style.display = 'inline-flex';
 
       // Success notification
       @if(session('success'))
@@ -546,7 +607,7 @@
         });
       @endif
 
-      // Delete confirmation
+      // Delete confirmation for permohonan
       document.querySelectorAll('.btn-delete-permohonan').forEach(btn => {
         btn.addEventListener('click', function (e) {
           e.preventDefault();
@@ -556,6 +617,31 @@
           Swal.fire({
             title: 'Konfirmasi Hapus',
             html: `Apakah Anda yakin ingin menghapus permohonan <strong>${name}</strong>?<br><small class="text-muted">Data yang dihapus tidak dapat dikembalikan.</small>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#94a3b8',
+            confirmButtonText: '<i class="ri-delete-bin-line"></i> Ya, Hapus!',
+            cancelButtonText: 'Batal',
+            reverseButtons: true,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              form.submit();
+            }
+          });
+        });
+      });
+
+      // Delete confirmation for perizinan
+      document.querySelectorAll('.btn-delete-perizinan').forEach(btn => {
+        btn.addEventListener('click', function (e) {
+          e.preventDefault();
+          const form = this.closest('.form-delete-perizinan');
+          const name = form.dataset.name;
+
+          Swal.fire({
+            title: 'Konfirmasi Hapus',
+            html: `Apakah Anda yakin ingin menghapus perizinan <strong>${name}</strong>?<br><small class="text-muted">Data yang dihapus tidak dapat dikembalikan.</small>`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
@@ -611,6 +697,36 @@
       searchPerizinan?.addEventListener('input', filterTable);
       filterStatus?.addEventListener('change', filterTable);
       filterJenisIzin?.addEventListener('change', filterTable);
+
+      // Filter for permohonan table (client-side)
+      const searchPermohonan = document.getElementById('searchPermohonan');
+      const filterStatusPermohonan = document.getElementById('filterStatusPermohonan');
+      const tablePermohonan = document.getElementById('tablePermohonan');
+
+      function filterTablePermohonan() {
+        const searchTerm = searchPermohonan?.value.toLowerCase() || '';
+        const statusFilter = filterStatusPermohonan?.value.toLowerCase() || '';
+
+        const rows = tablePermohonan?.querySelectorAll('tbody tr') || [];
+        rows.forEach(row => {
+          const pengguna = row.cells[1]?.textContent.toLowerCase() || '';
+          const kategori = row.cells[2]?.textContent.toLowerCase() || '';
+          const status = row.cells[3]?.textContent.toLowerCase() || '';
+
+          const matchSearch = pengguna.includes(searchTerm) || kategori.includes(searchTerm);
+          const matchStatus = !statusFilter ||
+            (statusFilter === 'pending' && status.includes('menunggu')) ||
+            (statusFilter === 'diproses' && status.includes('diproses')) ||
+            (statusFilter === 'selesai' && (status.includes('aktif') || status.includes('selesai'))) ||
+            (statusFilter === 'ditolak' && status.includes('ditolak')) ||
+            (statusFilter === 'expired' && status.includes('expired'));
+
+          row.style.display = (matchSearch && matchStatus) ? '' : 'none';
+        });
+      }
+
+      searchPermohonan?.addEventListener('input', filterTablePermohonan);
+      filterStatusPermohonan?.addEventListener('change', filterTablePermohonan);
     });
   </script>
 @endpush

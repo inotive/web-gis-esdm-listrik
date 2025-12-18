@@ -62,6 +62,26 @@
     color: #065F46;
   }
 
+  .badge-pending {
+    background: #FEF3C7;
+    color: #D97706;
+  }
+
+  .badge-proses {
+    background: #DBEAFE;
+    color: #1E40AF;
+  }
+
+  .badge-ditolak {
+    background: #FEE2E2;
+    color: #DC2626;
+  }
+
+  .badge-expired {
+    background: #F1F5F9;
+    color: #64748B;
+  }
+
   .question-item {
     background: #FCFCFD;
     border: 1px solid #E2E8F0;
@@ -175,10 +195,282 @@
     margin-bottom: 16px;
     opacity: 0.5;
   }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  .form-label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #D1D5DB;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #111827;
+    transition: all 0.2s;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: #3B82F6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  .btn-primary {
+    padding: 10px 20px;
+    background: #3B82F6;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-primary:hover {
+    background: #2563EB;
+  }
+
+  .btn-danger {
+    padding: 8px 16px;
+    background: #EF4444;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-danger:hover {
+    background: #DC2626;
+  }
+
+  .btn-success {
+    padding: 10px 20px;
+    background: #10B981;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-success:hover {
+    background: #059669;
+  }
+
+  .document-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .form-section {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 2px solid #F1F1F4;
+  }
+
+  /* Modal Styling */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    display: none;
+    z-index: 1000;
+    padding: 18px;
+    overflow: auto;
+    backdrop-filter: blur(2px);
+  }
+
+  .modal-overlay.show {
+    display: block;
+    animation: fadeIn 0.2s ease;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .modal {
+    max-width: 600px;
+    margin: 20px auto;
+    background: #fff;
+    border: 1px solid #E2E8F0;
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    animation: slideDown 0.3s ease;
+  }
+
+  @keyframes slideDown {
+    from {
+      transform: translateY(-20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #E2E8F0;
+    background: #F9FAFB;
+  }
+
+  .modal-header h3 {
+    margin: 0;
+    font-weight: 800;
+    font-size: 20px;
+    color: #111827;
+    letter-spacing: -0.2px;
+  }
+
+  .btn-close-modal {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #E2E8F0;
+    background: #fff;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+  }
+
+  .btn-close-modal:hover {
+    background: #F8FAFC;
+    border-color: #CBD5E1;
+  }
+
+  .btn-close-modal i {
+    font-size: 18px;
+    color: #64748B;
+  }
+
+  .modal-body {
+    padding: 24px;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+  }
+
+  .modal-body::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .modal-body::-webkit-scrollbar-track {
+    background: #F1F5F9;
+  }
+
+  .modal-body::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 3px;
+  }
+
+  .modal-body::-webkit-scrollbar-thumb:hover {
+    background: #94A3B8;
+  }
+
+  .modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid #E2E8F0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #F9FAFB;
+  }
+
+  .btn-modal-primary {
+    flex: 1;
+    height: 44px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    color: #fff;
+    background: #3B82F6;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.18s ease;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  }
+
+  .btn-modal-primary:hover {
+    background: #2563EB;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-modal-primary:active {
+    transform: scale(0.98);
+  }
+
+  .btn-modal-cancel {
+    flex: 1;
+    height: 44px;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #64748B;
+    background: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.18s ease;
+  }
+
+  .btn-modal-cancel:hover {
+    background: #F8FAFC;
+    border-color: #CBD5E1;
+    color: #475569;
+  }
 </style>
 @endpush
 
 @section('content')
+  @php
+    $userRole = Auth::user()->roles()->first()->name ?? null;
+    $isAdmin = in_array($userRole, ['admin', 'superadmin']);
+  @endphp
+
   <div class="page-head">
     <div>
       <div class="page-meta">{{ now()->translatedFormat('l, d F Y') }}</div>
@@ -188,16 +480,22 @@
       </div>
     </div>
     <div class="page-actions">
-      <a href="{{ route('admin.permohonan-user.index', $permohonanId) }}" class="btn-back">
+      <a href="{{ route('admin.permohonan.index') }}" class="btn-back">
         <i class="ri-arrow-left-line"></i>
-        Kembali
+        Kembali ke Daftar Permohonan
       </a>
     </div>
   </div>
 
   <section class="card">
-    <div class="card-header">
-      <h2 class="card-title">Informasi Permohonan</h2>
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+      <h2 class="card-title" style="margin: 0;">Informasi Permohonan</h2>
+      @if($isAdmin && $permohonanUser->status !== 'selesai')
+        <button type="button" class="btn-success" data-open="#modalApprove">
+          <i class="ri-check-line"></i>
+          Setujui Permohonan
+        </button>
+      @endif
     </div>
 
     <div class="info-row">
@@ -208,7 +506,22 @@
     <div class="info-row">
       <div class="info-label">Status</div>
       <div class="info-value">
-        <span class="badge badge-selesai">Selesai</span>
+        @php
+          $statusClass = 'badge-selesai';
+          $statusText = ucfirst($permohonanUser->status);
+          $statusMap = [
+            'pending' => ['text' => 'Menunggu Verifikasi', 'class' => 'badge-pending'],
+            'diproses' => ['text' => 'Sedang Diproses', 'class' => 'badge-proses'],
+            'selesai' => ['text' => 'Aktif', 'class' => 'badge-selesai'],
+            'ditolak' => ['text' => 'Ditolak', 'class' => 'badge-ditolak'],
+            'expired' => ['text' => 'Expired', 'class' => 'badge-expired'],
+          ];
+          if (isset($statusMap[$permohonanUser->status])) {
+            $statusText = $statusMap[$permohonanUser->status]['text'];
+            $statusClass = $statusMap[$permohonanUser->status]['class'];
+          }
+        @endphp
+        <span class="badge {{ $statusClass }}">{{ $statusText }}</span>
       </div>
     </div>
 
@@ -293,7 +606,15 @@
 
   @if($permohonanUser->documents && $permohonanUser->documents->count() > 0)
   <section class="card">
-    <h2 class="section-title">Dokumen Persetujuan</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <h2 class="section-title" style="margin: 0;">Dokumen Persetujuan</h2>
+      @if($isAdmin)
+        <button type="button" class="btn-primary" data-open="#modalAddDocument">
+          <i class="ri-add-line"></i>
+          Tambah Dokumen
+        </button>
+      @endif
+    </div>
 
     @foreach($permohonanUser->documents as $document)
       <div class="document-item">
@@ -314,18 +635,46 @@
             @endif
           </div>
         </div>
-        <a href="{{ asset('storage/permohonan-documents/' . $document->path) }}" 
-           target="_blank" 
-           class="btn-download"
-           download>
-          <i class="ri-download-line"></i>
-          Download
-        </a>
+        <div class="document-actions">
+          @if($document->dokumen && $document->dokumen->path)
+            <a href="{{ asset('storage/permohonan-documents/' . $document->dokumen->path) }}"
+               target="_blank"
+               class="btn-download"
+               download>
+              <i class="ri-download-line"></i>
+              Download
+            </a>
+          @else
+            <span style="color: #94A3B8; font-size: 12px;">Dokumen tidak tersedia</span>
+          @endif
+          @if($isAdmin)
+            <form action="{{ route('admin.permohonan-user.document.delete', [$permohonanId, $permohonanUser->id, $document->id]) }}"
+                  method="POST"
+                  class="form-delete-document"
+                  style="display: inline;">
+              @csrf
+              @method('DELETE')
+              <button type="submit" class="btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus dokumen ini?')">
+                <i class="ri-delete-bin-line"></i>
+                Hapus
+              </button>
+            </form>
+          @endif
+        </div>
       </div>
     @endforeach
   </section>
   @else
   <section class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <h2 class="section-title" style="margin: 0;">Dokumen Persetujuan</h2>
+      @if($isAdmin)
+        <button type="button" class="btn-primary" data-open="#modalAddDocument">
+          <i class="ri-add-line"></i>
+          Tambah Dokumen
+        </button>
+      @endif
+    </div>
     <div class="empty-state">
       <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -335,5 +684,283 @@
     </div>
   </section>
   @endif
+
+  <!-- Modal Approve Permohonan -->
+  @if($isAdmin && $permohonanUser->status !== 'selesai')
+  <div class="modal-overlay" id="modalApprove">
+    <div class="modal" style="max-width: 700px;">
+      <div class="modal-header">
+        <h3>Setujui Permohonan</h3>
+        <button type="button" class="btn-close-modal" data-close>
+          <i class="ri-close-line"></i>
+        </button>
+      </div>
+      <form action="{{ route('admin.permohonan-user.approve', [$permohonanId, $permohonanUser->id]) }}"
+            method="POST"
+            enctype="multipart/form-data"
+            id="formApprove">
+        @csrf
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Keterangan</label>
+            <textarea name="keterangan" class="form-control" rows="3" placeholder="Masukkan keterangan (opsional)">{{ old('keterangan', $permohonanUser->keterangan) }}</textarea>
+          </div>
+
+          <div id="documentContainer">
+            <div class="form-section">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="font-size: 16px; font-weight: 600; margin: 0;">Tambah Dokumen Persetujuan</h3>
+                <button type="button" class="btn-primary" id="btnAddDocument" style="background: #6B7280; padding: 8px 16px; font-size: 13px;">
+                  <i class="ri-add-line"></i>
+                  Tambah Dokumen Lain
+                </button>
+              </div>
+              <div class="document-form-item" style="background: #F9FAFB; padding: 16px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #E2E8F0;">
+                <div class="form-group">
+                  <label class="form-label">Nama Dokumen</label>
+                  <input type="text" name="documents[0][nama]" class="form-control" placeholder="Contoh: Surat Izin Operasional" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">File Dokumen</label>
+                  <input type="file" name="documents[0][file]" class="form-control" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" required>
+                  <small style="color: #6B7280; font-size: 12px;">Format: PDF, DOC, DOCX, JPG, PNG (Max: 10MB)</small>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Masa Berlaku (Opsional)</label>
+                  <input type="date" name="documents[0][masa_berlaku]" class="form-control">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-modal-cancel" data-close>
+            <i class="ri-close-line"></i>
+            Batal
+          </button>
+          <button type="submit" class="btn-modal-primary" style="background: #10B981;">
+            <i class="ri-check-line"></i>
+            Setujui Permohonan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  @endif
+
+  <!-- Modal Tambah Dokumen -->
+  <div class="modal-overlay" id="modalAddDocument">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Tambah Dokumen Baru</h3>
+        <button type="button" class="btn-close-modal" data-close>
+          <i class="ri-close-line"></i>
+        </button>
+      </div>
+      <form action="{{ route('admin.permohonan-user.document.add', [$permohonanId, $permohonanUser->id]) }}"
+            method="POST"
+            enctype="multipart/form-data"
+            id="formAddDocument">
+        @csrf
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Nama Dokumen</label>
+            <input type="text" name="nama" class="form-control" placeholder="Contoh: Surat Izin Operasional" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">File Dokumen</label>
+            <input type="file" name="file" class="form-control" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" required>
+            <small style="color: #6B7280; font-size: 12px;">Format: PDF, DOC, DOCX, JPG, PNG (Max: 10MB)</small>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Masa Berlaku (Opsional)</label>
+            <input type="date" name="masa_berlaku" class="form-control">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-modal-cancel" data-close>
+            <i class="ri-close-line"></i>
+            Batal
+          </button>
+          <button type="submit" class="btn-modal-primary">
+            <i class="ri-add-line"></i>
+            Tambah Dokumen
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 @endsection
+
+@push('scripts')
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Modal functionality
+    const openModal = (selector) => {
+      const modal = document.querySelector(selector);
+      if (modal) {
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+      }
+    };
+
+    const closeModal = (modal) => {
+      if (modal) {
+        modal.classList.remove('show');
+        document.body.style.overflow = '';
+        // Reset form
+        const form = modal.querySelector('form');
+        if (form) {
+          form.reset();
+        }
+      }
+    };
+
+    // Open modal on button click
+    document.addEventListener('click', function(e) {
+      const opener = e.target.closest('[data-open]');
+      if (opener) {
+        e.preventDefault();
+        const modalSelector = opener.getAttribute('data-open');
+        openModal(modalSelector);
+      }
+
+      // Close modal
+      if (e.target.hasAttribute('data-close') || e.target.classList.contains('modal-overlay')) {
+        const modal = e.target.closest('.modal-overlay') || document.querySelector('.modal-overlay.show');
+        closeModal(modal);
+      }
+    });
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        const modal = document.querySelector('.modal-overlay.show');
+        closeModal(modal);
+      }
+    });
+
+    // Success notification
+    @if(session('success'))
+      Swal.fire({
+        icon: 'success',
+        title: 'Berhasil!',
+        text: '{{ session('success') }}',
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end',
+      });
+      // Close modal if open
+      setTimeout(() => {
+        const openModalEl = document.querySelector('.modal-overlay.show');
+        if (openModalEl) {
+          closeModal(openModalEl);
+        }
+      }, 100);
+    @endif
+
+    // Error notification
+    @if(session('error') || $errors->any())
+      Swal.fire({
+        icon: 'error',
+        title: 'Error!',
+        text: '{{ session('error') ?? $errors->first() }}',
+        timer: 3000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end',
+      });
+    @endif
+
+    // Add document form (for approve modal)
+    let documentCount = 1;
+    const btnAddDocument = document.getElementById('btnAddDocument');
+    if (btnAddDocument) {
+      btnAddDocument.addEventListener('click', function() {
+        const container = document.getElementById('documentContainer');
+        if (!container) return;
+
+        const formSection = container.querySelector('.form-section');
+        if (!formSection) return;
+
+        const newDocument = document.createElement('div');
+        newDocument.className = 'document-form-item';
+        newDocument.style.cssText = 'background: #F9FAFB; padding: 16px; border-radius: 8px; margin-bottom: 12px; border: 1px solid #E2E8F0;';
+        newDocument.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h4 style="font-size: 14px; font-weight: 600; margin: 0; color: #111827;">Dokumen ${documentCount + 1}</h4>
+            <button type="button" class="btn-danger" onclick="this.closest('.document-form-item').remove()" style="padding: 6px 12px; font-size: 12px; height: auto;">
+              <i class="ri-delete-bin-line"></i> Hapus
+            </button>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nama Dokumen</label>
+            <input type="text" name="documents[${documentCount}][nama]" class="form-control" placeholder="Contoh: Surat Izin Operasional" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">File Dokumen</label>
+            <input type="file" name="documents[${documentCount}][file]" class="form-control" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" required>
+            <small style="color: #6B7280; font-size: 12px;">Format: PDF, DOC, DOCX, JPG, PNG (Max: 10MB)</small>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Masa Berlaku (Opsional)</label>
+            <input type="date" name="documents[${documentCount}][masa_berlaku]" class="form-control">
+          </div>
+        `;
+        formSection.appendChild(newDocument);
+        documentCount++;
+
+        // Scroll to new document
+        newDocument.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+    }
+
+    // Reset document count when modal approve is opened
+    document.addEventListener('click', function(e) {
+      if (e.target.closest('[data-open="#modalApprove"]')) {
+        documentCount = 1;
+        // Reset document container to only have first document
+        const container = document.getElementById('documentContainer');
+        if (container) {
+          const formSection = container.querySelector('.form-section');
+          if (formSection) {
+            const documentItems = formSection.querySelectorAll('.document-form-item');
+            // Keep only first document, remove others
+            documentItems.forEach((item, index) => {
+              if (index > 0) {
+                item.remove();
+              }
+            });
+          }
+        }
+      }
+    });
+
+    // Delete document confirmation
+    const deleteForms = document.querySelectorAll('.form-delete-document');
+    deleteForms.forEach(form => {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        Swal.fire({
+          title: 'Konfirmasi Hapus',
+          text: 'Apakah Anda yakin ingin menghapus dokumen ini?',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#EF4444',
+          cancelButtonColor: '#6B7280',
+          confirmButtonText: 'Ya, Hapus!',
+          cancelButtonText: 'Batal',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            form.submit();
+          }
+        });
+      });
+    });
+  });
+</script>
+@endpush
 

@@ -170,7 +170,7 @@
 </div>
 
 <section class="card">
-  <form method="POST" action="{{ route('admin.permohonan.store') }}" id="formPermohonan">
+  <form method="POST" action="{{ route('admin.kategori-permohonan.store') }}" id="formPermohonan">
     @csrf
 
     <div class="form-group">

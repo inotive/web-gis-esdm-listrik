@@ -17,7 +17,7 @@ class PermohonanUserDocument extends Model
         'permohonan_user_id',
         'nama',
         'masa_berlaku',
-        'path',
+        'dokumen_id',
     ];
 
     protected $casts = [
@@ -38,5 +38,13 @@ class PermohonanUserDocument extends Model
     public function permohonanUser(): BelongsTo
     {
         return $this->belongsTo(PermohonanUser::class, 'permohonan_user_id');
+    }
+
+    /**
+     * Relasi: PermohonanUserDocument belongs to Dokumen
+     */
+    public function dokumen(): BelongsTo
+    {
+        return $this->belongsTo(Dokumen::class, 'dokumen_id');
     }
 }
