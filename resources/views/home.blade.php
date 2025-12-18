@@ -142,97 +142,390 @@
             background-color: var(--primary-dark);
         }
 
-        /* Hero Section */
+        /* Hero Section Revamp */
         .hero {
             background-color: var(--primary);
-            /* Solid Green Background */
             color: var(--white);
             position: relative;
             overflow: hidden;
-            height: 100vh;
+            min-height: 80vh;
             display: flex;
             align-items: center;
             width: 100%;
+            padding: 120px 0 60px;
+            /* Account for navbar */
         }
 
-        /* Decorative circles for Hero */
-        .hero-decoration {
+        /* Abstract Background Shapes */
+        .hero-shape {
             position: absolute;
             border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.1);
+            filter: blur(80px);
             z-index: 1;
+            opacity: 0.6;
+            animation: pulse 10s infinite alternate;
         }
 
-        .hd-1 {
+        .shape-1 {
+            background: rgba(255, 255, 255, 0.15);
+            width: 500px;
+            height: 500px;
+            top: -100px;
+            right: -100px;
+        }
+
+        .shape-2 {
+            background: rgba(16, 185, 129, 0.4);
+            /* Primary Light */
             width: 300px;
             height: 300px;
-            top: -100px;
-            right: -50px;
+            bottom: -50px;
+            left: -50px;
+            animation-delay: -2s;
         }
 
-        .hd-2 {
+        .shape-3 {
+            background: rgba(4, 120, 87, 0.3);
+            /* Primary Dark */
             width: 150px;
             height: 150px;
-            bottom: 40px;
-            left: 10%;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
-        .hero-content {
+        .hero-container {
             position: relative;
             z-index: 2;
-            display: flex;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 60px;
             align-items: center;
-            /* Center Vertically if there was an image, but text centered is good */
-            justify-content: center;
-            text-align: center;
-            flex-direction: column;
-            max-width: 800px;
+            width: 100%;
+            max-width: var(--max-width);
             margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .hero-text-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
         }
 
         .hero-badge {
-            background-color: rgba(255, 255, 255, 0.2);
+            background-color: rgba(255, 255, 255, 0.15);
             color: var(--white);
-            padding: 6px 16px;
-            border-radius: 20px;
+            padding: 8px 20px;
+            border-radius: 50px;
             font-size: 14px;
             font-weight: 600;
-            margin-bottom: 24px;
-            display: inline-block;
-            backdrop-filter: blur(4px);
+            margin-bottom: 32px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .hero-badge i {
+            font-size: 16px;
         }
 
         .hero-title {
-            font-size: 48px;
+            font-size: 56px;
             font-weight: 800;
             margin-bottom: 24px;
-            line-height: 1.2;
-            letter-spacing: -0.02em;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
-        .hero-subtitle {
-            font-size: 18px;
+        .text-highlight {
+            color: #d1fae5;
+            /* Very light green */
+            position: relative;
+            display: inline-block;
+        }
+
+        /* Underline effect */
+        .text-highlight::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 4px;
+            width: 100%;
+            height: 8px;
+            background-color: rgba(255, 255, 255, 0.2);
+            z-index: -1;
+            border-radius: 4px;
+        }
+
+        .hero-desc {
+            font-size: 20px;
             color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 40px;
+            margin-bottom: 48px;
             line-height: 1.6;
+            max-width: 600px;
+            font-weight: 400;
         }
 
-        .hero-cta {
+        .hero-actions {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 60px;
+        }
+
+        .btn-hero-primary {
             background-color: var(--white);
             color: var(--primary);
-            padding: 16px 32px;
+            padding: 16px 36px;
             border-radius: 12px;
             font-weight: 700;
             font-size: 16px;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            transition: transform 0.2s, box-shadow 0.2s;
+            gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
 
-        .hero-cta:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        .btn-hero-primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            background-color: #f0fdf4;
+        }
+
+        .btn-hero-secondary {
+            background-color: transparent;
+            color: var(--white);
+            padding: 16px 36px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-hero-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: var(--white);
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 48px;
+            padding-top: 32px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        /* Hero Visual (Right Side) */
+        .hero-visual {
+            position: relative;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .visual-circle {
+            position: absolute;
+            width: 450px;
+            height: 450px;
+            border-radius: 50%;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            animation: spin 60s linear infinite;
+        }
+
+        .visual-circle-inner {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .visual-logo {
+            width: 120px;
+            height: auto;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.2));
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .floating-card {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--gray-900);
+            padding: 16px 20px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            animation: float 5s ease-in-out infinite;
+            z-index: 5;
+            max-width: 200px;
+        }
+
+        .floating-card i {
+            font-size: 24px;
+            color: var(--primary);
+            background: #ecfdf5;
+            padding: 8px;
+            border-radius: 10px;
+        }
+
+        .fc-1 {
+            top: 50px;
+            left: 0;
+            animation-delay: 0s;
+        }
+
+        .fc-2 {
+            bottom: 80px;
+            right: 20px;
+            animation-delay: -2.5s;
+        }
+
+        .fc-3 {
+            top: 40%;
+            right: -40px;
+            animation-delay: -1s;
+        }
+
+        /* Animations */
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
+
+            100% {
+                transform: scale(1.1);
+                opacity: 0.4;
+            }
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Mobile Responsive for Hero */
+        @media (max-width: 1024px) {
+            .hero-title {
+                font-size: 48px;
+            }
+
+            .hero-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 40px;
+            }
+
+            .hero-text-content {
+                align-items: center;
+                text-align: center;
+            }
+
+            .hero-badge {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-actions {
+                justify-content: center;
+            }
+
+            .hero-stats {
+                justify-content: center;
+                margin: 0 auto;
+                border-top: 1px solid rgba(255, 255, 255, 0.2);
+            }
+
+            .hero-visual {
+                height: 400px;
+                display: none;
+                /* Optional: hide detailed visual on mobile if too cluttered */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding-top: 100px;
+                min-height: auto;
+                padding-bottom: 80px;
+            }
+
+            .hero-title {
+                font-size: 36px;
+            }
+
+            .hero-actions {
+                flex-direction: column;
+                width: 100%;
+                gap: 12px;
+            }
+
+            .btn-hero-primary,
+            .btn-hero-secondary {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .hero-desc {
+                font-size: 16px;
+                margin-bottom: 32px;
+            }
         }
 
         /* Section Styling */
@@ -273,6 +566,8 @@
         /* Alur Permohonan */
         .alur-section {
             background-color: var(--white);
+            padding-top: 40px;
+            /* Reduced top padding to move it up */
         }
 
         .steps-grid {
@@ -382,6 +677,8 @@
         /* FAQ Section */
         .faq-section {
             background-color: var(--gray-50);
+            padding-top: 20px;
+
         }
 
         .faq-container {
@@ -534,7 +831,7 @@
             <div class="logo-area">
                 <img src="{{ asset('assets/media/logos/logo.png') }}" alt="Logo ESDM" class="logo-img">
                 <div class="logo-text">
-                    <span class="logo-title">Dinas ESDM</span>
+                    <span class="logo-title">Dinas Energi Dan Sumber Daya Mineral</span>
                     <span class="logo-subtitle">Provinsi Kalimantan Timur</span>
                 </div>
             </div>
@@ -549,13 +846,82 @@
 
     <!-- Hero Section -->
     <section id="home" class="hero">
-        <div class="hero-decoration hd-1"></div>
-        <div class="hero-decoration hd-2"></div>
-        <div class="container hero-content">
-            <div class="hero-badge">Selamat Datang</div>
-            <h1 class="hero-title">Dinas Energi Dan Sumberdaya Mineral</h1>
-            <p class="hero-subtitle">Mempermudah akses informasi dan permohonan layanan kelistrikan di wilayah
-                Kalimantan Timur secara transparan dan efisien.</p>
+        <!-- Abstract Background -->
+        <div class="hero-shape shape-1"></div>
+        <div class="hero-shape shape-2"></div>
+        <div class="hero-shape shape-3"></div>
+
+        <div class="hero-container">
+            <div class="hero-text-content">
+                <div class="hero-badge">
+                    <i class="ri-government-line"></i> Dinas Energi Dan Sumber Daya Mineral
+                </div>
+                <h1 class="hero-title">
+                    Sistem Informasi <br>
+                    <span class="text-highlight">Geografis ESDM</span>
+                </h1>
+                <p class="hero-desc">
+                    Portal terpadu untuk pemetaan infrastruktur energi dan layanan permohonan kelistrikan di Kalimantan
+                    Timur. Transparan, terpercaya, dan mudah diakses.
+                </p>
+                <div class="hero-actions">
+                    {{-- <a href="#alur" class="btn-hero-primary">
+                        Alur <i class="ri-arrow-right-line"></i>
+                    </a> --}}
+                    {{-- <a href="#alur" class="btn-hero-secondary">
+                        <i class="ri-play-circle-line"></i> Alur
+                    </a> --}}
+                </div>
+
+                {{-- <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-value">10K+</span>
+                        <span class="stat-label">Data Titik</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">24/7</span>
+                        <span class="stat-label">Akses Online</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value">100%</span>
+                        <span class="stat-label">Transparan</span>
+                    </div>
+                </div> --}}
+            </div>
+
+            <div class="hero-visual">
+                <!-- Decorative Orbit -->
+                <div class="visual-circle"></div>
+
+                <div class="visual-circle-inner">
+                    <img src="{{ asset('assets/media/logos/logo.png') }}" alt="ESDM Logo" class="visual-logo">
+                </div>
+
+                <!-- Floating Cards -->
+                <div class="floating-card fc-1">
+                    <i class="ri-map-2-line"></i>
+                    <div style="font-size: 14px;">
+                        <div>Website Interaktif</div>
+                        {{-- <div style="font-size: 12px; color: var(--gray-500); font-weight: normal;">Real-time GIS</div> --}}
+                    </div>
+                </div>
+
+                <div class="floating-card fc-2">
+                    <i class="ri-flashlight-line"></i>
+                    <div style="font-size: 14px;">
+                        <div>Infrastruktur Listrik</div>
+                        {{-- <div style="font-size: 12px; color: var(--gray-500); font-weight: normal;">Layanan Terpadu</div> --}}
+                    </div>
+                </div>
+
+                <div class="floating-card fc-3">
+                    <i class="ri-shield-check-line"></i>
+                    <div style="font-size: 14px;">
+                        <div>Permohonan Dan Perizinan</div>
+                        {{-- <div style="font-size: 12px; color: var(--gray-500); font-weight: normal;">Data Valid</div> --}}
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -579,8 +945,7 @@
                         <div class="step-number">1</div>
                     </div>
                     {{-- <h3 class="step-title">Masuk ke sistem</h3> --}}
-                    <p class="step-text">Pengguna melakukan login sebagai Desa/Perusahaan untuk mengakses fitur
-                        permohonan layanan ESDM.</p>
+                    <p class="step-text">Login sebagai Desa/Perusahaan</p>
                 </div>
 
                 <!-- Step 2 -->
@@ -616,7 +981,7 @@
                         <div class="step-number">4</div>
                     </div>
                     {{-- <h3 class="step-title">Selesai</h3> --}}
-                    <p class="step-text">Selamat permohonan Anda berhasil diajukan</p>
+                    <p class="step-text">Permohonan Anda berhasil diajukan</p>
                 </div>
             </div>
         </div>
