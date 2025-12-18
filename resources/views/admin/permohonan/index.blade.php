@@ -379,6 +379,87 @@
 
   <!-- Tab 1: Data Perizinan -->
   <div class="tab-content {{ $tab === 'perizinan' ? 'active' : '' }}" id="tab-perizinan">
+    <!-- Metric Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 20px;">
+      <!-- Total Perizinan -->
+      <div style="background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 48px; height: 48px; background: #EEF2FF; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+            <i class="ri-file-shield-2-line" style="font-size: 24px; color: #667eea;"></i>
+          </div>
+          <div>
+            <div style="font-size: 12px; color: #6B7280; font-weight: 500;">Total Perizinan</div>
+            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">{{ number_format($perizinanStats['total']) }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- IUPTLS -->
+      <div style="background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 48px; height: 48px; background: #D1FAE5; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+            <i class="ri-shield-check-line" style="font-size: 24px; color: #059669;"></i>
+          </div>
+          <div>
+            <div style="font-size: 12px; color: #6B7280; font-weight: 500;">IUPTLS</div>
+            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">{{ number_format($perizinanStats['iuptls']) }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SKTP -->
+      <div style="background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 48px; height: 48px; background: #FCE7F3; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+            <i class="ri-shield-star-line" style="font-size: 24px; color: #DB2777;"></i>
+          </div>
+          <div>
+            <div style="font-size: 12px; color: #6B7280; font-weight: 500;">SKTP</div>
+            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">{{ number_format($perizinanStats['sktp']) }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sedang Aktif -->
+      <div style="background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 48px; height: 48px; background: #D1FAE5; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+            <i class="ri-checkbox-circle-line" style="font-size: 24px; color: #10B981;"></i>
+          </div>
+          <div>
+            <div style="font-size: 12px; color: #6B7280; font-weight: 500;">Sedang Aktif</div>
+            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">{{ number_format($perizinanStats['aktif']) }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mau Berakhir -->
+      <div style="background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 48px; height: 48px; background: #FEF3C7; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+            <i class="ri-time-line" style="font-size: 24px; color: #F59E0B;"></i>
+          </div>
+          <div>
+            <div style="font-size: 12px; color: #6B7280; font-weight: 500;">Mau Berakhir</div>
+            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">{{ number_format($perizinanStats['mau_berakhir']) }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Berakhir -->
+      <div style="background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 48px; height: 48px; background: #FEE2E2; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+            <i class="ri-close-circle-line" style="font-size: 24px; color: #EF4444;"></i>
+          </div>
+          <div>
+            <div style="font-size: 12px; color: #6B7280; font-weight: 500;">Berakhir</div>
+            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">{{ number_format($perizinanStats['berakhir']) }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <section class="card">
       <div class="card-header">
         <form method="GET" action="{{ route('admin.permohonan.index') }}" id="filterFormPerizinan">
