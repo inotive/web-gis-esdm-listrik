@@ -845,8 +845,12 @@
             }
 
             .nav-links {
+                display: flex;
+                gap: 12px;
+            }
+
+            .nav-link {
                 display: none;
-                /* Add mobile menu logic if needed, hiding for now */
             }
         }
     </style>
