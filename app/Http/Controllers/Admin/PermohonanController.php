@@ -61,16 +61,21 @@ class PermohonanController extends Controller
         if ($status) {
             $today = now();
             if ($status === 'aktif') {
+                // Sedang Aktif: tanggal_akhir lebih dari 30 hari dari sekarang
+                $queryPerizinan->whereNotNull('tanggal_akhir')
+                    ->where('tanggal_akhir', '>', $today->copy()->addDays(30))
+                    ->where('tanggal_akhir', '>', '1901-01-01');
+            } elseif ($status === 'mau_berakhir') {
+                // Mau Berakhir: tanggal_akhir dalam 30 hari ke depan
                 $queryPerizinan->whereNotNull('tanggal_akhir')
                     ->where('tanggal_akhir', '>=', $today)
+                    ->where('tanggal_akhir', '<=', $today->copy()->addDays(30))
                     ->where('tanggal_akhir', '>', '1901-01-01');
-            } elseif ($status === 'expired') {
+            } elseif ($status === 'berakhir') {
+                // Berakhir: tanggal_akhir sudah lewat
                 $queryPerizinan->whereNotNull('tanggal_akhir')
                     ->where('tanggal_akhir', '<', $today)
                     ->where('tanggal_akhir', '>', '1901-01-01');
-            } elseif ($status === 'menunggu') {
-                $queryPerizinan->whereNull('tanggal_terbit')
-                    ->orWhere('tanggal_terbit', '<', '1901-01-01');
             }
         }
 

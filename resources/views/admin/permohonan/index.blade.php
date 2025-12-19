@@ -186,6 +186,11 @@
       color: #DC2626;
     }
 
+    .status-warning {
+      background: #FEF3C7;
+      color: #D97706;
+    }
+
     .status-ditolak {
       background: #F1F5F9;
       color: #64748B;
@@ -423,16 +428,19 @@
   <!-- Tab 1: Data Perizinan -->
   <div class="tab-content {{ $tab === 'perizinan' ? 'active' : '' }}" id="tab-perizinan">
     <!-- Metric Cards -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 20px;">
+    <div
+      style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 20px;">
       <!-- Total Perizinan -->
       <div style="background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px;">
         <div style="display: flex; align-items: center; gap: 12px;">
-          <div style="width: 48px; height: 48px; background: #EEF2FF; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+          <div
+            style="width: 48px; height: 48px; background: #EEF2FF; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
             <i class="ri-file-shield-2-line" style="font-size: 24px; color: #667eea;"></i>
           </div>
           <div>
             <div style="font-size: 12px; color: #6B7280; font-weight: 500;">Total Perizinan</div>
-            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">{{ number_format($perizinanStats['total']) }}</div>
+            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">
+              {{ number_format($perizinanStats['total']) }}</div>
           </div>
         </div>
       </div>
@@ -440,12 +448,14 @@
       <!-- IUPTLS -->
       <div style="background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px;">
         <div style="display: flex; align-items: center; gap: 12px;">
-          <div style="width: 48px; height: 48px; background: #D1FAE5; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+          <div
+            style="width: 48px; height: 48px; background: #D1FAE5; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
             <i class="ri-shield-check-line" style="font-size: 24px; color: #059669;"></i>
           </div>
           <div>
             <div style="font-size: 12px; color: #6B7280; font-weight: 500;">IUPTLS</div>
-            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">{{ number_format($perizinanStats['iuptls']) }}</div>
+            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">
+              {{ number_format($perizinanStats['iuptls']) }}</div>
           </div>
         </div>
       </div>
@@ -453,12 +463,14 @@
       <!-- SKTP -->
       <div style="background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px;">
         <div style="display: flex; align-items: center; gap: 12px;">
-          <div style="width: 48px; height: 48px; background: #FCE7F3; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+          <div
+            style="width: 48px; height: 48px; background: #FCE7F3; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
             <i class="ri-shield-star-line" style="font-size: 24px; color: #DB2777;"></i>
           </div>
           <div>
             <div style="font-size: 12px; color: #6B7280; font-weight: 500;">SKTP</div>
-            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">{{ number_format($perizinanStats['sktp']) }}</div>
+            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">
+              {{ number_format($perizinanStats['sktp']) }}</div>
           </div>
         </div>
       </div>
@@ -466,12 +478,14 @@
       <!-- Sedang Aktif -->
       <div style="background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px;">
         <div style="display: flex; align-items: center; gap: 12px;">
-          <div style="width: 48px; height: 48px; background: #D1FAE5; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+          <div
+            style="width: 48px; height: 48px; background: #D1FAE5; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
             <i class="ri-checkbox-circle-line" style="font-size: 24px; color: #10B981;"></i>
           </div>
           <div>
             <div style="font-size: 12px; color: #6B7280; font-weight: 500;">Sedang Aktif</div>
-            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">{{ number_format($perizinanStats['aktif']) }}</div>
+            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">
+              {{ number_format($perizinanStats['aktif']) }}</div>
           </div>
         </div>
       </div>
@@ -479,12 +493,14 @@
       <!-- Mau Berakhir -->
       <div style="background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px;">
         <div style="display: flex; align-items: center; gap: 12px;">
-          <div style="width: 48px; height: 48px; background: #FEF3C7; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+          <div
+            style="width: 48px; height: 48px; background: #FEF3C7; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
             <i class="ri-time-line" style="font-size: 24px; color: #F59E0B;"></i>
           </div>
           <div>
             <div style="font-size: 12px; color: #6B7280; font-weight: 500;">Mau Berakhir</div>
-            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">{{ number_format($perizinanStats['mau_berakhir']) }}</div>
+            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">
+              {{ number_format($perizinanStats['mau_berakhir']) }}</div>
           </div>
         </div>
       </div>
@@ -492,12 +508,14 @@
       <!-- Berakhir -->
       <div style="background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px;">
         <div style="display: flex; align-items: center; gap: 12px;">
-          <div style="width: 48px; height: 48px; background: #FEE2E2; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+          <div
+            style="width: 48px; height: 48px; background: #FEE2E2; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
             <i class="ri-close-circle-line" style="font-size: 24px; color: #EF4444;"></i>
           </div>
           <div>
             <div style="font-size: 12px; color: #6B7280; font-weight: 500;">Berakhir</div>
-            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">{{ number_format($perizinanStats['berakhir']) }}</div>
+            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">
+              {{ number_format($perizinanStats['berakhir']) }}</div>
           </div>
         </div>
       </div>
@@ -515,9 +533,9 @@
             </div>
             <select class="filter-select" name="status" onchange="this.form.submit()">
               <option value="">Semua Status</option>
-              <option value="aktif" {{ $status === 'aktif' ? 'selected' : '' }}>Aktif</option>
-              <option value="menunggu" {{ $status === 'menunggu' ? 'selected' : '' }}>Menunggu Verifikasi</option>
-              <option value="expired" {{ $status === 'expired' ? 'selected' : '' }}>Expired</option>
+              <option value="aktif" {{ $status === 'aktif' ? 'selected' : '' }}>Sedang Aktif</option>
+              <option value="mau_berakhir" {{ $status === 'mau_berakhir' ? 'selected' : '' }}>Mau Berakhir</option>
+              <option value="berakhir" {{ $status === 'berakhir' ? 'selected' : '' }}>Berakhir</option>
             </select>
             <select class="filter-select" name="jenis" onchange="this.form.submit()">
               <option value="">Semua Jenis Izin</option>
@@ -553,23 +571,30 @@
             <tbody>
               @forelse($perizinanItems as $i => $izin)
                 @php
-                  // Determine status based on tanggal_terbit and tanggal_akhir
+                  // Determine status based on tanggal_akhir
                   $statusText = 'Menunggu Verifikasi';
                   $statusClass = 'status-menunggu';
 
-                  if ($izin->tanggal_terbit && $izin->tanggal_akhir) {
+                  if ($izin->tanggal_akhir) {
                     $today = now();
                     $tanggalAkhir = \Carbon\Carbon::parse($izin->tanggal_akhir);
+                    $daysRemaining = $today->diffInDays($tanggalAkhir, false);
 
                     if ($tanggalAkhir->isPast()) {
-                      $statusText = 'Expired';
+                      // Sudah lewat tanggal akhir
+                      $statusText = 'Berakhir';
                       $statusClass = 'status-expired';
+                    } elseif ($daysRemaining <= 30) {
+                      // Dalam 30 hari akan berakhir
+                      $statusText = 'Mau Berakhir';
+                      $statusClass = 'status-warning';
                     } else {
-                      $statusText = 'Aktif';
+                      // Lebih dari 30 hari
+                      $statusText = 'Sedang Aktif';
                       $statusClass = 'status-aktif';
                     }
                   } elseif ($izin->tanggal_terbit) {
-                    $statusText = 'Aktif';
+                    $statusText = 'Sedang Aktif';
                     $statusClass = 'status-aktif';
                   }
 
@@ -781,8 +806,8 @@
         });
       @endif
 
-        // Auto submit search on enter
-        const searchInput = document.querySelector('#filterFormPerizinan input[name="q"]');
+          // Auto submit search on enter
+          const searchInput = document.querySelector('#filterFormPerizinan input[name="q"]');
       if (searchInput) {
         searchInput.addEventListener('keypress', function (e) {
           if (e.key === 'Enter') {
@@ -835,7 +860,7 @@
       const filterVillagePermohonan = document.getElementById('filterVillagePermohonan');
 
       // Load districts when regency is selected
-      filterRegencyPermohonan?.addEventListener('change', async function() {
+      filterRegencyPermohonan?.addEventListener('change', async function () {
         const regencyId = this.value;
 
         // Reset district and village dropdowns
@@ -868,7 +893,7 @@
       });
 
       // Load villages when district is selected
-      filterDistrictPermohonan?.addEventListener('change', async function() {
+      filterDistrictPermohonan?.addEventListener('change', async function () {
         const districtId = this.value;
 
         // Reset village dropdown
@@ -902,7 +927,7 @@
 
       const sortableHeaders = tablePermohonan?.querySelectorAll('.sortable-header');
       sortableHeaders?.forEach(header => {
-        header.addEventListener('click', function() {
+        header.addEventListener('click', function () {
           const sortType = this.getAttribute('data-sort');
 
           // Toggle sort direction if clicking the same column
