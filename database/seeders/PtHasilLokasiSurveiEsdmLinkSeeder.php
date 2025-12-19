@@ -40,6 +40,13 @@ class PtHasilLokasiSurveiEsdmLinkSeeder extends Seeder
             ],
         ];
 
+        $penajamVideoLinks = [
+            'https://youtu.be/G24Y0RclaaM',
+            'https://youtu.be/2NwtFMVcBk4',
+            'https://youtu.be/A7_vs-qBMrU',
+            'https://youtu.be/S_9TW5jJUMQ',
+        ];
+
         foreach ($linkData as $data) {
             $record = PtHasilLokasiSurveiEsdm::where('Kodifikasi', $data['kodifikasi'])->first();
 
@@ -49,6 +56,16 @@ class PtHasilLokasiSurveiEsdmLinkSeeder extends Seeder
             } else {
                 $this->command->warn("Kodifikasi not found: {$data['kodifikasi']}");
             }
+        }
+
+        $penajamRecords = PtHasilLokasiSurveiEsdm::where('WADMKC', 'like', 'Penajam%')->get();
+
+        foreach ($penajamRecords as $record) {
+            $record->update([
+                // Simpan semua link dipisah dengan pipe, nanti dipilih acak di front-end
+                'link_dokumen' => implode('|', $penajamVideoLinks),
+            ]);
+            $this->command->info("Updated Penajam link_dokumen for ID: {$record->id}");
         }
 
         $this->command->info('Link dokumen seeding completed!');

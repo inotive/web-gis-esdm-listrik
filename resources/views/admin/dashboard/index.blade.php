@@ -84,6 +84,13 @@
       gap: 20px;
     }
 
+    .infra-chart-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
     /* ===== KABUPATEN LIST ===== */
     .kabupaten-list {
       list-style: none;
@@ -296,6 +303,10 @@
         grid-template-columns: repeat(2, 1fr);
       }
 
+      .infra-chart-grid {
+        grid-template-columns: 1fr;
+      }
+
       .dashboard-grid {
         grid-template-columns: 1fr;
       }
@@ -309,6 +320,10 @@
 
       .summary-grid,
       .infra-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .infra-chart-grid {
         grid-template-columns: 1fr;
       }
     }
@@ -376,6 +391,38 @@
       <div class="infra-icon"><i class="ri-building-line"></i></div>
       <div class="infra-value">{{ number_format($totalPerusahaan) }}</div>
       <div class="infra-label">Perusahaan</div>
+    </div>
+  </div>
+
+  <div class="infra-chart-grid">
+    <div class="dash-card">
+      <div class="dash-card-header">
+        <div class="dash-card-title">Gardu per Jenis</div>
+      </div>
+      <div class="dash-card-body">
+        @if($garduPerJenis->isEmpty())
+          <div style="color: #6B7280; font-size: 13px;">Belum ada data gardu.</div>
+        @else
+          <div class="chart-container">
+            <canvas id="garduChart"></canvas>
+          </div>
+        @endif
+      </div>
+    </div>
+
+    <div class="dash-card">
+      <div class="dash-card-header">
+        <div class="dash-card-title">Panjang Jaringan per Tipe</div>
+      </div>
+      <div class="dash-card-body">
+        @if($jaringanPerTipe->isEmpty())
+          <div style="color: #6B7280; font-size: 13px;">Belum ada data jaringan.</div>
+        @else
+          <div class="chart-container">
+            <canvas id="jaringanChart"></canvas>
+          </div>
+        @endif
+      </div>
     </div>
   </div>
 
@@ -739,6 +786,8 @@
     document.addEventListener('DOMContentLoaded', function () {
       const greenColor = '#17C653';
       const grayColor = '#9CA3AF';
+      const garduData = @json($garduPerJenis);
+      const jaringanData = @json($jaringanPerTipe);
 
       // ===== TREND CHART =====
       const trendCtx = document.getElementById('trendChart')?.getContext('2d');
@@ -781,6 +830,62 @@
                 grid: { color: 'rgba(148,163,184,0.12)' },
                 ticks: { color: '#94A3B8', font: { size: 11 } }
               }
+            }
+          }
+        });
+      }
+
+      // ===== GARDU CHART =====
+      const garduCtx = document.getElementById('garduChart')?.getContext('2d');
+      if (garduCtx && garduData.length) {
+        new Chart(garduCtx, {
+          type: 'bar',
+          data: {
+            labels: garduData.map(d => d.jenis_gardu_distribusi ?? 'Tidak diketahui'),
+            datasets: [{
+              label: 'Jumlah Gardu',
+              data: garduData.map(d => Number(d.total)),
+              backgroundColor: 'rgba(23, 198, 83, 0.15)',
+              borderColor: greenColor,
+              borderWidth: 1,
+              borderRadius: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { grid: { display: false }, ticks: { color: '#64748B', font: { size: 10 } } },
+              y: { grid: { color: 'rgba(148,163,184,0.12)' }, ticks: { color: '#94A3B8' }, beginAtZero: true }
+            }
+          }
+        });
+      }
+
+      // ===== JARINGAN CHART =====
+      const jaringanCtx = document.getElementById('jaringanChart')?.getContext('2d');
+      if (jaringanCtx && jaringanData.length) {
+        new Chart(jaringanCtx, {
+          type: 'bar',
+          data: {
+            labels: jaringanData.map(d => d.jaringan ?? 'Tidak diketahui'),
+            datasets: [{
+              label: 'Panjang Jaringan (km)',
+              data: jaringanData.map(d => Number(d.total_km)),
+              backgroundColor: 'rgba(59, 130, 246, 0.12)',
+              borderColor: '#2563EB',
+              borderWidth: 1,
+              borderRadius: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { grid: { display: false }, ticks: { color: '#64748B', font: { size: 10 } } },
+              y: { grid: { color: 'rgba(148,163,184,0.12)' }, ticks: { color: '#94A3B8' }, beginAtZero: true }
             }
           }
         });

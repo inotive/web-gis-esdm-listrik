@@ -125,6 +125,26 @@
       const attrs = graphic?.attributes || {};
       let layerTitle = graphic?.layer?.title || 'Detail Fitur';
 
+      const pickVideoLink = (itemAttrs) => {
+        const raw = itemAttrs?.link_dokumen;
+        if (!raw) return null;
+
+        const links = String(raw)
+          .split('|')
+          .map((v) => v.trim())
+          .filter(Boolean);
+
+        if (!links.length) return null;
+
+        const isPenajam = (itemAttrs.WADMKC || '').toLowerCase().includes('penajam');
+        const chosen = isPenajam ? links[Math.floor(Math.random() * links.length)] : links[0];
+
+        return {
+          url: chosen,
+          title: itemAttrs.Kodifikasi || itemAttrs.NAMOBJ || 'Video 360',
+        };
+      };
+
       // Jika layer adalah H_Survei, gunakan nilai H_Survei sebagai judul
       if (layerTitle === 'H_Survei' && attrs.H_Survei) {
         layerTitle = attrs.H_Survei;
@@ -151,9 +171,11 @@
         const linkRows = [];
         const otherRows = [];
 
-        if (attrs.link_dokumen) {
-          const safeUrl = escapeHtml(attrs.link_dokumen);
-          const safeTitle = escapeHtml(attrs.Kodifikasi || attrs.NAMOBJ || 'Video 360');
+        const pickedVideo = pickVideoLink(attrs);
+
+        if (pickedVideo) {
+          const safeUrl = escapeHtml(pickedVideo.url);
+          const safeTitle = escapeHtml(pickedVideo.title);
           const link = `<a href="#" class="video360-link" data-video-url="${safeUrl}" data-video-title="${safeTitle}" style="color: #007bff; text-decoration: underline; cursor: pointer;">Lihat Video 360</a>`;
           linkRows.push(buildRow('Link Dokumen', link));
         }
@@ -1705,6 +1727,26 @@
             return String(str).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
           };
 
+          const pickVideoLink = (itemAttrs) => {
+            const raw = itemAttrs?.link_dokumen;
+            if (!raw) return null;
+
+            const links = String(raw)
+              .split('|')
+              .map((v) => v.trim())
+              .filter(Boolean);
+
+            if (!links.length) return null;
+
+            const isPenajam = (itemAttrs.WADMKC || '').toLowerCase().includes('penajam');
+            const chosen = isPenajam ? links[Math.floor(Math.random() * links.length)] : links[0];
+
+            return {
+              url: chosen,
+              title: itemAttrs.Kodifikasi || itemAttrs.NAMOBJ || 'Video 360',
+            };
+          };
+
           let content = `
             <b>Nama Objek:</b> ${attrs.NAMOBJ || '-'}<br>
             <b>Lokasi:</b> ${attrs.Lokasi || '-'}<br>
@@ -1725,9 +1767,11 @@
             <b>Kodifikasi:</b> ${attrs.Kodifikasi || '-'}<br>
           `;
 
-          if (attrs.link_dokumen) {
-            const videoUrl = escapeAttr(attrs.link_dokumen);
-            const videoTitle = escapeAttr(attrs.Kodifikasi || 'Video 360');
+          const pickedVideo = pickVideoLink(attrs);
+
+          if (pickedVideo) {
+            const videoUrl = escapeAttr(pickedVideo.url);
+            const videoTitle = escapeAttr(pickedVideo.title);
             content += `<b>Link Dokumen:</b> <a href="#" class="video360-link" data-video-url="${videoUrl}" data-video-title="${videoTitle}" style="color: #007bff; text-decoration: underline; cursor: pointer;">Lihat Video 360</a><br>`;
           }
 
