@@ -33,6 +33,11 @@ use App\Http\Controllers\Admin\DataInfrastrukturController;
 use App\Http\Controllers\Admin\KategoriPermohonanController;
 use App\Http\Controllers\Admin\PerizinanController;
 
+// Models untuk statistik home
+use App\Models\InfrastrukturJaringan;
+use App\Models\Gardu;
+use App\Models\PembangkitLokal;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -43,11 +48,19 @@ Route::get('login', [LoginController::class, 'show'])->middleware('guest')->name
 Route::post('login', [LoginController::class, 'login'])->name('login-post');
 
 Route::get('/', function () {
-    return view('home');
+    $infrastrukturCount = InfrastrukturJaringan::count();
+    $garduCount = Gardu::count();
+    $pembangkitCount = PembangkitLokal::count();
+
+    return view('home', compact('infrastrukturCount', 'garduCount', 'pembangkitCount'));
 });
 
 Route::get('/home', function () {
-    return view('home');
+    $infrastrukturCount = InfrastrukturJaringan::count();
+    $garduCount = Gardu::count();
+    $pembangkitCount = PembangkitLokal::count();
+
+    return view('home', compact('infrastrukturCount', 'garduCount', 'pembangkitCount'));
 });
 
 

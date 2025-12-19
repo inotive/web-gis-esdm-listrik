@@ -466,7 +466,7 @@
             </div>
 
             <div class="login-image-section">
-                <img class="login-image" src="{{ asset('assets/media/Section.png') }}" alt="Background Kalimantan Timur" />
+                <img class="login-image" src="{{ asset('assets/bg.png') }}" alt="Background Kalimantan Timur" />
             </div>
         </div>
 

@@ -908,15 +908,15 @@
 
                 <div class="hero-stats">
                     <div class="stat-item">
-                        <span class="stat-value">0</span>
+                        <span class="stat-value">{{ number_format($infrastrukturCount ?? 0, 0, ',', '.') }}</span>
                         <span class="stat-label">Data Infrastruktur Jaringan</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-value">0</span>
+                        <span class="stat-value">{{ number_format($garduCount ?? 0, 0, ',', '.') }}</span>
                         <span class="stat-label">Data Gardu</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-value">0</span>
+                        <span class="stat-value">{{ number_format($pembangkitCount ?? 0, 0, ',', '.') }}</span>
                         <span class="stat-label">Pembangkit Lokal</span>
                     </div>
                 </div>
