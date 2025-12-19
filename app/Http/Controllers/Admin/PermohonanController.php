@@ -9,6 +9,9 @@ use App\Models\PermohonanQuestion;
 use App\Models\PermohonanQuestionOption;
 use App\Models\PerizinanListrik;
 use App\Models\Perusahaan;
+use App\Models\RegRegency;
+use App\Models\RegDistrict;
+use App\Models\RegVillage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -145,6 +148,9 @@ class PermohonanController extends Controller
             ->paginate($perPage, ['*'], 'page_permohonan_user')
             ->withQueryString();
 
+        // Untuk filter dropdown (tidak digunakan untuk filtering, hanya UI)
+        $regencies = RegRegency::orderBy('name')->get(['id', 'name']);
+
         return view('admin.permohonan.index', [
             'title' => 'Perizinan dan Permohonan',
             'permohonans' => $permohonans,
@@ -156,7 +162,42 @@ class PermohonanController extends Controller
             'q' => $q,
             'status' => $status,
             'jenis' => $jenis,
+            'regencies' => $regencies,
         ]);
+    }
+
+    /**
+     * Get districts for cascading dropdown (AJAX)
+     */
+    public function optionsDistricts(Request $request)
+    {
+        $regencyId = $request->get('regency_id');
+        $q = $request->get('q');
+
+        $items = RegDistrict::when($regencyId, fn($qq) => $qq->where('regency_id', $regencyId))
+            ->when($q, fn($qq) => $qq->where('name', 'like', "%{$q}%"))
+            ->orderBy('name')
+            ->limit(200)
+            ->get(['id', 'name']);
+
+        return response()->json($items);
+    }
+
+    /**
+     * Get villages for cascading dropdown (AJAX)
+     */
+    public function optionsVillages(Request $request)
+    {
+        $districtId = $request->get('district_id');
+        $q = $request->get('q');
+
+        $items = RegVillage::when($districtId, fn($qq) => $qq->where('district_id', $districtId))
+            ->when($q, fn($qq) => $qq->where('name', 'like', "%{$q}%"))
+            ->orderBy('name')
+            ->limit(300)
+            ->get(['id', 'name']);
+
+        return response()->json($items);
     }
 
     /**

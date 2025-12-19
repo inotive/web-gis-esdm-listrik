@@ -416,7 +416,7 @@ class PermohonanUserController extends Controller
             'keterangan' => $validated['keterangan'],
         ]);
 
-        return redirect()->route('admin.permohonan-user.index', $permohonanId)
+        return redirect()->route('admin.permohonan-user.show', [$permohonanId, $permohonanUser->id])
             ->with('success', 'Permohonan berhasil ditolak.');
     }
 

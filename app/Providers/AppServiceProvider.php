@@ -40,6 +40,7 @@ class AppServiceProvider extends ServiceProvider
             $view->with([
                 'shouldShowMenu' => $shouldShowMenu,
                 'permohonans' => $permohonans,
+                'userRole' => $userRole,
             ]);
         });
     }
