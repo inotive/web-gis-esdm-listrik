@@ -44,6 +44,7 @@
             color: var(--gray-700);
             line-height: 1.5;
             background-color: var(--white);
+            overflow-x: hidden;
         }
 
         a {
@@ -151,6 +152,7 @@
             display: flex;
             align-items: center;
             width: 100%;
+            margin: 0;
             padding: 85px 0 20px;
         }
 
