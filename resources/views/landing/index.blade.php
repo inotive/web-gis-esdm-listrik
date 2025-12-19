@@ -148,18 +148,23 @@
           .join('');
       } else {
         // Untuk layer lain, tampilkan semua attributes
-        rows = Object.entries(attrs)
-          .map(([k, v]) => {
-            if (k === 'link_dokumen' && v) {
-              const safeUrl = escapeHtml(v);
-              const safeTitle = escapeHtml(attrs.Kodifikasi || attrs.NAMOBJ || 'Video 360');
-              const link = `<a href="#" class="video360-link" data-video-url="${safeUrl}" data-video-title="${safeTitle}" style="color: #007bff; text-decoration: underline; cursor: pointer;">Lihat Video 360</a>`;
-              return buildRow('Link Dokumen', link);
-            }
+        const linkRows = [];
+        const otherRows = [];
 
-            return buildRow(k, escapeHtml(v));
-          })
-          .join('');
+        if (attrs.link_dokumen) {
+          const safeUrl = escapeHtml(attrs.link_dokumen);
+          const safeTitle = escapeHtml(attrs.Kodifikasi || attrs.NAMOBJ || 'Video 360');
+          const link = `<a href="#" class="video360-link" data-video-url="${safeUrl}" data-video-title="${safeTitle}" style="color: #007bff; text-decoration: underline; cursor: pointer;">Lihat Video 360</a>`;
+          linkRows.push(buildRow('Link Dokumen', link));
+        }
+
+        Object.entries(attrs)
+          .filter(([k]) => k !== 'link_dokumen')
+          .forEach(([k, v]) => {
+            otherRows.push(buildRow(k, escapeHtml(v)));
+          });
+
+        rows = [...linkRows, ...otherRows].join('');
       }
 
       dmContent.innerHTML = `
