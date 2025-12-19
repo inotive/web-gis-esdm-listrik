@@ -203,6 +203,10 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
         Route::get('/{permohonan}/edit', [PermohonanController::class, 'edit'])->name('edit');
         Route::put('/{permohonan}', [PermohonanController::class, 'update'])->name('update');
         Route::delete('/{permohonan}', [PermohonanController::class, 'destroy'])->name('destroy');
+
+        // Endpoints untuk dropdown berjenjang
+        Route::get('/options/districts', [PermohonanController::class, 'optionsDistricts'])->name('options.districts');
+        Route::get('/options/villages', [PermohonanController::class, 'optionsVillages'])->name('options.villages');
     });
 
     // Perizinan

@@ -638,6 +638,18 @@
             <input type="text" id="searchPermohonan" class="form-control"
               placeholder="Cari Pengguna atau Kategori Permohonan" autocomplete="off">
           </div>
+          <select class="filter-select" id="filterRegencyPermohonan">
+            <option value="">Semua Kota/Kabupaten</option>
+            @foreach($regencies as $regency)
+              <option value="{{ $regency->id }}">{{ $regency->name }}</option>
+            @endforeach
+          </select>
+          <select class="filter-select" id="filterDistrictPermohonan" disabled>
+            <option value="">Semua Kecamatan</option>
+          </select>
+          <select class="filter-select" id="filterVillagePermohonan" disabled>
+            <option value="">Semua Kelurahan/Desa</option>
+          </select>
           <select class="filter-select" id="filterStatusPermohonan">
             <option value="">Semua Status</option>
             <option value="pending">Menunggu Verifikasi</option>
@@ -816,6 +828,73 @@
 
       searchPermohonan?.addEventListener('input', filterTablePermohonan);
       filterStatusPermohonan?.addEventListener('change', filterTablePermohonan);
+
+      // Cascading dropdown for regency, district, and village (Permohonan tab)
+      const filterRegencyPermohonan = document.getElementById('filterRegencyPermohonan');
+      const filterDistrictPermohonan = document.getElementById('filterDistrictPermohonan');
+      const filterVillagePermohonan = document.getElementById('filterVillagePermohonan');
+
+      // Load districts when regency is selected
+      filterRegencyPermohonan?.addEventListener('change', async function() {
+        const regencyId = this.value;
+
+        // Reset district and village dropdowns
+        if (filterDistrictPermohonan) {
+          filterDistrictPermohonan.innerHTML = '<option value="">Semua Kecamatan</option>';
+          filterDistrictPermohonan.disabled = !regencyId;
+        }
+        if (filterVillagePermohonan) {
+          filterVillagePermohonan.innerHTML = '<option value="">Semua Kelurahan/Desa</option>';
+          filterVillagePermohonan.disabled = true;
+        }
+
+        if (regencyId) {
+          try {
+            const response = await fetch('{{ route("admin.permohonan.options.districts") }}?regency_id=' + encodeURIComponent(regencyId));
+            const districts = await response.json();
+
+            if (filterDistrictPermohonan) {
+              districts.forEach(district => {
+                const option = document.createElement('option');
+                option.value = district.id;
+                option.textContent = district.name;
+                filterDistrictPermohonan.appendChild(option);
+              });
+            }
+          } catch (error) {
+            console.error('Error loading districts:', error);
+          }
+        }
+      });
+
+      // Load villages when district is selected
+      filterDistrictPermohonan?.addEventListener('change', async function() {
+        const districtId = this.value;
+
+        // Reset village dropdown
+        if (filterVillagePermohonan) {
+          filterVillagePermohonan.innerHTML = '<option value="">Semua Kelurahan/Desa</option>';
+          filterVillagePermohonan.disabled = !districtId;
+        }
+
+        if (districtId) {
+          try {
+            const response = await fetch('{{ route("admin.permohonan.options.villages") }}?district_id=' + encodeURIComponent(districtId));
+            const villages = await response.json();
+
+            if (filterVillagePermohonan) {
+              villages.forEach(village => {
+                const option = document.createElement('option');
+                option.value = village.id;
+                option.textContent = village.name;
+                filterVillagePermohonan.appendChild(option);
+              });
+            }
+          } catch (error) {
+            console.error('Error loading villages:', error);
+          }
+        }
+      });
 
       // Sorting functionality
       let currentSortColumn = null;
