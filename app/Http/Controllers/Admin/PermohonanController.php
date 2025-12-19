@@ -61,21 +61,26 @@ class PermohonanController extends Controller
         if ($status) {
             $today = now();
             if ($status === 'aktif') {
-                // Sedang Aktif: tanggal_akhir lebih dari 30 hari dari sekarang
+                // Sedang Aktif: tanggal_akhir terisi dan lebih dari 30 hari dari sekarang
                 $queryPerizinan->whereNotNull('tanggal_akhir')
                     ->where('tanggal_akhir', '>', $today->copy()->addDays(30))
                     ->where('tanggal_akhir', '>', '1901-01-01');
             } elseif ($status === 'mau_berakhir') {
-                // Mau Berakhir: tanggal_akhir dalam 30 hari ke depan
+                // Mau Berakhir: tanggal_akhir terisi dan dalam 30 hari ke depan
                 $queryPerizinan->whereNotNull('tanggal_akhir')
                     ->where('tanggal_akhir', '>=', $today)
                     ->where('tanggal_akhir', '<=', $today->copy()->addDays(30))
                     ->where('tanggal_akhir', '>', '1901-01-01');
             } elseif ($status === 'berakhir') {
-                // Berakhir: tanggal_akhir sudah lewat
-                $queryPerizinan->whereNotNull('tanggal_akhir')
-                    ->where('tanggal_akhir', '<', $today)
-                    ->where('tanggal_akhir', '>', '1901-01-01');
+                // Berakhir: tanggal_akhir NULL ATAU sudah lewat
+                $queryPerizinan->where(function ($query) use ($today) {
+                    $query->whereNull('tanggal_akhir')
+                        ->orWhere(function ($q) use ($today) {
+                            $q->whereNotNull('tanggal_akhir')
+                                ->where('tanggal_akhir', '<', $today)
+                                ->where('tanggal_akhir', '>', '1901-01-01');
+                        });
+                });
             }
         }
 
@@ -113,24 +118,28 @@ class PermohonanController extends Controller
         $totalSKTP = PerizinanListrik::where('jenis', 'SKTP')->count();
 
         // Count by Status
-        // Aktif: tanggal_akhir > today + 30 days
+        // Aktif: tanggal_akhir terisi dan > today + 30 days
         $countAktif = PerizinanListrik::whereNotNull('tanggal_akhir')
             ->where('tanggal_akhir', '>', $thirtyDaysLater)
             ->where('tanggal_akhir', '>', '1901-01-01')
             ->count();
 
-        // Mau Berakhir: tanggal_akhir between today and today + 30 days
+        // Mau Berakhir: tanggal_akhir terisi dan between today and today + 30 days
         $countMauBerakhir = PerizinanListrik::whereNotNull('tanggal_akhir')
             ->where('tanggal_akhir', '>=', $today)
             ->where('tanggal_akhir', '<=', $thirtyDaysLater)
             ->where('tanggal_akhir', '>', '1901-01-01')
             ->count();
 
-        // Berakhir: tanggal_akhir < today
-        $countBerakhir = PerizinanListrik::whereNotNull('tanggal_akhir')
-            ->where('tanggal_akhir', '<', $today)
-            ->where('tanggal_akhir', '>', '1901-01-01')
-            ->count();
+        // Berakhir: tanggal_akhir NULL ATAU < today
+        $countBerakhir = PerizinanListrik::where(function ($query) use ($today) {
+            $query->whereNull('tanggal_akhir')
+                ->orWhere(function ($q) use ($today) {
+                    $q->whereNotNull('tanggal_akhir')
+                        ->where('tanggal_akhir', '<', $today)
+                        ->where('tanggal_akhir', '>', '1901-01-01');
+                });
+        })->count();
 
         // Total kapasitas
         $totalKapasitas = PerizinanListrik::sum('kapasitas');

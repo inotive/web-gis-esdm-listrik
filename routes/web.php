@@ -51,9 +51,8 @@ Route::get('/home', function () {
 });
 
 
-// Landing (peta) wajib login
+// Landing (peta) - bisa diakses tanpa login
 Route::get('/landing', [LandingPageController::class, 'index'])
-    ->middleware('auth')
     ->name('landing');
 
 Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], function () {

@@ -572,8 +572,8 @@
               @forelse($perizinanItems as $i => $izin)
                 @php
                   // Determine status based on tanggal_akhir
-                  $statusText = 'Menunggu Verifikasi';
-                  $statusClass = 'status-menunggu';
+                  $statusText = 'Berakhir';
+                  $statusClass = 'status-expired';
 
                   if ($izin->tanggal_akhir) {
                     $today = now();
@@ -593,9 +593,6 @@
                       $statusText = 'Sedang Aktif';
                       $statusClass = 'status-aktif';
                     }
-                  } elseif ($izin->tanggal_terbit) {
-                    $statusText = 'Sedang Aktif';
-                    $statusClass = 'status-aktif';
                   }
 
                   // Jenis badge class

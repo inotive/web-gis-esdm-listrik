@@ -901,7 +901,7 @@
                     {{-- <a href="#alur" class="btn-hero-primary">
                         Alur <i class="ri-arrow-right-line"></i>
                     </a> --}}
-                    <a href="#alur" class="btn-hero-secondary">
+                    <a href="{{ route('landing') }}" class="btn-hero-secondary">
                         <i class="ri-map-2-line"></i> Telusuri Peta Interaktif
                     </a>
                 </div>
@@ -935,7 +935,8 @@
                     <i class="ri-map-2-line"></i>
                     <div style="font-size: 13px;">
                         <div>Website Interaktif</div>
-                        {{-- <div style="font-size: 12px; color: var(--gray-500); font-weight: normal;">Real-time GIS</div> --}}
+                        {{-- <div style="font-size: 12px; color: var(--gray-500); font-weight: normal;">Real-time GIS
+                        </div> --}}
                     </div>
                 </div>
 
@@ -943,7 +944,8 @@
                     <i class="ri-flashlight-line"></i>
                     <div style="font-size: 13px;">
                         <div>Data Ketenagalistrikan</div>
-                        {{-- <div style="font-size: 12px; color: var(--gray-500); font-weight: normal;">Layanan Terpadu</div> --}}
+                        {{-- <div style="font-size: 12px; color: var(--gray-500); font-weight: normal;">Layanan Terpadu
+                        </div> --}}
                     </div>
                 </div>
 
@@ -951,7 +953,8 @@
                     <i class="ri-shield-check-line"></i>
                     <div style="font-size: 13px;">
                         <div>Permohonan Dan Perizinan</div>
-                        {{-- <div style="font-size: 12px; color: var(--gray-500); font-weight: normal;">Data Valid</div> --}}
+                        {{-- <div style="font-size: 12px; color: var(--gray-500); font-weight: normal;">Data Valid</div>
+                        --}}
                     </div>
                 </div>
             </div>
