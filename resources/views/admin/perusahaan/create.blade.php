@@ -36,16 +36,6 @@
               placeholder="Masukkan alamat perusahaan"></textarea>
           </div>
         </div>
-
-        {{-- Kabupaten/Kota (Text Input) --}}
-        <div class="form-group">
-          <label class="label">Kabupaten/Kota</label>
-          <div class="control">
-            <input type="text" name="kabupaten_kota" id="cKabupatenKota" class="input"
-              placeholder="Contoh: Kota Samarinda">
-          </div>
-        </div>
-
         <hr style="border:none;border-top:1px solid #E2E8F0;margin:16px 0;">
         <p style="font-size:12px;color:#64748B;margin-bottom:12px;"><i class="ri-information-line"></i> Opsional: Pilih
           lokasi detail (Kabupaten → Kecamatan → Desa)</p>
@@ -89,26 +79,71 @@
   <style>
     .modal-overlay {
       position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, .45);
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      background: rgba(15, 23, 42, 0.45);
       display: none;
-      z-index: 1000;
+      z-index: 9999;
       padding: 18px;
-      overflow: auto;
+      overflow-y: auto;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(2px);
     }
 
     .modal-overlay.show {
-      display: block;
+      display: flex !important;
+      animation: fadeIn 0.2s ease;
     }
 
-    .modal {
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .modal-overlay .modal {
       max-width: 520px;
-      margin: 20px auto;
-      background: #fff;
-      border: 1px solid var(--line);
+      width: calc(100% - 36px);
+      margin: auto;
+      background: #ffffff !important;
+      border: 1px solid #E2E8F0;
       border-radius: 16px;
-      box-shadow: var(--shadow-2);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
       overflow: hidden;
+      position: relative;
+      z-index: 10000;
+      flex-shrink: 0;
+      min-height: 100px;
+      visibility: visible !important;
+      opacity: 1 !important;
+      display: block !important;
+      pointer-events: auto;
+      height: auto;
+      animation: slideDown 0.3s ease;
+    }
+
+    .modal-overlay.show .modal {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+
+    @keyframes slideDown {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
     }
 
     .modal-header {
@@ -250,6 +285,15 @@
       z-index: 10001 !important;
     }
 
+    /* Ensure Select2 container appears above modal */
+    .modal .select2-container {
+      z-index: 10002 !important;
+    }
+
+    .modal .select2-container--open {
+      z-index: 10002 !important;
+    }
+
     .modal .select2-search--dropdown {
       padding: 8px !important;
       border-bottom: 1px solid #F1F1F4 !important;
@@ -328,14 +372,14 @@
             jQuery(selReg).select2('destroy');
           }
 
-          // Get modal element for dropdownParent
-          const modalElement = document.getElementById('modalCreatePerusahaan');
+          // Get modal element for dropdownParent (use the .modal element, not the overlay)
+          const modalElement = document.querySelector('#modalCreatePerusahaan .modal');
 
           jQuery(selReg).select2({
             placeholder: 'Pilih Kabupaten/Kota',
             allowClear: true,
             width: '100%',
-            dropdownParent: jQuery(modalElement), // Ensure dropdown is rendered inside modal
+            dropdownParent: jQuery(modalElement || '#modalCreatePerusahaan'), // Ensure dropdown is rendered inside modal
             language: {
               noResults: function () { return "Tidak ada hasil"; },
               searching: function () { return "Mencari..."; }
@@ -465,14 +509,14 @@
 
         // Reinitialize Select2 for district
         if (jQuery && jQuery.fn.select2) {
-          // Get modal element for dropdownParent
-          const modalElement = document.getElementById('modalCreatePerusahaan');
+          // Get modal element for dropdownParent (use the .modal element, not the overlay)
+          const modalElement = document.querySelector('#modalCreatePerusahaan .modal');
 
           jQuery(selDis).select2({
             placeholder: 'Pilih Kecamatan',
             allowClear: true,
             width: '100%',
-            dropdownParent: jQuery(modalElement), // Ensure dropdown is rendered inside modal
+            dropdownParent: jQuery(modalElement || '#modalCreatePerusahaan'), // Ensure dropdown is rendered inside modal
             language: {
               noResults: function () { return "Tidak ada hasil"; },
               searching: function () { return "Mencari..."; }
@@ -557,14 +601,14 @@
 
         // Reinitialize Select2 for village
         if (jQuery && jQuery.fn.select2) {
-          // Get modal element for dropdownParent
-          const modalElement = document.getElementById('modalCreatePerusahaan');
+          // Get modal element for dropdownParent (use the .modal element, not the overlay)
+          const modalElement = document.querySelector('#modalCreatePerusahaan .modal');
 
           jQuery(selVil).select2({
             placeholder: 'Pilih Desa/Kelurahan',
             allowClear: true,
             width: '100%',
-            dropdownParent: jQuery(modalElement), // Ensure dropdown is rendered inside modal
+            dropdownParent: jQuery(modalElement || '#modalCreatePerusahaan'), // Ensure dropdown is rendered inside modal
             language: {
               noResults: function () { return "Tidak ada hasil"; },
               searching: function () { return "Mencari..."; }
@@ -632,7 +676,10 @@
       btnAdd?.addEventListener('click', (e) => {
         e.preventDefault();
         openModal();
-        loadRegencies();
+        // Wait a bit for modal to be fully rendered before initializing Select2
+        setTimeout(() => {
+          loadRegencies();
+        }, 50);
       });
       btnClose?.addEventListener('click', closeModal);
       overlay?.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProfileController;
@@ -47,6 +48,7 @@ use App\Models\PembangkitLokal;
 Route::get('login', [LoginController::class, 'show'])->middleware('guest')->name('login');
 Route::post('login', [LoginController::class, 'login'])->name('login-post');
 
+Route::get('/', [HomeController::class, 'index']);
 Route::get('/', function () {
     $infrastrukturCount = InfrastrukturJaringan::count();
     $garduCount = Gardu::count();
@@ -56,17 +58,12 @@ Route::get('/', function () {
 });
 
 Route::get('/home', function () {
-    $infrastrukturCount = InfrastrukturJaringan::count();
-    $garduCount = Gardu::count();
-    $pembangkitCount = PembangkitLokal::count();
-
-    return view('home', compact('infrastrukturCount', 'garduCount', 'pembangkitCount'));
+    return view('home');
 });
 
 
-// Landing (peta) wajib login
+// Landing (peta) - bisa diakses tanpa login
 Route::get('/landing', [LandingPageController::class, 'index'])
-    ->middleware('auth')
     ->name('landing');
 
 Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], function () {
@@ -216,6 +213,10 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
         Route::get('/{permohonan}/edit', [PermohonanController::class, 'edit'])->name('edit');
         Route::put('/{permohonan}', [PermohonanController::class, 'update'])->name('update');
         Route::delete('/{permohonan}', [PermohonanController::class, 'destroy'])->name('destroy');
+
+        // Endpoints untuk dropdown berjenjang
+        Route::get('/options/districts', [PermohonanController::class, 'optionsDistricts'])->name('options.districts');
+        Route::get('/options/villages', [PermohonanController::class, 'optionsVillages'])->name('options.villages');
     });
 
     // Perizinan

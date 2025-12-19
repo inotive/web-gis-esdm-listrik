@@ -477,6 +477,260 @@
       </ul>
     </div>
   </div>
+
+  <!-- Top 5 Ranking Table -->
+  <div class="section-title"><i class="ri-trophy-line"></i> Top 5 Ranking Prioritas</div>
+  <div class="dash-card">
+    <div class="dash-card-header">
+      <div class="dash-card-title">Ranking Prioritas Berdasarkan Total Skor</div>
+    </div>
+    <div class="dash-card-body" style="padding: 0; overflow-x: auto;">
+      <table style="width: 100%; min-width: 1400px; border-collapse: collapse; font-size: 13px;">
+        <thead>
+          <tr style="background: #7B1FA2; color: white;">
+            <th rowspan="2"
+              style="padding: 12px 16px; text-align: center; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.2); white-space: nowrap;">
+              No</th>
+            <th rowspan="2"
+              style="padding: 12px 16px; text-align: center; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.2); white-space: nowrap;">
+              Kecamatan</th>
+            <th rowspan="2"
+              style="padding: 12px 16px; text-align: center; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.2); white-space: nowrap;">
+              Desa</th>
+            <th rowspan="2"
+              style="padding: 12px 16px; text-align: center; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.2); white-space: nowrap;">
+              Klasifikasi</th>
+            <th rowspan="2"
+              style="padding: 12px 16px; text-align: center; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.2); white-space: nowrap;">
+              Kelengkapan Persyaratan SKTP (%)</th>
+            <th colspan="2"
+              style="padding: 8px 16px; text-align: center; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.2); border-bottom: 1px solid rgba(255,255,255,0.2);">
+              Aksesibilitas<br />(Bobot: 20%)</th>
+            <th colspan="2"
+              style="padding: 8px 16px; text-align: center; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.2); border-bottom: 1px solid rgba(255,255,255,0.2);">
+              Radius ke Jaringan Eksisting<br />(Bobot: 20%)</th>
+            <th colspan="2"
+              style="padding: 8px 16px; text-align: center; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.2); border-bottom: 1px solid rgba(255,255,255,0.2);">
+              Arah & Kejelasan Tata Ruang<br />(Bobot: 20%)</th>
+            <th colspan="2"
+              style="padding: 8px 16px; text-align: center; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.2); border-bottom: 1px solid rgba(255,255,255,0.2);">
+              Kegiatan<br />(Bobot: 20%)</th>
+            <th colspan="2"
+              style="padding: 8px 16px; text-align: center; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.2); border-bottom: 1px solid rgba(255,255,255,0.2);">
+              Jumlah Pengguna<br />(Bobot: 20%)</th>
+            <th rowspan="2"
+              style="padding: 12px 16px; text-align: center; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.2); white-space: nowrap;">
+              Total Skor<br />(E-Skor + Bobot)</th>
+            <th rowspan="2" style="padding: 12px 16px; text-align: center; font-weight: 600; white-space: nowrap;">
+              Prioritas</th>
+          </tr>
+          <tr style="background: #7B1FA2; color: white;">
+            <th
+              style="padding: 8px 12px; text-align: center; font-weight: 500; font-size: 12px; border-right: 1px solid rgba(255,255,255,0.2); white-space: nowrap;">
+              kondisi</th>
+            <th
+              style="padding: 8px 12px; text-align: center; font-weight: 500; font-size: 12px; border-right: 1px solid rgba(255,255,255,0.2); white-space: nowrap;">
+              skor</th>
+            <th
+              style="padding: 8px 12px; text-align: center; font-weight: 500; font-size: 12px; border-right: 1px solid rgba(255,255,255,0.2); white-space: nowrap;">
+              kondisi</th>
+            <th
+              style="padding: 8px 12px; text-align: center; font-weight: 500; font-size: 12px; border-right: 1px solid rgba(255,255,255,0.2); white-space: nowrap;">
+              skor</th>
+            <th
+              style="padding: 8px 12px; text-align: center; font-weight: 500; font-size: 12px; border-right: 1px solid rgba(255,255,255,0.2); white-space: nowrap;">
+              kondisi</th>
+            <th
+              style="padding: 8px 12px; text-align: center; font-weight: 500; font-size: 12px; border-right: 1px solid rgba(255,255,255,0.2); white-space: nowrap;">
+              skor</th>
+            <th
+              style="padding: 8px 12px; text-align: center; font-weight: 500; font-size: 12px; border-right: 1px solid rgba(255,255,255,0.2); white-space: nowrap;">
+              kondisi</th>
+            <th
+              style="padding: 8px 12px; text-align: center; font-weight: 500; font-size: 12px; border-right: 1px solid rgba(255,255,255,0.2); white-space: nowrap;">
+              skor</th>
+            <th
+              style="padding: 8px 12px; text-align: center; font-weight: 500; font-size: 12px; border-right: 1px solid rgba(255,255,255,0.2); white-space: nowrap;">
+              kondisi</th>
+            <th
+              style="padding: 8px 12px; text-align: center; font-weight: 500; font-size: 12px; border-right: 1px solid rgba(255,255,255,0.2); white-space: nowrap;">
+              skor</th>
+          </tr>
+        </thead>
+        <tbody>
+          @php
+            $rankingData = [
+              [
+                'kecamatan' => 'Bintuni',
+                'desa' => 'Bintuni Ulu',
+                'klasifikasi' => 'BRU-BUA-1',
+                'perizinan' => '6,67',
+                'aksesibilitas_kondisi' => 'Terdapat Jaringan Jalan dengan Lebar Lahan dan 4 Meter dan Terasfaltasi dengan Jarak Pengukuran Lainnya',
+                'aksesibilitas_skor' => '4',
+                'radius_kondisi' => '> 15 Km',
+                'radius_skor' => '1',
+                'tata_ruang_kondisi' => 'Sesuai Dengan RTR dan Terdapat Perumahan Bersebelah Lainnya/Tidak Terdapat Perizinan Bersebelah Lainnya',
+                'tata_ruang_skor' => '4',
+                'kegiatan' => 'Terdapat Pusat Kegiatan Eksisting',
+                'kegiatan_skor' => '4',
+                'pengguna_kondisi' => '158',
+                'pengguna_skor' => '4',
+                'total_skor' => '17',
+                'prioritas' => 'Prioritas 2 SUTM'
+              ],
+              [
+                'kecamatan' => 'Bintuni',
+                'desa' => 'Karanggau',
+                'klasifikasi' => 'BRU-KRG-1',
+                'perizinan' => '4,17',
+                'aksesibilitas_kondisi' => 'Tidak Terdapat Jaringan Jalan dan Tidak dengan Jalan Penghubung Lainnya',
+                'aksesibilitas_skor' => '2',
+                'radius_kondisi' => '2,5 Km - 7,5 Km',
+                'radius_skor' => '3',
+                'tata_ruang_kondisi' => 'Tidak Sesuai Dengan RTR dan Tidak Terdapat Perizinan Bersebelah Lainnya',
+                'tata_ruang_skor' => '3',
+                'kegiatan' => 'Terdapat Pusat Kegiatan Eksisting dan Mengatasi Pertumbuhan',
+                'kegiatan_skor' => '5',
+                'pengguna_kondisi' => '52',
+                'pengguna_skor' => '2',
+                'total_skor' => '15',
+                'prioritas' => 'Prioritas 2 SUTM'
+              ],
+              [
+                'kecamatan' => 'Biduk-Biduk',
+                'desa' => 'Teluk Sumbang',
+                'klasifikasi' => 'BRU-BDK-1',
+                'perizinan' => '3,46',
+                'aksesibilitas_kondisi' => 'Terdapat Jaringan Jalan dengan Lebar Lahan dan 4 Meter dan Terasfaltasi dengan Jarak Pengukuran Lainnya',
+                'aksesibilitas_skor' => '5',
+                'radius_kondisi' => '> 15 Km',
+                'radius_skor' => '1',
+                'tata_ruang_kondisi' => 'Sesuai Dengan RTR dan Tidak Terdapat Perizinan Kawasan Hutan Lainnya',
+                'tata_ruang_skor' => '5',
+                'kegiatan' => 'Terdapat Pusat Kegiatan Eksisting',
+                'kegiatan_skor' => '4',
+                'pengguna_kondisi' => '138',
+                'pengguna_skor' => '4',
+                'total_skor' => '19',
+                'prioritas' => 'Prioritas 1 SUTM'
+              ],
+              [
+                'kecamatan' => 'Kelay',
+                'desa' => 'Lemar Dayak',
+                'klasifikasi' => 'BRU-LDK-1',
+                'perizinan' => '2,67',
+                'aksesibilitas_kondisi' => 'Terdapat Jaringan Jalan dengan Lebar Lahan dan 4 Meter dan Terasfaltasi dengan Jarak Pengukuran Lainnya',
+                'aksesibilitas_skor' => '4',
+                'radius_kondisi' => '7,5 Km - 15 Km',
+                'radius_skor' => '2',
+                'tata_ruang_kondisi' => 'Sesuai Dengan RTR dan Terdapat Perumahan Bersebelah Lainnya/Tidak Terdapat Perizinan Bersebelah Lainnya',
+                'tata_ruang_skor' => '4',
+                'kegiatan' => 'Terdapat Pusat Kegiatan Eksisting dan Mengatasi Pertumbuhan',
+                'kegiatan_skor' => '5',
+                'pengguna_kondisi' => '64',
+                'pengguna_skor' => '3',
+                'total_skor' => '18',
+                'prioritas' => 'Prioritas 1 SUTM'
+              ],
+              [
+                'kecamatan' => 'Kelay',
+                'desa' => 'Long Beliu',
+                'klasifikasi' => 'BRU-LGB-1',
+                'perizinan' => '3,96',
+                'aksesibilitas_kondisi' => 'Terdapat Jaringan Jalan dengan Lebar Lahan dan 4 Meter dan Terasfaltasi dengan Jarak Pengukuran Lainnya',
+                'aksesibilitas_skor' => '4',
+                'radius_kondisi' => '2,5 Km - 7,5 Km',
+                'radius_skor' => '3',
+                'tata_ruang_kondisi' => 'Sesuai Dengan RTR dan Tidak Terdapat Perizinan Kawasan Hutan Lainnya',
+                'tata_ruang_skor' => '5',
+                'kegiatan' => 'Terdapat Potensi Perkembangan Kegiatan',
+                'kegiatan_skor' => '3',
+                'pengguna_kondisi' => '275',
+                'pengguna_skor' => '5',
+                'total_skor' => '20',
+                'prioritas' => 'Prioritas 1 SUTM'
+              ],
+            ];
+          @endphp
+
+          @foreach($rankingData as $index => $item)
+            <tr style="border-bottom: 1px solid #F1F5F9; {{ $index < 3 ? 'background: #FFFBEB;' : 'background: white;' }}">
+              <td
+                style="padding: 12px 16px; text-align: center; color: #111827; font-weight: 600; border-right: 1px solid #F1F5F9; white-space: nowrap;">
+                @if($index === 0)
+                  <span
+                    style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: #FCD34D; color: #78350F; border-radius: 50%; font-weight: 700;">1</span>
+                @elseif($index === 1)
+                  <span
+                    style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: #D1D5DB; color: #374151; border-radius: 50%; font-weight: 700;">2</span>
+                @elseif($index === 2)
+                  <span
+                    style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: #FCA5A5; color: #7F1D1D; border-radius: 50%; font-weight: 700;">3</span>
+                @else
+                  {{ $index + 1 }}
+                @endif
+              </td>
+              <td style="padding: 12px 16px; color: #374151; border-right: 1px solid #F1F5F9; white-space: nowrap;">
+                {{ $item['kecamatan'] }}</td>
+              <td
+                style="padding: 12px 16px; color: #374151; font-weight: 500; border-right: 1px solid #F1F5F9; white-space: nowrap;">
+                {{ $item['desa'] }}</td>
+              <td
+                style="padding: 12px 16px; color: #6B7280; font-family: monospace; font-size: 12px; border-right: 1px solid #F1F5F9; white-space: nowrap;">
+                {{ $item['klasifikasi'] }}</td>
+              <td
+                style="padding: 12px 16px; text-align: center; color: #374151; font-weight: 600; border-right: 1px solid #F1F5F9; white-space: nowrap;">
+                {{ $item['perizinan'] }}%</td>
+              <td
+                style="padding: 12px 16px; color: #374151; font-size: 12px; border-right: 1px solid #F1F5F9; white-space: nowrap;">
+                {{ $item['aksesibilitas_kondisi'] }}</td>
+              <td style="padding: 12px 16px; text-align: center; border-right: 1px solid #F1F5F9; white-space: nowrap;">
+                <span
+                  style="display: inline-block; padding: 4px 10px; background: #DBEAFE; color: #1E40AF; border-radius: 12px; font-weight: 600;">{{ $item['aksesibilitas_skor'] }}</span>
+              </td>
+              <td
+                style="padding: 12px 16px; color: #374151; font-size: 12px; border-right: 1px solid #F1F5F9; white-space: nowrap;">
+                {{ $item['radius_kondisi'] }}</td>
+              <td style="padding: 12px 16px; text-align: center; border-right: 1px solid #F1F5F9; white-space: nowrap;">
+                <span
+                  style="display: inline-block; padding: 4px 10px; background: #DBEAFE; color: #1E40AF; border-radius: 12px; font-weight: 600;">{{ $item['radius_skor'] }}</span>
+              </td>
+              <td
+                style="padding: 12px 16px; color: #374151; font-size: 12px; border-right: 1px solid #F1F5F9; max-width: 250px;">
+                {{ $item['tata_ruang_kondisi'] }}</td>
+              <td style="padding: 12px 16px; text-align: center; border-right: 1px solid #F1F5F9; white-space: nowrap;">
+                <span
+                  style="display: inline-block; padding: 4px 10px; background: #DBEAFE; color: #1E40AF; border-radius: 12px; font-weight: 600;">{{ $item['tata_ruang_skor'] }}</span>
+              </td>
+              <td
+                style="padding: 12px 16px; color: #374151; font-size: 12px; border-right: 1px solid #F1F5F9; white-space: nowrap;">
+                {{ $item['kegiatan'] }}</td>
+              <td style="padding: 12px 16px; text-align: center; border-right: 1px solid #F1F5F9; white-space: nowrap;">
+                <span
+                  style="display: inline-block; padding: 4px 10px; background: #DBEAFE; color: #1E40AF; border-radius: 12px; font-weight: 600;">{{ $item['kegiatan_skor'] }}</span>
+              </td>
+              <td
+                style="padding: 12px 16px; text-align: center; color: #374151; font-weight: 600; border-right: 1px solid #F1F5F9; white-space: nowrap;">
+                {{ $item['pengguna_kondisi'] }}</td>
+              <td style="padding: 12px 16px; text-align: center; border-right: 1px solid #F1F5F9; white-space: nowrap;">
+                <span
+                  style="display: inline-block; padding: 4px 10px; background: #DBEAFE; color: #1E40AF; border-radius: 12px; font-weight: 600;">{{ $item['pengguna_skor'] }}</span>
+              </td>
+              <td style="padding: 12px 16px; text-align: center; border-right: 1px solid #F1F5F9; white-space: nowrap;">
+                <div style="font-weight: 700; color: #059669; font-size: 18px;">{{ $item['total_skor'] }}</div>
+              </td>
+              <td style="padding: 12px 16px; text-align: center; white-space: nowrap;">
+                <span
+                  style="display: inline-block; padding: 6px 12px; background: {{ str_contains($item['prioritas'], 'Prioritas 1') ? '#DCFCE7' : '#FEF3C7' }}; color: {{ str_contains($item['prioritas'], 'Prioritas 1') ? '#166534' : '#92400E' }}; border-radius: 6px; font-weight: 600; font-size: 12px;">
+                  {{ $item['prioritas'] }}
+                </span>
+              </td>
+            </tr>
+          @endforeach
+        </tbody>
+      </table>
+    </div>
+  </div>
 @endsection
 
 @push('scripts')

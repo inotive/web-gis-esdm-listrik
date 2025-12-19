@@ -49,10 +49,12 @@
         </a>
 
 
+        @if (!in_array($userRole ?? null, ['desa', 'perusahaan']))
         <a class="menu-item {{ nav_active('admin.permohonan.*') }}" href="{{ route('admin.permohonan.index') }}">
             <span class="menu-icon"><i class="ri-file-list-3-line" aria-hidden="true"></i></span>
             <span class="menu-label">Perizinan dan Permohonan</span>
         </a>
+        @endif
 
          <a class="menu-item {{ nav_active('admin.rekap-data.*') }}" href="{{ route('admin.rekap-data.index') }}">
             <span class="menu-icon"><i class="ri-file-text-line" aria-hidden="true"></i></span>
@@ -86,9 +88,12 @@
     </nav>
 
     <!-- separator -->
+    @if (!in_array($userRole ?? null, ['desa', 'perusahaan']))
     <hr class="menu-sep" />
+    @endif
 
     <!-- Konfigurasi -->
+    @if (!in_array($userRole ?? null, ['desa', 'perusahaan']))
     <nav class="menu-section" aria-label="Konfigurasi">
         <div class="menu-title">Konfigurasi</div>
 
@@ -123,10 +128,10 @@
             <span class="menu-label">Data Jalan &amp; Aksesbilitas</span>
         </a>
 
-        <a class="menu-item {{ nav_active('admin.skoring.*') }}" href="{{ route('admin.skoring.index') }}">
+        <!-- <a class="menu-item {{ nav_active('admin.skoring.*') }}" href="{{ route('admin.skoring.index') }}">
             <span class="menu-icon"><i class="ri-slideshow-2-line" aria-hidden="true"></i></span>
             <span class="menu-label">Variabel Skoring &amp; Bobot</span>
-        </a>
+        </a> -->
         <a class="menu-item {{ nav_active('admin.kategori-permohonan.*') }}" href="{{ route('admin.kategori-permohonan.index') }}">
             <span class="menu-icon"><i class="ri-file-list-3-line" aria-hidden="true"></i></span>
             <span class="menu-label">Kategori Permohonan</span>
@@ -148,4 +153,5 @@
         </a>
         @endcan
     </nav>
+    @endif
 </aside>

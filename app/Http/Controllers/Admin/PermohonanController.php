@@ -9,6 +9,9 @@ use App\Models\PermohonanQuestion;
 use App\Models\PermohonanQuestionOption;
 use App\Models\PerizinanListrik;
 use App\Models\Perusahaan;
+use App\Models\RegRegency;
+use App\Models\RegDistrict;
+use App\Models\RegVillage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -58,16 +61,26 @@ class PermohonanController extends Controller
         if ($status) {
             $today = now();
             if ($status === 'aktif') {
+                // Sedang Aktif: tanggal_akhir terisi dan lebih dari 30 hari dari sekarang
+                $queryPerizinan->whereNotNull('tanggal_akhir')
+                    ->where('tanggal_akhir', '>', $today->copy()->addDays(30))
+                    ->where('tanggal_akhir', '>', '1901-01-01');
+            } elseif ($status === 'mau_berakhir') {
+                // Mau Berakhir: tanggal_akhir terisi dan dalam 30 hari ke depan
                 $queryPerizinan->whereNotNull('tanggal_akhir')
                     ->where('tanggal_akhir', '>=', $today)
+                    ->where('tanggal_akhir', '<=', $today->copy()->addDays(30))
                     ->where('tanggal_akhir', '>', '1901-01-01');
-            } elseif ($status === 'expired') {
-                $queryPerizinan->whereNotNull('tanggal_akhir')
-                    ->where('tanggal_akhir', '<', $today)
-                    ->where('tanggal_akhir', '>', '1901-01-01');
-            } elseif ($status === 'menunggu') {
-                $queryPerizinan->whereNull('tanggal_terbit')
-                    ->orWhere('tanggal_terbit', '<', '1901-01-01');
+            } elseif ($status === 'berakhir') {
+                // Berakhir: tanggal_akhir NULL ATAU sudah lewat
+                $queryPerizinan->where(function ($query) use ($today) {
+                    $query->whereNull('tanggal_akhir')
+                        ->orWhere(function ($q) use ($today) {
+                            $q->whereNotNull('tanggal_akhir')
+                                ->where('tanggal_akhir', '<', $today)
+                                ->where('tanggal_akhir', '>', '1901-01-01');
+                        });
+                });
             }
         }
 
@@ -105,24 +118,28 @@ class PermohonanController extends Controller
         $totalSKTP = PerizinanListrik::where('jenis', 'SKTP')->count();
 
         // Count by Status
-        // Aktif: tanggal_akhir > today + 30 days
+        // Aktif: tanggal_akhir terisi dan > today + 30 days
         $countAktif = PerizinanListrik::whereNotNull('tanggal_akhir')
             ->where('tanggal_akhir', '>', $thirtyDaysLater)
             ->where('tanggal_akhir', '>', '1901-01-01')
             ->count();
 
-        // Mau Berakhir: tanggal_akhir between today and today + 30 days
+        // Mau Berakhir: tanggal_akhir terisi dan between today and today + 30 days
         $countMauBerakhir = PerizinanListrik::whereNotNull('tanggal_akhir')
             ->where('tanggal_akhir', '>=', $today)
             ->where('tanggal_akhir', '<=', $thirtyDaysLater)
             ->where('tanggal_akhir', '>', '1901-01-01')
             ->count();
 
-        // Berakhir: tanggal_akhir < today
-        $countBerakhir = PerizinanListrik::whereNotNull('tanggal_akhir')
-            ->where('tanggal_akhir', '<', $today)
-            ->where('tanggal_akhir', '>', '1901-01-01')
-            ->count();
+        // Berakhir: tanggal_akhir NULL ATAU < today
+        $countBerakhir = PerizinanListrik::where(function ($query) use ($today) {
+            $query->whereNull('tanggal_akhir')
+                ->orWhere(function ($q) use ($today) {
+                    $q->whereNotNull('tanggal_akhir')
+                        ->where('tanggal_akhir', '<', $today)
+                        ->where('tanggal_akhir', '>', '1901-01-01');
+                });
+        })->count();
 
         // Total kapasitas
         $totalKapasitas = PerizinanListrik::sum('kapasitas');
@@ -145,6 +162,9 @@ class PermohonanController extends Controller
             ->paginate($perPage, ['*'], 'page_permohonan_user')
             ->withQueryString();
 
+        // Untuk filter dropdown (tidak digunakan untuk filtering, hanya UI)
+        $regencies = RegRegency::orderBy('name')->get(['id', 'name']);
+
         return view('admin.permohonan.index', [
             'title' => 'Perizinan dan Permohonan',
             'permohonans' => $permohonans,
@@ -156,7 +176,42 @@ class PermohonanController extends Controller
             'q' => $q,
             'status' => $status,
             'jenis' => $jenis,
+            'regencies' => $regencies,
         ]);
+    }
+
+    /**
+     * Get districts for cascading dropdown (AJAX)
+     */
+    public function optionsDistricts(Request $request)
+    {
+        $regencyId = $request->get('regency_id');
+        $q = $request->get('q');
+
+        $items = RegDistrict::when($regencyId, fn($qq) => $qq->where('regency_id', $regencyId))
+            ->when($q, fn($qq) => $qq->where('name', 'like', "%{$q}%"))
+            ->orderBy('name')
+            ->limit(200)
+            ->get(['id', 'name']);
+
+        return response()->json($items);
+    }
+
+    /**
+     * Get villages for cascading dropdown (AJAX)
+     */
+    public function optionsVillages(Request $request)
+    {
+        $districtId = $request->get('district_id');
+        $q = $request->get('q');
+
+        $items = RegVillage::when($districtId, fn($qq) => $qq->where('district_id', $districtId))
+            ->when($q, fn($qq) => $qq->where('name', 'like', "%{$q}%"))
+            ->orderBy('name')
+            ->limit(300)
+            ->get(['id', 'name']);
+
+        return response()->json($items);
     }
 
     /**

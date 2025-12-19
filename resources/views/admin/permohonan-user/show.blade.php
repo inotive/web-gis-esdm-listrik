@@ -544,11 +544,17 @@
   <section class="card">
     <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
       <h2 class="card-title" style="margin: 0;">Informasi Permohonan</h2>
-      @if($isAdmin && $permohonanUser->status !== 'selesai')
-        <button type="button" class="btn-success" data-open="#modalApprove">
-          <i class="ri-check-line"></i>
-          Setujui Permohonan
-        </button>
+      @if($isAdmin && $permohonanUser->status !== 'selesai' && $permohonanUser->status !== 'ditolak')
+        <div style="display: flex; gap: 12px;">
+          <button type="button" class="btn-success" data-open="#modalApprove">
+            <i class="ri-check-line"></i>
+            Setujui Permohonan
+          </button>
+          <button type="button" class="btn-danger" data-open="#modalReject">
+            <i class="ri-close-line"></i>
+            Tolak Permohonan
+          </button>
+        </div>
       @endif
     </div>
 
@@ -802,6 +808,42 @@
   </div>
   @endif
 
+  <!-- Modal Reject Permohonan -->
+  @if($isAdmin && $permohonanUser->status !== 'selesai' && $permohonanUser->status !== 'ditolak')
+  <div class="modal-overlay" id="modalReject">
+    <div class="modal" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3>Tolak Permohonan</h3>
+        <button type="button" class="btn-close-modal" data-close>
+          <i class="ri-close-line"></i>
+        </button>
+      </div>
+      <form action="{{ route('admin.permohonan-user.reject', [$permohonanId, $permohonanUser->id]) }}"
+            method="POST"
+            id="formReject">
+        @csrf
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Alasan Penolakan <span style="color: #EF4444;">*</span></label>
+            <textarea name="keterangan" class="form-control" rows="5" placeholder="Masukkan alasan penolakan permohonan (wajib diisi)" required>{{ old('keterangan') }}</textarea>
+            <small style="color: #6B7280; font-size: 12px;">Mohon berikan alasan yang jelas mengapa permohonan ditolak</small>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-modal-cancel" data-close>
+            <i class="ri-close-line"></i>
+            Batal
+          </button>
+          <button type="submit" class="btn-modal-primary" style="background: #EF4444;">
+            <i class="ri-close-line"></i>
+            Tolak Permohonan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  @endif
+
   <!-- Modal Tambah Dokumen -->
   <div class="modal-overlay" id="modalAddDocument">
     <div class="modal">
@@ -851,6 +893,7 @@
   document.addEventListener('DOMContentLoaded', function() {
     // Handle form submit - disable button until process complete
     const formApprove = document.getElementById('formApprove');
+    const formReject = document.getElementById('formReject');
     const formAddDocument = document.getElementById('formAddDocument');
 
     const handleFormSubmit = (form) => {
@@ -875,6 +918,10 @@
     // Initialize form submit handlers
     if (formApprove) {
       handleFormSubmit(formApprove);
+    }
+
+    if (formReject) {
+      handleFormSubmit(formReject);
     }
 
     if (formAddDocument) {

@@ -901,22 +901,22 @@
                     {{-- <a href="#alur" class="btn-hero-primary">
                         Alur <i class="ri-arrow-right-line"></i>
                     </a> --}}
-                    <a href="#alur" class="btn-hero-secondary">
+                    <a href="{{ route('landing') }}" class="btn-hero-secondary">
                         <i class="ri-map-2-line"></i> Telusuri Peta Interaktif
                     </a>
                 </div>
 
                 <div class="hero-stats">
                     <div class="stat-item">
-                        <span class="stat-value">{{ number_format($infrastrukturCount ?? 0, 0, ',', '.') }}</span>
+                        <span class="stat-value">{{ number_format($countJaringan ?? 0) }}</span>
                         <span class="stat-label">Data Infrastruktur Jaringan</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-value">{{ number_format($garduCount ?? 0, 0, ',', '.') }}</span>
+                        <span class="stat-value">{{ number_format($countGardu ?? 0) }}</span>
                         <span class="stat-label">Data Gardu</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-value">{{ number_format($pembangkitCount ?? 0, 0, ',', '.') }}</span>
+                        <span class="stat-value">{{ number_format($countPembangkit ?? 0) }}</span>
                         <span class="stat-label">Pembangkit Lokal</span>
                     </div>
                 </div>
@@ -935,7 +935,8 @@
                     <i class="ri-map-2-line"></i>
                     <div style="font-size: 13px;">
                         <div>Website Interaktif</div>
-                        {{-- <div style="font-size: 12px; color: var(--gray-500); font-weight: normal;">Real-time GIS</div> --}}
+                        {{-- <div style="font-size: 12px; color: var(--gray-500); font-weight: normal;">Real-time GIS
+                        </div> --}}
                     </div>
                 </div>
 
@@ -943,7 +944,8 @@
                     <i class="ri-flashlight-line"></i>
                     <div style="font-size: 13px;">
                         <div>Data Ketenagalistrikan</div>
-                        {{-- <div style="font-size: 12px; color: var(--gray-500); font-weight: normal;">Layanan Terpadu</div> --}}
+                        {{-- <div style="font-size: 12px; color: var(--gray-500); font-weight: normal;">Layanan Terpadu
+                        </div> --}}
                     </div>
                 </div>
 
@@ -951,7 +953,8 @@
                     <i class="ri-shield-check-line"></i>
                     <div style="font-size: 13px;">
                         <div>Permohonan Dan Perizinan</div>
-                        {{-- <div style="font-size: 12px; color: var(--gray-500); font-weight: normal;">Data Valid</div> --}}
+                        {{-- <div style="font-size: 12px; color: var(--gray-500); font-weight: normal;">Data Valid</div>
+                        --}}
                     </div>
                 </div>
             </div>

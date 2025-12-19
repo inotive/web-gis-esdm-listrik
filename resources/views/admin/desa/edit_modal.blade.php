@@ -54,9 +54,74 @@
   <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
 
   <style>
-    .modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;z-index:1000;padding:18px;overflow:auto;}
-    .modal-overlay.show{display:block;}
-    .modal{max-width:520px;margin:20px auto;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-2);overflow:hidden;}
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      background: rgba(15, 23, 42, 0.45);
+      display: none;
+      z-index: 9999;
+      padding: 18px;
+      overflow-y: auto;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(2px);
+    }
+
+    .modal-overlay.show {
+      display: flex !important;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .modal-overlay .modal {
+      max-width: 520px;
+      width: calc(100% - 36px);
+      margin: auto;
+      background: #ffffff !important;
+      border: 1px solid #E2E8F0;
+      border-radius: 16px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      overflow: hidden;
+      position: relative;
+      z-index: 10000;
+      flex-shrink: 0;
+      min-height: 100px;
+      visibility: visible !important;
+      opacity: 1 !important;
+      display: block !important;
+      pointer-events: auto;
+      height: auto;
+      animation: slideDown 0.3s ease;
+    }
+
+    .modal-overlay.show .modal {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+
+    @keyframes slideDown {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
     .modal-header{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid var(--line);}
     .modal-header h3{margin:0;font-weight:800;font-size:20px;letter-spacing:-.2px;}
     .btn-x{width:36px;height:36px;display:grid;place-items:center;border:1px solid #E2E8F0;background:#fff;border-radius:10px;cursor:pointer;}

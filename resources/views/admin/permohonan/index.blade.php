@@ -186,6 +186,11 @@
       color: #DC2626;
     }
 
+    .status-warning {
+      background: #FEF3C7;
+      color: #D97706;
+    }
+
     .status-ditolak {
       background: #F1F5F9;
       color: #64748B;
@@ -346,6 +351,49 @@
       background: #F9FAFB;
       color: #374151;
     }
+
+    /* Sortable column headers */
+    .sortable-header {
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+      padding-right: 20px;
+      transition: background-color 0.2s;
+    }
+
+    .sortable-header:hover {
+      background-color: #F3F4F6;
+    }
+
+    .sortable-header .sort-icon {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      color: #9CA3AF;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .sortable-header:hover .sort-icon,
+    .sortable-header.sorted .sort-icon {
+      opacity: 1;
+    }
+
+    .sortable-header.sorted-asc .sort-icon::before {
+      content: '▲';
+      color: #3B82F6;
+    }
+
+    .sortable-header.sorted-desc .sort-icon::before {
+      content: '▼';
+      color: #3B82F6;
+    }
+
+    .sortable-header.sorted .sort-icon {
+      color: #3B82F6;
+    }
   </style>
 @endpush
 
@@ -380,16 +428,19 @@
   <!-- Tab 1: Data Perizinan -->
   <div class="tab-content {{ $tab === 'perizinan' ? 'active' : '' }}" id="tab-perizinan">
     <!-- Metric Cards -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 20px;">
+    <div
+      style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 20px;">
       <!-- Total Perizinan -->
       <div style="background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px;">
         <div style="display: flex; align-items: center; gap: 12px;">
-          <div style="width: 48px; height: 48px; background: #EEF2FF; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+          <div
+            style="width: 48px; height: 48px; background: #EEF2FF; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
             <i class="ri-file-shield-2-line" style="font-size: 24px; color: #667eea;"></i>
           </div>
           <div>
             <div style="font-size: 12px; color: #6B7280; font-weight: 500;">Total Perizinan</div>
-            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">{{ number_format($perizinanStats['total']) }}</div>
+            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">
+              {{ number_format($perizinanStats['total']) }}</div>
           </div>
         </div>
       </div>
@@ -397,12 +448,14 @@
       <!-- IUPTLS -->
       <div style="background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px;">
         <div style="display: flex; align-items: center; gap: 12px;">
-          <div style="width: 48px; height: 48px; background: #D1FAE5; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+          <div
+            style="width: 48px; height: 48px; background: #D1FAE5; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
             <i class="ri-shield-check-line" style="font-size: 24px; color: #059669;"></i>
           </div>
           <div>
             <div style="font-size: 12px; color: #6B7280; font-weight: 500;">IUPTLS</div>
-            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">{{ number_format($perizinanStats['iuptls']) }}</div>
+            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">
+              {{ number_format($perizinanStats['iuptls']) }}</div>
           </div>
         </div>
       </div>
@@ -410,12 +463,14 @@
       <!-- SKTP -->
       <div style="background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px;">
         <div style="display: flex; align-items: center; gap: 12px;">
-          <div style="width: 48px; height: 48px; background: #FCE7F3; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+          <div
+            style="width: 48px; height: 48px; background: #FCE7F3; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
             <i class="ri-shield-star-line" style="font-size: 24px; color: #DB2777;"></i>
           </div>
           <div>
             <div style="font-size: 12px; color: #6B7280; font-weight: 500;">SKTP</div>
-            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">{{ number_format($perizinanStats['sktp']) }}</div>
+            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">
+              {{ number_format($perizinanStats['sktp']) }}</div>
           </div>
         </div>
       </div>
@@ -423,12 +478,14 @@
       <!-- Sedang Aktif -->
       <div style="background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px;">
         <div style="display: flex; align-items: center; gap: 12px;">
-          <div style="width: 48px; height: 48px; background: #D1FAE5; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+          <div
+            style="width: 48px; height: 48px; background: #D1FAE5; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
             <i class="ri-checkbox-circle-line" style="font-size: 24px; color: #10B981;"></i>
           </div>
           <div>
             <div style="font-size: 12px; color: #6B7280; font-weight: 500;">Sedang Aktif</div>
-            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">{{ number_format($perizinanStats['aktif']) }}</div>
+            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">
+              {{ number_format($perizinanStats['aktif']) }}</div>
           </div>
         </div>
       </div>
@@ -436,12 +493,14 @@
       <!-- Mau Berakhir -->
       <div style="background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px;">
         <div style="display: flex; align-items: center; gap: 12px;">
-          <div style="width: 48px; height: 48px; background: #FEF3C7; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+          <div
+            style="width: 48px; height: 48px; background: #FEF3C7; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
             <i class="ri-time-line" style="font-size: 24px; color: #F59E0B;"></i>
           </div>
           <div>
             <div style="font-size: 12px; color: #6B7280; font-weight: 500;">Mau Berakhir</div>
-            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">{{ number_format($perizinanStats['mau_berakhir']) }}</div>
+            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">
+              {{ number_format($perizinanStats['mau_berakhir']) }}</div>
           </div>
         </div>
       </div>
@@ -449,12 +508,14 @@
       <!-- Berakhir -->
       <div style="background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px;">
         <div style="display: flex; align-items: center; gap: 12px;">
-          <div style="width: 48px; height: 48px; background: #FEE2E2; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+          <div
+            style="width: 48px; height: 48px; background: #FEE2E2; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
             <i class="ri-close-circle-line" style="font-size: 24px; color: #EF4444;"></i>
           </div>
           <div>
             <div style="font-size: 12px; color: #6B7280; font-weight: 500;">Berakhir</div>
-            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">{{ number_format($perizinanStats['berakhir']) }}</div>
+            <div style="font-size: 24px; font-weight: 700; color: #111827; line-height: 1;">
+              {{ number_format($perizinanStats['berakhir']) }}</div>
           </div>
         </div>
       </div>
@@ -472,9 +533,9 @@
             </div>
             <select class="filter-select" name="status" onchange="this.form.submit()">
               <option value="">Semua Status</option>
-              <option value="aktif" {{ $status === 'aktif' ? 'selected' : '' }}>Aktif</option>
-              <option value="menunggu" {{ $status === 'menunggu' ? 'selected' : '' }}>Menunggu Verifikasi</option>
-              <option value="expired" {{ $status === 'expired' ? 'selected' : '' }}>Expired</option>
+              <option value="aktif" {{ $status === 'aktif' ? 'selected' : '' }}>Sedang Aktif</option>
+              <option value="mau_berakhir" {{ $status === 'mau_berakhir' ? 'selected' : '' }}>Mau Berakhir</option>
+              <option value="berakhir" {{ $status === 'berakhir' ? 'selected' : '' }}>Berakhir</option>
             </select>
             <select class="filter-select" name="jenis" onchange="this.form.submit()">
               <option value="">Semua Jenis Izin</option>
@@ -510,24 +571,28 @@
             <tbody>
               @forelse($perizinanItems as $i => $izin)
                 @php
-                  // Determine status based on tanggal_terbit and tanggal_akhir
-                  $statusText = 'Menunggu Verifikasi';
-                  $statusClass = 'status-menunggu';
+                  // Determine status based on tanggal_akhir
+                  $statusText = 'Berakhir';
+                  $statusClass = 'status-expired';
 
-                  if ($izin->tanggal_terbit && $izin->tanggal_akhir) {
+                  if ($izin->tanggal_akhir) {
                     $today = now();
                     $tanggalAkhir = \Carbon\Carbon::parse($izin->tanggal_akhir);
+                    $daysRemaining = $today->diffInDays($tanggalAkhir, false);
 
                     if ($tanggalAkhir->isPast()) {
-                      $statusText = 'Expired';
+                      // Sudah lewat tanggal akhir
+                      $statusText = 'Berakhir';
                       $statusClass = 'status-expired';
+                    } elseif ($daysRemaining <= 30) {
+                      // Dalam 30 hari akan berakhir
+                      $statusText = 'Mau Berakhir';
+                      $statusClass = 'status-warning';
                     } else {
-                      $statusText = 'Aktif';
+                      // Lebih dari 30 hari
+                      $statusText = 'Sedang Aktif';
                       $statusClass = 'status-aktif';
                     }
-                  } elseif ($izin->tanggal_terbit) {
-                    $statusText = 'Aktif';
-                    $statusClass = 'status-aktif';
                   }
 
                   // Jenis badge class
@@ -595,6 +660,18 @@
             <input type="text" id="searchPermohonan" class="form-control"
               placeholder="Cari Pengguna atau Kategori Permohonan" autocomplete="off">
           </div>
+          <select class="filter-select" id="filterRegencyPermohonan">
+            <option value="">Semua Kota/Kabupaten</option>
+            @foreach($regencies as $regency)
+              <option value="{{ $regency->id }}">{{ $regency->name }}</option>
+            @endforeach
+          </select>
+          <select class="filter-select" id="filterDistrictPermohonan" disabled>
+            <option value="">Semua Kecamatan</option>
+          </select>
+          <select class="filter-select" id="filterVillagePermohonan" disabled>
+            <option value="">Semua Kelurahan/Desa</option>
+          </select>
           <select class="filter-select" id="filterStatusPermohonan">
             <option value="">Semua Status</option>
             <option value="pending">Menunggu Verifikasi</option>
@@ -611,11 +688,26 @@
           <table class="table-data" id="tablePermohonan">
             <thead>
               <tr>
-                <th class="col-no">No</th>
-                <th>Pengguna</th>
-                <th>Kategori Permohonan</th>
-                <th>Status</th>
-                <th>Tanggal Pengajuan</th>
+                <th class="col-no sortable-header" data-sort="no">
+                  No
+                  <span class="sort-icon"></span>
+                </th>
+                <th class="sortable-header" data-sort="pengguna">
+                  Pengguna
+                  <span class="sort-icon"></span>
+                </th>
+                <th class="sortable-header" data-sort="kategori">
+                  Kategori Permohonan
+                  <span class="sort-icon"></span>
+                </th>
+                <th class="sortable-header" data-sort="status">
+                  Status
+                  <span class="sort-icon"></span>
+                </th>
+                <th class="sortable-header" data-sort="tanggal">
+                  Tanggal Pengajuan
+                  <span class="sort-icon"></span>
+                </th>
                 <th class="col-aksi">Aksi</th>
               </tr>
             </thead>
@@ -711,8 +803,8 @@
         });
       @endif
 
-        // Auto submit search on enter
-        const searchInput = document.querySelector('#filterFormPerizinan input[name="q"]');
+          // Auto submit search on enter
+          const searchInput = document.querySelector('#filterFormPerizinan input[name="q"]');
       if (searchInput) {
         searchInput.addEventListener('keypress', function (e) {
           if (e.key === 'Enter') {
@@ -749,10 +841,188 @@
 
           row.style.display = (matchSearch && matchStatus) ? '' : 'none';
         });
+
+        // Re-apply sorting after filtering if there's an active sort
+        if (currentSortColumn) {
+          sortTablePermohonan(currentSortColumn, currentSortDirection);
+        }
       }
 
       searchPermohonan?.addEventListener('input', filterTablePermohonan);
       filterStatusPermohonan?.addEventListener('change', filterTablePermohonan);
+
+      // Cascading dropdown for regency, district, and village (Permohonan tab)
+      const filterRegencyPermohonan = document.getElementById('filterRegencyPermohonan');
+      const filterDistrictPermohonan = document.getElementById('filterDistrictPermohonan');
+      const filterVillagePermohonan = document.getElementById('filterVillagePermohonan');
+
+      // Load districts when regency is selected
+      filterRegencyPermohonan?.addEventListener('change', async function () {
+        const regencyId = this.value;
+
+        // Reset district and village dropdowns
+        if (filterDistrictPermohonan) {
+          filterDistrictPermohonan.innerHTML = '<option value="">Semua Kecamatan</option>';
+          filterDistrictPermohonan.disabled = !regencyId;
+        }
+        if (filterVillagePermohonan) {
+          filterVillagePermohonan.innerHTML = '<option value="">Semua Kelurahan/Desa</option>';
+          filterVillagePermohonan.disabled = true;
+        }
+
+        if (regencyId) {
+          try {
+            const response = await fetch('{{ route("admin.permohonan.options.districts") }}?regency_id=' + encodeURIComponent(regencyId));
+            const districts = await response.json();
+
+            if (filterDistrictPermohonan) {
+              districts.forEach(district => {
+                const option = document.createElement('option');
+                option.value = district.id;
+                option.textContent = district.name;
+                filterDistrictPermohonan.appendChild(option);
+              });
+            }
+          } catch (error) {
+            console.error('Error loading districts:', error);
+          }
+        }
+      });
+
+      // Load villages when district is selected
+      filterDistrictPermohonan?.addEventListener('change', async function () {
+        const districtId = this.value;
+
+        // Reset village dropdown
+        if (filterVillagePermohonan) {
+          filterVillagePermohonan.innerHTML = '<option value="">Semua Kelurahan/Desa</option>';
+          filterVillagePermohonan.disabled = !districtId;
+        }
+
+        if (districtId) {
+          try {
+            const response = await fetch('{{ route("admin.permohonan.options.villages") }}?district_id=' + encodeURIComponent(districtId));
+            const villages = await response.json();
+
+            if (filterVillagePermohonan) {
+              villages.forEach(village => {
+                const option = document.createElement('option');
+                option.value = village.id;
+                option.textContent = village.name;
+                filterVillagePermohonan.appendChild(option);
+              });
+            }
+          } catch (error) {
+            console.error('Error loading villages:', error);
+          }
+        }
+      });
+
+      // Sorting functionality
+      let currentSortColumn = null;
+      let currentSortDirection = 'asc'; // 'asc' or 'desc'
+
+      const sortableHeaders = tablePermohonan?.querySelectorAll('.sortable-header');
+      sortableHeaders?.forEach(header => {
+        header.addEventListener('click', function () {
+          const sortType = this.getAttribute('data-sort');
+
+          // Toggle sort direction if clicking the same column
+          if (currentSortColumn === sortType) {
+            currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+          } else {
+            currentSortColumn = sortType;
+            currentSortDirection = 'asc';
+          }
+
+          // Update header classes
+          sortableHeaders.forEach(h => {
+            h.classList.remove('sorted', 'sorted-asc', 'sorted-desc');
+          });
+          this.classList.add('sorted', `sorted-${currentSortDirection}`);
+
+          // Sort table
+          sortTablePermohonan(sortType, currentSortDirection);
+        });
+      });
+
+      function sortTablePermohonan(sortType, direction) {
+        const tbody = tablePermohonan?.querySelector('tbody');
+        if (!tbody) return;
+
+        const rows = Array.from(tbody.querySelectorAll('tr')).filter(row => {
+          // Skip empty state row and hidden rows (filtered out)
+          return !row.querySelector('.empty-state') && row.style.display !== 'none';
+        });
+
+        rows.sort((a, b) => {
+          let aValue, bValue;
+
+          switch (sortType) {
+            case 'no':
+              aValue = parseInt(a.cells[0]?.textContent.trim()) || 0;
+              bValue = parseInt(b.cells[0]?.textContent.trim()) || 0;
+              break;
+            case 'pengguna':
+              aValue = (a.cells[1]?.textContent.trim() || '').toLowerCase();
+              bValue = (b.cells[1]?.textContent.trim() || '').toLowerCase();
+              break;
+            case 'kategori':
+              aValue = (a.cells[2]?.textContent.trim() || '').toLowerCase();
+              bValue = (b.cells[2]?.textContent.trim() || '').toLowerCase();
+              break;
+            case 'status':
+              aValue = (a.cells[3]?.textContent.trim() || '').toLowerCase();
+              bValue = (b.cells[3]?.textContent.trim() || '').toLowerCase();
+              break;
+            case 'tanggal':
+              // Parse tanggal format d/m/Y
+              const aDateStr = a.cells[4]?.textContent.trim() || '';
+              const bDateStr = b.cells[4]?.textContent.trim() || '';
+
+              if (aDateStr === '-' && bDateStr === '-') {
+                aValue = 0;
+                bValue = 0;
+              } else if (aDateStr === '-') {
+                aValue = 0;
+                bValue = parseDate(bDateStr);
+              } else if (bDateStr === '-') {
+                aValue = parseDate(aDateStr);
+                bValue = 0;
+              } else {
+                aValue = parseDate(aDateStr);
+                bValue = parseDate(bDateStr);
+              }
+              break;
+            default:
+              return 0;
+          }
+
+          // Compare values
+          if (typeof aValue === 'number' && typeof bValue === 'number') {
+            return direction === 'asc' ? aValue - bValue : bValue - aValue;
+          } else {
+            if (aValue < bValue) return direction === 'asc' ? -1 : 1;
+            if (aValue > bValue) return direction === 'asc' ? 1 : -1;
+            return 0;
+          }
+        });
+
+        // Re-append sorted rows
+        rows.forEach(row => tbody.appendChild(row));
+      }
+
+      function parseDate(dateStr) {
+        // Parse format d/m/Y to timestamp
+        if (!dateStr || dateStr === '-') return 0;
+        const parts = dateStr.split('/');
+        if (parts.length !== 3) return 0;
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
+        const year = parseInt(parts[2], 10);
+        const date = new Date(year, month, day);
+        return date.getTime();
+      }
     });
   </script>
 @endpush
