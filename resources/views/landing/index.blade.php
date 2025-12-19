@@ -111,6 +111,16 @@
     const closeBtn = detailModal.querySelector('.dm-close');
     const dmContent = detailModal.querySelector('.dm-content');
 
+    const escapeHtml = (value) => {
+      if (value === null || value === undefined) return '-';
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    };
+
     const renderDetailContent = (graphic) => {
       const attrs = graphic?.attributes || {};
       let layerTitle = graphic?.layer?.title || 'Detail Fitur';
@@ -120,6 +130,7 @@
         layerTitle = attrs.H_Survei;
       }
 
+      const buildRow = (label, value) => `<div class="dm-row"><div class="dm-key">${label}</div><div class="dm-val">${value}</div></div>`;
       let rows = '';
 
       // Khusus untuk layer Status Listrik (H_Survei)
@@ -133,17 +144,26 @@
         ];
 
         rows = fieldsToShow
-          .map(({ key, label }) => `<div class="dm-row"><div class="dm-key">${label}</div><div class="dm-val">${attrs[key] ?? '-'}</div></div>`)
+          .map(({ key, label }) => buildRow(label, escapeHtml(attrs[key])))
           .join('');
       } else {
         // Untuk layer lain, tampilkan semua attributes
         rows = Object.entries(attrs)
-          .map(([k, v]) => `<div class="dm-row"><div class="dm-key">${k}</div><div class="dm-val">${v ?? '-'}</div></div>`)
+          .map(([k, v]) => {
+            if (k === 'link_dokumen' && v) {
+              const safeUrl = escapeHtml(v);
+              const safeTitle = escapeHtml(attrs.Kodifikasi || attrs.NAMOBJ || 'Video 360');
+              const link = `<a href="#" class="video360-link" data-video-url="${safeUrl}" data-video-title="${safeTitle}" style="color: #007bff; text-decoration: underline; cursor: pointer;">Lihat Video 360</a>`;
+              return buildRow('Link Dokumen', link);
+            }
+
+            return buildRow(k, escapeHtml(v));
+          })
           .join('');
       }
 
       dmContent.innerHTML = `
-        <div class="dm-head">${layerTitle}</div>
+        <div class="dm-head">${escapeHtml(layerTitle)}</div>
         <div class="dm-body">${rows || '<div class="dm-empty">Tidak ada atribut</div>'}</div>
       `;
     };
