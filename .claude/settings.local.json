@@ -13,7 +13,11 @@
       "Bash(php check_data.php:*)",
       "Bash(php artisan config:clear:*)",
       "Bash(php artisan cache:clear:*)",
-      "Bash(php artisan make:migration:*)"
+      "Bash(php artisan make:migration:*)",
+      "Bash(php artisan make:seeder:*)",
+      "Bash(php check_tables.php:*)",
+      "Bash(php check_more_tables.php:*)",
+      "Bash(php check_chart_data.php:*)"
     ]
   }
 }
