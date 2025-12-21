@@ -173,12 +173,7 @@
 
         const pickedVideo = pickVideoLink(attrs);
 
-        if (pickedVideo) {
-          const safeUrl = escapeHtml(pickedVideo.url);
-          const safeTitle = escapeHtml(pickedVideo.title);
-          const link = `<a href="#" class="video360-link" data-video-url="${safeUrl}" data-video-title="${safeTitle}" style="color: #007bff; text-decoration: underline; cursor: pointer;">Lihat Video 360</a>`;
-          linkRows.push(buildRow('Link Dokumen', link));
-        }
+       
 
         Object.entries(attrs)
           .filter(([k]) => k !== 'link_dokumen')
@@ -1767,13 +1762,7 @@
             <b>Kodifikasi:</b> ${attrs.Kodifikasi || '-'}<br>
           `;
 
-          const pickedVideo = pickVideoLink(attrs);
-
-          if (pickedVideo) {
-            const videoUrl = escapeAttr(pickedVideo.url);
-            const videoTitle = escapeAttr(pickedVideo.title);
-            content += `<b>Link Dokumen:</b> <a href="#" class="video360-link" data-video-url="${videoUrl}" data-video-title="${videoTitle}" style="color: #007bff; text-decoration: underline; cursor: pointer;">Lihat Video 360</a><br>`;
-          }
+          
 
           return content;
         },
@@ -2026,17 +2015,113 @@
         { label: 'Jalan Paser', layer: jalanPaserLayer, icon: '🛣️' },
         { label: 'Jalan PPU', layer: jalanPPULayer, icon: '🛣️' },
         { label: 'Jalan Samarinda', layer: jalanSamarindaLayer, icon: '🛣️' }
-      ],
-      // 7. Lainnya
-      lainnya: [
-        { label: 'Pembangkit Eksisting', layer: ptPembangkitEksistingLayer, icon: '🏗️' },
-        { label: 'Rencana Pembangkit Bontang', layer: ptRencanaPembangkitBontangLayer, icon: '📐' }
-      ],
-      // 8. Survei Video 360
-      surveiVideo360: [
-        { label: 'Hasil Lokasi Survei ESDM', layer: ptHasilLokasiSurveiEsdmLayer, icon: '📍' }
       ]
+     
     };
+
+     // ===== Widgets dasar =====
+      const home = new Home({ view });
+      view.ui.add(home, { position: "top-left", index: 0 });
+
+      const compass = new Compass({ view });
+      view.ui.add(compass, { position: "top-left", index: 1 });
+
+      const printWidget = new Print({
+        view,
+        printServiceUrl: "https://utility.arcgisonline.com/ArcGIS/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task"
+      });
+      const printExpand = new Expand({
+        view,
+        content: printWidget,
+        expanded: false,
+        expandIconClass: "esri-icon-printer",
+        expandTooltip: "Cetak peta"
+      });
+      view.ui.add(printExpand, { position: "top-left", index: 2 });
+
+      // ===== LIVE LOCATION (seperti Google Maps) =====
+      const liveLocationLayer = new GraphicsLayer({
+        title: "Lokasi saya",
+        listMode: "hide"
+      });
+      map.add(liveLocationLayer);
+
+      const accuracyWidget = document.createElement("div");
+      accuracyWidget.className = "live-location-accuracy-widget esri-widget esri-component";
+      accuracyWidget.innerHTML = "📍 Lokasi belum aktif";
+      view.ui.add(accuracyWidget, { position: "bottom-right", index: 1 });
+
+      const trackWidget = new Track({
+        view,
+        scale: 3000,
+        geolocationOptions: {
+          maximumAge: 0,
+          timeout: 15000,
+          enableHighAccuracy: true
+        },
+        graphic: new Graphic({
+          symbol: {
+            type: "simple-marker",
+            size: 12,
+            color: [59,130,246,1],
+            outline: {
+              color: [255,255,255,1],
+              width: 2
+            }
+          }
+        })
+      });
+      trackWidget.label = "Ikuti lokasi saya";
+
+      view.ui.add(trackWidget, { position: "top-left", index: 3 });
+
+      trackWidget.on("track", ({ position }) => {
+        const coords = position && position.coords ? position.coords : null;
+        if (!coords) return;
+        const { longitude, latitude, accuracy } = coords;
+
+        liveLocationLayer.removeAll();
+
+        const point = {
+          type: "point",
+          longitude,
+          latitude
+        };
+
+        if (typeof accuracy === "number" && !isNaN(accuracy)) {
+          const accuracyCircle = new Circle({
+            center: point,
+            radius: accuracy,
+            radiusUnit: "meters",
+            geodesic: true
+          });
+
+          const circleGraphic = new Graphic({
+            geometry: accuracyCircle,
+            symbol: {
+              type: "simple-fill",
+              color: [59,130,246,0.12],
+              outline: {
+                color: [37,99,235,0.8],
+                width: 1
+              }
+            }
+          });
+          liveLocationLayer.add(circleGraphic);
+
+          const akurasiMeter = Math.round(accuracy);
+          accuracyWidget.innerHTML = `📍 Lokasi aktif<br><span>Akurasi ± ${akurasiMeter.toLocaleString('id-ID')} m</span>`;
+        } else {
+          accuracyWidget.innerHTML = "📍 Lokasi aktif<br><span>Akurasi tidak diketahui</span>";
+        }
+      });
+
+      trackWidget.watch("tracking", (isTracking) => {
+        if (!isTracking) {
+          liveLocationLayer.removeAll();
+          accuracyWidget.innerHTML = "📍 Lokasi belum aktif";
+        }
+      });
 
     const layerFilter = document.createElement('div');
     layerFilter.className = 'layer-filter';
@@ -2058,20 +2143,26 @@
       </div>
     `;
 
-    // 8. Survei Video 360
-    categoriesHTML += `<label class="lf-row lf-parent" data-category="surveiVideo360">
-      <span class="lf-toggle">▼</span>
-      <input type="checkbox" id="lf-surveiVideo360-parent">
-      <span class="lf-icon">🎥</span>
-      <span><strong>Survei Video 360</strong></span>
-    </label>
-    <div class="lf-children" data-category="surveiVideo360">`;
-    layerCategories.surveiVideo360.forEach((item, idx) => {
-      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-surveiVideo360-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
-    });
-    categoriesHTML += `</div>`;
+    function setWhereOnAll(where){ asetLayers.forEach(l => l.definitionExpression = where); }
 
-    // 3. Infrastruktur - with nested Gardu and Trafo sub-categories
+      async function queryFeatureCountAll(where){
+        const counts = await Promise.all(asetLayers.map(l => l.queryFeatureCount({ where })));
+        return counts.reduce((a,b)=>a+(b||0), 0);
+      }
+
+      async function zoomToWhere(where, fallbackCenterLngLat=null, fallbackZoom=11){
+        try{
+          const extents = await Promise.all(asetLayers.map(l => l.queryExtent({ where })));
+          const exts = extents.map(e=>e?.extent).filter(x => x && isFinite(x.xmin));
+          let target = null;
+          if (exts.length === 1) target = exts[0].expand(1.2);
+          if (exts.length > 1)  target = exts.reduce((u, e) => u ? u.union(e) : e, null).expand(1.2);
+          if (target) { await view.goTo({ target }, { duration: 800 }); return true; }
+        }catch(e){ console.warn('queryExtent failed:', e); }
+        if (fallbackCenterLngLat){ await view.goTo({ center: fallbackCenterLngLat, zoom: fallbackZoom }, { duration: 800 }); }
+        return false;
+      }
+
     categoriesHTML += `<label class="lf-row lf-parent" data-category="infrastruktur">
       <span class="lf-toggle">▼</span>
       <input type="checkbox" id="lf-infrastruktur-parent">
@@ -2164,18 +2255,6 @@
       categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-jalan-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
     });
     categoriesHTML += `</div>`;
-
-    // 7. Lainnya
-    categoriesHTML += `<label class="lf-row lf-parent" data-category="lainnya">
-      <span class="lf-toggle">▼</span>
-      <input type="checkbox" id="lf-lainnya-parent">
-      <span class="lf-icon">📂</span>
-      <span><strong>Pembangkit</strong></span>
-    </label>
-    <div class="lf-children collapsed" data-category="lainnya">`;
-    layerCategories.lainnya.forEach((item, idx) => {
-      categoriesHTML += `<label class="lf-row lf-child"><input type="checkbox" id="lf-lainnya-${idx}"> <span class="lf-icon">${item.icon}</span> <span>${item.label}</span></label>`;
-    });
     categoriesHTML += `</div>`;
 
     layerFilter.innerHTML = `
@@ -2381,8 +2460,7 @@
     setupCategoryHandlers('transmisi');
     setupCategoryHandlers('administrasi');
     setupCategoryHandlers('jalan');
-    setupCategoryHandlers('lainnya');
-    setupCategoryHandlers('surveiVideo360');
+  
 
     // Helper function to update grandparent checkbox based on sub-parents
     const updateGrandparentCheckbox = (grandparentId, subparentIds) => {
