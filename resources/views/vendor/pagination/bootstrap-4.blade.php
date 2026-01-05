@@ -4,14 +4,14 @@
             {{-- Previous Page Link --}}
             @if ($paginator->onFirstPage())
                 <li class="page-item disabled">
-                    <span class="page-link">
-                        <i class="ri-arrow-left-s-line"></i> Sebelumnya
+                    <span class="page-link" aria-label="Sebelumnya">
+                        <i class="ri-arrow-left-s-line"></i>
                     </span>
                 </li>
             @else
                 <li class="page-item">
-                    <a class="page-link" href="{{ $paginator->previousPageUrl() }}" rel="prev">
-                        <i class="ri-arrow-left-s-line"></i> Sebelumnya
+                    <a class="page-link" href="{{ $paginator->previousPageUrl() }}" rel="prev" aria-label="Sebelumnya">
+                        <i class="ri-arrow-left-s-line"></i>
                     </a>
                 </li>
             @endif
@@ -38,14 +38,14 @@
             {{-- Next Page Link --}}
             @if ($paginator->hasMorePages())
                 <li class="page-item">
-                    <a class="page-link" href="{{ $paginator->nextPageUrl() }}" rel="next">
-                        Selanjutnya <i class="ri-arrow-right-s-line"></i>
+                    <a class="page-link" href="{{ $paginator->nextPageUrl() }}" rel="next" aria-label="Berikutnya">
+                        <i class="ri-arrow-right-s-line"></i>
                     </a>
                 </li>
             @else
                 <li class="page-item disabled">
-                    <span class="page-link">
-                        Selanjutnya <i class="ri-arrow-right-s-line"></i>
+                    <span class="page-link" aria-label="Berikutnya">
+                        <i class="ri-arrow-right-s-line"></i>
                     </span>
                 </li>
             @endif
@@ -61,48 +61,43 @@
         .pagination {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 2px;
             list-style: none;
             padding: 0;
             margin: 0;
         }
 
         .pagination .page-item {
-            display: inline-flex;
+            list-style: none;
         }
 
         .pagination .page-link {
-            display: inline-flex;
+            width: 30px;
+            height: 30px;
+            display: flex;
             align-items: center;
-            gap: 4px;
-            padding: 6px 12px;
-            font-size: 13px;
-            font-weight: 500;
-            color: #4B5675;
-            background: white;
-            border: 1px solid #E5E7EB;
+            justify-content: center;
             border-radius: 6px;
+            font-size: 14px;
+            color: #4B5675;
             text-decoration: none;
-            transition: all 0.2s ease;
-            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            background: transparent;
         }
 
         .pagination .page-link:hover {
-            color: #059669;
-            border-color: #059669;
-            background: #ECFDF5;
+            background: #F5F5F5;
         }
 
         .pagination .page-item.active .page-link {
-            color: white;
-            background: #059669;
-            border-color: #059669;
+            background: #F1F1F4;
+            color: #252F4A;
+            font-weight: 500;
         }
 
         .pagination .page-item.disabled .page-link {
-            color: #9CA3AF;
-            background: #F9FAFB;
-            border-color: #E5E7EB;
+            opacity: 0.5;
             cursor: not-allowed;
         }
 
@@ -110,4 +105,8 @@
             font-size: 16px;
         }
     </style>
+@else
+<div class="summary">Menampilkan
+    <strong>{{ $paginator->firstItem() ?? 0 }}–{{ $paginator->lastItem() ?? 0 }}</strong> dari
+    <strong>{{ $paginator->total() }}</strong> data</div>
 @endif

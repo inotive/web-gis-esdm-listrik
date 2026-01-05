@@ -5,6 +5,8 @@
 @push('styles')
 <!-- Select2 CSS -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
   /* Table Header/Filter Section - Sesuai Figma */
@@ -213,7 +215,7 @@
     vertical-align: middle;
   }
 
-  /* Action Buttons - Sesuai Figma */
+  /* Action Buttons - Sesuai Manajemen Pengguna */
   .btn-ico{
     width: 24px;
     height: 24px;
@@ -233,24 +235,19 @@
     transform: scale(1.1);
   }
 
-  .btn-ico svg {
-    width: 24px;
-    height: 24px;
-    display: block;
+  /* Edit icon - Kuning */
+  .btn-ico.edit {
+    color: #f59e0b;
   }
 
-  /* Edit icon - Orange/Yellow */
-  .btn-ico.edit svg path {
-    stroke: #DFA000;
+  /* Delete icon - Merah */
+  .btn-ico.delete,
+  .btn-ico.danger {
+    color: #ef4444;
   }
 
-  .btn-ico.edit svg circle {
-    fill: #DFA000;
-  }
-
-  /* Delete icon - Red */
-  .btn-ico.danger svg path {
-    stroke: #F8285A;
+  .btn-ico i {
+    font-size: 16px;
   }
 
   .col-aksi .btn-ico:first-child {
@@ -333,7 +330,7 @@
     border-color: #17C653;
   }
 
-  /* Pagination Styles - Sesuai Figma */
+  /* Pagination Styles - Sesuai Manajemen Pengguna */
   .pagination {
     display: flex;
     align-items: center;
@@ -638,17 +635,12 @@
                     data-regency-id="{{ $desa->district->regency_id ?? '' }}"
                     data-district-id="{{ $desa->district_id }}"
                     title="Edit">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="12" cy="12" r="2" fill="#DFA000"/>
-                      <path d="M12 5L9 8M12 5L15 8M12 5V3M12 19L9 16M12 19L15 16M12 19V21M19 12L16 9M19 12L16 15M19 12H21M5 12L8 9M5 12L8 15M5 12H3" stroke="#DFA000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+                    <i class="fa-solid fa-pen-to-square"></i>
                   </button>
                   <form action="{{ route('admin.desa.destroy', $desa) }}" method="POST" style="display:inline-block;margin:0;" class="form-delete-desa" data-name="{{ $desa->name }}">
                     @csrf @method('DELETE')
-                    <button type="button" class="btn-ico danger btn-delete-desa" title="Hapus">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M9 20H15M10 4H14M7 7H17L16 20H8L7 7Z" stroke="#F8285A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
+                    <button type="button" class="btn-ico delete btn-delete-desa" title="Hapus">
+                      <i class="fa-solid fa-trash"></i>
                     </button>
                   </form>
                 </td>
@@ -660,10 +652,6 @@
         </table>
 
         <div class="table-footer">
-            <div class="summary">Menampilkan
-                <strong>{{ $desas->firstItem() ?? 0 }}–{{ $desas->lastItem() ?? 0 }}</strong> dari
-                <strong>{{ $desas->total() }}</strong> data</div>
-
             <div class="show-wrap">
                 <span>Show</span>
                 <form id="perPageForm" method="GET" action="#">
@@ -672,7 +660,7 @@
                     <input type="hidden" name="val" value="{{ request('val') }}">
                     <select class="form-select" name="per_page"
                         aria-label="Jumlah baris per halaman">
-                        @foreach ([5, 10, 25, 50, 100] as $pp)
+                        @foreach ([10, 25, 50, 100] as $pp)
                             <option value="{{ $pp }}"
                                 {{ (string) request('per_page', '10') === (string) $pp ? 'selected' : '' }}>
                                 {{ $pp }}</option>
@@ -683,7 +671,7 @@
             </div>
 
             <nav aria-label="Pagination">
-                {{ $desas->links('pagination::bootstrap-4') }}
+                {{ $desas->appends(request()->query())->links('pagination::bootstrap-4') }}
             </nav>
         </div>
       </div>
@@ -923,6 +911,44 @@
         }, 100);
       });
     });
+
+    // ========== Update Pagination Icons (Like Manajemen Pengguna) ==========
+    function updatePaginationIcons() {
+      const pagination = document.querySelector('.pagination');
+      if (!pagination) return;
+
+      pagination.querySelectorAll('.page-link').forEach(link => {
+        const text = link.textContent.trim();
+        const rel = link.getAttribute('rel');
+        const href = link.getAttribute('href');
+
+        // Detect previous link: rel="prev" or text contains "‹" or "«"
+        const isPrevious = rel === 'prev' || text === '‹' || text === '«' ||
+                          (href && href.includes('page=') && text.match(/previous|sebelum/i));
+
+        // Detect next link: rel="next" or text contains "›" or "»"
+        const isNext = rel === 'next' || text === '›' || text === '»' ||
+                      (href && href.includes('page=') && text.match(/next|berikut/i));
+
+        if (isPrevious && !link.querySelector('i')) {
+          link.innerHTML = '<i class="ri-arrow-left-s-line"></i>';
+        } else if (isNext && !link.querySelector('i')) {
+          link.innerHTML = '<i class="ri-arrow-right-s-line"></i>';
+        }
+      });
+    }
+
+    // Run on page load
+    setTimeout(updatePaginationIcons, 100);
+
+    // Also run after any DOM changes (if using dynamic content)
+    const observer = new MutationObserver(() => {
+      setTimeout(updatePaginationIcons, 50);
+    });
+    const paginationContainer = document.querySelector('nav[aria-label="Pagination"]');
+    if (paginationContainer) {
+      observer.observe(paginationContainer, { childList: true, subtree: true });
+    }
   });
 </script>
 

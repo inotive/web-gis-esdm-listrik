@@ -506,7 +506,6 @@
           document.getElementById('edit_nama').value = nama;
           document.getElementById('edit_kontak').value = kontak;
           document.getElementById('edit_alamat').value = alamat;
-          document.getElementById('edit_kabupaten_kota').value = kabupatenKota;
 
           // Load regencies
           const selReg = document.getElementById('edit_regency_id');

@@ -3,6 +3,7 @@
 @section('title', 'Dashboard ESDM - Data Perusahaan')
 
 @push('styles')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
   /* Table Header/Filter Section - Sesuai Figma */
   .card-header {
@@ -237,17 +238,13 @@
   }
 
   /* Edit icon - Orange/Yellow */
-  .btn-ico.edit svg path {
-    stroke: #DFA000;
-  }
-
-  .btn-ico.edit svg circle {
-    fill: #DFA000;
+  .btn-ico.edit {
+    color: #f59e0b;
   }
 
   /* Delete icon - Red */
-  .btn-ico.danger svg path {
-    stroke: #F8285A;
+  .btn-ico.danger {
+    color: #ef4444;
   }
 
   .col-aksi .btn-ico:first-child {
@@ -622,17 +619,12 @@
                     data-district-id="{{ $perusahaan->village->district_id ?? '' }}"
                     data-village-id="{{ $perusahaan->village_id ?? '' }}"
                     title="Edit">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="12" cy="12" r="2" fill="#DFA000"/>
-                      <path d="M12 5L9 8M12 5L15 8M12 5V3M12 19L9 16M12 19L15 16M12 19V21M19 12L16 9M19 12L16 15M19 12H21M5 12L8 9M5 12L8 15M5 12H3" stroke="#DFA000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
+                    <i class="fa-solid fa-pen-to-square"></i>
                   </button>
                   <form action="{{ route('admin.perusahaan.destroy', $perusahaan) }}" method="POST" style="display:inline-block;margin:0;" class="form-delete-perusahaan" data-name="{{ $perusahaan->nama }}">
                     @csrf @method('DELETE')
                     <button type="button" class="btn-ico danger btn-delete-perusahaan" title="Hapus">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M9 20H15M10 4H14M7 7H17L16 20H8L7 7Z" stroke="#F8285A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
+                      <i class="fa-solid fa-trash"></i>
                     </button>
                   </form>
                 </td>
@@ -644,10 +636,6 @@
         </table>
 
         <div class="table-footer">
-            <div class="summary">Menampilkan
-                <strong>{{ $perusahaans->firstItem() ?? 0 }}–{{ $perusahaans->lastItem() ?? 0 }}</strong> dari
-                <strong>{{ $perusahaans->total() }}</strong> data</div>
-
             <div class="show-wrap">
                 <span>Show</span>
                 <form id="perPageForm" method="GET" action="#">
@@ -656,7 +644,7 @@
                     <input type="hidden" name="district_id" value="{{ request('district_id') }}">
                     <select class="form-select auto-submit" name="per_page"
                         aria-label="Jumlah baris per halaman">
-                        @foreach ([5, 10, 25, 50, 100] as $pp)
+                        @foreach ([10, 25, 50, 100] as $pp)
                             <option value="{{ $pp }}"
                                 {{ (string) request('per_page', '10') === (string) $pp ? 'selected' : '' }}>
                                 {{ $pp }}</option>
