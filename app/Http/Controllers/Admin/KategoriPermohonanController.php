@@ -11,13 +11,14 @@ use Illuminate\Support\Facades\DB;
 
 class KategoriPermohonanController extends Controller
 {
-     /**
+    /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
         $perPage = (int) $request->get('per_page', 10);
         $q = $request->get('q');
+        $kind = $request->get('kind'); // Filter jenis permohonan
 
         $query = Permohonan::withCount('questions');
 
@@ -29,14 +30,22 @@ class KategoriPermohonanController extends Controller
             });
         }
 
+        // Filter by jenis_permohonan
+        if ($kind) {
+            $query->where('jenis_permohonan', $kind);
+        }
+
         $permohonans = $query->orderBy('created_at', 'desc')
             ->paginate($perPage)
             ->withQueryString();
 
+        // Get unique kinds for filter dropdown
+        $kinds = Permohonan::distinct()->pluck('jenis_permohonan')->filter()->values();
 
         return view('admin.kategori-permohonan.index', [
             'title' => 'Kategori Permohonan',
-            'permohonans' => $permohonans
+            'permohonans' => $permohonans,
+            'kinds' => $kinds
         ]);
     }
 

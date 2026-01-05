@@ -22,6 +22,11 @@
             width: 250px;
         }
 
+        /* Filter Dropdown - Sesuai Figma */
+        .w-filter {
+            width: 250px;
+        }
+
         .input-group {
             display: flex;
             align-items: center;
@@ -267,8 +272,8 @@
 
         /* ========== Select2 Custom Styling ========== */
         /* .select2-container {
-                                    width: 100% !important;
-                                } Remove this as it breaks the small dropdown when no other selects exist */
+                                                width: 100% !important;
+                                            } Remove this as it breaks the small dropdown when no other selects exist */
 
 
         .select2-container--default .select2-selection--single {
@@ -377,6 +382,16 @@
                     <span class="input-group-text"><i class="ri-search-line"></i></span>
                     <input type="text" name="q" value="{{ request('q') }}" class="form-control"
                         placeholder="Cari Nama atau Jenis Kategori Permohonan" autocomplete="off">
+                </div>
+
+                <div class="input-group w-filter">
+                    <select class="form-select" name="kind" id="filterKind">
+                        <option value="">Semua Jenis Permohonan</option>
+                        @foreach ($kinds as $kind)
+                            <option value="{{ $kind }}" {{ request('kind') == $kind ? 'selected' : '' }}>
+                                {{ $kind }}</option>
+                        @endforeach
+                    </select>
                 </div>
             </form>
         </div>
@@ -513,12 +528,23 @@
 
             // Select2 custom initialization
             $(document).ready(function() {
+                // Per page dropdown
                 $('select[name="per_page"]').select2({
                     minimumResultsForSearch: Infinity,
                     width: '70px',
                     dropdownAutoWidth: false
                 }).on('select2:select', function(e) {
                     $(this).closest('form').submit();
+                });
+
+                // Kind filter dropdown
+                $('#filterKind').select2({
+                    minimumResultsForSearch: Infinity,
+                    width: '100%',
+                    placeholder: 'Semua Jenis Permohonan',
+                    allowClear: true
+                }).on('select2:select select2:unselect', function(e) {
+                    document.getElementById('filterForm').submit();
                 });
             });
         });
