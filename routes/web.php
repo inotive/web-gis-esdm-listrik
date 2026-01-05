@@ -236,6 +236,7 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
         Route::get('/', [KategoriPermohonanController::class, 'index'])->name('index');
         Route::get('/create', [KategoriPermohonanController::class, 'create'])->name('create');
         Route::post('/', [KategoriPermohonanController::class, 'store'])->name('store');
+        Route::get('/{permohonan}', [KategoriPermohonanController::class, 'show'])->name('show');
         Route::get('/{permohonan}/edit', [KategoriPermohonanController::class, 'edit'])->name('edit');
         Route::put('/{permohonan}', [KategoriPermohonanController::class, 'update'])->name('update');
         Route::delete('/{permohonan}', [KategoriPermohonanController::class, 'destroy'])->name('destroy');

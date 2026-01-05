@@ -129,6 +129,24 @@ class KategoriPermohonanController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     */
+    public function show(Permohonan $permohonan)
+    {
+        $permohonan->load(['questions.options' => function ($query) {
+            $query->orderBy('id');
+        }]);
+
+        // Sort questions explicitly
+        $permohonan->setRelation('questions', $permohonan->questions->sortBy('urutan'));
+
+        return view('admin.kategori-permohonan.show', [
+            'title' => 'Detail Kategori Permohonan',
+            'permohonan' => $permohonan
+        ]);
+    }
+
+    /**
      * Show the form for editing the specified resource.
      */
     public function edit(Permohonan $permohonan)

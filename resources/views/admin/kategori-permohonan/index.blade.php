@@ -272,8 +272,8 @@
 
         /* ========== Select2 Custom Styling ========== */
         /* .select2-container {
-                                                width: 100% !important;
-                                            } Remove this as it breaks the small dropdown when no other selects exist */
+                                                        width: 100% !important;
+                                                    } Remove this as it breaks the small dropdown when no other selects exist */
 
 
         .select2-container--default .select2-selection--single {
@@ -418,6 +418,10 @@
                                 <td>{{ $permohonan->questions_count ?? 0 }}</td>
                                 <td>{{ $permohonan->keterangan ?? '-' }}</td>
                                 <td class="col-aksi">
+                                    <a href="{{ route('admin.kategori-permohonan.show', $permohonan) }}" class="btn-ico"
+                                        title="Detail" style="color: #009ef7;">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
                                     <a href="{{ route('admin.kategori-permohonan.edit', $permohonan) }}"
                                         class="btn-ico edit" title="Edit">
                                         <i class="fa-solid fa-pen-to-square"></i>
