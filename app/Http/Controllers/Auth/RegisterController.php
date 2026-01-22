@@ -55,7 +55,7 @@ class RegisterController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'identity_type' => ['required', 'string', 'in:desa,perusahaan'],
             'jabatan' => ['required', 'string', 'max:255'],
-            'phone' => ['required', 'numeric', 'max:20'],
+            'phone' => ['required', 'string', 'max:20', 'regex:/^[0-9+\-\s()]+$/'],
             'address' => ['required', 'string'],
             'village_id' => ['required', 'exists:reg_villages,id'],
         ]);
