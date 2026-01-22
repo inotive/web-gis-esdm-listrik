@@ -13,9 +13,18 @@ class InfrastrukturJaringan extends Model
         'jaringan',          // 'distribusi' | 'transmisi'
         'jenis',             // teks
         'panjang_jaringan',  // decimal
+        'perusahaan_id',
     ];
 
     protected $casts = [
         'panjang_jaringan' => 'decimal:2',
     ];
+
+    /**
+     * Relasi ke perusahaan
+     */
+    public function perusahaan()
+    {
+        return $this->belongsTo(Perusahaan::class, 'perusahaan_id', 'id');
+    }
 }

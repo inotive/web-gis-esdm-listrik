@@ -56,7 +56,7 @@ class LoginController extends Controller
             'password' => 'required',
         ]);
 
-        $fieldType = filter_var($request->email, FILTER_VALIDATE_EMAIL) ? 'username' : 'name';
+        $fieldType = filter_var($request->name, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
         if (auth()->attempt([$fieldType => $input['name'], 'password' => $input['password']])) {
 
             return redirect()->route('admin.dashboard')->with('login_success', 'Selamat datang kembali! Anda berhasil masuk.');

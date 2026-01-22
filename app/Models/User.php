@@ -10,6 +10,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use App\Models\RegVillage;
 
 class User extends Authenticatable
 {
@@ -26,7 +27,12 @@ class User extends Authenticatable
         'email',
         'password',
         'status',
-        'image'
+        'image',
+        'jabatan',
+        'phone',
+        'address',
+        'village_id',
+        'identity_type',
     ];
 
     /**
@@ -67,5 +73,10 @@ class User extends Authenticatable
     public function permohonanDocuments(): HasMany
     {
         return $this->hasMany(PermohonanUserDocument::class, 'user_id');
+    }
+
+    public function village()
+    {
+        return $this->belongsTo(RegVillage::class, 'village_id');
     }
 }

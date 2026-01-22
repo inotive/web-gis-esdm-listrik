@@ -12,7 +12,16 @@ class PembangkitLokal extends Model
     protected $fillable = [
         'wilayah_id',
         'kapasitas_gardu',
+        'perusahaan_id',
     ];
+
+    /**
+     * Relasi ke perusahaan
+     */
+    public function perusahaan()
+    {
+        return $this->belongsTo(Perusahaan::class, 'perusahaan_id', 'id');
+    }
 
     public function wilayah()
     {

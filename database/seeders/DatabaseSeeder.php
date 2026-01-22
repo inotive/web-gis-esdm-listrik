@@ -16,20 +16,10 @@ class DatabaseSeeder extends Seeder
         RoleSeeder::class,
         PermissionSeeder::class,
         UserSeeder::class,
-        // ProvinsiSeeder::class,
-        // KabupatenSeeder::class,
-        // KecamatanSeeder::class,
-        // KelurahanSeeder::class,
-        // KategoriAssetSeeder::class,
-        // StatusHukumAssetSeeder::class,
-        // UnitKerjaSeeder::class,
-         WilayahSeeder::class,
-        // RegProvincesSeeder::class,
-        // RegRegenciesSeeder::class,
-        // RegDistrictsSeeder::class,
-        // RegVillagesSeeder::class,
-  
-      
+        WilayahSeeder::class,
+        RekapElektrifikasiSeeder::class,
+        DataBerlistrikSeeder::class,
+        InfrastrukturPerusahaanSeeder::class,
     ]);
 }
 

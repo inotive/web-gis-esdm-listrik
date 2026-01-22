@@ -369,6 +369,192 @@
     </div>
   </div>
 
+  <!-- Status Desa Berlistrik Breakdown -->
+  <div class="section-title"><i class="ri-lightbulb-flash-line"></i> Status Keterlayanan Listrik Desa</div>
+  
+  <div class="status-section-grid">
+    <!-- Breakdown Cards -->
+    <div class="dash-card">
+      <div class="dash-card-header">
+        <div class="dash-card-title">Jumlah Desa per Kategori</div>
+      </div>
+      <div class="dash-card-body">
+        <div class="status-cards-grid">
+          <!-- Card PLN -->
+          <div class="status-card status-card-pln">
+            <div class="status-number">{{ number_format($totalDesaBerlistrikPln) }}</div>
+            <div class="status-label">Berlistrik PLN</div>
+            <div class="status-percentage">
+              {{ $totalDesa > 0 ? number_format(($totalDesaBerlistrikPln / $totalDesa) * 100, 1) : 0 }}%
+            </div>
+          </div>
+          
+          <!-- Card Non-PLN -->
+          <div class="status-card status-card-non-pln">
+            <div class="status-number">{{ number_format($totalDesaBerlistrikNonPln) }}</div>
+            <div class="status-label">Berlistrik Non-PLN</div>
+            <div class="status-percentage">
+              {{ $totalDesa > 0 ? number_format(($totalDesaBerlistrikNonPln / $totalDesa) * 100, 1) : 0 }}%
+            </div>
+          </div>
+          
+          <!-- Card Tidak Berlistrik -->
+          <div class="status-card status-card-belum">
+            <div class="status-number">{{ number_format($totalDesaBelum) }}</div>
+            <div class="status-label">Tidak Berlistrik</div>
+            <div class="status-percentage">
+              {{ $totalDesa > 0 ? number_format(($totalDesaBelum / $totalDesa) * 100, 1) : 0 }}%
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pie Chart -->
+    <div class="dash-card">
+      <div class="dash-card-header">
+        <div class="dash-card-title">Proporsi Status Keterlayanan</div>
+      </div>
+      <div class="dash-card-body">
+        <div class="chart-container" style="height: 200px;">
+          <canvas id="statusPieChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    /* Main grid: 2 columns on desktop */
+    .status-section-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    /* Cards grid inside left column */
+    .status-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .status-card {
+      text-align: center;
+      padding: 24px 20px;
+      border-radius: 12px;
+      border: 2px solid;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .status-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .status-card-pln {
+      background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+      border-color: #22c55e;
+    }
+
+    .status-card-non-pln {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+      border-color: #f59e0b;
+    }
+
+    .status-card-belum {
+      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+      border-color: #ef4444;
+    }
+
+    .status-number {
+      font-size: 36px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .status-card-pln .status-number,
+    .status-card-pln .status-percentage {
+      color: #166534;
+    }
+
+    .status-card-non-pln .status-number,
+    .status-card-non-pln .status-percentage {
+      color: #92400e;
+    }
+
+    .status-card-belum .status-number,
+    .status-card-belum .status-percentage {
+      color: #991b1b;
+    }
+
+    .status-label {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .status-card-pln .status-label {
+      color: #15803d;
+    }
+
+    .status-card-non-pln .status-label {
+      color: #b45309;
+    }
+
+    .status-card-belum .status-label {
+      color: #dc2626;
+    }
+
+    .status-percentage {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      /* Stack everything vertically on mobile */
+      .status-section-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .status-cards-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .status-card {
+        min-height: 120px;
+        padding: 20px 16px;
+      }
+
+      .status-number {
+        font-size: 32px;
+      }
+
+      .status-percentage {
+        font-size: 14px;
+      }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+      /* Tablet: keep 2 columns but adjust cards */
+      .status-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .status-cards-grid > :last-child {
+        grid-column: 1 / -1;
+      }
+    }
+  </style>
+
+
   <!-- Infrastruktur Stats -->
   <div class="section-title"><i class="ri-plug-line"></i> Data Infrastruktur</div>
   <div class="infra-grid">
@@ -426,6 +612,160 @@
     </div>
   </div>
 
+  <!-- Company-Infrastructure Section -->
+  <div class="section-title"><i class="ri-building-4-line"></i> Infrastruktur per Perusahaan</div>
+  
+  <div class="infra-chart-grid">
+    <!-- Pie Chart: Gardu per Perusahaan -->
+    <div class="dash-card">
+      <div class="dash-card-header">
+        <div class="dash-card-title">Distribusi Gardu per Perusahaan</div>
+      </div>
+      <div class="dash-card-body">
+        @if($garduPerPerusahaan->isEmpty())
+          <div style="color: #6B7280; font-size: 13px;">Belum ada data gardu perusahaan.</div>
+        @else
+          <div class="chart-container">
+            <canvas id="garduPerusahaanChart"></canvas>
+          </div>
+        @endif
+      </div>
+    </div>
+
+    <!-- Bar Chart: Jaringan per Perusahaan -->
+    <div class="dash-card">
+      <div class="dash-card-header">
+        <div class="dash-card-title">Panjang Jaringan per Perusahaan</div>
+      </div>
+      <div class="dash-card-body">
+        @if($jaringanPerPerusahaan->isEmpty())
+          <div style="color: #6B7280; font-size: 13px;">Belum ada data jaringan perusahaan.</div>
+        @else
+          <div class="chart-container">
+            <canvas id="jaringanPerusahaanChart"></canvas>
+          </div>
+        @endif
+      </div>
+    </div>
+  </div>
+
+  <!-- Table: Detail Infrastruktur per Perusahaan -->
+  <div class="dash-card" style="margin-top: 24px;">
+    <div class="dash-card-header">
+      <div class="dash-card-title">Detail Infrastruktur per Perusahaan</div>
+    </div>
+    <div class="dash-card-body">
+      @if($perusahaanWithInfrastruktur->isEmpty())
+        <div style="color: #6B7280; font-size: 13px;">Belum ada data perusahaan.</div>
+      @else
+        <div style="overflow-x: auto;">
+          <table class="company-table">
+            <thead>
+              <tr>
+                <th>Nama Perusahaan</th>
+                <th>Jenis Usaha</th>
+                <th>Kabupaten/Kota</th>
+                <th class="text-center">Gardu</th>
+                <th class="text-center">Jaringan (km)</th>
+                <th class="text-center">Pembangkit</th>
+                <th class="text-center">Total Infrastruktur</th>
+              </tr>
+            </thead>
+            <tbody>
+              @foreach($perusahaanWithInfrastruktur as $perusahaan)
+                <tr>
+                  <td><strong>{{ $perusahaan['nama'] }}</strong></td>
+                  <td>{{ $perusahaan['jenis_usaha'] ?? '-' }}</td>
+                  <td>{{ $perusahaan['kabupaten_kota'] ?? '-' }}</td>
+                  <td class="text-center">
+                    <span class="badge badge-blue">{{ $perusahaan['total_gardu'] }}</span>
+                  </td>
+                  <td class="text-center">
+                    <span class="badge badge-green">{{ number_format($perusahaan['total_jaringan_km'], 2) }}</span>
+                  </td>
+                  <td class="text-center">
+                    <span class="badge badge-orange">{{ $perusahaan['total_pembangkit'] }}</span>
+                  </td>
+                  <td class="text-center">
+                    <strong style="color: #1F2937;">{{ $perusahaan['total_infrastruktur'] }}</strong>
+                  </td>
+                </tr>
+              @endforeach
+            </tbody>
+          </table>
+        </div>
+      @endif
+    </div>
+  </div>
+
+  <style>
+    .company-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .company-table thead {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .company-table th {
+      padding: 12px 16px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .company-table th.text-center {
+      text-align: center;
+    }
+
+    .company-table tbody tr {
+      border-bottom: 1px solid #E5E7EB;
+      transition: background-color 0.2s;
+    }
+
+    .company-table tbody tr:hover {
+      background-color: #F9FAFB;
+    }
+
+    .company-table td {
+      padding: 14px 16px;
+      color: #374151;
+    }
+
+    .company-table td.text-center {
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-blue {
+      background: #DBEAFE;
+      color: #1E40AF;
+    }
+
+    .badge-green {
+      background: #D1FAE5;
+      color: #065F46;
+    }
+
+    .badge-orange {
+      background: #FED7AA;
+      color: #92400E;
+    }
+  </style>
+
+
   <!-- Main Dashboard Grid -->
   <div class="dashboard-grid">
     <!-- Chart: Trend Elektrifikasi -->
@@ -467,18 +807,19 @@
     </div>
   </div>
 
-  <!-- Chart: Desa Per Kabupaten -->
+  <!-- Chart: Desa Per Kabupaten (3 Kategori) -->
   <div class="dash-card">
     <div class="dash-card-header">
-      <div class="dash-card-title">Jumlah Desa Berlistrik Per Kabupaten/Kota</div>
+      <div class="dash-card-title">Jumlah Desa Per Kabupaten/Kota (PLN, Non-PLN, Tidak Berlistrik)</div>
     </div>
     <div class="dash-card-body">
       <div class="chart-container">
         <canvas id="desaChart"></canvas>
       </div>
       <div class="chart-legend">
-        <span class="legend-item"><span class="legend-dot green"></span> Desa Berlistrik</span>
-        <span class="legend-item"><span class="legend-dot gray"></span> Desa Belum Berlistrik</span>
+        <span class="legend-item"><span class="legend-dot" style="background: #22c55e;"></span> Berlistrik PLN</span>
+        <span class="legend-item"><span class="legend-dot" style="background: #f59e0b;"></span> Berlistrik Non-PLN</span>
+        <span class="legend-item"><span class="legend-dot" style="background: #ef4444;"></span> Tidak Berlistrik</span>
       </div>
     </div>
   </div>
@@ -891,36 +1232,217 @@
         });
       }
 
-      // ===== DESA CHART =====
+      // ===== DESA CHART (3 Kategori: PLN, Non-PLN, Tidak Berlistrik) =====
       const desaCtx = document.getElementById('desaChart')?.getContext('2d');
       if (desaCtx) {
         const elektrifikasiData = @json($elektrifikasiData);
+        const plnColor = '#22c55e';
+        const nonPlnColor = '#f59e0b';
+        const tidakBerlistrikColor = '#ef4444';
+
         new Chart(desaCtx, {
           type: 'bar',
           data: {
             labels: elektrifikasiData.map(d => d.name),
             datasets: [{
-              label: 'Desa Berlistrik',
-              data: elektrifikasiData.map(d => d.desa_berlistrik),
-              backgroundColor: greenColor,
+              label: 'Berlistrik PLN',
+              data: elektrifikasiData.map(d => d.desa_berlistrik_pln ?? 0),
+              backgroundColor: plnColor,
               borderRadius: 4
             }, {
-              label: 'Desa Belum Berlistrik',
-              data: elektrifikasiData.map(d => d.desa_belum),
-              backgroundColor: grayColor,
+              label: 'Berlistrik Non-PLN',
+              data: elektrifikasiData.map(d => d.desa_berlistrik_non_pln ?? 0),
+              backgroundColor: nonPlnColor,
+              borderRadius: 4
+            }, {
+              label: 'Tidak Berlistrik',
+              data: elektrifikasiData.map(d => d.desa_belum ?? 0),
+              backgroundColor: tidakBerlistrikColor,
               borderRadius: 4
             }]
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return context.dataset.label + ': ' + context.parsed.y + ' desa';
+                  }
+                }
+              }
+            },
             scales: {
               x: {
                 grid: { display: false },
                 ticks: { color: '#64748B', font: { size: 10 }, maxRotation: 45, minRotation: 45 }
               },
               y: { grid: { color: 'rgba(148,163,184,0.12)' }, ticks: { color: '#94A3B8' } }
+            }
+          }
+        });
+      }
+
+      // ===== PIE CHART (Status Keterlayanan) =====
+      const pieCtx = document.getElementById('statusPieChart')?.getContext('2d');
+      if (pieCtx) {
+        new Chart(pieCtx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Berlistrik PLN', 'Berlistrik Non-PLN', 'Tidak Berlistrik'],
+            datasets: [{
+              data: [
+                {{ $totalDesaBerlistrikPln }},
+                {{ $totalDesaBerlistrikNonPln }},
+                {{ $totalDesaBelum }}
+              ],
+              backgroundColor: ['#22c55e', '#f59e0b', '#ef4444'],
+              borderWidth: 2,
+              borderColor: '#fff'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '60%',
+            plugins: {
+              legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                  usePointStyle: true,
+                  pointStyle: 'circle',
+                  padding: 16,
+                  font: { size: 11 },
+                  color: '#374151'
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                    const pct = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
+                    return context.label + ': ' + context.parsed.toLocaleString('id-ID') + ' (' + pct + '%)';
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // ===== PIE CHART (Gardu per Perusahaan) =====
+      const garduPerusahaanCtx = document.getElementById('garduPerusahaanChart')?.getContext('2d');
+      if (garduPerusahaanCtx) {
+        const garduPerusahaanData = {!! json_encode($garduPerPerusahaan->values()) !!};
+        const garduLabels = garduPerusahaanData.map(item => item.nama);
+        const garduValues = garduPerusahaanData.map(item => item.total);
+        
+        // Generate vibrant colors for each company
+        const garduColors = [
+          '#3B82F6', // Blue
+          '#10B981', // Green
+          '#F59E0B', // Orange
+          '#8B5CF6', // Purple
+          '#EF4444', // Red
+          '#06B6D4', // Cyan
+        ];
+
+        new Chart(garduPerusahaanCtx, {
+          type: 'doughnut',
+          data: {
+            labels: garduLabels,
+            datasets: [{
+              data: garduValues,
+              backgroundColor: garduColors.slice(0, garduLabels.length),
+              borderWidth: 2,
+              borderColor: '#fff'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '60%',
+            plugins: {
+              legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                  usePointStyle: true,
+                  pointStyle: 'circle',
+                  padding: 16,
+                  font: { size: 11 },
+                  color: '#374151'
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                    const pct = total > 0 ? ((context.parsed / total) * 100).toFixed(1) : 0;
+                    return context.label + ': ' + context.parsed + ' gardu (' + pct + '%)';
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // ===== BAR CHART (Jaringan per Perusahaan) =====
+      const jaringanPerusahaanCtx = document.getElementById('jaringanPerusahaanChart')?.getContext('2d');
+      if (jaringanPerusahaanCtx) {
+        const jaringanPerusahaanData = {!! json_encode($jaringanPerPerusahaan->values()) !!};
+        const jaringanLabels = jaringanPerusahaanData.map(item => item.nama);
+        const jaringanValues = jaringanPerusahaanData.map(item => item.total_km);
+
+        new Chart(jaringanPerusahaanCtx, {
+          type: 'bar',
+          data: {
+            labels: jaringanLabels,
+            datasets: [{
+              label: 'Panjang Jaringan (km)',
+              data: jaringanValues,
+              backgroundColor: 'rgba(16, 185, 129, 0.8)',
+              borderColor: '#10B981',
+              borderWidth: 1,
+              borderRadius: 6
+            }]
+          },
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return context.parsed.x.toFixed(2) + ' km';
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                beginAtZero: true,
+                grid: { color: 'rgba(148,163,184,0.12)' },
+                ticks: { 
+                  color: '#94A3B8',
+                  callback: function(value) {
+                    return value + ' km';
+                  }
+                }
+              },
+              y: {
+                grid: { display: false },
+                ticks: { 
+                  color: '#64748B',
+                  font: { size: 11 }
+                }
+              }
             }
           }
         });

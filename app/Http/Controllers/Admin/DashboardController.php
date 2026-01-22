@@ -54,6 +54,8 @@ class DashboardController extends Controller
             return [
                 'name' => $item->kabupaten_kota,
                 'desa_berlistrik' => $item->desa_berlistrik_jumlah,
+                'desa_berlistrik_pln' => $item->desa_berlistrik_pln,
+                'desa_berlistrik_non_pln' => $item->desa_berlistrik_non_pln,
                 'desa_belum' => $item->desa_belum_berlistrik,
                 'kk_berlistrik' => $item->kk_berlistrik_jumlah,
                 'total_kk' => $item->jumlah_kk,
@@ -81,6 +83,8 @@ class DashboardController extends Controller
         $totalStats = RekapElektrifikasi::getTotalByYear($latestYear);
         if ($totalStats) {
             $totalDesaBerlistrik = $totalStats['desa_berlistrik_jumlah'];
+            $totalDesaBerlistrikPln = $totalStats['desa_berlistrik_pln'];
+            $totalDesaBerlistrikNonPln = $totalStats['desa_berlistrik_non_pln'];
             $totalDesaBelum = $totalStats['desa_belum_berlistrik'];
             $totalKK = $totalStats['jumlah_kk'];
             $totalKKBerlistrik = $totalStats['kk_berlistrik_jumlah'];
@@ -88,6 +92,8 @@ class DashboardController extends Controller
             $totalDesaRekap = $totalStats['jumlah_desa'];
         } else {
             $totalDesaBerlistrik = collect($elektrifikasiData)->sum('desa_berlistrik');
+            $totalDesaBerlistrikPln = collect($elektrifikasiData)->sum('desa_berlistrik_pln');
+            $totalDesaBerlistrikNonPln = collect($elektrifikasiData)->sum('desa_berlistrik_non_pln');
             $totalDesaBelum = collect($elektrifikasiData)->sum('desa_belum');
             $totalKK = collect($elektrifikasiData)->sum('total_kk');
             $totalKKBerlistrik = collect($elektrifikasiData)->sum('kk_berlistrik');
@@ -115,6 +121,70 @@ class DashboardController extends Controller
             ->get();
 
         // ==========================================
+        // INFRASTRUKTUR PER PERUSAHAAN
+        // ==========================================
+        // Get all companies with their infrastructure counts
+        $perusahaanWithInfrastruktur = Perusahaan::with(['gardus', 'infrastrukturJaringans', 'pembangkitLokals'])
+            ->get()
+            ->map(function ($perusahaan) {
+                return [
+                    'id' => $perusahaan->id,
+                    'nama' => $perusahaan->nama,
+                    'jenis_usaha' => $perusahaan->jenis_usaha,
+                    'kabupaten_kota' => $perusahaan->kabupaten_kota,
+                    'total_gardu' => $perusahaan->gardus->count(),
+                    'total_jaringan_km' => $perusahaan->infrastrukturJaringans->sum('panjang_jaringan'),
+                    'total_pembangkit' => $perusahaan->pembangkitLokals->count(),
+                    'total_infrastruktur' => $perusahaan->gardus->count() + 
+                                            $perusahaan->infrastrukturJaringans->count() + 
+                                            $perusahaan->pembangkitLokals->count(),
+                ];
+            })
+            ->sortByDesc('total_infrastruktur')
+            ->values();
+
+        // Top 5 companies by infrastructure count
+        $topPerusahaan = $perusahaanWithInfrastruktur->take(5);
+
+        // Gardu per perusahaan (for pie chart)
+        $garduPerPerusahaan = Perusahaan::withCount('gardus')
+            ->having('gardus_count', '>', 0)
+            ->get()
+            ->map(function ($p) {
+                return [
+                    'nama' => $p->nama,
+                    'total' => $p->gardus_count,
+                ];
+            });
+
+        // Jaringan per perusahaan (for bar chart)
+        $jaringanPerPerusahaan = Perusahaan::with('infrastrukturJaringans')
+            ->get()
+            ->map(function ($p) {
+                $totalKm = $p->infrastrukturJaringans->sum('panjang_jaringan');
+                return [
+                    'nama' => $p->nama,
+                    'total_km' => round($totalKm, 2),
+                ];
+            })
+            ->filter(function ($item) {
+                return $item['total_km'] > 0;
+            })
+            ->sortByDesc('total_km')
+            ->values();
+
+        // Pembangkit per perusahaan
+        $pembangkitPerPerusahaan = Perusahaan::withCount('pembangkitLokals')
+            ->having('pembangkit_lokals_count', '>', 0)
+            ->get()
+            ->map(function ($p) {
+                return [
+                    'nama' => $p->nama,
+                    'total' => $p->pembangkit_lokals_count,
+                ];
+            });
+
+        // ==========================================
         // TREND DATA (12 bulan terakhir - data statis)
         // ==========================================
         $trendLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
@@ -135,6 +205,8 @@ class DashboardController extends Controller
             'totalKecamatan' => $totalKecamatan,
             'totalDesa' => $totalDesaRekap ?? $totalDesa,
             'totalDesaBerlistrik' => $totalDesaBerlistrik,
+            'totalDesaBerlistrikPln' => $totalDesaBerlistrikPln,
+            'totalDesaBerlistrikNonPln' => $totalDesaBerlistrikNonPln,
             'totalDesaBelum' => $totalDesaBelum,
             'rasioElektrifikasi' => $rasioElektrifikasi,
             'totalKK' => $totalKK,
@@ -146,6 +218,12 @@ class DashboardController extends Controller
             'totalPerusahaan' => $totalPerusahaan,
             'garduPerJenis' => $garduPerJenis,
             'jaringanPerTipe' => $jaringanPerTipe,
+            // Company-Infrastructure Data
+            'perusahaanWithInfrastruktur' => $perusahaanWithInfrastruktur,
+            'topPerusahaan' => $topPerusahaan,
+            'garduPerPerusahaan' => $garduPerPerusahaan,
+            'jaringanPerPerusahaan' => $jaringanPerPerusahaan,
+            'pembangkitPerPerusahaan' => $pembangkitPerPerusahaan,
             // Data per Kabupaten
             'elektrifikasiData' => $elektrifikasiData,
             'regencies' => $regencies,

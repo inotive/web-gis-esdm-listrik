@@ -20,6 +20,7 @@ class DataBerlistrik extends Model
         'WADMKK',
         'WADMPR',
         'H_Survei',
+        'sumber_listrik',
     ];
 
     protected $casts = [
