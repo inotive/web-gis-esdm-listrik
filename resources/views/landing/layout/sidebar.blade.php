@@ -16,13 +16,13 @@
 <aside class="sidebar" aria-label="Sidebar navigasi">
     <!-- Topbar di dalam sidebar (sinkron dgn header) -->
     <div class="sidebar-topbar">
-        <div class="brand">
+        <a href="{{ route('admin.dashboard') }}" class="brand" style="text-decoration: none; color: inherit;">
             <img class="logo" src="{{ asset('assets/media/logos/logo.png') }}" alt="Logo Dinas ESDM" />
             <div class="brand-text">
                 <strong>Dinas ESDM</strong>
                 <span>Provinsi Kalimantan Timur</span>
             </div>
-        </div>
+        </a>
     </div>
 
     <!-- Menu utama -->
@@ -49,10 +49,12 @@
         </a>
 
 
+        @if (!in_array($userRole ?? null, ['desa', 'perusahaan']))
         <a class="menu-item {{ nav_active('admin.permohonan.*') }}" href="{{ route('admin.permohonan.index') }}">
             <span class="menu-icon"><i class="ri-file-list-3-line" aria-hidden="true"></i></span>
             <span class="menu-label">Perizinan dan Permohonan</span>
         </a>
+        @endif
 
          <a class="menu-item {{ nav_active('admin.rekap-data.*') }}" href="{{ route('admin.rekap-data.index') }}">
             <span class="menu-icon"><i class="ri-file-text-line" aria-hidden="true"></i></span>
@@ -86,9 +88,12 @@
     </nav>
 
     <!-- separator -->
+    @if (!in_array($userRole ?? null, ['desa', 'perusahaan']))
     <hr class="menu-sep" />
+    @endif
 
     <!-- Konfigurasi -->
+    @if (!in_array($userRole ?? null, ['desa', 'perusahaan']))
     <nav class="menu-section" aria-label="Konfigurasi">
         <div class="menu-title">Konfigurasi</div>
 
@@ -148,4 +153,5 @@
         </a>
         @endcan
     </nav>
+    @endif
 </aside>

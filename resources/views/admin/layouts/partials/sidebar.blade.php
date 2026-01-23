@@ -16,13 +16,13 @@
 <aside class="sidebar" aria-label="Sidebar navigasi">
     <!-- Topbar di dalam sidebar (sinkron dgn header) -->
     <div class="sidebar-topbar">
-        <div class="brand">
+        <a href="{{ route('admin.dashboard') }}" class="brand" style="text-decoration: none; color: inherit;">
             <img class="logo" src="{{ asset('assets/media/logos/logo.png') }}" alt="Logo Dinas ESDM" />
             <div class="brand-text">
                 <strong>Dinas ESDM</strong>
                 <span>Provinsi Kalimantan Timur</span>
             </div>
-        </div>
+        </a>
     </div>
 
     <!-- Menu utama -->

@@ -21,7 +21,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        View::composer('admin.layouts.partials.sidebar', function ($view) {
+        // Share userRole, shouldShowMenu, and permohonans with both admin and landing sidebars
+        View::composer(['admin.layouts.partials.sidebar', 'landing.layout.sidebar'], function ($view) {
             $user = auth()->user();
             $userRole = $user?->roles()->first()?->name ?? null;
 

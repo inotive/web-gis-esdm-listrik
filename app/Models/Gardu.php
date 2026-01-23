@@ -14,7 +14,16 @@ class Gardu extends Model
         'lokasi',
         'jenis_gardu_distribusi',
         'wilayah_id',
+        'perusahaan_id',
     ];
+
+    /**
+     * Relasi ke perusahaan
+     */
+    public function perusahaan()
+    {
+        return $this->belongsTo(Perusahaan::class, 'perusahaan_id', 'id');
+    }
 
     /**
      * Relasi ke wilayah

@@ -59,4 +59,28 @@ class Perusahaan extends Model
     {
         return $this->hasMany(Perizinan::class, 'perusahaan_id');
     }
+
+    /**
+     * Relationship: Perusahaan memiliki banyak Gardu
+     */
+    public function gardus(): HasMany
+    {
+        return $this->hasMany(Gardu::class, 'perusahaan_id');
+    }
+
+    /**
+     * Relationship: Perusahaan memiliki banyak InfrastrukturJaringan
+     */
+    public function infrastrukturJaringans(): HasMany
+    {
+        return $this->hasMany(InfrastrukturJaringan::class, 'perusahaan_id');
+    }
+
+    /**
+     * Relationship: Perusahaan memiliki banyak PembangkitLokal
+     */
+    public function pembangkitLokals(): HasMany
+    {
+        return $this->hasMany(PembangkitLokal::class, 'perusahaan_id');
+    }
 }

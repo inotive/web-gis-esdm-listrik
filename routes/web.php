@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\PublicRegionController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -46,6 +48,13 @@ use App\Models\PembangkitLokal;
 */
 
 Route::get('login', [LoginController::class, 'show'])->middleware('guest')->name('login');
+Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+Route::post('register', [RegisterController::class, 'register'])->name('register.perform');
+
+// Public Region API for Registration
+Route::get('/ajax/regions/regencies', [PublicRegionController::class, 'regencies'])->name('ajax.regions.regencies');
+Route::get('/ajax/regions/districts', [PublicRegionController::class, 'districts'])->name('ajax.regions.districts');
+Route::get('/ajax/regions/villages', [PublicRegionController::class, 'villages'])->name('ajax.regions.villages');
 Route::post('login', [LoginController::class, 'login'])->name('login-post');
 
 Route::get('/', [HomeController::class, 'index']);

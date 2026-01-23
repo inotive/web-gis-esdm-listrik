@@ -705,6 +705,33 @@
             line-height: 1.6;
         }
 
+        /* Clickable step card */
+        .step-card-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .step-card-link:hover {
+            transform: translateY(-8px);
+        }
+
+        .step-card-link .step-card {
+            cursor: pointer;
+        }
+
+        .step-card-link:hover .step-icon-wrapper {
+            border-color: var(--primary);
+            background-color: var(--primary);
+            color: var(--white);
+            box-shadow: 0 8px 24px rgba(5, 150, 105, 0.3);
+        }
+
+        .step-card-link:hover .step-text {
+            color: var(--primary);
+        }
+
         /* FAQ Section */
         .faq-section {
             background-color: var(--gray-50);
@@ -975,28 +1002,32 @@
 
             <div class="steps-grid">
                 <!-- Step 1 -->
-                <div class="step-card">
-                    <div class="step-icon-container">
-                        <div class="step-icon-wrapper">
-                            <i class="ri-login-circle-line"></i>
+                <a href="{{ route('login') }}" class="step-card-link">
+                    <div class="step-card">
+                        <div class="step-icon-container">
+                            <div class="step-icon-wrapper">
+                                <i class="ri-login-circle-line"></i>
+                            </div>
+                            <div class="step-number">1</div>
                         </div>
-                        <div class="step-number">1</div>
+                        {{-- <h3 class="step-title">Masuk ke sistem</h3> --}}
+                        <p class="step-text">Login sebagai Desa/Perusahaan</p>
                     </div>
-                    {{-- <h3 class="step-title">Masuk ke sistem</h3> --}}
-                    <p class="step-text">Login sebagai Desa/Perusahaan</p>
-                </div>
+                </a>
 
                 <!-- Step 2 -->
-                <div class="step-card">
-                    <div class="step-icon-container">
-                        <div class="step-icon-wrapper">
-                            <i class="ri-cursor-line"></i>
+                <a href="{{ route('admin.dashboard') }}" class="step-card-link">
+                    <div class="step-card">
+                        <div class="step-icon-container">
+                            <div class="step-icon-wrapper">
+                                <i class="ri-cursor-line"></i>
+                            </div>
+                            <div class="step-number">2</div>
                         </div>
-                        <div class="step-number">2</div>
+                        {{-- <h3 class="step-title">Isi Formulir</h3> --}}
+                        <p class="step-text">Pilih layanan ESDM.</p>
                     </div>
-                    {{-- <h3 class="step-title">Isi Formulir</h3> --}}
-                    <p class="step-text">Pilih layanan ESDM.</p>
-                </div>
+                </a>
 
                 <!-- Step 3 -->
                 <div class="step-card">

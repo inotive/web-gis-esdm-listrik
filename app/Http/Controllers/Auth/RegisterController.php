@@ -28,7 +28,7 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/admin/dashboard';
 
     /**
      * Create a new controller instance.
@@ -50,8 +50,14 @@ class RegisterController extends Controller
     {
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:255', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'identity_type' => ['required', 'string', 'in:desa,perusahaan'],
+            'jabatan' => ['required', 'string', 'max:255'],
+            'phone' => ['required', 'string', 'max:20', 'regex:/^[0-9+\-\s()]+$/'],
+            'address' => ['required', 'string'],
+            'village_id' => ['required', 'exists:reg_villages,id'],
         ]);
     }
 
@@ -63,10 +69,24 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
+        $user = User::create([
             'name' => $data['name'],
+            'username' => $data['username'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+            'jabatan' => $data['jabatan'],
+            'phone' => $data['phone'],
+            'address' => $data['address'],
+            'village_id' => $data['village_id'],
+            'identity_type' => $data['identity_type'],
+            'status' => 'aktif',
         ]);
+
+        // Assign role (pastikan role sudah ada di database)
+        if (isset($data['identity_type'])) {
+            $user->assignRole($data['identity_type']);
+        }
+
+        return $user;
     }
 }

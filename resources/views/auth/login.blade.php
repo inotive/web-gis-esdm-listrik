@@ -397,6 +397,23 @@
                     height: 50px;
                 }
             }
+
+            .login-link {
+                text-align: center;
+                margin-top: 24px;
+                font-size: 15px;
+                color: var(--gray-600);
+            }
+
+            .login-link a {
+                color: var(--primary);
+                text-decoration: none;
+                font-weight: 600;
+            }
+
+            .login-link a:hover {
+                text-decoration: underline;
+            }
         </style>
     </head>
 
@@ -450,6 +467,10 @@
                         <button type="submit" class="login-button">
                             <span>Masuk Sekarang</span>
                         </button>
+
+                        <div class="login-link">
+                            Belum memiliki akun? <a href="{{ route('register') }}">Daftar</a>
+                        </div>
 
                         <div style="text-align: center;">
                             <a href="{{ url('/') }}" class="back-link">
