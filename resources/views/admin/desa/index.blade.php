@@ -548,7 +548,70 @@
       gap: 12px;
     }
   }
+  
+  /* ========== Map Visualization Styles ========== */
+  #map {
+    height: 450px;
+    width: 100%;
+    border-radius: 12px;
+    z-index: 1;
+  }
+  
+  .map-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #F1F1F4;
+    padding: 20px;
+    margin-top: 18px;
+    margin-bottom: 18px;
+  }
+  
+  .map-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  
+  .map-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #252F4A;
+  }
+  
+  .map-subtitle {
+    font-size: 13px;
+    color: #78829D;
+    margin-top: 4px;
+  }
+  
+  .legend-container {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #F1F1F4;
+  }
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #4B5675;
+    font-weight: 500;
+  }
+  
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
 </style>
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
 @endpush
 
 @section('content')
@@ -568,6 +631,30 @@
       </button>
     </div>
   </div>
+
+  {{-- Map Visualization Section --}}
+  <section class="map-card">
+    <div class="map-header">
+      <div>
+        <div class="map-title">Visualisasi Status Kelistrikan Desa</div>
+        <div class="map-subtitle">Peta sebaran desa berdasarkan status kelistrikan (PLN, Non-PLN, Tidak Berlistrik)</div>
+      </div>
+    </div>
+    
+    <div id="map"></div>
+    
+    <div class="legend-container">
+      <div class="legend-item">
+        <span class="legend-dot" style="background: #2AAD27;"></span> Berlistrik PLN
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot" style="background: #FFD326;"></span> Berlistrik Non-PLN
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot" style="background: #CB2B3E;"></span> Tidak Berlistrik
+      </div>
+    </div>
+  </section>
 
   <section class="card" style="margin-top:18px;">
     <div class="card-header">
@@ -684,9 +771,87 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <!-- Select2 JS -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
+    // ========== Initialize Leaflet Map ==========
+    if (document.getElementById('map')) {
+      var map = L.map('map').setView([-0.502106, 117.153709], 7);
+      
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap'
+      }).addTo(map);
+      
+      // Define colored icons
+      var greenIcon = new L.Icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+      });
+      
+      var yellowIcon = new L.Icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-gold.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+      });
+      
+      var redIcon = new L.Icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
+      });
+      
+      function getIcon(color) {
+        if (color === 'green') return greenIcon;
+        if (color === 'yellow') return yellowIcon;
+        if (color === 'red') return redIcon;
+        return greenIcon;
+      }
+      
+      // Fetch perizinan data
+      fetch("{{ route('admin.perizinan.map-data') }}")
+        .then(response => response.json())
+        .then(data => {
+          console.log("Map data loaded:", data.length);
+          
+          data.forEach(item => {
+            if (item.lat && item.lng) {
+              var popupContent = `
+                <div style="text-align:center; min-width: 160px;">
+                  <h4 style="margin:0 0 5px 0; font-size:15px; font-weight:700;">${item.title}</h4>
+                  <div style="font-size:12px; color:#555; margin-bottom:8px;">${item.lokasi || '-'}</div>
+                  <hr style="margin:6px 0; border-top:1px solid #eee;">
+                  <div style="margin-top:8px;">
+                    <span style="
+                      display:inline-block;
+                      background:${item.color === 'green' ? '#d1fae5' : (item.color === 'yellow' ? '#fef3c7' : '#fee2e2')};
+                      color:${item.color === 'green' ? '#065f46' : (item.color === 'yellow' ? '#92400e' : '#991b1b')};
+                      padding:4px 8px; border-radius:4px; font-size:11px; font-weight:bold;">
+                      ${item.status_label}
+                    </span>
+                  </div>
+                  <div style="margin-top:12px;">
+                    <a href="/admin/perizinan/${item.id}" style="
+                      color:#2563EB; font-size:12px; font-weight:600; text-decoration:none;
+                      display:inline-flex; align-items:center; gap:4px;">
+                      Lihat Detail &rarr;
+                    </a>
+                  </div>
+                </div>
+              `;
+              
+              L.marker([item.lat, item.lng], {icon: getIcon(item.color)})
+                .bindPopup(popupContent)
+                .addTo(map);
+            }
+          });
+        })
+        .catch(error => console.error('Error loading map data:', error));
+    }
+    
     // ========== SweetAlert Notifications ==========
     @if(session('success'))
       Swal.fire({

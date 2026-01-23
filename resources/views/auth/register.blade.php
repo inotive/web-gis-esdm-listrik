@@ -205,6 +205,39 @@
                 color: var(--gray-500);
             }
 
+            .validation-feedback {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 13px;
+                margin-top: 6px;
+                font-weight: 500;
+            }
+
+            .validation-feedback.success {
+                color: #059669;
+            }
+
+            .validation-feedback.error {
+                color: #DC2626;
+            }
+
+            .validation-feedback.warning {
+                color: #F59E0B;
+            }
+
+            .form-input.valid {
+                border-color: #059669;
+            }
+
+            .form-input.invalid {
+                border-color: #DC2626;
+            }
+
+            .validation-icon {
+                font-size: 16px;
+            }
+
             .role-selector {
                 display: flex;
                 gap: 24px;
@@ -324,7 +357,8 @@
 
                         <div class="form-group">
                             <label class="form-label">Username</label>
-                            <input class="form-input" type="text" name="username" placeholder="Masukkan Username" required />
+                            <input class="form-input" type="text" name="username" id="username" placeholder="Masukkan Username" required />
+                            <div id="usernameValidation" class="validation-feedback" style="display:none;"></div>
                         </div>
 
                         <div class="form-group">
@@ -334,7 +368,8 @@
 
                         <div class="form-group">
                             <label class="form-label">Email</label>
-                            <input class="form-input" type="email" name="email" placeholder="email@mail.com" required />
+                            <input class="form-input" type="email" name="email" id="email" placeholder="email@mail.com" required />
+                            <div id="emailValidation" class="validation-feedback" style="display:none;"></div>
                         </div>
 
                         <div class="form-group">
@@ -372,21 +407,23 @@
                         <div class="form-group">
                             <label class="form-label">Kata Sandi</label>
                             <div class="password-wrapper">
-                                <input class="form-input" type="password" name="password" id="password" required minlength="8" />
+                                <input class="form-input" type="password" name="password" id="password" placeholder="Minimal 8 karakter" required minlength="8" />
                                 <div class="password-toggle" onclick="togglePassword('password')">
                                     <i class="ri-eye-off-line"></i>
                                 </div>
                             </div>
+                            <div id="passwordValidation" class="validation-feedback" style="display:none;"></div>
                         </div>
 
                         <div class="form-group">
                             <label class="form-label">Ulangi Kata Sandi</label>
                             <div class="password-wrapper">
-                                <input class="form-input" type="password" name="password_confirmation" id="password_confirm" required minlength="8" />
+                                <input class="form-input" type="password" name="password_confirmation" id="password_confirm" placeholder="Ulangi kata sandi" required minlength="8" />
                                 <div class="password-toggle" onclick="togglePassword('password_confirm')">
                                     <i class="ri-eye-off-line"></i>
                                 </div>
                             </div>
+                            <div id="passwordConfirmValidation" class="validation-feedback" style="display:none;"></div>
                         </div>
 
                         <button type="submit" class="login-button">
@@ -427,13 +464,18 @@
 
             function togglePassword(id) {
                 const input = document.getElementById(id);
-                const icon = input.nextElementSibling.querySelector('i');
+                const wrapper = input.parentElement;
+                const toggleBtn = wrapper.querySelector('.password-toggle');
+                const icon = toggleBtn.querySelector('i');
+                
                 if (input.type === 'password') {
                     input.type = 'text';
-                    icon.classList.replace('ri-eye-off-line', 'ri-eye-line');
+                    icon.classList.remove('ri-eye-off-line');
+                    icon.classList.add('ri-eye-line');
                 } else {
                     input.type = 'password';
-                    icon.classList.replace('ri-eye-line', 'ri-eye-off-line');
+                    icon.classList.remove('ri-eye-line');
+                    icon.classList.add('ri-eye-off-line');
                 }
             }
 
@@ -488,6 +530,271 @@
                         });
                 } else {
                     villageSelect.disabled = true;
+                }
+            });
+
+            // ========== LIVE VALIDATION ==========
+            
+            // Username validation
+            const usernameInput = document.getElementById('username');
+            const usernameValidation = document.getElementById('usernameValidation');
+            let usernameTimeout;
+            let usernameValid = false;
+
+            usernameInput.addEventListener('input', function() {
+                const username = this.value.trim();
+                
+                // Clear previous timeout
+                clearTimeout(usernameTimeout);
+                
+                // Reset if empty
+                if (username.length === 0) {
+                    usernameValidation.style.display = 'none';
+                    this.classList.remove('valid', 'invalid');
+                    usernameValid = false;
+                    return;
+                }
+
+                // Check minimum length
+                if (username.length < 3) {
+                    showValidation(usernameValidation, 'error', 'Username minimal 3 karakter');
+                    this.classList.remove('valid');
+                    this.classList.add('invalid');
+                    usernameValid = false;
+                    return;
+                }
+
+                // Check format (alphanumeric and underscore only)
+                const usernameRegex = /^[a-zA-Z0-9_]+$/;
+                if (!usernameRegex.test(username)) {
+                    showValidation(usernameValidation, 'error', 'Username hanya boleh huruf, angka, dan underscore');
+                    this.classList.remove('valid');
+                    this.classList.add('invalid');
+                    usernameValid = false;
+                    return;
+                }
+
+                // Show loading
+                showValidation(usernameValidation, 'warning', 'Memeriksa ketersediaan...');
+                this.classList.remove('valid', 'invalid');
+
+                // Debounce AJAX call
+                usernameTimeout = setTimeout(() => {
+                    fetch(`/api/check-username?username=${encodeURIComponent(username)}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.available) {
+                                showValidation(usernameValidation, 'success', '✓ Username tersedia');
+                                usernameInput.classList.remove('invalid');
+                                usernameInput.classList.add('valid');
+                                usernameValid = true;
+                            } else {
+                                showValidation(usernameValidation, 'error', '✗ Username sudah digunakan');
+                                usernameInput.classList.remove('valid');
+                                usernameInput.classList.add('invalid');
+                                usernameValid = false;
+                            }
+                        })
+                        .catch(err => {
+                            showValidation(usernameValidation, 'error', 'Gagal memeriksa username');
+                            usernameInput.classList.remove('valid', 'invalid');
+                            usernameValid = false;
+                        });
+                }, 500);
+            });
+
+            // Email validation
+            const emailInput = document.getElementById('email');
+            const emailValidation = document.getElementById('emailValidation');
+            let emailTimeout;
+            let emailValid = false;
+
+            emailInput.addEventListener('input', function() {
+                const email = this.value.trim();
+                
+                // Clear previous timeout
+                clearTimeout(emailTimeout);
+                
+                // Reset if empty
+                if (email.length === 0) {
+                    emailValidation.style.display = 'none';
+                    this.classList.remove('valid', 'invalid');
+                    emailValid = false;
+                    return;
+                }
+
+                // Check email format
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    showValidation(emailValidation, 'error', 'Format email tidak valid');
+                    this.classList.remove('valid');
+                    this.classList.add('invalid');
+                    emailValid = false;
+                    return;
+                }
+
+                // Show loading
+                showValidation(emailValidation, 'warning', 'Memeriksa ketersediaan...');
+                this.classList.remove('valid', 'invalid');
+
+                // Debounce AJAX call
+                emailTimeout = setTimeout(() => {
+                    fetch(`/api/check-email?email=${encodeURIComponent(email)}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.available) {
+                                showValidation(emailValidation, 'success', '✓ Email tersedia');
+                                emailInput.classList.remove('invalid');
+                                emailInput.classList.add('valid');
+                                emailValid = true;
+                            } else {
+                                showValidation(emailValidation, 'error', '✗ Email sudah terdaftar');
+                                emailInput.classList.remove('valid');
+                                emailInput.classList.add('invalid');
+                                emailValid = false;
+                            }
+                        })
+                        .catch(err => {
+                            showValidation(emailValidation, 'error', 'Gagal memeriksa email');
+                            emailInput.classList.remove('valid', 'invalid');
+                            emailValid = false;
+                        });
+                }, 500);
+            });
+
+            // Password validation
+            const passwordInput = document.getElementById('password');
+            const passwordValidation = document.getElementById('passwordValidation');
+            const passwordConfirmInput = document.getElementById('password_confirm');
+            const passwordConfirmValidation = document.getElementById('passwordConfirmValidation');
+            let passwordValid = false;
+            let passwordConfirmValid = false;
+
+            passwordInput.addEventListener('input', function() {
+                const password = this.value;
+                
+                if (password.length === 0) {
+                    passwordValidation.style.display = 'none';
+                    this.classList.remove('valid', 'invalid');
+                    passwordValid = false;
+                    return;
+                }
+
+                // Check minimum length
+                if (password.length < 8) {
+                    showValidation(passwordValidation, 'error', 'Password minimal 8 karakter');
+                    this.classList.remove('valid');
+                    this.classList.add('invalid');
+                    passwordValid = false;
+                    return;
+                }
+
+                // Check for at least one letter and one number
+                const hasLetter = /[a-zA-Z]/.test(password);
+                const hasNumber = /[0-9]/.test(password);
+
+                if (!hasLetter || !hasNumber) {
+                    showValidation(passwordValidation, 'warning', 'Password harus kombinasi huruf dan angka');
+                    this.classList.remove('valid');
+                    this.classList.add('invalid');
+                    passwordValid = false;
+                    return;
+                }
+
+                // Password is strong
+                showValidation(passwordValidation, 'success', '✓ Password kuat');
+                this.classList.remove('invalid');
+                this.classList.add('valid');
+                passwordValid = true;
+
+                // Re-validate password confirmation if it has value
+                if (passwordConfirmInput.value.length > 0) {
+                    passwordConfirmInput.dispatchEvent(new Event('input'));
+                }
+            });
+
+            // Password confirmation validation
+            passwordConfirmInput.addEventListener('input', function() {
+                const password = passwordInput.value;
+                const passwordConfirm = this.value;
+                
+                if (passwordConfirm.length === 0) {
+                    passwordConfirmValidation.style.display = 'none';
+                    this.classList.remove('valid', 'invalid');
+                    passwordConfirmValid = false;
+                    return;
+                }
+
+                if (password !== passwordConfirm) {
+                    showValidation(passwordConfirmValidation, 'error', '✗ Password tidak cocok');
+                    this.classList.remove('valid');
+                    this.classList.add('invalid');
+                    passwordConfirmValid = false;
+                } else {
+                    showValidation(passwordConfirmValidation, 'success', '✓ Password cocok');
+                    this.classList.remove('invalid');
+                    this.classList.add('valid');
+                    passwordConfirmValid = true;
+                }
+            });
+
+            // Helper function to show validation message
+            function showValidation(element, type, message) {
+                element.style.display = 'flex';
+                element.className = `validation-feedback ${type}`;
+                
+                let icon = '';
+                if (type === 'success') icon = '<i class="ri-checkbox-circle-fill validation-icon"></i>';
+                else if (type === 'error') icon = '<i class="ri-close-circle-fill validation-icon"></i>';
+                else if (type === 'warning') icon = '<i class="ri-loader-4-line validation-icon"></i>';
+                
+                element.innerHTML = icon + '<span>' + message + '</span>';
+            }
+
+            // Form submit validation
+            document.getElementById('registerForm').addEventListener('submit', function(e) {
+                if (!usernameValid) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Username Tidak Valid',
+                        text: 'Pastikan username tersedia dan valid',
+                        confirmButtonColor: '#059669'
+                    });
+                    return false;
+                }
+
+                if (!emailValid) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Email Tidak Valid',
+                        text: 'Pastikan email valid dan belum terdaftar',
+                        confirmButtonColor: '#059669'
+                    });
+                    return false;
+                }
+
+                if (!passwordValid) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Password Tidak Valid',
+                        text: 'Password harus minimal 8 karakter dengan kombinasi huruf dan angka',
+                        confirmButtonColor: '#059669'
+                    });
+                    return false;
+                }
+
+                if (!passwordConfirmValid) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Password Tidak Cocok',
+                        text: 'Pastikan password dan konfirmasi password sama',
+                        confirmButtonColor: '#059669'
+                    });
+                    return false;
                 }
             });
 

@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\PendingVerificationController;
 use App\Http\Controllers\PublicRegionController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LandingPageController;
@@ -57,6 +58,25 @@ Route::get('/ajax/regions/districts', [PublicRegionController::class, 'districts
 Route::get('/ajax/regions/villages', [PublicRegionController::class, 'villages'])->name('ajax.regions.villages');
 Route::post('login', [LoginController::class, 'login'])->name('login-post');
 
+// Pending Verification Page (accessible to authenticated but unverified users)
+Route::get('/pending-verification', [PendingVerificationController::class, 'index'])
+    ->middleware('auth')
+    ->name('pending-verification');
+
+// API: Check username availability
+Route::get('/api/check-username', function(Illuminate\Http\Request $request) {
+    $username = $request->query('username');
+    $exists = \App\Models\User::where('username', $username)->exists();
+    return response()->json(['available' => !$exists]);
+});
+
+// API: Check email availability
+Route::get('/api/check-email', function(Illuminate\Http\Request $request) {
+    $email = $request->query('email');
+    $exists = \App\Models\User::where('email', $email)->exists();
+    return response()->json(['available' => !$exists]);
+});
+
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/', function () {
     $infrastrukturCount = InfrastrukturJaringan::count();
@@ -75,7 +95,7 @@ Route::get('/home', function () {
 Route::get('/landing', [LandingPageController::class, 'index'])
     ->name('landing');
 
-Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], function () {
+Route::group(['middleware' => ['auth', 'verified_user'], 'as' => 'admin.', 'prefix' => 'admin'], function () {
 
     Route::group(['middleware' => [], 'as' => 'profile.', 'prefix' => 'profile'], function () {
         Route::get('profile/{profile}', [ProfileController::class, 'profile'])->name('index');
@@ -104,6 +124,8 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
         // User Management
         Route::middleware('can:user.view')->group(function () {
             Route::resource('user', UserController::class)->except('show');
+            Route::post('user/{user}/approve', [UserController::class, 'approve'])->name('user.approve');
+            Route::post('user/{user}/reject', [UserController::class, 'reject'])->name('user.reject');
         });
     });
     // Data Wilayah
@@ -233,6 +255,7 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
         Route::get('/', [PerizinanController::class, 'index'])->name('index');
         Route::get('/create', [PerizinanController::class, 'create'])->name('create');
         Route::post('/', [PerizinanController::class, 'store'])->name('store');
+        Route::get('/api/map-data', [PerizinanController::class, 'getMapData'])->name('map-data');
         Route::get('/{perizinan}', [PerizinanController::class, 'show'])->name('show');
         Route::get('/{perizinan}/edit', [PerizinanController::class, 'edit'])->name('edit');
         Route::put('/{perizinan}', [PerizinanController::class, 'update'])->name('update');

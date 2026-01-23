@@ -16,7 +16,7 @@
 <aside class="sidebar" aria-label="Sidebar navigasi">
     <!-- Topbar di dalam sidebar (sinkron dgn header) -->
     <div class="sidebar-topbar">
-        <a href="{{ route('admin.dashboard') }}" class="brand" style="text-decoration: none; color: inherit;">
+        <a href="{{ url('/') }}" class="brand" style="text-decoration: none; color: inherit;">
             <img class="logo" src="{{ asset('assets/media/logos/logo.png') }}" alt="Logo Dinas ESDM" />
             <div class="brand-text">
                 <strong>Dinas ESDM</strong>
@@ -29,13 +29,14 @@
     <nav class="menu-section" aria-label="Menu Utama Sidebar">
         <div class="menu-title">Menu Utama</div>
 
-        @can('dashboard.view')
+        {{-- Menu Dashboard: Hanya tampil jika BUKAN Desa/Perusahaan --}}
+        @if (!in_array($userRole ?? null, ['desa', 'perusahaan']))
         <a class="menu-item {{ nav_active('admin.dashboard') }}" href="{{ route('admin.dashboard') }}"
             @if (nav_active('admin.dashboard')) aria-current="page" @endif>
             <span class="menu-icon"><i class="ri-dashboard-line" aria-hidden="true"></i></span>
             <span class="menu-label">Dashboards</span>
         </a>
-        @endcan
+        @endif
 
         <a class="menu-item {{ request()->routeIs('landing') ? 'active' : '' }}"
             href="{{ route('landing') }}">
