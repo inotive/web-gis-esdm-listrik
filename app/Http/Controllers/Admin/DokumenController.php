@@ -78,7 +78,12 @@ class DokumenController extends Controller
                 $query->orderBy('tipe', 'desc')->orderBy('nama', 'asc');
         }
 
-        $dokumens = $query->get();
+        // Add pagination (50 items per page for better performance)
+        $dokumens = $query->paginate(50)->appends([
+            'folder' => $folderId,
+            'sort' => $sortBy,
+            'q' => $search,
+        ]);
 
         // Get breadcrumbs
         $breadcrumbs = [];
@@ -151,19 +156,28 @@ class DokumenController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'files' => 'required|array',
-            'files.*' => 'file|max:10240|mimes:doc,docx,xlsx,jpg,jpeg,png,pdf', // Max 10MB, allowed types
+            'files.*' => 'file|max:10240|mimes:doc,docx,xlsx,xls,ppt,pptx,jpg,jpeg,png,pdf', // Max 10MB, allowed types
             'parent_id' => 'nullable|exists:dokumens,id',
         ], [
-            'files.*.mimes' => 'Tipe file yang diperbolehkan: doc, docx, xlsx, jpg, jpeg, png, pdf.',
+            'files.*.mimes' => 'Tipe file yang diperbolehkan: doc, docx, xlsx, xls, ppt, pptx, jpg, jpeg, png, pdf.',
             'files.*.max' => 'Ukuran file maksimal adalah 10MB per file.',
         ]);
 
         if ($validator->fails()) {
+            // Check if AJAX request
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first(),
+                    'errors' => $validator->errors()
+                ], 422);
+            }
             return back()->withErrors($validator)->withInput();
         }
 
         $parentId = $request->parent_id ?: null;
         $uploadedCount = 0;
+        $skippedCount = 0;
 
         foreach ($request->file('files') as $file) {
             // Check if file name already exists in same parent
@@ -173,6 +187,7 @@ class DokumenController extends Controller
                 ->first();
 
             if ($existing) {
+                $skippedCount++;
                 continue; // Skip duplicate
             }
 
@@ -195,6 +210,28 @@ class DokumenController extends Controller
             $uploadedCount++;
         }
 
+        // Check if AJAX request
+        if ($request->ajax() || $request->wantsJson()) {
+            if ($uploadedCount > 0) {
+                $message = $uploadedCount . ' file berhasil diupload.';
+                if ($skippedCount > 0) {
+                    $message .= ' ' . $skippedCount . ' file dilewati (duplikat).';
+                }
+                return response()->json([
+                    'success' => true,
+                    'message' => $message,
+                    'uploaded' => $uploadedCount,
+                    'skipped' => $skippedCount,
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak ada file yang berhasil diupload.',
+            ], 400);
+        }
+
+        // Regular form submission
         $redirectUrl = route('admin.dokumen.index');
         if ($request->folder) {
             $redirectUrl = route('admin.dokumen.index', ['folder' => $request->folder]);
@@ -204,7 +241,11 @@ class DokumenController extends Controller
         }
 
         if ($uploadedCount > 0) {
-            return redirect($redirectUrl)->with('success', $uploadedCount . ' file berhasil diupload.');
+            $message = $uploadedCount . ' file berhasil diupload.';
+            if ($skippedCount > 0) {
+                $message .= ' ' . $skippedCount . ' file dilewati (duplikat).';
+            }
+            return redirect($redirectUrl)->with('success', $message);
         }
 
         return redirect($redirectUrl)->withErrors(['files' => 'Tidak ada file yang berhasil diupload.']);

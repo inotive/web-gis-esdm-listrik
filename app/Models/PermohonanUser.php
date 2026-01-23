@@ -16,6 +16,7 @@ class PermohonanUser extends Model
     protected $fillable = [
         'permohonan_id',
         'user_id',
+        'perusahaan_id',
         'status',
         'jawaban',
         'keterangan',
@@ -47,5 +48,13 @@ class PermohonanUser extends Model
     public function documents(): HasMany
     {
         return $this->hasMany(PermohonanUserDocument::class, 'permohonan_user_id');
+    }
+
+    /**
+     * Relasi: PermohonanUser belongs to Perusahaan
+     */
+    public function perusahaan(): BelongsTo
+    {
+        return $this->belongsTo(Perusahaan::class, 'perusahaan_id');
     }
 }

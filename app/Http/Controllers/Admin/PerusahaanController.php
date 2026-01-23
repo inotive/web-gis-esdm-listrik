@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Perusahaan;
 use App\Models\Permohonan;
 use App\Models\PermohonanUser;
+use App\Models\PerizinanListrik;
 use App\Models\RegVillage;
 use App\Models\RegDistrict;
 use App\Models\RegRegency;
@@ -82,50 +83,102 @@ class PerusahaanController extends Controller
         ]);
     }
 
-    // SHOW (Detail Perusahaan dengan Perizinan)
+    // SHOW (Detail Perusahaan dengan Perizinan, Permohonan, dan Dokumen)
     public function show(Perusahaan $perusahaan)
     {
-        $perusahaan->load('village.district.regency');
+        // Load relasi perusahaan
+        $perusahaan->load([
+            'village.district.regency',
+            'perizinans.documents.dokumen',
+            'permohonanUsers.permohonan',
+            'permohonanUsers.user',
+            'permohonanUsers.documents.dokumen',
+        ]);
 
-        // Data perizinan contoh (nantinya bisa dari database/relasi)
-        $perizinanData = [
-            [
-                'no_izin' => 'IUPTL/2024/001',
-                'jenis_izin' => 'Izin Usaha Penyediaan Tenaga Listrik (IUPTL)',
-                'tanggal_terbit' => '2024-01-15',
-                'tanggal_berlaku' => '2029-01-15',
-                'status' => 'Aktif',
-                'keterangan' => 'Izin untuk penyediaan tenaga listrik untuk kepentingan umum',
-            ],
-            [
-                'no_izin' => 'IMB/2023/045',
-                'jenis_izin' => 'Izin Mendirikan Bangunan (IMB)',
-                'tanggal_terbit' => '2023-06-20',
-                'tanggal_berlaku' => null,
-                'status' => 'Aktif',
-                'keterangan' => 'Izin pembangunan gardu induk',
-            ],
-            [
-                'no_izin' => 'AMDAL/2023/012',
-                'jenis_izin' => 'Analisis Mengenai Dampak Lingkungan (AMDAL)',
-                'tanggal_terbit' => '2023-03-10',
-                'tanggal_berlaku' => '2028-03-10',
-                'status' => 'Aktif',
-                'keterangan' => 'Dokumen AMDAL untuk pembangunan PLTU',
-            ],
-            [
-                'no_izin' => 'SLO/2022/089',
-                'jenis_izin' => 'Sertifikat Laik Operasi (SLO)',
-                'tanggal_terbit' => '2022-09-01',
-                'tanggal_berlaku' => '2024-09-01',
-                'status' => 'Perlu Diperpanjang',
-                'keterangan' => 'Sertifikat kelayakan operasi instalasi listrik',
-            ],
-        ];
+        // Ambil data perizinan dari PerizinanListrik berdasarkan nama_pemohon yang cocok dengan nama perusahaan
+        $perizinanListriks = PerizinanListrik::where('nama_pemohon', 'LIKE', '%' . $perusahaan->nama . '%')
+            ->orWhere('nama_pemohon', $perusahaan->nama)
+            ->orderBy('tanggal_terbit', 'desc')
+            ->get();
+
+        $perizinanData = $perizinanListriks->map(function ($perizinan) {
+            // Hitung status berdasarkan tanggal_akhir
+            $status = 'Berakhir';
+            if ($perizinan->tanggal_akhir) {
+                $today = now();
+                $tanggalAkhir = $perizinan->tanggal_akhir;
+                if ($tanggalAkhir > $today->copy()->addDays(30)) {
+                    $status = 'Aktif';
+                } elseif ($tanggalAkhir >= $today && $tanggalAkhir <= $today->copy()->addDays(30)) {
+                    $status = 'Mau Berakhir';
+                }
+            }
+
+            return [
+                'id' => $perizinan->id,
+                'no_izin' => $perizinan->no_surat_izin ?? $perizinan->no_pengajuan ?? '-',
+                'nama' => $perizinan->nama_pemohon,
+                'jenis_izin' => $perizinan->jenis ?? '-',
+                'tanggal_terbit' => $perizinan->tanggal_terbit,
+                'tanggal_akhir' => $perizinan->tanggal_akhir,
+                'lokasi' => $perizinan->lokasi ?? $perizinan->kabupaten_kota,
+                'kapasitas' => $perizinan->kapasitas,
+                'total_kapasitas' => $perizinan->total_kapasitas,
+                'sifat_penggunaan' => $perizinan->sifat_penggunaan,
+                'catatan' => $perizinan->catatan,
+                'status' => $status,
+            ];
+        })->toArray();
+
+        // Ambil data permohonan dari relasi permohonanUsers (pivot)
+        $permohonanData = $perusahaan->permohonanUsers->map(function ($permohonanUser) {
+            return [
+                'id' => $permohonanUser->id,
+                'jenis_permohonan' => $permohonanUser->permohonan->nama ?? $permohonanUser->permohonan->jenis_permohonan ?? '-',
+                'status' => $permohonanUser->status,
+                'keterangan' => $permohonanUser->keterangan,
+                'user' => $permohonanUser->user->name ?? '-',
+                'tanggal_pengajuan' => $permohonanUser->created_at,
+                'documents' => $permohonanUser->documents,
+            ];
+        })->toArray();
+
+        // Ambil dokumen dari perizinan_documents (dari relasi perizinans jika ada)
+        $dokumenData = [];
+        foreach ($perusahaan->perizinans as $perizinan) {
+            foreach ($perizinan->documents as $doc) {
+                $dokumenData[] = [
+                    'id' => $doc->id,
+                    'nama' => $doc->nama ?? $doc->dokumen->nama ?? '-',
+                    'no_surat' => $doc->no_surat_izin_terbit,
+                    'tanggal_terbit' => $doc->tanggal_terbit,
+                    'tanggal_akhir' => $doc->tanggal_akhir,
+                    'perizinan_nama' => $perizinan->nama ?? $perizinan->jenis ?? '-',
+                    'dokumen' => $doc->dokumen,
+                ];
+            }
+        }
+
+        // Juga ambil dokumen dari permohonan user documents
+        foreach ($perusahaan->permohonanUsers as $permohonanUser) {
+            foreach ($permohonanUser->documents as $doc) {
+                $dokumenData[] = [
+                    'id' => $doc->id,
+                    'nama' => $doc->nama ?? $doc->dokumen->nama ?? '-',
+                    'no_surat' => null,
+                    'tanggal_terbit' => null,
+                    'tanggal_akhir' => $doc->masa_berlaku,
+                    'perizinan_nama' => 'Dokumen Permohonan',
+                    'dokumen' => $doc->dokumen,
+                ];
+            }
+        }
 
         return view('admin.perusahaan.show', [
             'perusahaan' => $perusahaan,
             'perizinanData' => $perizinanData,
+            'permohonanData' => $permohonanData,
+            'dokumenData' => $dokumenData,
         ]);
     }
 

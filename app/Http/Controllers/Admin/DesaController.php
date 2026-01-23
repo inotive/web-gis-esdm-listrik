@@ -19,7 +19,7 @@ class DesaController extends Controller
         $regencyId = $request->get('regency_id');
         $districtId = $request->get('district_id');
 
-        $query = RegVillage::with(['district.regency']);
+        $query = RegVillage::with(['district.regency', 'dataBerlistrik']);
 
         // Search by name
         if ($q) {

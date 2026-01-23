@@ -191,6 +191,15 @@
     border-bottom: none;
   }
 
+  .table-perusahaan tbody tr.clickable-row {
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .table-perusahaan tbody tr.clickable-row:hover {
+    background: #f0fdf4;
+  }
+
   .table-perusahaan tbody tr:hover{
     background: #FCFCFC;
   }
@@ -202,9 +211,11 @@
   }
 
   .col-aksi{
-    width: 120px;
+    width: 160px;
+    min-width: 160px;
     text-align: center;
     vertical-align: middle;
+    white-space: nowrap;
   }
 
   .col-aksi > * {
@@ -240,6 +251,11 @@
   /* Edit icon - Orange/Yellow */
   .btn-ico.edit {
     color: #f59e0b;
+  }
+
+  /* Detail icon - Blue */
+  .btn-ico.detail {
+    color: #0077B6;
   }
 
   /* Delete icon - Red */
@@ -534,6 +550,18 @@
   .select2-container--open .select2-dropdown {
     z-index: 9999 !important;
   }
+
+  /* Badge Belum Ada */
+  .badge-empty {
+    display: inline-block;
+    padding: 4px 10px;
+    background: #F1F5F9;
+    color: #64748B;
+    font-size: 11px;
+    font-weight: 500;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
 </style>
 @endpush
 
@@ -596,19 +624,28 @@
               <th>Nama Perusahaan</th>
               <th>Alamat</th>
               <th>Kontak</th>
+              <th>Desa/Kelurahan</th>
+              <th>Kecamatan</th>
               <th>Kabupaten/Kota</th>
+              <th>Tanggal Terdaftar</th>
               <th class="col-aksi">Aksi</th>
             </tr>
           </thead>
           <tbody>
             @forelse ($perusahaans as $i => $perusahaan)
-              <tr>
+              <tr class="clickable-row" data-href="{{ route('admin.perusahaan.show', $perusahaan) }}">
                 <td class="col-no">{{ $perusahaans->firstItem() + $i }}</td>
                 <td><strong>{{ $perusahaan->nama }}</strong></td>
-                <td>{{ $perusahaan->alamat ?? '-' }}</td>
-                <td>{{ $perusahaan->kontak ?? '-' }}</td>
-                <td>{{ $perusahaan->kabupaten_kota ?? ($perusahaan->village->district->regency->name ?? '-') }}</td>
+                <td>@if($perusahaan->alamat){{ $perusahaan->alamat }}@else<span class="badge-empty">Belum ada</span>@endif</td>
+                <td>@if($perusahaan->kontak){{ $perusahaan->kontak }}@else<span class="badge-empty">Belum ada</span>@endif</td>
+                <td>@if($perusahaan->village){{ $perusahaan->village->name }}@else<span class="badge-empty">Belum ada</span>@endif</td>
+                <td>@if($perusahaan->village && $perusahaan->village->district){{ $perusahaan->village->district->name }}@else<span class="badge-empty">Belum ada</span>@endif</td>
+                <td>@if($perusahaan->kabupaten_kota){{ $perusahaan->kabupaten_kota }}@elseif($perusahaan->village && $perusahaan->village->district && $perusahaan->village->district->regency){{ $perusahaan->village->district->regency->name }}@else<span class="badge-empty">Belum ada</span>@endif</td>
+                <td>@if($perusahaan->created_at){{ $perusahaan->created_at->translatedFormat('d F Y') }}@else<span class="badge-empty">Belum ada</span>@endif</td>
                 <td class="col-aksi">
+                  <a href="{{ route('admin.perusahaan.show', $perusahaan) }}" class="btn-ico detail" title="Detail">
+                    <i class="fa-solid fa-eye"></i>
+                  </a>
                   <button type="button" class="btn-ico edit btn-edit-perusahaan"
                     data-id="{{ $perusahaan->id }}"
                     data-nama="{{ $perusahaan->nama }}"
@@ -630,7 +667,7 @@
                 </td>
               </tr>
             @empty
-              <tr><td colspan="6" class="text-center" style="text-align:center;color:#64748B;padding:40px;">Belum ada data</td></tr>
+              <tr><td colspan="9" class="text-center" style="text-align:center;color:#64748B;padding:40px;">Belum ada data</td></tr>
             @endforelse
           </tbody>
         </table>
@@ -787,6 +824,22 @@
             form.submit();
           }
         });
+      });
+    });
+
+    // ========== Clickable Row Navigation ==========
+    document.querySelectorAll('.clickable-row').forEach(row => {
+      row.addEventListener('click', function(e) {
+        // Jangan navigasi jika klik pada tombol aksi, link, atau form
+        if (e.target.closest('.col-aksi') || e.target.closest('button') || 
+            e.target.closest('a') || e.target.closest('form')) {
+          return;
+        }
+        
+        const href = this.dataset.href;
+        if (href) {
+          window.location.href = href;
+        }
       });
     });
 
