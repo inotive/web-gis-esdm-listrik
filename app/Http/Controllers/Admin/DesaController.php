@@ -172,4 +172,33 @@ class DesaController extends Controller
             ->orderBy('name')->limit(200)->get(['id', 'name']);
         return response()->json($items);
     }
+
+    /**
+     * Get electricity statistics for visualization
+     */
+    public function getElectricityStats()
+    {
+        $plnCount = \DB::table('perizinan_listriks')
+            ->where('status_kelistrikan', 'berlistrik_pln')
+            ->count();
+
+        $nonPlnCount = \DB::table('perizinan_listriks')
+            ->where('status_kelistrikan', 'berlistrik_non_pln')
+            ->count();
+
+        $noElectricityCount = \DB::table('perizinan_listriks')
+            ->where('status_kelistrikan', 'tidak_berlistrik')
+            ->count();
+
+        $total = \DB::table('perizinan_listriks')
+            ->whereNotNull('status_kelistrikan')
+            ->count();
+
+        return response()->json([
+            'pln' => $plnCount,
+            'non_pln' => $nonPlnCount,
+            'no_electricity' => $noElectricityCount,
+            'total' => $total
+        ]);
+    }
 }

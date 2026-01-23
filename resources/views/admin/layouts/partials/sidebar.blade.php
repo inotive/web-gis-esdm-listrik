@@ -51,9 +51,14 @@
 
 
         @if (!in_array($userRole ?? null, ['desa', 'perusahaan']))
-        <a class="menu-item {{ nav_active('admin.permohonan.*') }}" href="{{ route('admin.permohonan.index') }}">
+        <a class="menu-item {{ nav_active('admin.perizinan.*') }}" href="{{ route('admin.perizinan.index') }}">
             <span class="menu-icon"><i class="ri-file-list-3-line" aria-hidden="true"></i></span>
-            <span class="menu-label">Perizinan dan Permohonan</span>
+            <span class="menu-label">Data Perizinan</span>
+        </a>
+
+        <a class="menu-item {{ nav_active('admin.permohonan.*') }}" href="{{ route('admin.permohonan.index') }}">
+            <span class="menu-icon"><i class="ri-article-line" aria-hidden="true"></i></span>
+            <span class="menu-label">Data Permohonan</span>
         </a>
         @endif
 

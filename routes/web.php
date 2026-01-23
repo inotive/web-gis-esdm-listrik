@@ -161,6 +161,9 @@ Route::group(['middleware' => ['auth', 'verified_user'], 'as' => 'admin.', 'pref
         // Endpoints opsi untuk dropdown berjenjang
         Route::get('/options/regencies', [DesaController::class, 'optionsRegencies'])->name('options.regencies');
         Route::get('/options/districts', [DesaController::class, 'optionsDistricts'])->name('options.districts');
+        
+        // API for electricity statistics
+        Route::get('/api/electricity-stats', [DesaController::class, 'getElectricityStats'])->name('api.electricity-stats');
     });
 
     // Data Perusahaan
@@ -238,6 +241,9 @@ Route::group(['middleware' => ['auth', 'verified_user'], 'as' => 'admin.', 'pref
 
     // Permohonan
     Route::group(['as' => 'permohonan.', 'prefix' => 'permohonan'], function () {
+        Route::get('/import', [PermohonanController::class, 'import'])->name('import');
+        Route::post('/import', [PermohonanController::class, 'importProcess'])->name('import.process');
+
         Route::get('/', [PermohonanController::class, 'index'])->name('index');
         Route::get('/create', [PermohonanController::class, 'create'])->name('create');
         Route::post('/', [PermohonanController::class, 'store'])->name('store');
@@ -252,6 +258,9 @@ Route::group(['middleware' => ['auth', 'verified_user'], 'as' => 'admin.', 'pref
 
     // Perizinan
     Route::group(['as' => 'perizinan.', 'prefix' => 'perizinan'], function () {
+        Route::get('/import', [PerizinanController::class, 'import'])->name('import');
+        Route::post('/import', [PerizinanController::class, 'importProcess'])->name('import.process');
+        
         Route::get('/', [PerizinanController::class, 'index'])->name('index');
         Route::get('/create', [PerizinanController::class, 'create'])->name('create');
         Route::post('/', [PerizinanController::class, 'store'])->name('store');

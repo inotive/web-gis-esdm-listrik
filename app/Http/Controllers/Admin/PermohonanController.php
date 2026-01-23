@@ -7,13 +7,13 @@ use App\Models\Permohonan;
 use App\Models\PermohonanUser;
 use App\Models\PermohonanQuestion;
 use App\Models\PermohonanQuestionOption;
-use App\Models\PerizinanListrik;
-use App\Models\Perusahaan;
 use App\Models\RegRegency;
 use App\Models\RegDistrict;
 use App\Models\RegVillage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\PermohonanImport;
 
 class PermohonanController extends Controller
 {
@@ -24,160 +24,64 @@ class PermohonanController extends Controller
     {
         $perPage = (int) $request->get('per_page', 10);
         $q = $request->get('q');
-        $tab = $request->get('tab', 'perizinan');
         $status = $request->get('status', '');
-        $jenis = $request->get('jenis', '');
 
-        $query = Permohonan::withCount('questions');
+        // Data Permohonan dari PermohonanUser (Permohonan Masuk)
+        $query = PermohonanUser::with(['permohonan', 'user']);
 
-        // Search by name or jenis_permohonan
         if ($q) {
-            $query->where(function ($query) use ($q) {
-                $query->where('nama', 'like', '%' . $q . '%')
-                    ->orWhere('jenis_permohonan', 'like', '%' . $q . '%');
+            $query->whereHas('user', function ($sub) use ($q) {
+                $sub->where('name', 'like', "%{$q}%");
+            })->orWhereHas('permohonan', function ($sub) use ($q) {
+                $sub->where('nama', 'like', "%{$q}%");
             });
         }
 
-        $permohonans = $query->orderBy('created_at', 'desc')
-            ->paginate($perPage, ['*'], 'page_permohonan')
-            ->withQueryString();
-
-        // =========================================
-        // TAB 1: Data Perizinan (dari database perizinan_listriks)
-        // =========================================
-        $queryPerizinan = PerizinanListrik::query();
-
-        // Search
-        if ($q && $tab === 'perizinan') {
-            $queryPerizinan->where(function ($qry) use ($q) {
-                $qry->where('nama_pemohon', 'like', "%{$q}%")
-                    ->orWhere('kabupaten_kota', 'like', "%{$q}%")
-                    ->orWhere('no_surat_izin', 'like', "%{$q}%")
-                    ->orWhere('jenis', 'like', "%{$q}%");
-            });
-        }
-
-        // Filter by status (berdasarkan tanggal_akhir)
         if ($status) {
-            $today = now();
-            if ($status === 'aktif') {
-                // Sedang Aktif: tanggal_akhir terisi dan lebih dari 30 hari dari sekarang
-                $queryPerizinan->whereNotNull('tanggal_akhir')
-                    ->where('tanggal_akhir', '>', $today->copy()->addDays(30))
-                    ->where('tanggal_akhir', '>', '1901-01-01');
-            } elseif ($status === 'mau_berakhir') {
-                // Mau Berakhir: tanggal_akhir terisi dan dalam 30 hari ke depan
-                $queryPerizinan->whereNotNull('tanggal_akhir')
-                    ->where('tanggal_akhir', '>=', $today)
-                    ->where('tanggal_akhir', '<=', $today->copy()->addDays(30))
-                    ->where('tanggal_akhir', '>', '1901-01-01');
-            } elseif ($status === 'berakhir') {
-                // Berakhir: tanggal_akhir NULL ATAU sudah lewat
-                $queryPerizinan->where(function ($query) use ($today) {
-                    $query->whereNull('tanggal_akhir')
-                        ->orWhere(function ($q) use ($today) {
-                            $q->whereNotNull('tanggal_akhir')
-                                ->where('tanggal_akhir', '<', $today)
-                                ->where('tanggal_akhir', '>', '1901-01-01');
-                        });
-                });
-            }
+            $query->where('status', $status);
         }
 
-        // Filter by jenis
-        if ($jenis) {
-            $queryPerizinan->where('jenis', 'like', "%{$jenis}%");
-        }
-
-        $perizinanItems = $queryPerizinan
-            ->orderBy('tanggal_terbit', 'desc')
-            ->paginate($perPage, ['*'], 'page_perizinan')
+        $permohonanUsers = $query->orderBy('created_at', 'desc')
+            ->paginate($perPage)
             ->withQueryString();
 
-        // Get jenis options for filter
-        $jenisOptions = PerizinanListrik::select('jenis')
-            ->distinct()
-            ->whereNotNull('jenis')
-            ->where('jenis', '!=', '')
-            ->where('jenis', '!=', '5') // Exclude invalid "5" values
-            ->pluck('jenis')
-            ->filter()
-            ->values();
-
-        // =========================================
-        // Calculate Statistics for Metric Cards
-        // =========================================
-        $today = now();
-        $thirtyDaysLater = $today->copy()->addDays(30);
-
-        // Total Perizinan
-        $totalPerizinan = PerizinanListrik::count();
-
-        // Count by Jenis
-        $totalIUPTLS = PerizinanListrik::where('jenis', 'IUPTLS')->count();
-        $totalSKTP = PerizinanListrik::where('jenis', 'SKTP')->count();
-
-        // Count by Status
-        // Aktif: tanggal_akhir terisi dan > today + 30 days
-        $countAktif = PerizinanListrik::whereNotNull('tanggal_akhir')
-            ->where('tanggal_akhir', '>', $thirtyDaysLater)
-            ->where('tanggal_akhir', '>', '1901-01-01')
-            ->count();
-
-        // Mau Berakhir: tanggal_akhir terisi dan between today and today + 30 days
-        $countMauBerakhir = PerizinanListrik::whereNotNull('tanggal_akhir')
-            ->where('tanggal_akhir', '>=', $today)
-            ->where('tanggal_akhir', '<=', $thirtyDaysLater)
-            ->where('tanggal_akhir', '>', '1901-01-01')
-            ->count();
-
-        // Berakhir: tanggal_akhir NULL ATAU < today
-        $countBerakhir = PerizinanListrik::where(function ($query) use ($today) {
-            $query->whereNull('tanggal_akhir')
-                ->orWhere(function ($q) use ($today) {
-                    $q->whereNotNull('tanggal_akhir')
-                        ->where('tanggal_akhir', '<', $today)
-                        ->where('tanggal_akhir', '>', '1901-01-01');
-                });
-        })->count();
-
-        // Total kapasitas
-        $totalKapasitas = PerizinanListrik::sum('kapasitas');
-
-        $perizinanStats = [
-            'total' => $totalPerizinan,
-            'iuptls' => $totalIUPTLS,
-            'sktp' => $totalSKTP,
-            'aktif' => $countAktif,
-            'mau_berakhir' => $countMauBerakhir,
-            'berakhir' => $countBerakhir,
-            'total_kapasitas' => $totalKapasitas,
-        ];
-
-        // =========================================
-        // TAB 2: Data Permohonan dari PermohonanUser
-        // =========================================
-        $permohonanUsers = PermohonanUser::with(['permohonan', 'user'])
-            ->orderBy('created_at', 'desc')
-            ->paginate($perPage, ['*'], 'page_permohonan_user')
-            ->withQueryString();
-
-        // Untuk filter dropdown (tidak digunakan untuk filtering, hanya UI)
+        // Untuk filter dropdown (hanya UI)
         $regencies = RegRegency::orderBy('name')->get(['id', 'name']);
 
         return view('admin.permohonan.index', [
-            'title' => 'Perizinan dan Permohonan',
-            'permohonans' => $permohonans,
-            'perizinanItems' => $perizinanItems,
+            'title' => 'Data Permohonan Masuk',
             'permohonanUsers' => $permohonanUsers,
-            'jenisOptions' => $jenisOptions,
-            'perizinanStats' => $perizinanStats,
-            'tab' => $tab,
+            'regencies' => $regencies,
             'q' => $q,
             'status' => $status,
-            'jenis' => $jenis,
-            'regencies' => $regencies,
         ]);
+    }
+
+    /**
+     * Show import form
+     */
+    public function import(Request $request)
+    {
+        return view('admin.permohonan.import', [
+            'title' => 'Import Data Permohonan',
+        ]);
+    }
+
+    /**
+     * Process import
+     */
+    public function importProcess(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:10240',
+        ]);
+
+        try {
+            Excel::import(new PermohonanImport, $request->file('file'));
+            return redirect()->route('admin.permohonan.index')->with('success', 'Data permohonan berhasil diimport.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal import data: ' . $e->getMessage());
+        }
     }
 
     /**

@@ -632,26 +632,64 @@
     </div>
   </div>
 
-  {{-- Map Visualization Section --}}
+  {{-- Visualization Section - Card Based --}}
   <section class="map-card">
     <div class="map-header">
       <div>
         <div class="map-title">Visualisasi Status Kelistrikan Desa</div>
-        <div class="map-subtitle">Peta sebaran desa berdasarkan status kelistrikan (PLN, Non-PLN, Tidak Berlistrik)</div>
+        <div class="map-subtitle">Statistik status kelistrikan desa berdasarkan data perizinan</div>
       </div>
     </div>
     
-    <div id="map"></div>
-    
-    <div class="legend-container">
-      <div class="legend-item">
-        <span class="legend-dot" style="background: #2AAD27;"></span> Berlistrik PLN
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 20px 0;">
+      {{-- Card: Berlistrik PLN --}}
+      <div style="background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%); border-radius: 16px; padding: 24px; border-left: 4px solid #10B981; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+          <div style="width: 48px; height: 48px; background: #10B981; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+            <i class="ri-flashlight-fill" style="font-size: 24px; color: white;"></i>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 32px; font-weight: 700; color: #065F46;" id="plnCount">0</div>
+          </div>
+        </div>
+        <div style="font-size: 15px; font-weight: 600; color: #065F46; margin-bottom: 4px;">Berlistrik PLN</div>
+        <div style="font-size: 13px; color: #059669;">Desa dengan akses listrik PLN</div>
       </div>
-      <div class="legend-item">
-        <span class="legend-dot" style="background: #FFD326;"></span> Berlistrik Non-PLN
+
+      {{-- Card: Berlistrik Non-PLN --}}
+      <div style="background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%); border-radius: 16px; padding: 24px; border-left: 4px solid #F59E0B; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.1);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+          <div style="width: 48px; height: 48px; background: #F59E0B; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+            <i class="ri-lightbulb-flash-fill" style="font-size: 24px; color: white;"></i>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 32px; font-weight: 700; color: #92400E;" id="nonPlnCount">0</div>
+          </div>
+        </div>
+        <div style="font-size: 15px; font-weight: 600; color: #92400E; margin-bottom: 4px;">Berlistrik Non-PLN</div>
+        <div style="font-size: 13px; color: #D97706;">Desa dengan sumber listrik alternatif</div>
       </div>
-      <div class="legend-item">
-        <span class="legend-dot" style="background: #CB2B3E;"></span> Tidak Berlistrik
+
+      {{-- Card: Tidak Berlistrik --}}
+      <div style="background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%); border-radius: 16px; padding: 24px; border-left: 4px solid #EF4444; box-shadow: 0 2px 8px rgba(239, 68, 68, 0.1);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+          <div style="width: 48px; height: 48px; background: #EF4444; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+            <i class="ri-flashlight-line" style="font-size: 24px; color: white;"></i>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 32px; font-weight: 700; color: #991B1B;" id="noElectricityCount">0</div>
+          </div>
+        </div>
+        <div style="font-size: 15px; font-weight: 600; color: #991B1B; margin-bottom: 4px;">Tidak Berlistrik</div>
+        <div style="font-size: 13px; color: #DC2626;">Desa yang belum memiliki akses listrik</div>
+      </div>
+    </div>
+
+    {{-- Total Summary --}}
+    <div style="background: #F9FAFB; border-radius: 12px; padding: 16px; margin-top: 8px; border: 1px solid #E5E7EB;">
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div style="font-size: 14px; color: #6B7280; font-weight: 500;">Total Data Perizinan dengan Status Kelistrikan</div>
+        <div style="font-size: 20px; font-weight: 700; color: #111827;" id="totalCount">0</div>
       </div>
     </div>
   </section>
@@ -776,81 +814,19 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    // ========== Initialize Leaflet Map ==========
-    if (document.getElementById('map')) {
-      var map = L.map('map').setView([-0.502106, 117.153709], 7);
-      
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; OpenStreetMap'
-      }).addTo(map);
-      
-      // Define colored icons
-      var greenIcon = new L.Icon({
-        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-        iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
-      });
-      
-      var yellowIcon = new L.Icon({
-        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-gold.png',
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-        iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
-      });
-      
-      var redIcon = new L.Icon({
-        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-        iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41]
-      });
-      
-      function getIcon(color) {
-        if (color === 'green') return greenIcon;
-        if (color === 'yellow') return yellowIcon;
-        if (color === 'red') return redIcon;
-        return greenIcon;
-      }
-      
-      // Fetch perizinan data
-      fetch("{{ route('admin.perizinan.map-data') }}")
-        .then(response => response.json())
-        .then(data => {
-          console.log("Map data loaded:", data.length);
-          
-          data.forEach(item => {
-            if (item.lat && item.lng) {
-              var popupContent = `
-                <div style="text-align:center; min-width: 160px;">
-                  <h4 style="margin:0 0 5px 0; font-size:15px; font-weight:700;">${item.title}</h4>
-                  <div style="font-size:12px; color:#555; margin-bottom:8px;">${item.lokasi || '-'}</div>
-                  <hr style="margin:6px 0; border-top:1px solid #eee;">
-                  <div style="margin-top:8px;">
-                    <span style="
-                      display:inline-block;
-                      background:${item.color === 'green' ? '#d1fae5' : (item.color === 'yellow' ? '#fef3c7' : '#fee2e2')};
-                      color:${item.color === 'green' ? '#065f46' : (item.color === 'yellow' ? '#92400e' : '#991b1b')};
-                      padding:4px 8px; border-radius:4px; font-size:11px; font-weight:bold;">
-                      ${item.status_label}
-                    </span>
-                  </div>
-                  <div style="margin-top:12px;">
-                    <a href="/admin/perizinan/${item.id}" style="
-                      color:#2563EB; font-size:12px; font-weight:600; text-decoration:none;
-                      display:inline-flex; align-items:center; gap:4px;">
-                      Lihat Detail &rarr;
-                    </a>
-                  </div>
-                </div>
-              `;
-              
-              L.marker([item.lat, item.lng], {icon: getIcon(item.color)})
-                .bindPopup(popupContent)
-                .addTo(map);
-            }
-          });
-        })
-        .catch(error => console.error('Error loading map data:', error));
-    }
+    // ========== Load Statistics for Cards ==========
+    fetch("{{ route('admin.desa.api.electricity-stats') }}")
+      .then(response => response.json())
+      .then(data => {
+        console.log("Statistics data loaded:", data);
+        
+        // Update card values directly from database
+        document.getElementById('plnCount').textContent = data.pln;
+        document.getElementById('nonPlnCount').textContent = data.non_pln;
+        document.getElementById('noElectricityCount').textContent = data.no_electricity;
+        document.getElementById('totalCount').textContent = data.total;
+      })
+      .catch(error => console.error('Error loading statistics:', error));
     
     // ========== SweetAlert Notifications ==========
     @if(session('success'))

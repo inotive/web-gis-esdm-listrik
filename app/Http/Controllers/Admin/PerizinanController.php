@@ -11,6 +11,8 @@ use App\Helpers\UploadFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\PerizinanImport;
 
 class PerizinanController extends Controller
 {
@@ -20,9 +22,53 @@ class PerizinanController extends Controller
      */
     public function index(Request $request)
     {
+        $query = Perizinan::with('perusahaan');
+
+        if ($request->has('q')) {
+            $q = $request->q;
+            $query->where(function($sub) use ($q) {
+                $sub->where('nama', 'like', "%{$q}%")
+                    ->orWhere('no_pengajuan', 'like', "%{$q}%")
+                    ->orWhere('jenis', 'like', "%{$q}%")
+                    ->orWhereHas('perusahaan', function($p) use ($q) {
+                        $p->where('nama', 'like', "%{$q}%");
+                    });
+            });
+        }
+
+        $perizinans = $query->orderBy('created_at', 'desc')->paginate(10);
+
         return view('admin.perizinan.index', [
-            'title' => 'Visualisasi Data Desa',
+            'title' => 'Manajemen Data Perizinan',
+            'perizinans' => $perizinans
         ]);
+    }
+
+    /**
+     * Show import form
+     */
+    public function import(Request $request)
+    {
+        return view('admin.perizinan.import', [
+            'title' => 'Import Data Perizinan',
+        ]);
+    }
+
+    /**
+     * Process import
+     */
+    public function importProcess(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:10240',
+        ]);
+
+        try {
+            Excel::import(new PerizinanImport, $request->file('file'));
+            return redirect()->route('admin.perizinan.index')->with('success', 'Data perizinan berhasil diimport.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal import data: ' . $e->getMessage());
+        }
     }
 
     /**

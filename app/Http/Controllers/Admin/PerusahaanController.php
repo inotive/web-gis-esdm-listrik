@@ -82,50 +82,29 @@ class PerusahaanController extends Controller
         ]);
     }
 
-    // SHOW (Detail Perusahaan dengan Perizinan)
+    // SHOW (Detail Perusahaan dengan Perizinan & Infrastruktur)
     public function show(Perusahaan $perusahaan)
     {
         $perusahaan->load('village.district.regency');
 
-        // Data perizinan contoh (nantinya bisa dari database/relasi)
-        $perizinanData = [
-            [
-                'no_izin' => 'IUPTL/2024/001',
-                'jenis_izin' => 'Izin Usaha Penyediaan Tenaga Listrik (IUPTL)',
-                'tanggal_terbit' => '2024-01-15',
-                'tanggal_berlaku' => '2029-01-15',
-                'status' => 'Aktif',
-                'keterangan' => 'Izin untuk penyediaan tenaga listrik untuk kepentingan umum',
-            ],
-            [
-                'no_izin' => 'IMB/2023/045',
-                'jenis_izin' => 'Izin Mendirikan Bangunan (IMB)',
-                'tanggal_terbit' => '2023-06-20',
-                'tanggal_berlaku' => null,
-                'status' => 'Aktif',
-                'keterangan' => 'Izin pembangunan gardu induk',
-            ],
-            [
-                'no_izin' => 'AMDAL/2023/012',
-                'jenis_izin' => 'Analisis Mengenai Dampak Lingkungan (AMDAL)',
-                'tanggal_terbit' => '2023-03-10',
-                'tanggal_berlaku' => '2028-03-10',
-                'status' => 'Aktif',
-                'keterangan' => 'Dokumen AMDAL untuk pembangunan PLTU',
-            ],
-            [
-                'no_izin' => 'SLO/2022/089',
-                'jenis_izin' => 'Sertifikat Laik Operasi (SLO)',
-                'tanggal_terbit' => '2022-09-01',
-                'tanggal_berlaku' => '2024-09-01',
-                'status' => 'Perlu Diperpanjang',
-                'keterangan' => 'Sertifikat kelayakan operasi instalasi listrik',
-            ],
-        ];
+        // Load real perizinan data from database
+        $perizinanData = \DB::table('perizinan_listriks')
+            ->where('perusahaan_id', $perusahaan->id)
+            ->orWhere('nama_perusahaan', 'like', "%{$perusahaan->nama}%")
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Load infrastructure data
+        $infrastrukturJaringans = $perusahaan->infrastrukturJaringans()->get();
+        $gardus = $perusahaan->gardus()->get();
+        $pembangkitLokals = $perusahaan->pembangkitLokals()->get();
 
         return view('admin.perusahaan.show', [
             'perusahaan' => $perusahaan,
             'perizinanData' => $perizinanData,
+            'infrastrukturJaringans' => $infrastrukturJaringans,
+            'gardus' => $gardus,
+            'pembangkitLokals' => $pembangkitLokals,
         ]);
     }
 
@@ -155,12 +134,25 @@ class PerusahaanController extends Controller
         $perusahaan->load('village.district.regency');
 
         $regencies = RegRegency::orderBy('name')->get(['id', 'name']);
-        $districts = RegDistrict::where('regency_id', $perusahaan->village->district->regency_id ?? null)
-            ->orderBy('name')
-            ->get(['id', 'name']);
-        $villages = RegVillage::where('district_id', $perusahaan->village->district_id ?? null)
-            ->orderBy('name')
-            ->get(['id', 'name']);
+        
+        // Fix null pointer error - safely get regency_id and district_id
+        $regencyId = null;
+        $districtId = null;
+        
+        if ($perusahaan->village) {
+            $districtId = $perusahaan->village->district_id;
+            if ($perusahaan->village->district) {
+                $regencyId = $perusahaan->village->district->regency_id;
+            }
+        }
+        
+        $districts = $regencyId
+            ? RegDistrict::where('regency_id', $regencyId)->orderBy('name')->get(['id', 'name'])
+            : collect([]);
+            
+        $villages = $districtId
+            ? RegVillage::where('district_id', $districtId)->orderBy('name')->get(['id', 'name'])
+            : collect([]);
 
         return view('admin.perusahaan.edit', compact('perusahaan', 'regencies', 'districts', 'villages'));
     }
