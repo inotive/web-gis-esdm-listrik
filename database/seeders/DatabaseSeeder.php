@@ -28,8 +28,10 @@ class DatabaseSeeder extends Seeder
         // RegRegenciesSeeder::class,
         // RegDistrictsSeeder::class,
         // RegVillagesSeeder::class,
-  
-      
+
+        // Dokumen Seeders
+        // DataJaringanSeeder::class, // Old seeder - specific to "2. Data Jaringan" folder only
+        DokumenSeeder::class, // New general seeder - imports all from storage/app/public/dokumen/
     ]);
 }
 

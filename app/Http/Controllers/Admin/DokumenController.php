@@ -178,13 +178,15 @@ class DokumenController extends Controller
 
             // Store file using trait method
             $fileName = $this->storeFile($file, 'dokumen');
+
+            // Path lengkap dengan folder dokumen
             $filePath = 'dokumen/' . $fileName;
 
             Dokumen::create([
                 'nama' => $file->getClientOriginalName(),
                 'tipe' => 'file',
                 'parent_id' => $parentId,
-                'path' => $fileName,
+                'path' => $filePath, // Simpan path lengkap
                 'mime_type' => $file->getMimeType(),
                 'size' => $file->getSize(),
                 'user_id' => auth()->id(),

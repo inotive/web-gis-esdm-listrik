@@ -93,7 +93,8 @@ class Dokumen extends Model
      */
     public function getFullPathAttribute(): string
     {
-        return 'dokumen/' . $this->path;
+        // Path sudah lengkap dari seeder, tidak perlu tambah prefix
+        return $this->path;
     }
 
     /**
@@ -104,6 +105,6 @@ class Dokumen extends Model
         if ($this->isFolder()) {
             return route('admin.dokumen.index', ['folder' => $this->id]);
         }
-        return asset('storage/' . $this->full_path);
+        return asset('storage/' . $this->path);
     }
 }
