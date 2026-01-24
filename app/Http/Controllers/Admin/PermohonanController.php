@@ -7,13 +7,13 @@ use App\Models\Permohonan;
 use App\Models\PermohonanUser;
 use App\Models\PermohonanQuestion;
 use App\Models\PermohonanQuestionOption;
-use App\Models\PerizinanListrik;
-use App\Models\Perusahaan;
 use App\Models\RegRegency;
 use App\Models\RegDistrict;
 use App\Models\RegVillage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\PermohonanImport;
 
 class PermohonanController extends Controller
 {
@@ -26,7 +26,6 @@ class PermohonanController extends Controller
         $q = $request->get('q');
         $tab = $request->get('tab', 'permohonan');
         $status = $request->get('status', '');
-        $jenis = $request->get('jenis', '');
 
         // Per-column filters for Perizinan tab
         $filterPerizinanNama = $request->get('filter_perizinan_nama');
@@ -46,11 +45,11 @@ class PermohonanController extends Controller
 
         $query = Permohonan::withCount('questions');
 
-        // Search by name or jenis_permohonan
         if ($q) {
-            $query->where(function ($query) use ($q) {
-                $query->where('nama', 'like', '%' . $q . '%')
-                    ->orWhere('jenis_permohonan', 'like', '%' . $q . '%');
+            $query->whereHas('user', function ($sub) use ($q) {
+                $sub->where('name', 'like', "%{$q}%");
+            })->orWhereHas('permohonan', function ($sub) use ($q) {
+                $sub->where('nama', 'like', "%{$q}%");
             });
         }
 
@@ -271,18 +270,39 @@ class PermohonanController extends Controller
         $regencies = RegRegency::orderBy('name')->get(['id', 'name']);
 
         return view('admin.permohonan.index', [
-            'title' => 'Perizinan dan Permohonan',
-            'permohonans' => $permohonans,
-            'perizinanItems' => $perizinanItems,
+            'title' => 'Data Permohonan Masuk',
             'permohonanUsers' => $permohonanUsers,
-            'jenisOptions' => $jenisOptions,
-            'perizinanStats' => $perizinanStats,
-            'tab' => $tab,
+            'regencies' => $regencies,
             'q' => $q,
             'status' => $status,
-            'jenis' => $jenis,
-            'regencies' => $regencies,
         ]);
+    }
+
+    /**
+     * Show import form
+     */
+    public function import(Request $request)
+    {
+        return view('admin.permohonan.import', [
+            'title' => 'Import Data Permohonan',
+        ]);
+    }
+
+    /**
+     * Process import
+     */
+    public function importProcess(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:10240',
+        ]);
+
+        try {
+            Excel::import(new PermohonanImport, $request->file('file'));
+            return redirect()->route('admin.permohonan.index')->with('success', 'Data permohonan berhasil diimport.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal import data: ' . $e->getMessage());
+        }
     }
 
     /**

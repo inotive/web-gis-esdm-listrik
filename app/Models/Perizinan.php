@@ -22,6 +22,7 @@ class Perizinan extends Model
         'no_surat_keluar',
         'tanggal',
         'lokasi',
+        'status_kelistrikan',
         'titik_koordinat',
         'jumlah_kapasitas',
         'total_kapasitas_kva',

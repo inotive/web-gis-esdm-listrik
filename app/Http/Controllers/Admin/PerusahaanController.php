@@ -294,12 +294,25 @@ class PerusahaanController extends Controller
         $perusahaan->load('village.district.regency');
 
         $regencies = RegRegency::orderBy('name')->get(['id', 'name']);
-        $districts = RegDistrict::where('regency_id', $perusahaan->village->district->regency_id ?? null)
-            ->orderBy('name')
-            ->get(['id', 'name']);
-        $villages = RegVillage::where('district_id', $perusahaan->village->district_id ?? null)
-            ->orderBy('name')
-            ->get(['id', 'name']);
+
+        // Fix null pointer error - safely get regency_id and district_id
+        $regencyId = null;
+        $districtId = null;
+
+        if ($perusahaan->village) {
+            $districtId = $perusahaan->village->district_id;
+            if ($perusahaan->village->district) {
+                $regencyId = $perusahaan->village->district->regency_id;
+            }
+        }
+
+        $districts = $regencyId
+            ? RegDistrict::where('regency_id', $regencyId)->orderBy('name')->get(['id', 'name'])
+            : collect([]);
+
+        $villages = $districtId
+            ? RegVillage::where('district_id', $districtId)->orderBy('name')->get(['id', 'name'])
+            : collect([]);
 
         return view('admin.perusahaan.edit', compact('perusahaan', 'regencies', 'districts', 'villages'));
     }

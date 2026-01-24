@@ -183,6 +183,25 @@
       @enderror
     </div>
 
+    <div class="form-group">
+      <label class="label">Status Kelistrikan Desa <span style="color:#DC2626">*</span></label>
+      <select name="status_kelistrikan" class="input" required>
+        <option value="" disabled>Pilih Status Kelistrikan</option>
+        <option value="berlistrik_pln" {{ old('status_kelistrikan', $perizinan->status_kelistrikan) == 'berlistrik_pln' ? 'selected' : '' }}>
+          Berlistrik PLN
+        </option>
+        <option value="berlistrik_non_pln" {{ old('status_kelistrikan', $perizinan->status_kelistrikan) == 'berlistrik_non_pln' ? 'selected' : '' }}>
+          Berlistrik Non-PLN
+        </option>
+        <option value="tidak_berlistrik" {{ old('status_kelistrikan', $perizinan->status_kelistrikan) == 'tidak_berlistrik' ? 'selected' : '' }}>
+          Tidak Berlistrik
+        </option>
+      </select>
+      @error('status_kelistrikan')
+        <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
+      @enderror
+    </div>
+
     <div class="form-row">
       <div class="form-group">
         <label class="label">Jumlah Kapasitas</label>

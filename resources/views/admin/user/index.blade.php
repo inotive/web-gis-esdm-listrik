@@ -88,6 +88,66 @@
     </div>
   </div>
 
+  {{-- Pending Verification Section --}}
+  @if($pendingUsers->count() > 0)
+  <section class="card" style="margin-top:18px; border-left: 4px solid #F59E0B;">
+    <div class="card-header" style="background: #FEF3C7; border-bottom: 1px solid #FCD34D;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <i class="ri-alert-line" style="font-size: 24px; color: #F59E0B;"></i>
+        <div>
+          <div style="font-size: 16px; font-weight: 700; color: #92400E;">Pending Verification</div>
+          <div style="font-size: 13px; color: #78350F; margin-top: 2px;">
+            {{ $pendingUsers->count() }} user baru menunggu verifikasi
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-body" style="padding:0;">
+      <div class="table-responsive table-shell">
+        <table class="data">
+          <thead>
+            <tr>
+              <th class="col-no">No</th>
+              <th class="col-name">Nama Pengguna</th>
+              <th class="col-email">Email</th>
+              <th>Username</th>
+              <th>Tanggal Daftar</th>
+              <th class="col-aksi">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach ($pendingUsers as $user)
+              <tr>
+                <td class="col-no">{{ $loop->iteration }}</td>
+                <td class="col-name"><strong>{{ $user->name }}</strong></td>
+                <td class="col-email">{{ $user->email }}</td>
+                <td><strong>{{ $user->username }}</strong></td>
+                <td>{{ $user->created_at->format('d M Y H:i') }}</td>
+                <td class="col-aksi">
+                  <form action="{{ route('admin.hak-akses.user.approve', $user) }}" method="POST" style="display:inline-block;margin:0;">
+                    @csrf
+                    <button type="submit" class="btn-ico" style="color:#10b981;" title="Approve">
+                      <i class="fa-solid fa-check-circle"></i>
+                    </button>
+                  </form>
+                  <button 
+                    data-route="{{ route('admin.hak-akses.user.reject', $user) }}" 
+                    class="btn-ico delete" 
+                    title="Reject" 
+                    onclick="rejectUser(this, '{{ $user->name }}')">
+                    <i class="fa-solid fa-times-circle"></i>
+                  </button>
+                </td>
+              </tr>
+            @endforeach
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+  @endif
+
   <section class="card" style="margin-top:18px;">
     <div class="card-header">
       <div class="card-title">Daftar Pengguna</div>
@@ -295,6 +355,28 @@
           .post(route);
       } else {
         Swal.fire({title:"Aksi Dibatalkan :)", icon:"info"});
+      }
+    });
+  };
+
+  window.rejectUser = (e, userName) => {
+    const route = e.getAttribute('data-route');
+    Swal.fire({
+      title: "Tolak Pendaftaran User?",
+      html: `<p>Apakah Anda yakin ingin menolak pendaftaran <strong>${userName}</strong>?</p><p style="color:#DC2626;font-size:13px;">User akan dihapus dari sistem dan tidak dapat login.</p>`,
+      icon: "warning",
+      showCancelButton: true,
+      reverseButtons: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Ya, Tolak!',
+      cancelButtonText: 'Batalkan'
+    }).then((res) => {
+      if (res.isConfirmed) {
+        (new FormElementHelper)
+          .createAttribute('hidden', '_token', '{{ csrf_token() }}')
+          .createAttribute('hidden', '_method', 'POST')
+          .post(route);
       }
     });
   };

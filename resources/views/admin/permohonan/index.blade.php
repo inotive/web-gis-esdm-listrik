@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Dashboard ESDM - Perizinan dan Permohonan')
+@section('title', 'Data Permohonan Masuk')
 
 @push('styles')
     <style>

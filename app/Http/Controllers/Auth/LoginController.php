@@ -58,8 +58,30 @@ class LoginController extends Controller
 
         $fieldType = filter_var($request->name, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
         if (auth()->attempt([$fieldType => $input['name'], 'password' => $input['password']])) {
+            
+            // Ambil user yg baru login
+            $user = auth()->user();
+            
+            // Check if user is verified
+            if (!$user->is_verified) {
+                return redirect()->route('pending-verification')
+                    ->with('info', 'Akun Anda sedang menunggu verifikasi dari administrator.');
+            }
+            
+            // Cek role pertamanya
+            $role = $user->roles->first()?->name;
 
-            return redirect()->route('admin.dashboard')->with('login_success', 'Selamat datang kembali! Anda berhasil masuk.');
+            // Logic Redirect:
+            // 1. Admin & Superadmin => Dashboard
+            if (in_array($role, ['admin', 'superadmin'])) {
+                return redirect()->route('admin.dashboard')
+                    ->with('login_success', 'Selamat datang kembali! Anda berhasil masuk ke Dashboard.');
+            }
+            
+            // 2. Selain itu (Desa, Perusahaan, dll) => Halaman Peta (Landing)
+            return redirect()->route('landing')
+                ->with('login_success', 'Selamat datang kembali! Silakan lihat peta persebaran.');
+
         } else {
             return redirect()
                 ->back()
