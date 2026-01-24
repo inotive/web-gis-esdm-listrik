@@ -16,6 +16,7 @@ return new class extends Migration
 
             $table->string('kategori')->index();
             $table->string('sub_kategori')->nullable()->index();
+            $table->string('sub_subkategori')->nullable()->index();
             $table->char('regency_id', 4)->nullable()->index(); // Foreign key to reg_regencies.id
 
             $table->json('properties')->nullable();

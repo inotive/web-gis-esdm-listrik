@@ -50,73 +50,62 @@ class ImportJsonSeeder extends Seeder
             $pathParts = explode('/', $relativePath);
             $rootFolder = $pathParts[0] ?? null;
 
-            // Determine categorization strategy based on root folder
             $kategori = $rootFolder;
             $subKategori = null;
+            $subSubKategori = null;
             $regencyId = null;
 
-            if ($rootFolder === 'Administrasi') {
-                // Aturan: folder kategori, file subkategori, regency null
+            // Parts after root
+            $innerParts = array_slice($pathParts, 1);
+
+            // Logic for Sub and SubSub
+            if (count($innerParts) > 0) {
+                // First folder inside root is Sub Kategori
+                $subKategori = $innerParts[0];
+
+                // Remove it from parts
+                $remainingParts = array_slice($innerParts, 1);
+
+                if (!empty($remainingParts)) {
+                    // There are deeper folders. Use them as sub_subkategori.
+                    // File is irrelevant/grouped.
+                    $subSubKategori = implode('/', $remainingParts);
+                } else {
+                    // No deeper folders. The file itself is the sub_subkategori.
+                    $subSubKategori = $baseName;
+                }
+            } else {
+                // No folder inside root, just file -> File is Sub Kategori
                 $subKategori = $baseName;
-            } elseif ($rootFolder === 'Desa Berlistrik') {
-                // Aturan: folder kategori, file subkategori, regency null
-                $subKategori = $baseName;
-            } elseif ($rootFolder === 'Infrastruktur') {
-                // Aturan: folder infrastructure -> kategori
-                // folder kota/kabupaten -> regency_id
-                // file -> subkategori
-                // Path examples: Infrastruktur / Kab. Paser / Gardu.json
+                $subSubKategori = null;
+            }
+
+            // Keep Regency ID detection logic (same as before)
+            if ($rootFolder === 'Infrastruktur') {
                 $regencyFolderName = $pathParts[1] ?? null;
                 if ($regencyFolderName) {
                     $regencyId = $this->findRegencyId($regencyFolderName, $regencies);
                 }
-                $subKategori = $baseName;
             } elseif ($rootFolder === 'Jalan') {
-                // Aturan:
-                // folder jalan -> kategori
-                // folder didalamnya -> subkategori (e.g. Jalan Kabupaten, Jalan Nasional?)
-                // if subkategori == 'Jalan Kabupaten' -> folder didalamnya = regency_id
-                // Path examples: Jalan / Jalan Kabupaten / Kab. Paser / data.json
-                // Path examples: Jalan / Jalan Nasional / data.json
-
                 $folderL1 = $pathParts[1] ?? null;
-                $subKategori = $folderL1;
-
-                // Check for deeper structure for Regency ID
-                if ($folderL1) {
-                    // Start checking from index 2 for regency
-                    if (isset($pathParts[2])) {
-                        $potentialRegency = $pathParts[2];
-                        $foundId = $this->findRegencyId($potentialRegency, $regencies);
-                        if ($foundId) {
-                            $regencyId = $foundId;
-                        }
+                if ($folderL1 && isset($pathParts[2])) {
+                    $potentialRegency = $pathParts[2];
+                    $foundId = $this->findRegencyId($potentialRegency, $regencies);
+                    if ($foundId) {
+                        $regencyId = $foundId;
                     }
                 }
-                // Filename as extra detail or ignored? User didn't specify filename usage for Jalan broadly,
-                // but usually filename implies content. Let's keep subKategori as the folder type (Jalan Kabupaten)
-                // and maybe if there's no deeper folder, filename is the feature source.
             } elseif ($rootFolder === 'Kondisi Titik Pemukiman Non Listrik PLN') {
-                // Aturan: kategori
-                // folder kota/kabupaten -> regency_id
-                // file -> subkategori
                 $regencyFolderName = $pathParts[1] ?? null;
                 if ($regencyFolderName) {
                     $regencyId = $this->findRegencyId($regencyFolderName, $regencies);
                 }
-                $subKategori = $baseName;
             } else {
-                // Fallback / Jaringan Listrik case (User didn't explicitly mention Jaringan Listrik rules in the LAST message,
-                // but logically it follows Infrastruktur pattern usually. Or generic.)
-                // Let's assume generic pattern:
-                // Kategori = Root
-                // Regency = Check L1
-                // Sub = Filename
+                // Fallback for Jaringan Listrik etc
                 $possibleRegency = $pathParts[1] ?? null;
                 if ($possibleRegency) {
                     $regencyId = $this->findRegencyId($possibleRegency, $regencies);
                 }
-                $subKategori = $baseName;
             }
 
             $jsonContent = File::get($fullPath);
@@ -135,7 +124,8 @@ class ImportJsonSeeder extends Seeder
 
                 $featuresToInsert[] = [
                     'kategori' => Str::slug($kategori),
-                    'sub_kategori' => $subKategori ? Str::slug($subKategori) : null,
+                    'sub_kategori' => $subKategori,
+                    'sub_subkategori' => $subSubKategori,
                     'regency_id' => $regencyId,
                     'properties' => $properties,
                     'geometry' => $geometry,
