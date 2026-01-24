@@ -16,20 +16,20 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             PermissionSeeder::class,
             UserSeeder::class,
-                // ProvinsiSeeder::class,
-                // KabupatenSeeder::class,
-                // KecamatanSeeder::class,
-                // KelurahanSeeder::class,
-                // KategoriAssetSeeder::class,
-                // StatusHukumAssetSeeder::class,
-                // UnitKerjaSeeder::class,
+            // ProvinsiSeeder::class,
+            // KabupatenSeeder::class,
+            // KecamatanSeeder::class,
+            // KelurahanSeeder::class,
+            // KategoriAssetSeeder::class,
+            // StatusHukumAssetSeeder::class,
+            // UnitKerjaSeeder::class,
             WilayahSeeder::class,
-                // RegProvincesSeeder::class,
-                // RegRegenciesSeeder::class,
-                // RegDistrictsSeeder::class,
-                // RegVillagesSeeder::class,
+            // RegProvincesSeeder::class,
+            // RegRegenciesSeeder::class,
+            // RegDistrictsSeeder::class,
+            // RegVillagesSeeder::class,
 
-                // Dokumen Seeders
+            // Dokumen Seeders
             DokumenSeeder::class, // New general seeder - imports all from storage/app/public/dokumen/
             RekapElektrifikasiSeeder::class,
             DataBerlistrikSeeder::class,
@@ -37,7 +37,7 @@ class DatabaseSeeder extends Seeder
             PerizinanListrikSeeder::class,
             JalanSeeder::class,
             DataJaringanSeeder::class,
+            ImportJsonSeeder::class,
         ]);
     }
-
 }

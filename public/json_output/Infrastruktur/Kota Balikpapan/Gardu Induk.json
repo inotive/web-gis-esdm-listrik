@@ -1,0 +1,12 @@
+{
+"type": "FeatureCollection",
+"name": "Gardu Induk",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "REMARK": "Gardu Induk New Balikpapan" }, "geometry": { "type": "Point", "coordinates": [ 116.890602767000019, -1.225699330999987, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "Gardu Induk Gn. Malang/Industri" }, "geometry": { "type": "Point", "coordinates": [ 116.841254008162537, -1.261822728682489, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "Gardu Induk Kariangau" }, "geometry": { "type": "Point", "coordinates": [ 116.792627390167468, -1.165591032875, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "Gardu Induk Batakan/Manggar Sari" }, "geometry": { "type": "Point", "coordinates": [ 116.948693403277503, -1.237772723142484, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "Gardu Induk Karang Joang/Giri Rejo" }, "geometry": { "type": "Point", "coordinates": [ 116.878725859572455, -1.148432542944988, 0.0 ] } }
+]
+}

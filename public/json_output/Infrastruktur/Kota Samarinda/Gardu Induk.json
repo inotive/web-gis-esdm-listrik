@@ -1,0 +1,12 @@
+{
+"type": "FeatureCollection",
+"name": "Gardu Induk",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "REMARK": "Gardu Induk Bukuan" }, "geometry": { "type": "Point", "coordinates": [ 117.193816356467551, -0.58305595979499, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "Gardu Induk Harapan Baru" }, "geometry": { "type": "Point", "coordinates": [ 117.106725497967545, -0.547288541979981, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "Gardu Induk Sei Keledang" }, "geometry": { "type": "Point", "coordinates": [ 117.120817584844986, -0.525193226265003, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "Gardu Induk PLN Sambutan" }, "geometry": { "type": "Point", "coordinates": [ 117.214186534112514, -0.524569819279975, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "Gardu Induk Tengkawang" }, "geometry": { "type": "Point", "coordinates": [ 117.113838402697525, -0.502618372635027, 0.0 ] } }
+]
+}
