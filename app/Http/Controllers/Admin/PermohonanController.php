@@ -7,6 +7,7 @@ use App\Models\Permohonan;
 use App\Models\PermohonanUser;
 use App\Models\PermohonanQuestion;
 use App\Models\PermohonanQuestionOption;
+use App\Models\PerizinanListrik;
 use App\Models\RegRegency;
 use App\Models\RegDistrict;
 use App\Models\RegVillage;
@@ -26,6 +27,7 @@ class PermohonanController extends Controller
         $q = $request->get('q');
         $tab = $request->get('tab', 'permohonan');
         $status = $request->get('status', '');
+        $jenis = $request->get('jenis', '');
 
         // Per-column filters for Perizinan tab
         $filterPerizinanNama = $request->get('filter_perizinan_nama');
@@ -272,9 +274,14 @@ class PermohonanController extends Controller
         return view('admin.permohonan.index', [
             'title' => 'Data Permohonan Masuk',
             'permohonanUsers' => $permohonanUsers,
+            'perizinanItems' => $perizinanItems,
+            'perizinanStats' => $perizinanStats,
+            'jenisOptions' => $jenisOptions,
             'regencies' => $regencies,
             'q' => $q,
             'status' => $status,
+            'jenis' => $jenis,
+            'tab' => $tab,
         ]);
     }
 
