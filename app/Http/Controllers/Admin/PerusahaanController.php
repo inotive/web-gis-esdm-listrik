@@ -7,6 +7,7 @@ use App\Models\Perusahaan;
 use App\Models\Permohonan;
 use App\Models\PermohonanUser;
 use App\Models\PerizinanListrik;
+use App\Models\Dokumen;
 use App\Models\RegVillage;
 use App\Models\RegDistrict;
 use App\Models\RegRegency;
@@ -20,66 +21,87 @@ class PerusahaanController extends Controller
     public function index(Request $request)
     {
         $perPage = (int) $request->get('per_page', 10);
-        $q = $request->get('q');
-        $regencyId = $request->get('regency_id');
-        $districtId = $request->get('district_id');
-        $villageId = $request->get('village_id');
-        $kabupatenKota = $request->get('kabupaten_kota');
+        $q = $request->get('q'); // Global search
+
+        // Per-column filters
+        $filterNama = $request->get('filter_nama');
+        $filterAlamat = $request->get('filter_alamat');
+        $filterKontak = $request->get('filter_kontak');
+        $filterDesa = $request->get('filter_desa');
+        $filterKecamatan = $request->get('filter_kecamatan');
+        $filterKabupaten = $request->get('filter_kabupaten');
+        $filterTanggal = $request->get('filter_tanggal');
 
         // Optional eager loading - village may be null for imported data
         $query = Perusahaan::with(['village.district.regency']);
 
-        // Search by name or kontak
-        if ($q) {
+        // Global search - search across multiple fields (only if no per-column filters)
+        if ($q && !$filterNama && !$filterAlamat && !$filterKontak && !$filterDesa && !$filterKecamatan && !$filterKabupaten && !$filterTanggal) {
             $query->where(function ($query) use ($q) {
                 $query->where('nama', 'like', '%' . $q . '%')
-                    ->orWhere('kontak', 'like', '%' . $q . '%');
+                    ->orWhere('alamat', 'like', '%' . $q . '%')
+                    ->orWhere('kontak', 'like', '%' . $q . '%')
+                    ->orWhere('kabupaten_kota', 'like', '%' . $q . '%')
+                    // Search in village name
+                    ->orWhereHas('village', function ($subQuery) use ($q) {
+                        $subQuery->where('name', 'like', '%' . $q . '%');
+                    })
+                    // Search in district name
+                    ->orWhereHas('village.district', function ($subQuery) use ($q) {
+                        $subQuery->where('name', 'like', '%' . $q . '%');
+                    })
+                    // Search in regency name
+                    ->orWhereHas('village.district.regency', function ($subQuery) use ($q) {
+                        $subQuery->where('name', 'like', '%' . $q . '%');
+                    });
             });
         }
 
-        // Filter by kabupaten_kota (string) for imported data
-        if ($kabupatenKota) {
-            $query->where('kabupaten_kota', 'like', '%' . $kabupatenKota . '%');
+        // Per-column filters (take priority over global search)
+        if ($filterNama) {
+            $query->where('nama', 'like', '%' . $filterNama . '%');
         }
 
-        // Filter by regency (from village relationship)
-        if ($regencyId) {
-            $query->whereHas('village.district', function ($q) use ($regencyId) {
-                $q->where('regency_id', $regencyId);
+        if ($filterAlamat) {
+            $query->where('alamat', 'like', '%' . $filterAlamat . '%');
+        }
+
+        if ($filterKontak) {
+            $query->where('kontak', 'like', '%' . $filterKontak . '%');
+        }
+
+        if ($filterDesa) {
+            $query->whereHas('village', function ($subQuery) use ($filterDesa) {
+                $subQuery->where('name', 'like', '%' . $filterDesa . '%');
             });
         }
 
-        // Filter by district
-        if ($districtId) {
-            $query->whereHas('village', function ($q) use ($districtId) {
-                $q->where('district_id', $districtId);
+        if ($filterKecamatan) {
+            $query->whereHas('village.district', function ($subQuery) use ($filterKecamatan) {
+                $subQuery->where('name', 'like', '%' . $filterKecamatan . '%');
             });
         }
 
-        // Filter by village
-        if ($villageId) {
-            $query->where('village_id', $villageId);
+        if ($filterKabupaten) {
+            $query->where(function ($subQuery) use ($filterKabupaten) {
+                $subQuery->where('kabupaten_kota', 'like', '%' . $filterKabupaten . '%')
+                    ->orWhereHas('village.district.regency', function ($q) use ($filterKabupaten) {
+                        $q->where('name', 'like', '%' . $filterKabupaten . '%');
+                    });
+            });
+        }
+
+        if ($filterTanggal) {
+            $query->whereDate('created_at', $filterTanggal);
         }
 
         $perusahaans = $query->orderBy('nama', 'asc')
             ->paginate($perPage)
             ->withQueryString();
 
-        // Untuk filter dropdown
-        $regencies = RegRegency::orderBy('name')->get(['id', 'name']);
-        $districts = $regencyId
-            ? RegDistrict::where('regency_id', $regencyId)->orderBy('name')->get(['id', 'name'])
-            : collect([]);
-        $villages = $districtId
-            ? RegVillage::where('district_id', $districtId)->orderBy('name')->get(['id', 'name'])
-            : collect([]);
-
         return view('admin.perusahaan.index', [
             'title' => "Manajemen Data Perusahaan",
             'perusahaans' => $perusahaans,
-            'regencies' => $regencies,
-            'districts' => $districts,
-            'villages' => $villages,
         ]);
     }
 
@@ -155,6 +177,7 @@ class PerusahaanController extends Controller
                     'tanggal_akhir' => $doc->tanggal_akhir,
                     'perizinan_nama' => $perizinan->nama ?? $perizinan->jenis ?? '-',
                     'dokumen' => $doc->dokumen,
+                    'source' => 'perizinan',
                 ];
             }
         }
@@ -170,6 +193,69 @@ class PerusahaanController extends Controller
                     'tanggal_akhir' => $doc->masa_berlaku,
                     'perizinan_nama' => 'Dokumen Permohonan',
                     'dokumen' => $doc->dokumen,
+                    'source' => 'permohonan',
+                ];
+            }
+        }
+
+        // Ambil dokumen dari tabel dokumens berdasarkan nama perusahaan
+        // Buat keyword pencarian dari nama perusahaan (hapus prefix umum)
+        $namaPerusahaan = $perusahaan->nama;
+        $keywords = [];
+
+        // Tambah nama lengkap sebagai keyword
+        $keywords[] = $namaPerusahaan;
+
+        // Hapus prefix seperti PT., PT, CV., CV, Tbk., dll dan buat keyword tambahan
+        $cleanedName = preg_replace('/^(PT\.?\s*|CV\.?\s*)/i', '', $namaPerusahaan);
+        $cleanedName = preg_replace('/\s*(Tbk\.?|\(.*\))\s*$/i', '', $cleanedName);
+        $cleanedName = trim($cleanedName);
+        if ($cleanedName && $cleanedName !== $namaPerusahaan) {
+            $keywords[] = $cleanedName;
+        }
+
+        // Ambil kata utama dari nama (misal: "TRAKINDO UTAMA" dari "PT. TRAKINDO UTAMA")
+        $words = explode(' ', $cleanedName);
+        if (count($words) > 1) {
+            // Kata pertama yang bukan umum (minimal 4 karakter)
+            foreach ($words as $word) {
+                if (strlen($word) >= 4 && !in_array(strtoupper($word), ['INDONESIA', 'UTAMA', 'JAYA', 'PRIMA', 'MANDIRI', 'SEJAHTERA', 'ABADI'])) {
+                    $keywords[] = $word;
+                    break;
+                }
+            }
+        }
+
+        // Cari dokumen yang cocok dengan keyword
+        if (!empty($keywords)) {
+            $dokumenQuery = Dokumen::query();
+
+            $dokumenQuery->where(function ($q) use ($keywords) {
+                foreach ($keywords as $keyword) {
+                    if (strlen($keyword) >= 3) {
+                        $q->orWhere('nama', 'LIKE', '%' . $keyword . '%');
+                    }
+                }
+            });
+
+            $dokumenResults = $dokumenQuery->orderBy('tipe', 'desc') // Folder dulu
+                ->orderBy('nama')
+                ->limit(50) // Batasi hasil
+                ->get();
+
+            foreach ($dokumenResults as $dok) {
+                $dokumenData[] = [
+                    'id' => $dok->id,
+                    'nama' => $dok->nama,
+                    'no_surat' => null,
+                    'tanggal_terbit' => $dok->created_at,
+                    'tanggal_akhir' => null,
+                    'perizinan_nama' => $dok->isFolder() ? 'Folder' : 'File Dokumen',
+                    'dokumen' => $dok,
+                    'source' => 'dokumen_db',
+                    'tipe' => $dok->tipe,
+                    'path' => $dok->path,
+                    'size' => $dok->formatted_size,
                 ];
             }
         }

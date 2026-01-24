@@ -30,13 +30,15 @@ class DatabaseSeeder extends Seeder
                 // RegVillagesSeeder::class,
 
                 // Dokumen Seeders
+                PermohonanSeeder::class,
+
             DokumenSeeder::class, // New general seeder - imports all from storage/app/public/dokumen/
             RekapElektrifikasiSeeder::class,
             DataBerlistrikSeeder::class,
             InfrastrukturPerusahaanSeeder::class,
             PerizinanListrikSeeder::class,
             JalanSeeder::class,
-            DataJaringanSeeder::class,
+            // DataJaringanSeeder::class,
         ]);
     }
 

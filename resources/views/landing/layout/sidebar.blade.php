@@ -59,21 +59,13 @@
             <span class="menu-icon"><i class="ri-file-text-line" aria-hidden="true"></i></span>
             <span class="menu-label">Rekap Data</span>
         </a>
-        @if ($shouldShowMenu ?? false)
-
+        @if (in_array($userRole ?? null, ['desa', 'perusahaan']))
             <div class="menu-title">Layanan</div>
-            @foreach ($permohonans as $permohonan)
-                @php
-                    $isActive =
-                        request()->routeIs('admin.permohonan-user.*') &&
-                        request()->route('permohonanId') == $permohonan->id;
-                @endphp
-                <a class="menu-item {{ $isActive ? 'active' : '' }}"
-                    href="{{ route('admin.permohonan-user.index', $permohonan->id) }}">
-                    <span class="menu-icon"><i class="ri-file-line" aria-hidden="true"></i></span>
-                    <span class="menu-label">{{ $permohonan->nama }}</span>
-                </a>
-            @endforeach
+            <a class="menu-item {{ nav_active('admin.pengajuan-permohonan.*') }}"
+                href="{{ route('admin.pengajuan-permohonan.index') }}">
+                <span class="menu-icon"><i class="ri-file-add-line" aria-hidden="true"></i></span>
+                <span class="menu-label">Pengajuan Permohonan</span>
+            </a>
         @endif
 
 
@@ -129,10 +121,10 @@
                 <span class="menu-label">Data Jalan &amp; Aksesbilitas</span>
             </a>
 
-            <a class="menu-item {{ nav_active('admin.skoring.*') }}" href="{{ route('admin.skoring.index') }}">
+            {{-- <a class="menu-item {{ nav_active('admin.skoring.*') }}" href="{{ route('admin.skoring.index') }}">
                 <span class="menu-icon"><i class="ri-slideshow-2-line" aria-hidden="true"></i></span>
                 <span class="menu-label">Variabel Skoring &amp; Bobot</span>
-            </a>
+            </a> --}}
             <a class="menu-item {{ nav_active('admin.kategori-permohonan.*') }}"
                 href="{{ route('admin.kategori-permohonan.index') }}">
                 <span class="menu-icon"><i class="ri-file-list-3-line" aria-hidden="true"></i></span>

@@ -35,6 +35,7 @@ use App\Http\Controllers\Admin\RekapDataController;
 use App\Http\Controllers\Admin\DataInfrastrukturController;
 use App\Http\Controllers\Admin\KategoriPermohonanController;
 use App\Http\Controllers\Admin\PerizinanController;
+use App\Http\Controllers\Admin\PengajuanPermohonanController;
 
 // Models untuk statistik home
 use App\Models\InfrastrukturJaringan;
@@ -251,7 +252,7 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
         Route::delete('/{permohonan}', [KategoriPermohonanController::class, 'destroy'])->name('destroy');
     });
 
-    // Permohonan User
+    // Permohonan User (Old - for admin to manage)
     Route::group(['as' => 'permohonan-user.', 'prefix' => 'permohonan-user'], function () {
         Route::get('/{permohonanId}', [PermohonanUserController::class, 'index'])->name('index');
         Route::get('/{permohonanId}/create', [PermohonanUserController::class, 'create'])->name('create');
@@ -266,6 +267,18 @@ Route::group(['middleware' => ['auth'], 'as' => 'admin.', 'prefix' => 'admin'], 
         Route::post('/{permohonanId}/{permohonanUser}/cancel', [PermohonanUserController::class, 'cancel'])->name('cancel');
         Route::post('/{permohonanId}/{permohonanUser}/document', [PermohonanUserController::class, 'addDocument'])->name('document.add');
         Route::delete('/{permohonanId}/{permohonanUser}/document/{document}', [PermohonanUserController::class, 'deleteDocument'])->name('document.delete');
+    });
+
+    // Pengajuan Permohonan (New - simplified for desa/perusahaan users)
+    Route::group(['as' => 'pengajuan-permohonan.', 'prefix' => 'pengajuan-permohonan'], function () {
+        Route::get('/', [PengajuanPermohonanController::class, 'index'])->name('index');
+        Route::get('/select-type', [PengajuanPermohonanController::class, 'selectType'])->name('select-type');
+        Route::get('/create', [PengajuanPermohonanController::class, 'create'])->name('create');
+        Route::post('/', [PengajuanPermohonanController::class, 'store'])->name('store');
+        Route::get('/{pengajuanPermohonan}', [PengajuanPermohonanController::class, 'show'])->name('show');
+        Route::get('/{pengajuanPermohonan}/edit', [PengajuanPermohonanController::class, 'edit'])->name('edit');
+        Route::put('/{pengajuanPermohonan}', [PengajuanPermohonanController::class, 'update'])->name('update');
+        Route::delete('/{pengajuanPermohonan}', [PengajuanPermohonanController::class, 'destroy'])->name('destroy');
     });
 
     // Dokumen

@@ -277,6 +277,11 @@
             color: #D97706;
         }
 
+        .status-database {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
         .keterangan {
             font-size: 12px;
             color: #6B7280;
@@ -713,10 +718,10 @@
                         <tr>
                             <th class="col-no">No</th>
                             <th>Nama Dokumen</th>
+                            <th>Tipe</th>
                             <th>Sumber</th>
-                            <th>No. Surat</th>
-                            <th>Tanggal Terbit</th>
-                            <th>Tanggal Berakhir</th>
+                            <th>Ukuran</th>
+                            <th>Tanggal</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -724,28 +729,64 @@
                         @foreach($dokumenData as $index => $doc)
                             <tr>
                                 <td class="col-no">{{ $index + 1 }}</td>
-                                <td class="nama-bold">{{ $doc['nama'] }}</td>
                                 <td>
-                                    <span class="status-badge status-aktif">{{ $doc['perizinan_nama'] }}</span>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        @if(isset($doc['tipe']) && $doc['tipe'] === 'folder')
+                                            <i class="ri-folder-fill" style="color: #F59E0B; font-size: 18px;"></i>
+                                        @else
+                                            <i class="ri-file-text-fill" style="color: #22C55E; font-size: 18px;"></i>
+                                        @endif
+                                        <span class="nama-bold">{{ $doc['nama'] }}</span>
+                                    </div>
                                 </td>
-                                <td>{{ $doc['no_surat'] ?? '-' }}</td>
-                                <td class="tanggal">
-                                    {{ $doc['tanggal_terbit'] ? \Carbon\Carbon::parse($doc['tanggal_terbit'])->translatedFormat('d M Y') : '-' }}
-                                </td>
-                                <td class="tanggal">
-                                    @if($doc['tanggal_akhir'])
-                                        @php
-                                            $isExpired = \Carbon\Carbon::parse($doc['tanggal_akhir'])->isPast();
-                                        @endphp
-                                        <span class="{{ $isExpired ? 'status-badge status-expired' : '' }}">
-                                            {{ \Carbon\Carbon::parse($doc['tanggal_akhir'])->translatedFormat('d M Y') }}
+                                <td>
+                                    @if(isset($doc['tipe']))
+                                        <span class="status-badge {{ $doc['tipe'] === 'folder' ? 'status-warning' : 'status-aktif' }}">
+                                            {{ ucfirst($doc['tipe']) }}
                                         </span>
                                     @else
-                                        -
+                                        <span class="status-badge status-aktif">File</span>
                                     @endif
                                 </td>
                                 <td>
-                                    @if($doc['dokumen'] && $doc['dokumen']->path)
+                                    @php
+                                        $source = $doc['source'] ?? 'unknown';
+                                        $sourceBadgeClass = 'status-aktif';
+                                        $sourceLabel = $doc['perizinan_nama'] ?? 'Dokumen';
+                                        
+                                        if ($source === 'dokumen_db') {
+                                            $sourceBadgeClass = 'status-database';
+                                            $sourceLabel = 'Database Dokumen';
+                                        } elseif ($source === 'perizinan') {
+                                            $sourceBadgeClass = 'status-aktif';
+                                        } elseif ($source === 'permohonan') {
+                                            $sourceBadgeClass = 'status-warning';
+                                        }
+                                    @endphp
+                                    <span class="status-badge {{ $sourceBadgeClass }}">{{ $sourceLabel }}</span>
+                                </td>
+                                <td class="text-muted">
+                                    {{ $doc['size'] ?? '-' }}
+                                </td>
+                                <td class="tanggal">
+                                    {{ $doc['tanggal_terbit'] ? \Carbon\Carbon::parse($doc['tanggal_terbit'])->translatedFormat('d M Y') : '-' }}
+                                </td>
+                                <td>
+                                    @if(isset($doc['source']) && $doc['source'] === 'dokumen_db')
+                                        @if(isset($doc['tipe']) && $doc['tipe'] === 'folder')
+                                            <a href="{{ route('admin.dokumen.index', ['folder' => $doc['id']]) }}" class="doc-link">
+                                                <i class="ri-folder-open-line"></i>
+                                                Buka
+                                            </a>
+                                        @elseif(isset($doc['path']) && $doc['path'])
+                                            <a href="{{ asset('storage/' . $doc['path']) }}" target="_blank" class="doc-link">
+                                                <i class="ri-eye-line"></i>
+                                                Lihat
+                                            </a>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    @elseif($doc['dokumen'] && $doc['dokumen']->path)
                                         <a href="{{ asset('storage/' . $doc['dokumen']->path) }}" target="_blank" class="doc-link">
                                             <i class="ri-eye-line"></i>
                                             Lihat
