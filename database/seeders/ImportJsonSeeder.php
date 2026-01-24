@@ -86,7 +86,7 @@ class ImportJsonSeeder extends Seeder
                 if ($regencyFolderName) {
                     $regencyId = $this->findRegencyId($regencyFolderName, $regencies);
                 }
-            } elseif ($rootFolder === 'Jalan') {
+            } elseif ($rootFolder === 'jalan') {
                 $folderL1 = $pathParts[1] ?? null;
                 if ($folderL1 && isset($pathParts[2])) {
                     $potentialRegency = $pathParts[2];
