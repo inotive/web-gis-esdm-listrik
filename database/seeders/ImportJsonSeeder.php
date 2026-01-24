@@ -41,6 +41,9 @@ class ImportJsonSeeder extends Seeder
             }
 
             $relativePath = $file->getRelativePath();
+            // Normalize path separators for Windows compatibility
+            $relativePath = str_replace('\\', '/', $relativePath);
+
             $fileName = $file->getFilename();
             $fullPath = $file->getPathname();
             $baseName = pathinfo($fileName, PATHINFO_FILENAME);
