@@ -80,13 +80,15 @@ class ImportJsonSeeder extends Seeder
                 $subSubKategori = null;
             }
 
+            $this->command->info("File: $relativePath -> Kategori: $kategori, Sub: $subKategori, SubSub: $subSubKategori");
+
             // Keep Regency ID detection logic (same as before)
             if ($rootFolder === 'Infrastruktur') {
                 $regencyFolderName = $pathParts[1] ?? null;
                 if ($regencyFolderName) {
                     $regencyId = $this->findRegencyId($regencyFolderName, $regencies);
                 }
-            } elseif ($rootFolder === 'jalan') {
+            } elseif ($rootFolder === 'Jalan') {
                 $folderL1 = $pathParts[1] ?? null;
                 if ($folderL1 && isset($pathParts[2])) {
                     $potentialRegency = $pathParts[2];
