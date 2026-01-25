@@ -658,13 +658,21 @@
 
                                 // Smart Renderer Assignment
                                 layer.watch("visible", (visible) => {
-                                    if (visible && !layer.renderer) {
+                                    if (visible) {
                                         layer.load().then(() => {
                                             const type = layer
                                                 .geometryType;
 
+                                            // Only apply if not already using picture-marker to avoid loop/flicker
+                                            // although overwriting is generally safe in this context
                                             if (type == "point" ||
                                                 type == "multipoint") {
+                                                // Check if we already applied our custom symbol
+                                                if (layer.renderer
+                                                    ?.symbol?.type ===
+                                                    'picture-marker')
+                                                    return;
+
                                                 const svgUrl =
                                                     createLocationPinSvg(
                                                         color);
