@@ -32,6 +32,7 @@ class DatabaseSeeder extends Seeder
                 // Dokumen Seeders
             DokumenSeeder::class, // New general seeder - imports all from storage/app/public/dokumen/
             RekapElektrifikasiSeeder::class,
+            PermohonanSeeder::class,
             DataBerlistrikSeeder::class,
             InfrastrukturPerusahaanSeeder::class,
             PerizinanListrikSeeder::class,
