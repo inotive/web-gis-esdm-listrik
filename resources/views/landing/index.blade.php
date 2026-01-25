@@ -626,9 +626,11 @@
                                         symbol: {
                                             type: "text",
                                             color: [255, 255, 0,
-                                            255], // Kuning terang agar kontras
+                                                255
+                                            ], // Kuning terang agar kontras
                                             haloColor: [0, 0, 0,
-                                            200], // Outline hitam
+                                                200
+                                            ], // Outline hitam
                                             haloSize: "1.5px",
                                             font: {
                                                 size: 11,
@@ -647,18 +649,18 @@
                                             const type = layer
                                                 .geometryType;
 
-                                            if (type === "point" ||
-                                                type === "multipoint") {
+                                            if (type == "point" ||
+                                                type == "multipoint") {
+                                                const svgUrl =
+                                                    createLocationPinSvg(
+                                                        color);
                                                 layer.renderer = {
                                                     type: "simple",
                                                     symbol: {
-                                                        type: "simple-marker",
-                                                        color: color,
-                                                        size: "12px",
-                                                        outline: {
-                                                            color: "white",
-                                                            width: 1
-                                                        }
+                                                        type: "picture-marker",
+                                                        url: svgUrl,
+                                                        width: "32px",
+                                                        height: "32px"
                                                     }
                                                 };
                                             } else if (type ===
