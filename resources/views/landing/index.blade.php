@@ -129,6 +129,9 @@
                     basemap: Basemap.fromId("satellite")
                 });
 
+                // Admin Status from Blade
+                const isAdmin = {{ auth()->check() && auth()->user()->hasRole('admin') ? 'true' : 'false' }};
+
                 const view = new MapView({
                     container: "viewDiv",
                     map: map,
@@ -641,6 +644,18 @@
                             const catLayers = [];
 
                             cat.sub_categories.forEach((sub) => {
+                                console.log(sub.label ==
+                                    'Status Desa Berlistrik Dengan Bantuan');
+                                // Filter Restricted Layers for Non-Admin
+                                if (!isAdmin) {
+                                    if (sub.label ==
+                                        'Status Desa Berlistrik Dengan Bantuan' ||
+                                        sub.label == 'Rencana Bantuan Lokasi Pemukiman'
+                                    ) {
+                                        return;
+                                    }
+                                }
+
                                 // Define dynamic layer
                                 const layerUrl =
                                     `{{ url('/api/features/data') }}?kategori=${encodeURIComponent(cat.slug)}&sub_kategori=${encodeURIComponent(sub.slug)}`;
