@@ -17,7 +17,11 @@ class ImportJsonSeeder extends Seeder
     {
         ini_set('memory_limit', '-1');
         DB::disableQueryLog();
+
+        // Disable foreign key checks temporarily
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         DB::table('imported_json_features')->truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         $jsonOutputPath = public_path('json_output');
 
