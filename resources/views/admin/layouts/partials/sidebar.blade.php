@@ -125,6 +125,11 @@
                 <span class="menu-label">Data Jalan &amp; Aksesbilitas</span>
             </a>
 
+            <a class="menu-item {{ nav_active('admin.rencana-pengembangan.*') }}" href="{{ route('admin.rencana-pengembangan.index') }}">
+                <span class="menu-icon"><i class="ri-lightbulb-flash-line" aria-hidden="true"></i></span>
+                <span class="menu-label">Rencana Pengembangan Bantuan</span>
+            </a>
+
             <!-- <a class="menu-item {{ nav_active('admin.skoring.*') }}" href="{{ route('admin.skoring.index') }}">
             <span class="menu-icon"><i class="ri-slideshow-2-line" aria-hidden="true"></i></span>
             <span class="menu-label">Variabel Skoring &amp; Bobot</span>

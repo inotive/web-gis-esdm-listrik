@@ -65,14 +65,14 @@ Route::get('/pending-verification', [PendingVerificationController::class, 'inde
     ->name('pending-verification');
 
 // API: Check username availability
-Route::get('/api/check-username', function(Illuminate\Http\Request $request) {
+Route::get('/api/check-username', function (Illuminate\Http\Request $request) {
     $username = $request->query('username');
     $exists = \App\Models\User::where('username', $username)->exists();
     return response()->json(['available' => !$exists]);
 });
 
 // API: Check email availability
-Route::get('/api/check-email', function(Illuminate\Http\Request $request) {
+Route::get('/api/check-email', function (Illuminate\Http\Request $request) {
     $email = $request->query('email');
     $exists = \App\Models\User::where('email', $email)->exists();
     return response()->json(['available' => !$exists]);
@@ -162,7 +162,7 @@ Route::group(['middleware' => ['auth', 'verified_user'], 'as' => 'admin.', 'pref
         // Endpoints opsi untuk dropdown berjenjang
         Route::get('/options/regencies', [DesaController::class, 'optionsRegencies'])->name('options.regencies');
         Route::get('/options/districts', [DesaController::class, 'optionsDistricts'])->name('options.districts');
-        
+
         // API for electricity statistics
         Route::get('/api/electricity-stats', [DesaController::class, 'getElectricityStats'])->name('api.electricity-stats');
     });
@@ -261,7 +261,7 @@ Route::group(['middleware' => ['auth', 'verified_user'], 'as' => 'admin.', 'pref
     Route::group(['as' => 'perizinan.', 'prefix' => 'perizinan'], function () {
         Route::get('/import', [PerizinanController::class, 'import'])->name('import');
         Route::post('/import', [PerizinanController::class, 'importProcess'])->name('import.process');
-        
+
         Route::get('/', [PerizinanController::class, 'index'])->name('index');
         Route::get('/create', [PerizinanController::class, 'create'])->name('create');
         Route::post('/', [PerizinanController::class, 'store'])->name('store');
@@ -327,6 +327,14 @@ Route::group(['middleware' => ['auth', 'verified_user'], 'as' => 'admin.', 'pref
     Route::group(['as' => 'rekap-data.', 'prefix' => 'rekap-data'], function () {
         Route::get('/', [RekapDataController::class, 'index'])->name('index');
         Route::get('/detail/{kabupaten}', [RekapDataController::class, 'detail'])->name('detail');
+    });
+
+    // Rencana Pengembangan Bantuan Ketenagalistrikan
+    Route::group(['as' => 'rencana-pengembangan.', 'prefix' => 'rencana-pengembangan'], function () {
+        Route::get('/', [\App\Http\Controllers\Admin\RencanaPengembanganController::class, 'index'])->name('index');
+        Route::post('/', [\App\Http\Controllers\Admin\RencanaPengembanganController::class, 'store'])->name('store');
+        Route::post('/{id}/update-field', [\App\Http\Controllers\Admin\RencanaPengembanganController::class, 'updateField'])->name('update-field');
+        Route::delete('/{id}', [\App\Http\Controllers\Admin\RencanaPengembanganController::class, 'destroy'])->name('destroy');
     });
 });
 

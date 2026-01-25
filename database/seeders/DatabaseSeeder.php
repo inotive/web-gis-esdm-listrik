@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
             InfrastrukturPerusahaanSeeder::class,
             PerizinanListrikSeeder::class,
             JalanSeeder::class,
+            RencanaPengembanganBantuanSeeder::class,
             // DataJaringanSeeder::class,
         ]);
     }
