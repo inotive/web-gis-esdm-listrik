@@ -1,0 +1,30 @@
+{
+"type": "FeatureCollection",
+"name": "Pembangkit",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "REMARK": "Pembangkit Listrik Tenaga Diesel (PLTD) Muara Pantuan" }, "geometry": { "type": "Point", "coordinates": [ 117.568760000773523, -0.580270000759867, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "Pembangkit Listrik Tenaga Uap (PLTU) Rimba Raya Lestari" }, "geometry": { "type": "Point", "coordinates": [ 117.034250000337352, -0.546971999458151, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "Pembangkit Listrik Tenaga Gas (PLTG) Peaking" }, "geometry": { "type": "Point", "coordinates": [ 117.051356693856405, -0.384236355823134, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "PLTMG Kaltimex" }, "geometry": { "type": "Point", "coordinates": [ 117.052939887365937, -0.383213524484518, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "Pembangkit Listrik Tenaga Uap (PLTU) Embalut" }, "geometry": { "type": "Point", "coordinates": [ 117.062304571898494, -0.374048216052302, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "Pembangkit Listrik Tenaga Uap (PLTU) 4 Kaltim" }, "geometry": { "type": "Point", "coordinates": [ 117.064893425091554, -0.363768945280526, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "Pembangkit Listrik Tenaga Gas (PLTG) Sambera" }, "geometry": { "type": "Point", "coordinates": [ 117.291765683639483, -0.316804341647014, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "Pembangkit Listrik Tenaga Surya (PLTS) Komunal Muara Enggelam Muara Wis" }, "geometry": { "type": "Point", "coordinates": [ 116.184675711415025, -0.109864603868346, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "Pembangkit Listrik Tenaga Diesel (PLTD) Sedulang" }, "geometry": { "type": "Point", "coordinates": [ 116.810807399941609, 0.125510400184851, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "Pembangkit Listrik Tenaga Diesel (PLTD) Tabang" }, "geometry": { "type": "Point", "coordinates": [ 116.012625459297624, 0.574341715897503, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "Pembangkit Listrik Tenaga Diesel (PLTD) Jantur" }, "geometry": { "type": "Point", "coordinates": [ 116.289609999901586, -0.41978000024676, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "Pembangkit Listrik Tenaga Diesel (PLTD) Kahala" }, "geometry": { "type": "Point", "coordinates": [ 116.365500000324801, -0.011719999878039, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "Pembangkit Listrik Tenaga Diesel (PLTD) Muara Aloh" }, "geometry": { "type": "Point", "coordinates": [ 116.351859999939052, -0.43181000013135, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "Pembangkit Listrik Tenaga Diesel (PLTD) Muara Siran" }, "geometry": { "type": "Point", "coordinates": [ 116.636419999583381, -0.128330000329186, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "Pembangkit Listrik Tenaga Diesel (PLTD) Semayang" }, "geometry": { "type": "Point", "coordinates": [ 116.451810000131445, -0.182780000396633, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "Pembangkit Listrik Tenaga Diesel (PLTD) Muara Muntai" }, "geometry": { "type": "Point", "coordinates": [ 116.474320000367811, -0.643319999917992, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "Pembangkit Listrik Tenaga Diesel (PLTD) Perangat" }, "geometry": { "type": "Point", "coordinates": [ 117.367769999585903, -0.051280000371662, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "Pembangkit Listrik Tenaga Diesel (PLTD) Sebuntal" }, "geometry": { "type": "Point", "coordinates": [ 117.417360000363828, -0.08973999960125, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "Pembangkit Listrik Tenaga Uap (PLTU) Sumalindo" }, "geometry": { "type": "Point", "coordinates": [ 117.030360999960294, -0.602472000282546, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "GI Embalut" }, "geometry": { "type": "Point", "coordinates": [ 117.051817000154529, -0.381617000324241, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "GI Tenggarong/Bukit Biru" }, "geometry": { "type": "Point", "coordinates": [ 116.978, -0.455999999600238, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "GI Sambera/Muara Badak" }, "geometry": { "type": "Point", "coordinates": [ 117.29251322170785, -0.316002437762222, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "GI Kota Bangun" }, "geometry": { "type": "Point", "coordinates": [ 116.595334599612102, -0.271557328907534, 0.0 ] } }
+]
+}

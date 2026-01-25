@@ -1,0 +1,18 @@
+{
+"type": "FeatureCollection",
+"name": "Pembangkit",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "REMARK": "PLTS Manaar Bulatn" }, "geometry": { "type": "Point", "coordinates": [ 115.880262439000035, -0.257447642999978, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "PLTS Tering" }, "geometry": { "type": "Point", "coordinates": [ 115.713315729000101, -0.025574974999927, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "PLTD Kelumpang" }, "geometry": { "type": "Point", "coordinates": [ 115.8227, -0.17304, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "PLTD Long Iram" }, "geometry": { "type": "Point", "coordinates": [ 115.633060000000114, 0.01347, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "PLTD Muara Pahu" }, "geometry": { "type": "Point", "coordinates": [ 116.06414, -0.32542, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "PLTD Muara Kedang" }, "geometry": { "type": "Point", "coordinates": [ 116.29792, -0.5665, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "PLTD Penyinggahan" }, "geometry": { "type": "Point", "coordinates": [ 116.22344, -0.38733, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "PLTD Sendawar" }, "geometry": { "type": "Point", "coordinates": [ 115.801470000000108, -0.24233, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "PLTD Tabisaq" }, "geometry": { "type": "Point", "coordinates": [ 115.92136, -0.49664, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "PLTD Tanjung Isuy" }, "geometry": { "type": "Point", "coordinates": [ 116.14019, -0.51375, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "PLTD/S Dilang Putih" }, "geometry": { "type": "Point", "coordinates": [ 115.766390000000115, -0.71683, 0.0 ] } }
+]
+}

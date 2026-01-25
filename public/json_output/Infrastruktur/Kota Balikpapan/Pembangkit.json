@@ -1,0 +1,12 @@
+{
+"type": "FeatureCollection",
+"name": "Pembangkit",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "REMARK": "PLTD Gunung Malang" }, "geometry": { "type": "Point", "coordinates": [ 116.841166575999978, -1.262616659, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "PLTD Batakan Unit" }, "geometry": { "type": "Point", "coordinates": [ 116.950427396, -1.238532046999978, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "PLTU Kaltim/Teluk Balikpapan (FTP1)" }, "geometry": { "type": "Point", "coordinates": [ 116.789407475999951, -1.169906411, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "PLTU Kariangau Power" }, "geometry": { "type": "Point", "coordinates": [ 116.801440456000023, -1.198839323000016, 0.0 ] } },
+{ "type": "Feature", "properties": { "REMARK": "PLTD CDE Karang Joang (MFO)" }, "geometry": { "type": "Point", "coordinates": [ 116.878774743572535, -1.148372337219996, 0.0 ] } }
+]
+}

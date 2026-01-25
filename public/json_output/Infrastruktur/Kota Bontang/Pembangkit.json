@@ -1,0 +1,16 @@
+{
+"type": "FeatureCollection",
+"name": "Pembangkit",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "Nama": "PLTU Teluk Kadere" }, "geometry": { "type": "Point", "coordinates": [ 117.493441911576937, 0.055439801221189 ] } },
+{ "type": "Feature", "properties": { "Nama": "PLTD Kanaan" }, "geometry": { "type": "Point", "coordinates": [ 117.453991937784764, 0.137096720035656 ] } },
+{ "type": "Feature", "properties": { "Nama": "PLTG Kanaan" }, "geometry": { "type": "Point", "coordinates": [ 117.454384275811094, 0.13819781329354 ] } },
+{ "type": "Feature", "properties": { "Nama": "PLTG BME" }, "geometry": { "type": "Point", "coordinates": [ 117.451106501099588, 0.165733785057174 ] } },
+{ "type": "Feature", "properties": { "Nama": "PLTS Gusung" }, "geometry": { "type": "Point", "coordinates": [ 117.510519373858457, 0.190289032554483 ] } },
+{ "type": "Feature", "properties": { "Nama": "PLTS Selangan" }, "geometry": { "type": "Point", "coordinates": [ 117.509252011997191, 0.067074501171284 ] } },
+{ "type": "Feature", "properties": { "Nama": "PLTS Tihi-Tihi" }, "geometry": { "type": "Point", "coordinates": [ 117.529590406624266, 0.063510108893679 ] } },
+{ "type": "Feature", "properties": { "Nama": "PLTS Melahing" }, "geometry": { "type": "Point", "coordinates": [ 117.529997707906091, 0.114267877918354 ] } },
+{ "type": "Feature", "properties": { "Nama": "PLTS Loktunggul" }, "geometry": { "type": "Point", "coordinates": [ 117.499451201964902, 0.055542642724075 ] } }
+]
+}
