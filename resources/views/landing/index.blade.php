@@ -798,7 +798,35 @@
                 const buildLayerFilter = () => {
                     let categoriesHTML = '';
 
-                    for (const [catKey, category] of Object.entries(layerCategories)) {
+                    // Define preferred order
+                    const sortOrder = [
+                        'Administrasi',
+                        'Status Desa Berlistrik',
+                        'Infrastruktur Pendukung Ketenagalistrikan',
+                        'Data Jaringan',
+                        'Jalan',
+                        'Kondisi Titik Pemukiman Non Listrik PLN'
+                    ];
+
+                    // Convert to array and sort
+                    const sortedEntries = Object.entries(layerCategories).sort((a, b) => {
+                        const labelA = a[1].label || '';
+                        const labelB = b[1].label || '';
+
+                        // Find index in sortOrder (case-insensitive partial match)
+                        let idxA = sortOrder.findIndex(key => labelA.toLowerCase().includes(key
+                            .toLowerCase()));
+                        let idxB = sortOrder.findIndex(key => labelB.toLowerCase().includes(key
+                            .toLowerCase()));
+
+                        // If not found, place at the end
+                        if (idxA === -1) idxA = 999;
+                        if (idxB === -1) idxB = 999;
+
+                        return idxA - idxB;
+                    });
+
+                    for (const [catKey, category] of sortedEntries) {
                         // Build tree from flat items list
                         const tree = {};
                         category.items.forEach((item, index) => {
