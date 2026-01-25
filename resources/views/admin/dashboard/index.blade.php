@@ -872,8 +872,8 @@
         </div>
     </div>
 
-    <!-- Top 5 Ranking Table -->
-    <div class="section-title"><i class="ri-trophy-line"></i> Top 5 Ranking Prioritas</div>
+    <!-- Top 10 Ranking Table -->
+    <div class="section-title"><i class="ri-trophy-line"></i> Top 10 Ranking Prioritas</div>
     <div class="dash-card">
         <div class="dash-card-header">
             <div class="dash-card-title">Ranking Prioritas Berdasarkan Total Skor</div>
@@ -885,59 +885,25 @@
                         <th style="padding: 14px 16px; text-align: center; font-weight: 600; white-space: nowrap;">
                             No</th>
                         <th style="padding: 14px 16px; text-align: left; font-weight: 600; white-space: nowrap;">
+                            Kabupaten/Kota</th>
+                        <th style="padding: 14px 16px; text-align: left; font-weight: 600; white-space: nowrap;">
                             Kecamatan</th>
                         <th style="padding: 14px 16px; text-align: left; font-weight: 600; white-space: nowrap;">
                             Desa</th>
                         <th style="padding: 14px 16px; text-align: center; font-weight: 600; white-space: nowrap;">
-                            Klasifikasi</th>
+                            Kodifikasi</th>
                         <th style="padding: 14px 16px; text-align: center; font-weight: 600; white-space: nowrap;">
-                            Kelengkapan Persyaratan SKTP (%)</th>
+                            Jumlah Calon Pelanggan</th>
+                        <th style="padding: 14px 16px; text-align: center; font-weight: 600; white-space: nowrap;">
+                            Total Skor</th>
                         <th style="padding: 14px 16px; text-align: center; font-weight: 600; white-space: nowrap;">
                             Prioritas</th>
+                        <th style="padding: 14px 16px; text-align: center; font-weight: 600; white-space: nowrap;">
+                            Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @php
-                        $rankingData = [
-                            [
-                                'kecamatan' => 'Bintuni',
-                                'desa' => 'Bintuni Ulu',
-                                'klasifikasi' => 'BRU-BUA-1',
-                                'perizinan' => '6,67',
-                                'prioritas' => 'Prioritas 2 SUTM',
-                            ],
-                            [
-                                'kecamatan' => 'Bintuni',
-                                'desa' => 'Karanggau',
-                                'klasifikasi' => 'BRU-KRG-1',
-                                'perizinan' => '4,17',
-                                'prioritas' => 'Prioritas 2 SUTM',
-                            ],
-                            [
-                                'kecamatan' => 'Biduk-Biduk',
-                                'desa' => 'Teluk Sumbang',
-                                'klasifikasi' => 'BRU-BDK-1',
-                                'perizinan' => '3,46',
-                                'prioritas' => 'Prioritas 1 SUTM',
-                            ],
-                            [
-                                'kecamatan' => 'Kelay',
-                                'desa' => 'Lemar Dayak',
-                                'klasifikasi' => 'BRU-LDK-1',
-                                'perizinan' => '2,67',
-                                'prioritas' => 'Prioritas 1 SUTM',
-                            ],
-                            [
-                                'kecamatan' => 'Kelay',
-                                'desa' => 'Long Beliu',
-                                'klasifikasi' => 'BRU-LGB-1',
-                                'perizinan' => '3,96',
-                                'prioritas' => 'Prioritas 1 SUTM',
-                            ],
-                        ];
-                    @endphp
-
-                    @foreach ($rankingData as $index => $item)
+                    @forelse($topPrioritas as $index => $item)
                         <tr
                             style="border-bottom: 1px solid #F1F5F9; {{ $index < 3 ? 'background: #FFFBEB;' : 'background: white;' }}">
                             <td
@@ -956,29 +922,52 @@
                                 @endif
                             </td>
                             <td style="padding: 14px 16px; color: #374151; white-space: nowrap;">
-                                {{ $item['kecamatan'] }}
+                                {{ $item->regency->name ?? '-' }}
+                            </td>
+                            <td style="padding: 14px 16px; color: #374151; white-space: nowrap;">
+                                {{ $item->district->name ?? '-' }}
                             </td>
                             <td style="padding: 14px 16px; color: #374151; font-weight: 500; white-space: nowrap;">
-                                {{ $item['desa'] }}
+                                {{ $item->village->name ?? '-' }}
                             </td>
                             <td
                                 style="padding: 14px 16px; text-align: center; color: #6B7280; font-family: monospace; font-size: 12px; white-space: nowrap;">
-                                {{ $item['klasifikasi'] }}
+                                {{ $item->kodifikasi ?? '-' }}
                             </td>
                             <td style="padding: 14px 16px; text-align: center; white-space: nowrap;">
                                 <span
                                     style="display: inline-block; padding: 4px 12px; background: #DBEAFE; color: #1E40AF; border-radius: 12px; font-weight: 600;">
-                                    {{ $item['perizinan'] }}%
+                                    {{ number_format($item->jumlah_calon_pelanggan ?? 0) }}
                                 </span>
                             </td>
                             <td style="padding: 14px 16px; text-align: center; white-space: nowrap;">
                                 <span
-                                    style="display: inline-block; padding: 6px 12px; background: {{ str_contains($item['prioritas'], 'Prioritas 1') ? '#DCFCE7' : '#FEF3C7' }}; color: {{ str_contains($item['prioritas'], 'Prioritas 1') ? '#166534' : '#92400E' }}; border-radius: 6px; font-weight: 600; font-size: 12px;">
-                                    {{ $item['prioritas'] }}
+                                    style="display: inline-block; padding: 6px 12px; background: #E0E7FF; color: #3730A3; border-radius: 12px; font-weight: 700; font-size: 13px;">
+                                    {{ $item->total_skor }}
                                 </span>
                             </td>
+                            <td style="padding: 14px 16px; text-align: center; white-space: nowrap;">
+                                <span
+                                    style="display: inline-block; padding: 6px 12px; background: {{ str_contains($item->prioritas ?? '', 'Prioritas 1') ? '#DCFCE7' : '#FEF3C7' }}; color: {{ str_contains($item->prioritas ?? '', 'Prioritas 1') ? '#166534' : '#92400E' }}; border-radius: 6px; font-weight: 600; font-size: 12px;">
+                                    {{ $item->prioritas ?? '-' }}
+                                </span>
+                            </td>
+                            <td style="padding: 14px 16px; text-align: center; white-space: nowrap;">
+                                <a href="{{ route('admin.rencana-pengembangan.index') }}"
+                                    style="display: inline-block; padding: 6px 12px; background: #7B1FA2; color: white; border-radius: 6px; font-weight: 600; font-size: 12px; text-decoration: none;">
+                                    Lihat Detail
+                                </a>
+                            </td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="9" style="padding: 24px; text-align: center; color: #6B7280;">
+                                Belum ada data prioritas. Silakan tambahkan data di menu <a
+                                    href="{{ route('admin.rencana-pengembangan.index') }}"
+                                    style="color: #7B1FA2; font-weight: 600;">Rencana Pengembangan Bantuan</a>.
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
