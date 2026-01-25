@@ -81,37 +81,49 @@ class ImportedFeatureController extends Controller
             $query = ImportedJsonFeature::query();
 
             // Select only necessary columns
-            $query->select(['id', 'kategori', 'sub_kategori', 'sub_subkategori', 'regency_id', 'properties', 'geometry']);
+            $query->select([
+                'imported_json_features.id',
+                'imported_json_features.kategori',
+                'imported_json_features.sub_kategori',
+                'imported_json_features.sub_subkategori',
+                'imported_json_features.regency_id',
+                'imported_json_features.properties',
+                'imported_json_features.geometry'
+            ]);
+
+            // $query->with('videos'); // Eager load doesn't work well with cursor
+
+            // Use Join for efficiency
+            $query->leftJoin('json_videos', 'imported_json_features.id', '=', 'json_videos.imported_json_features_id');
+
+            // Add video link to selection
+            $query->addSelect('json_videos.link as video_link_joined');
 
             if ($request->has('kategori')) {
-                $query->where('kategori', $request->kategori);
+                $query->where('imported_json_features.kategori', $request->kategori);
             }
 
             if ($request->has('sub_kategori')) {
                 $val = $request->sub_kategori;
                 if ($val === 'null' || $val === '') {
-                    $query->whereNull('sub_kategori');
+                    $query->whereNull('imported_json_features.sub_kategori');
                 } else {
-                    // Logic: The "sub_kategori" param from FE is actually "Path".
-                    // We need to split it back to sub and subsub.
-                    // Seeder logic: sub = first part, subsub = rest.
                     if (str_contains($val, '/')) {
                         $parts = explode('/', $val, 2);
                         $sub = $parts[0];
                         $subsub = $parts[1];
 
-                        $query->where('sub_kategori', $sub)
-                            ->where('sub_subkategori', $subsub);
+                        $query->where('imported_json_features.sub_kategori', $sub)
+                            ->where('imported_json_features.sub_subkategori', $subsub);
                     } else {
-                        // It matches sub_kategori only (and sub_sub is null)
-                        $query->where('sub_kategori', $val)
-                            ->whereNull('sub_subkategori');
+                        $query->where('imported_json_features.sub_kategori', $val)
+                            ->whereNull('imported_json_features.sub_subkategori');
                     }
                 }
             }
 
             if ($request->has('regency_id') && $request->regency_id) {
-                $query->where('regency_id', $request->regency_id);
+                $query->where('imported_json_features.regency_id', $request->regency_id);
             }
 
             echo '{"type": "FeatureCollection", "features": [';
@@ -131,6 +143,11 @@ class ImportedFeatureController extends Controller
                 $properties['sub_kategori'] = $item->sub_kategori;
                 $properties['sub_subkategori'] = $item->sub_subkategori;
                 $properties['regency_id'] = $item->regency_id;
+
+                // Add video link from joined column
+                if ($item->video_link_joined) {
+                    $properties['video_360_link'] = $item->video_link_joined;
+                }
 
                 // Build feature valid JSON string manually to avoid array overhead
                 $geometry = $item->geometry;

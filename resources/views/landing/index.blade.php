@@ -244,11 +244,10 @@
 
                     // Check for Video 360 Button condition
                     let video360Button = '';
-                    const subKategori = attrs.kategori || '';
-                    if (subKategori === 'kondisi-titik-pemukiman-non-listrik-pln') {
+                    if (attrs.video_360_link) {
                         video360Button = `
                         <div style="padding: 10px 14px; text-align: center;">
-                            <button onclick="openVideo360Modal('https://youtu.be/S_9TW5jJUMQ', 'Video 360 - ${escapeHtml(attrs.NAMOBJ || 'Lokasi')}')"
+                            <button onclick="openVideo360Modal('${attrs.video_360_link}', 'Video 360 - ${escapeHtml(attrs.NAMOBJ || 'Lokasi')}')"
                                 style="background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; width: 100%;">
                                 🎥 Lihat Video 360
                             </button>

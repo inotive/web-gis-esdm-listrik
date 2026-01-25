@@ -10,4 +10,9 @@ class ImportedJsonFeature extends Model
     use HasFactory;
 
     protected $table = 'imported_json_features';
+
+    public function videos()
+    {
+        return $this->hasMany(JsonVideo::class, 'imported_json_features_id');
+    }
 }
