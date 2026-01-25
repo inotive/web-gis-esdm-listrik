@@ -597,10 +597,40 @@
                 layerFilter.className = 'layer-filter';
                 view.ui.add(layerFilter, 'top-left');
 
+                // Helper: Fetch with Timeout
+                const fetchWithTimeout = async (resource, options = {}) => {
+                    const {
+                        timeout = 10000
+                    } = options; // Default 10 seconds
+
+                    const controller = new AbortController();
+                    const id = setTimeout(() => controller.abort(), timeout);
+
+                    try {
+                        const response = await fetch(resource, {
+                            ...options,
+                            signal: controller.signal
+                        });
+                        clearTimeout(id);
+                        return response;
+                    } catch (error) {
+                        clearTimeout(id);
+                        throw error;
+                    }
+                };
+
                 // Main Function to Load Structure
                 const loadFeatureStructure = async () => {
                     try {
-                        const response = await fetch("{{ url('/api/features/structure') }}");
+                        const response = await fetchWithTimeout(
+                            "{{ url('/api/features/structure') }}", {
+                                timeout: 10000
+                            });
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+
                         const structure = await response.json();
 
                         layerCategories = {}; // Reset
@@ -755,8 +785,12 @@
 
                     } catch (error) {
                         console.error("Failed to load feature structure:", error);
+                        let msg = error.message;
+                        if (error.name === 'AbortError') {
+                            msg = 'Permintaan waktu habis (timeout). Silakan muat ulang.';
+                        }
                         layerFilter.innerHTML =
-                            `<div class="p-2 text-red-500">Gagal memuat layer: ${error.message}</div>`;
+                            `<div class="p-2 text-red-500">Gagal memuat layer: ${msg}</div>`;
                     }
                 };
 
