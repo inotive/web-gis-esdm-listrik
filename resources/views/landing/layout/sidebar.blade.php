@@ -42,10 +42,12 @@
             <span class="menu-label">Peta Persebaran</span>
         </a>
 
-        <a class="menu-item {{ nav_active('admin.dokumen.*') }}" href="{{ route('admin.dokumen.index') }}">
-            <span class="menu-icon"><i class="ri-file-text-line" aria-hidden="true"></i></span>
-            <span class="menu-label">Dokumen</span>
-        </a>
+        @if (!in_array($userRole ?? null, ['desa', 'perusahaan']))
+            <a class="menu-item {{ nav_active('admin.dokumen.*') }}" href="{{ route('admin.dokumen.index') }}">
+                <span class="menu-icon"><i class="ri-file-text-line" aria-hidden="true"></i></span>
+                <span class="menu-label">Dokumen</span>
+            </a>
+        @endif
 
 
         @if (!in_array($userRole ?? null, ['desa', 'perusahaan']))
