@@ -124,7 +124,103 @@ class ImportJsonSeeder extends Seeder
 
             $featuresToInsert = [];
             foreach ($data['features'] as $feature) {
-                $properties = isset($feature['properties']) ? json_encode($feature['properties']) : null;
+                // Transform properties if matches specific category
+                $props = $feature['properties'] ?? [];
+
+
+                if ($kategori == 'Kondisi Titik Pemukiman Non Listrik PLN' && $subSubKategori == 'Identifikasi Lokasi Pemukiman') {
+                    $mapping = [
+                        'WADMKD' => 'Desa',
+                        'WADMKC' => 'Kecamatan',
+                        'WADMKK' => 'Kabupaten',
+                        'WADMPR' => 'Provinsi',
+                        'Status' => 'Status Desa Listrik',
+                        'Kodifikasi' => 'Kodifikasi',
+                        'DUSUN' => 'Nama Dusun',
+                        'J_RT' => 'Jumlah RT',
+                        'J_Pnddk' => 'Nama RT', // Mengikuti lampiran user, meskipun tidak umum
+                        'J_KK' => 'Jumlah Penduduk', // Mengikuti lampiran user
+                        'J_BRumah' => 'Jumlah KK', // Mengikuti lampiran user
+                        'J_BFasum' => 'Jumlah Bangunan Rumah', // Mengikuti lampiran user
+                        'Ket_BFasum' => 'Jumlah Bangunan Fasilitas Umum', // Mengikuti lampiran user
+                        'S_L_Kom' => 'Sumber Listrik Komunal',
+                        'N_S_L' => 'Nama Sumber Listrik',
+                        'K_S_L' => 'Kapasitas Sumber Listrik',
+                        'S_P_L' => 'Sumber Pendanaan Listrik',
+                        'W_NYALA' => 'Waktu Nyala',
+                        'L_NYALA' => 'Lama Nyala',
+                        'T_SL' => 'Tahun Sumber Listrik',
+                        'Knd_S_L' => 'Kondisi Sumber Listrik',
+                        'Koor_X' => 'Koordinat X',
+                        'Koor_Y' => 'Koordinat Y',
+                    ];
+
+                    $newProps = [];
+                    foreach ($props as $key => $val) {
+                        $newKey = $mapping[$key] ?? $key;
+                        $newProps[$newKey] = $val;
+                    }
+                    $props = $newProps;
+                } elseif ($kategori == 'Kondisi Titik Pemukiman Non Listrik PLN' && $subSubKategori == 'Rencana Bantuan Lokasi Pemukiman') {
+                    $mapping = [
+                        'NAMOBJ' => 'Objek',
+                        'LUASWH' => 'Luas Wilayah Administrasi',
+                        'TIPADM' => 'Tipe Administrasi',
+                        'WADMKC' => 'Kecamatan',
+                        'WADMKD' => 'Desa',
+                        'WADMKK' => 'Kabupaten',
+                        'WADMPR' => 'Provinsi',
+                        'Status' => 'Status Desa Listrik',
+                        'Kode_Kota' => 'Kode Kota',
+                        'Kode_L' => 'Kode Lokasi',
+                        'Lokasi_Ke' => 'Lokasi Ke',
+                        'Kodifikasi' => 'Kodifikasi',
+                        'DUSUN' => 'Nama Dusun',
+                        'J_RT' => 'Jumlah RT',
+                        'KET_RT' => 'Nama RT',
+                        'J_Pnddk' => 'Jumlah Penduduk',
+                        'J_KK' => 'Jumlah KK',
+                        'J_BRumah' => 'Jumlah Bangunan Rumah',
+                        'J_BFasum' => 'Jumlah Bangunan Fasilitas Umum',
+                        'Ket_BFasum' => 'Keterangan Bangunan Fasilitas Umum',
+                        'S_L_Kom' => 'Sumber Listrik Komunal',
+                        'N_S_L' => 'Nama Sumber Listrik',
+                        'K_S_L' => 'Kapasitas Sumber Listrik',
+                        'S_P_L' => 'Sumber Pendanaan Listrik',
+                        'W_NYALA' => 'Waktu Nyala',
+                        'L_NYALA' => 'Lama Nyala',
+                        'T_SL' => 'Tahun Sumber Listrik',
+                        'Knd_S_L' => 'Kondisi Sumber Listrik',
+                        'Koor_X' => 'Koordinat X',
+                        'Koor_Y' => 'Koordinat Y',
+                        'PR_Prov' => 'Pola Ruang RTRW Kaltim 2023-2042',
+                        'K_Hutan' => 'Kawasan Hutan (SK 397 2025)',
+                        'Izin_Lain' => 'Izin Pemenfaatan Ruang',
+                        'Potensi' => 'Potensi Lokasi',
+                        'R_JUTAMA' => 'Jarak ke Jalan Utama',
+                        'R_JLISTRIK' => 'Jarak Ke Jaringan Grid Listrik',
+                        'K_Jalan' => 'Kondisi Jalan',
+                        'L_Jalan' => 'Lebar Jalan',
+                        'P_Jalan' => 'Panjang Jalan',
+                        'PENYULANG' => 'Sumber Penyulang Terdekat',
+                        'R_S_L' => 'Rencana Sumber Listrik',
+                        'KENDALA' => 'Kendala Pengembangan Jaringan Listrik',
+                        'I_IUPT' => 'Izin IUP Tambang',
+                        'I_PPBH' => 'Izin PPBH Hutan',
+                        'I_IUPK' => 'Izin IUP Kebun',
+                        'S_L_P' => 'Sumber Listrik Perencanaan',
+                        'Prioritas' => 'Prioritas',
+                    ];
+
+                    $newProps = [];
+                    foreach ($props as $key => $val) {
+                        $newKey = $mapping[$key] ?? $key;
+                        $newProps[$newKey] = $val;
+                    }
+                    $props = $newProps;
+                }
+
+                $properties = isset($props) ? json_encode($props) : null;
                 $geometry = isset($feature['geometry']) ? json_encode($feature['geometry']) : null;
 
                 $featuresToInsert[] = [
