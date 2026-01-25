@@ -129,6 +129,9 @@
                     basemap: Basemap.fromId("satellite")
                 });
 
+                // Admin Status from Blade
+                const isAdmin = {{ auth()->check() && auth()->user()->hasRole('admin') ? 'true' : 'false' }};
+
                 const view = new MapView({
                     container: "viewDiv",
                     map: map,
@@ -597,10 +600,40 @@
                 layerFilter.className = 'layer-filter';
                 view.ui.add(layerFilter, 'top-left');
 
+                // Helper: Fetch with Timeout
+                const fetchWithTimeout = async (resource, options = {}) => {
+                    const {
+                        timeout = 10000
+                    } = options; // Default 10 seconds
+
+                    const controller = new AbortController();
+                    const id = setTimeout(() => controller.abort(), timeout);
+
+                    try {
+                        const response = await fetch(resource, {
+                            ...options,
+                            signal: controller.signal
+                        });
+                        clearTimeout(id);
+                        return response;
+                    } catch (error) {
+                        clearTimeout(id);
+                        throw error;
+                    }
+                };
+
                 // Main Function to Load Structure
                 const loadFeatureStructure = async () => {
                     try {
-                        const response = await fetch("{{ url('/api/features/structure') }}");
+                        const response = await fetchWithTimeout(
+                            "{{ url('/api/features/structure') }}", {
+                                timeout: 10000
+                            });
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+
                         const structure = await response.json();
 
                         layerCategories = {}; // Reset
@@ -611,6 +644,18 @@
                             const catLayers = [];
 
                             cat.sub_categories.forEach((sub) => {
+                                console.log(sub.label ==
+                                    'Status Desa Berlistrik Dengan Bantuan');
+                                // Filter Restricted Layers for Non-Admin
+                                if (!isAdmin) {
+                                    if (sub.label ==
+                                        'Status Desa Berlistrik Dengan Bantuan' ||
+                                        sub.label == 'Rencana Bantuan Lokasi Pemukiman'
+                                    ) {
+                                        return;
+                                    }
+                                }
+
                                 // Define dynamic layer
                                 const layerUrl =
                                     `{{ url('/api/features/data') }}?kategori=${encodeURIComponent(cat.slug)}&sub_kategori=${encodeURIComponent(sub.slug)}`;
@@ -755,8 +800,12 @@
 
                     } catch (error) {
                         console.error("Failed to load feature structure:", error);
+                        let msg = error.message;
+                        if (error.name === 'AbortError') {
+                            msg = 'Permintaan waktu habis (timeout). Silakan muat ulang.';
+                        }
                         layerFilter.innerHTML =
-                            `<div class="p-2 text-red-500">Gagal memuat layer: ${error.message}</div>`;
+                            `<div class="p-2 text-red-500">Gagal memuat layer: ${msg}</div>`;
                     }
                 };
 
@@ -764,7 +813,35 @@
                 const buildLayerFilter = () => {
                     let categoriesHTML = '';
 
-                    for (const [catKey, category] of Object.entries(layerCategories)) {
+                    // Define preferred order
+                    const sortOrder = [
+                        'Administrasi',
+                        'Status Desa Berlistrik',
+                        'Infrastruktur Pendukung Ketenagalistrikan',
+                        'Data Jaringan',
+                        'Jalan',
+                        'Kondisi Titik Pemukiman Non Listrik PLN'
+                    ];
+
+                    // Convert to array and sort
+                    const sortedEntries = Object.entries(layerCategories).sort((a, b) => {
+                        const labelA = a[1].label || '';
+                        const labelB = b[1].label || '';
+
+                        // Find index in sortOrder (case-insensitive partial match)
+                        let idxA = sortOrder.findIndex(key => labelA.toLowerCase().includes(key
+                            .toLowerCase()));
+                        let idxB = sortOrder.findIndex(key => labelB.toLowerCase().includes(key
+                            .toLowerCase()));
+
+                        // If not found, place at the end
+                        if (idxA === -1) idxA = 999;
+                        if (idxB === -1) idxB = 999;
+
+                        return idxA - idxB;
+                    });
+
+                    for (const [catKey, category] of sortedEntries) {
                         // Build tree from flat items list
                         const tree = {};
                         category.items.forEach((item, index) => {
