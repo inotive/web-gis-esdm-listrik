@@ -69,7 +69,7 @@ class ImportedFeatureController extends Controller
 
     /**
      * Get GeoJSON data filtered by parameters.
-     * Uses streaming to handle large datasets.
+     * Uses caching to handle large datasets efficiently.
      */
     public function getData(Request $request)
     {
@@ -77,7 +77,13 @@ class ImportedFeatureController extends Controller
         ini_set('memory_limit', '512M');
         ini_set('max_execution_time', 300);
 
-        return response()->stream(function () use ($request) {
+        // Generate Cache Key
+        $params = $request->all();
+        ksort($params); // Ensure consistent key order
+        $cacheKey = 'geojson_data_' . md5(json_encode($params));
+
+        // Attempt to get from cache (Forever)
+        $jsonContent = \Illuminate\Support\Facades\Cache::rememberForever($cacheKey, function () use ($request) {
             $query = ImportedJsonFeature::query();
 
             // Select only necessary columns
@@ -90,8 +96,6 @@ class ImportedFeatureController extends Controller
                 'imported_json_features.properties',
                 'imported_json_features.geometry'
             ]);
-
-            // $query->with('videos'); // Eager load doesn't work well with cursor
 
             // Use Join for efficiency
             $query->leftJoin('json_videos', 'imported_json_features.id', '=', 'json_videos.imported_json_features_id');
@@ -126,17 +130,11 @@ class ImportedFeatureController extends Controller
                 $query->where('imported_json_features.regency_id', $request->regency_id);
             }
 
-            echo '{"type": "FeatureCollection", "features": [';
-
-            $first = true;
+            // Buffer the output
+            $features = [];
 
             // Use cursor for memory efficient iteration
             foreach ($query->cursor() as $item) {
-                if (!$first) {
-                    echo ',';
-                }
-                $first = false;
-
                 $properties = $item->properties ? json_decode($item->properties, true) : [];
                 $properties['db_id'] = $item->id;
                 $properties['kategori'] = $item->kategori;
@@ -149,27 +147,25 @@ class ImportedFeatureController extends Controller
                     $properties['video_360_link'] = $item->video_link_joined;
                 }
 
-                // Build feature valid JSON string manually to avoid array overhead
-                $geometry = $item->geometry;
+                // Decode geometry if it's a JSON string
+                $geometry = $item->geometry ? json_decode($item->geometry) : null;
 
-                $feature = [
+                $features[] = [
                     'type' => 'Feature',
                     'properties' => $properties,
+                    'geometry' => $geometry
                 ];
-
-                // Encode properties part filter
-                $featureJson = json_encode($feature);
-                // remove last brace
-                echo substr($featureJson, 0, -1);
-
-                echo ',"geometry":';
-                echo $item->geometry ?: 'null';
-                echo '}';
             }
 
-            echo ']}';
-        }, 200, [
+            return json_encode([
+                'type' => 'FeatureCollection',
+                'features' => $features
+            ]);
+        });
+
+        return response($jsonContent, 200, [
             'Content-Type' => 'application/json',
+            'Cache-Control' => 'public, max-age=31536000' // Browser cache 1 year (effectively forever)
         ]);
     }
 }
