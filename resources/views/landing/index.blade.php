@@ -257,8 +257,8 @@
 
                     dmContent.innerHTML = `
         <div class="dm-head">${escapeHtml(layerTitle)}</div>
-        <div class="dm-body">${rows || '<div class="dm-empty">Tidak ada atribut</div>'}</div>
         ${video360Button}
+        <div class="dm-body">${rows || '<div class="dm-empty">Tidak ada atribut</div>'}</div>
       `;
                 };
 
