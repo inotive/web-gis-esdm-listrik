@@ -242,6 +242,7 @@ Route::group(['middleware' => ['auth', 'verified_user'], 'as' => 'admin.', 'pref
     // Permohonan
     Route::group(['as' => 'permohonan.', 'prefix' => 'permohonan'], function () {
         Route::get('/import', [PermohonanController::class, 'import'])->name('import');
+        Route::get('/import/template', [PermohonanController::class, 'downloadTemplate'])->name('import.template');
         Route::post('/import', [PermohonanController::class, 'importProcess'])->name('import.process');
 
         Route::get('/', [PermohonanController::class, 'index'])->name('index');
@@ -259,6 +260,7 @@ Route::group(['middleware' => ['auth', 'verified_user'], 'as' => 'admin.', 'pref
     // Perizinan
     Route::group(['as' => 'perizinan.', 'prefix' => 'perizinan'], function () {
         Route::get('/import', [PerizinanController::class, 'import'])->name('import');
+        Route::get('/import/template', [PerizinanController::class, 'downloadTemplate'])->name('import.template');
         Route::post('/import', [PerizinanController::class, 'importProcess'])->name('import.process');
         
         Route::get('/', [PerizinanController::class, 'index'])->name('index');

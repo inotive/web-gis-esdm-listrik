@@ -39,10 +39,10 @@ class PerizinanImport implements ToModel, WithHeadingRow
         }
 
         return new Perizinan([
-            'nama'              => $row['nama_perizinan'] ?? $row['nama'] ?? '-',
+            'nama'              => $row['nama_pemohon'] ?? $row['nama_perizinan'] ?? $row['nama'] ?? '-',
             'perusahaan_id'     => $perusahaan->id,
             'kontak'            => $row['kontak'] ?? null,
-            'jenis'             => $row['jenis_perizinan'] ?? $row['jenis'] ?? 'Izin Usaha',
+            'jenis'             => $row['jenis_permohonan'] ?? $row['jenis_perizinan'] ?? $row['jenis'] ?? 'Izin Usaha',
             'no_pengajuan'      => $row['no_pengajuan'] ?? null,
             'no_surat_keluar'   => $row['no_surat_keluar'] ?? null,
             'tanggal'           => $this->transformDate($row['tanggal'] ?? null),

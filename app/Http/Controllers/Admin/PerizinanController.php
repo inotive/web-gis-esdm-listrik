@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\PerizinanImport;
+use App\Exports\PerizinanTemplateExport;
 
 class PerizinanController extends Controller
 {
@@ -21,6 +22,7 @@ class PerizinanController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
+
     {
         $query = Perizinan::with('perusahaan');
 
@@ -52,6 +54,14 @@ class PerizinanController extends Controller
         return view('admin.perizinan.import', [
             'title' => 'Import Data Perizinan',
         ]);
+    }
+
+    /**
+     * Download import template
+     */
+    public function downloadTemplate()
+    {
+        return Excel::download(new PerizinanTemplateExport, 'template_import_perizinan.xlsx');
     }
 
     /**

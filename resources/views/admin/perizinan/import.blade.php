@@ -31,10 +31,22 @@
                     </div>
 
                     <div class="alert alert-info">
-                        <strong>Petunjuk Import:</strong>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <strong>Petunjuk Import:</strong>
+                            <a href="{{ route('admin.perizinan.import.template') }}" class="btn btn-sm btn-light border">
+                                <i class="ri-file-download-line"></i> Download Template
+                            </a>
+                        </div>
                         <ul class="mb-0 pl-3">
-                            <li>Pastikan format file sesuai dengan template.</li>
+                            <li>Pastikan format file sesuai dengan template yang disediakan.</li>
                             <li>Kolom wajib: <b>nama_perizinan</b>, <b>nama_perusahaan</b>, <b>status_kelistrikan</b>.</li>
+                            <li>Kolom <b>status_kelistrikan</b> harap diisi: 
+                                <ul>
+                                    <li><b>Berlistrik PLN</b></li>
+                                    <li><b>Berlistrik NON-PLN</b></li>
+                                    <li><b>Tidak Berlistrik</b></li>
+                                </ul>
+                            </li>
                             <li>Status kelistrikan akan otomatis dikonversi (Hijau/Kuning/Merah).</li>
                             <li>Jika perusahaan belum ada, sistem akan mencoba membuatnya otomatis.</li>
                         </ul>

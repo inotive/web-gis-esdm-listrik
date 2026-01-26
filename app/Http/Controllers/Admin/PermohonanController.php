@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\PermohonanImport;
+use App\Exports\PermohonanTemplateExport;
 
 class PermohonanController extends Controller
 {
@@ -21,6 +22,7 @@ class PermohonanController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
+
     {
         $perPage = (int) $request->get('per_page', 10);
         $q = $request->get('q');
@@ -65,6 +67,14 @@ class PermohonanController extends Controller
         return view('admin.permohonan.import', [
             'title' => 'Import Data Permohonan',
         ]);
+    }
+
+    /**
+     * Download import template
+     */
+    public function downloadTemplate()
+    {
+        return Excel::download(new PermohonanTemplateExport, 'template_import_permohonan.xlsx');
     }
 
     /**
