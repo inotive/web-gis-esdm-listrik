@@ -52,7 +52,6 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn-cancel" onclick="__closeModal('modalEditDesa')">Batal</button>
                 <button class="btn-save" type="submit">
                     <i class="ri-save-3-line"></i> Update
                 </button>
