@@ -842,6 +842,8 @@
                     });
 
                     for (const [catKey, category] of sortedEntries) {
+                        if (category.label.toLowerCase().includes('administrasi')) continue;
+
                         // Build tree from flat items list
                         const tree = {};
                         category.items.forEach((item, index) => {

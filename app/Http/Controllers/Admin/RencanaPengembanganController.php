@@ -85,9 +85,9 @@ class RencanaPengembanganController extends Controller
 
         // Order by total score descending (highest first), then by village name
         $query->orderBy('total_skor', 'desc')
-              ->orderBy('regency_id', 'asc')
-              ->orderBy('district_id', 'asc')
-              ->orderBy('village_id', 'asc');
+            ->orderBy('regency_id', 'asc')
+            ->orderBy('district_id', 'asc')
+            ->orderBy('village_id', 'asc');
 
         $perPage = $request->input('per_page', 10);
         $data = $query->paginate($perPage)->withQueryString();
@@ -95,7 +95,7 @@ class RencanaPengembanganController extends Controller
         // Get filter options
         $regencies = RegRegency::orderBy('name')->get(['id', 'name']);
         $districts = RegDistrict::orderBy('name')->get(['id', 'name']);
-        $prioritasOptions = ['Prioritas 1 RKTS', 'Prioritas 1 SJTM'];
+        $prioritasOptions = ['Prioritas 1 PLTS', 'Prioritas 1 SUTM'];
 
         // Get unique values from database for filters (maintain score order 5 to 1)
         $uniqueAksesibilitas = collect(array_keys(RencanaPengembanganBantuan::getAksesibilitasOptions()));
