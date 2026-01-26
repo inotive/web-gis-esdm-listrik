@@ -707,13 +707,26 @@
                                 <td>{{ $desa->district->name ?? '-' }}</td>
                                 <td>{{ $desa->district->regency->name ?? '-' }}</td>
                                 <td>
-                                    @if ($desa->dataBerlistrik)
-                                        @if ($desa->dataBerlistrik->sumber_listrik === 'PLN')
-                                            <span class="badge badge-success">Berlistrik PLN</span>
-                                        @elseif($desa->dataBerlistrik->sumber_listrik === 'Non-PLN')
-                                            <span class="badge badge-info">Berlistrik Non-PLN</span>
+                                    @php
+                                        // $desa->name might differ slightly in casing or trim, but usually matches if database is consistent.
+                                        // We use the direct name match as keys were set by name.
+                                        $statusProps = $statusMap[$desa->name] ?? null;
+                                    @endphp
+
+                                    @if ($statusProps)
+                                        @php
+                                            // Check 'StatusDesa' field
+                                            $status = $statusProps['StatusDesa'] ?? '';
+                                            $statusUpper = strtoupper($status);
+                                        @endphp
+
+                                        @if (str_contains($statusUpper, 'BELUM') || str_contains($statusUpper, 'TIDAK'))
+                                            <span class="badge badge-danger"
+                                                style="background-color: #FEE2E2; color: #EF4444;">{{ $status }}</span>
+                                        @elseif(str_contains($statusUpper, 'TERLAYANI') || str_contains($statusUpper, 'BERLISTRIK'))
+                                            <span class="badge badge-success">{{ $status }}</span>
                                         @else
-                                            <span class="badge badge-warning">Berlistrik</span>
+                                            <span class="badge badge-info">{{ $status }}</span>
                                         @endif
                                     @else
                                         <span class="badge badge-secondary">Tidak Ada Data</span>
@@ -723,7 +736,8 @@
                                     <button type="button" class="btn-ico edit btn-edit-desa" data-id="{{ $desa->id }}"
                                         data-name="{{ $desa->name }}"
                                         data-regency-id="{{ $desa->district->regency_id ?? '' }}"
-                                        data-district-id="{{ $desa->district_id }}" title="Edit">
+                                        data-district-id="{{ $desa->district_id }}"
+                                        data-status="{{ $statusProps['StatusDesa'] ?? '' }}" title="Edit">
                                         <i class="fa-solid fa-pen-to-square"></i>
                                     </button>
                                     <form action="{{ route('admin.desa.destroy', $desa) }}" method="POST"

@@ -15,4 +15,8 @@ class ImportedJsonFeature extends Model
     {
         return $this->hasMany(JsonVideo::class, 'imported_json_features_id');
     }
+
+    protected $casts = [
+        'properties' => 'array',
+    ];
 }
