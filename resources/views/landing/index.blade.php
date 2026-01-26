@@ -940,6 +940,7 @@
                        <div class="lf-title">🔍 Filter Peta</div>
                        <button class="lf-toggle-btn" title="Tutup/Buka">▼</button>
                      </div>
+
                      <div class="lf-body">
                        ${toggleButtonHtml}
                        <label class="lf-row lf-all"><input type="checkbox" id="lf-all"> <span class="lf-icon">📊</span> <span><strong>Semua Data</strong></span></label>
@@ -1127,8 +1128,46 @@
                         const item = layerCategories[catKey].items[idx];
                         if (item) {
                             item.layer.visible = isVisible;
+                            updateFeatureCount();
                         }
                     }
+                };
+
+                let featureCountTimeout;
+                const updateFeatureCount = () => {
+                    clearTimeout(featureCountTimeout);
+                    featureCountTimeout = setTimeout(async () => {
+                        const countEl = document.getElementById('featureCountValue');
+                        if (!countEl) return;
+
+                        countEl.textContent = '...';
+
+                        let total = 0;
+                        const countPromises = [];
+
+                        asetLayers.forEach(layer => {
+                            if (layer.visible) {
+                                const query = layer.createQuery();
+                                const promise = layer.queryFeatureCount(query).then(
+                                    count => {
+                                        return count;
+                                    }).catch(err => {
+                                    console.error("Error counting layer:", err);
+                                    return 0;
+                                });
+                                countPromises.push(promise);
+                            }
+                        });
+
+                        try {
+                            const counts = await Promise.all(countPromises);
+                            total = counts.reduce((a, b) => a + b, 0);
+                            countEl.textContent = total.toLocaleString('id-ID');
+                        } catch (error) {
+                            console.error("Error calculating total:", error);
+                            countEl.textContent = '-';
+                        }
+                    }, 500);
                 };
 
                 // Trigger Initial Load
@@ -1216,6 +1255,18 @@
                     nextBasemap: bm_osm
                 });
                 view.ui.add(basemapToggle, "bottom-right");
+
+                // Feature Count Widget
+                const featureCountWidget = document.createElement('div');
+                featureCountWidget.className = 'feature-count-widget esri-component esri-widget';
+                featureCountWidget.innerHTML = `
+                   <div class="fc-icon">📊</div>
+                   <div class="fc-content">
+                       <div class="fc-label">Total Data</div>
+                       <div id="featureCountValue" class="fc-value">0</div>
+                   </div>
+                `;
+                view.ui.add(featureCountWidget, "top-right");
 
                 // ================== DISTANCE MEASUREMENT & COST CALCULATION ==================
                 let distanceMeasurement = new DistanceMeasurement2D({
@@ -2118,10 +2169,56 @@
             border: none;
         }
 
+
+        /* Feature Count Widget */
+        .feature-count-widget {
+            background: #fff;
+            padding: 12px 16px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 160px;
+        }
+
+        .fc-icon {
+            font-size: 20px;
+            background: #eff6ff;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            color: #3b82f6;
+        }
+
+        .fc-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .fc-label {
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .fc-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+            line-height: 1.2;
+        }
+
         @media (max-width: 768px) {
             .detail-modal {
                 width: min(340px, 94vw);
             }
+
 
             .dm-row {
                 grid-template-columns: 1fr;
