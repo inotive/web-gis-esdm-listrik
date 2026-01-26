@@ -165,7 +165,9 @@ class ImportedFeatureController extends Controller
 
         return response($jsonContent, 200, [
             'Content-Type' => 'application/json',
-            'Cache-Control' => 'public, max-age=31536000' // Browser cache 1 year (effectively forever)
+            // Disable browser cache so it always checks the server (which is fast due to server-side cache)
+            // This ensures that when you run the seeder (and flush server cache), the browser sees the new data.
+            'Cache-Control' => 'no-cache, no-store, must-revalidate'
         ]);
     }
 }
