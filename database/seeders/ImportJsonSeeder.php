@@ -27,6 +27,7 @@ class ImportJsonSeeder extends Seeder
 
         DB::table('json_videos')->truncate();
         DB::table('imported_json_features')->truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         // Enable Foreign Key Check
         \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();

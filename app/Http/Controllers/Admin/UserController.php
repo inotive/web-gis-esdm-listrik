@@ -17,11 +17,13 @@ class UserController extends Controller
     public function index()
     {
         $db = User::latest()->get();
+        $pendingUsers = User::unverified()->latest()->get();
 
         $view = [
             'title' => "Manajemen Pengguna",
             'data' => $db,
-            'role' => Role::all()
+            'role' => Role::all(),
+            'pendingUsers' => $pendingUsers
         ];
 
         return view('admin.user.index', $view);
@@ -166,6 +168,43 @@ class UserController extends Controller
 
         $notifikasi = [
             'pesan' => 'Berhasil Hapus Data!',
+            'alert' => "success"
+        ];
+        return redirect()->route('admin.hak-akses.user.index')->with($notifikasi);
+    }
+
+    /**
+     * Approve user verification
+     */
+    public function approve(User $user)
+    {
+        $user->update([
+            'is_verified' => true,
+            'verified_at' => now(),
+            'verified_by' => auth()->id()
+        ]);
+
+        $notifikasi = [
+            'pesan' => 'User berhasil diverifikasi!',
+            'alert' => "success"
+        ];
+        return redirect()->route('admin.hak-akses.user.index')->with($notifikasi);
+    }
+
+    /**
+     * Reject user verification (delete user)
+     */
+    public function reject(User $user)
+    {
+        // Delete profile image if exists
+        if ($user->image) {
+            Storage::disk('public')->delete('profile/' . $user->image);
+        }
+        
+        $user->delete();
+
+        $notifikasi = [
+            'pesan' => 'Pendaftaran user ditolak dan dihapus!',
             'alert' => "success"
         ];
         return redirect()->route('admin.hak-akses.user.index')->with($notifikasi);

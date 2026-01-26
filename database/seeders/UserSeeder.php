@@ -17,49 +17,56 @@ class UserSeeder extends Seeder
         DB::transaction(function () {
             $users = [
                 [
-                    'name'  => 'Super Admin',
+                    'name' => 'Super Admin',
                     'username' => 'superadmin',
                     'email' => 'superadmin@gmail.com',
-                    'role'  => 'superadmin',
+                    'role' => 'superadmin',
+                    'is_verified' => true,
                 ],
                 [
-                    'name'  => 'Admin',
+                    'name' => 'Admin',
                     'username' => 'admin',
                     'email' => 'admin@gmail.com',
-                    'role'  => 'admin',
+                    'role' => 'admin',
+                    'is_verified' => true,
                 ],
                 [
-                    'name'  => 'Pengawas',
+                    'name' => 'Pengawas',
                     'username' => 'pengawas',
                     'email' => 'pengawas@gmail.com',
-                    'role'  => 'superadmin',
+                    'role' => 'superadmin',
+                    'is_verified' => true,
                 ],
                 [
-                    'name'  => 'Operator',
+                    'name' => 'Operator',
                     'username' => 'operator',
                     'email' => 'operator@gmail.com',
-                    'role'  => 'ppk',
+                    'role' => 'ppk',
+                    'is_verified' => true,
                 ],
                 [
-                    'name'  => 'Perusahaan',
+                    'name' => 'Perusahaan',
                     'username' => 'perusahaan',
                     'email' => 'perusahaan@gmail.com',
-                    'role'  => 'perusahaan',
+                    'role' => 'perusahaan',
+                    'is_verified' => true,
                 ],
                 [
-                    'name'  => 'Desa',
+                    'name' => 'Desa',
                     'username' => 'desa',
                     'email' => 'desa@gmail.com',
-                    'role'  => 'desa',
+                    'role' => 'desa',
+                    'is_verified' => true,
                 ],
             ];
 
             foreach ($users as $value) {
                 $user = User::create([
-                    'name'      => $value['name'],
-                    'username'     => $value['username'],
-                    'email'     => $value['email'],
-                    'password'  => bcrypt('123123')
+                    'name' => $value['name'],
+                    'username' => $value['username'],
+                    'email' => $value['email'],
+                    'password' => bcrypt('123123'),
+                    'is_verified' => $value['is_verified'],
                 ]);
 
                 $user->syncRoles([$value['role']]);

@@ -16,7 +16,7 @@
 <aside class="sidebar" aria-label="Sidebar navigasi">
     <!-- Topbar di dalam sidebar (sinkron dgn header) -->
     <div class="sidebar-topbar">
-        <a href="{{ route('admin.dashboard') }}" class="brand" style="text-decoration: none; color: inherit;">
+        <a href="{{ url('/') }}" class="brand" style="text-decoration: none; color: inherit;">
             <img class="logo" src="{{ asset('assets/media/logos/logo.png') }}" alt="Logo Dinas ESDM" />
             <div class="brand-text">
                 <strong>Dinas ESDM</strong>
@@ -42,10 +42,12 @@
             <span class="menu-label">Peta Persebaran</span>
         </a>
 
-        <a class="menu-item {{ nav_active('admin.dokumen.*') }}" href="{{ route('admin.dokumen.index') }}">
-            <span class="menu-icon"><i class="ri-file-text-line" aria-hidden="true"></i></span>
-            <span class="menu-label">Dokumen</span>
-        </a>
+        @if (!in_array($userRole ?? null, ['desa', 'perusahaan']))
+            <a class="menu-item {{ nav_active('admin.dokumen.*') }}" href="{{ route('admin.dokumen.index') }}">
+                <span class="menu-icon"><i class="ri-file-text-line" aria-hidden="true"></i></span>
+                <span class="menu-label">Dokumen</span>
+            </a>
+        @endif
 
 
         @if (!in_array($userRole ?? null, ['desa', 'perusahaan']))
@@ -59,21 +61,13 @@
             <span class="menu-icon"><i class="ri-file-text-line" aria-hidden="true"></i></span>
             <span class="menu-label">Rekap Data</span>
         </a>
-        @if ($shouldShowMenu ?? false)
-
+        @if (in_array($userRole ?? null, ['desa', 'perusahaan']))
             <div class="menu-title">Layanan</div>
-            @foreach ($permohonans as $permohonan)
-                @php
-                    $isActive =
-                        request()->routeIs('admin.permohonan-user.*') &&
-                        request()->route('permohonanId') == $permohonan->id;
-                @endphp
-                <a class="menu-item {{ $isActive ? 'active' : '' }}"
-                    href="{{ route('admin.permohonan-user.index', $permohonan->id) }}">
-                    <span class="menu-icon"><i class="ri-file-line" aria-hidden="true"></i></span>
-                    <span class="menu-label">{{ $permohonan->nama }}</span>
-                </a>
-            @endforeach
+            <a class="menu-item {{ nav_active('admin.pengajuan-permohonan.*') }}"
+                href="{{ route('admin.pengajuan-permohonan.index') }}">
+                <span class="menu-icon"><i class="ri-file-add-line" aria-hidden="true"></i></span>
+                <span class="menu-label">Pengajuan Permohonan</span>
+            </a>
         @endif
 
 
@@ -118,21 +112,21 @@
             <span class="menu-label">Data Pelanggan</span>
         </a> -->
 
-            <a class="menu-item {{ nav_active('admin.data-infrastruktur.*', 'admin.infrastruktur.*', 'admin.gardu.*', 'admin.pembangkit.*') }}"
+            {{-- <a class="menu-item {{ nav_active('admin.data-infrastruktur.*', 'admin.infrastruktur.*', 'admin.gardu.*', 'admin.pembangkit.*') }}"
                 href="{{ route('admin.data-infrastruktur.index') }}">
                 <span class="menu-icon"><i class="ri-plug-line"></i></span>
                 <span class="menu-label">Data Infrastruktur</span>
-            </a>
+            </a> --}}
 
             <a class="menu-item {{ nav_active('admin.jalan.*') }}" href="{{ route('admin.jalan.index') }}">
                 <span class="menu-icon"><i class="ri-road-map-line" aria-hidden="true"></i></span>
                 <span class="menu-label">Data Jalan &amp; Aksesbilitas</span>
             </a>
 
-            <a class="menu-item {{ nav_active('admin.skoring.*') }}" href="{{ route('admin.skoring.index') }}">
+            {{-- <a class="menu-item {{ nav_active('admin.skoring.*') }}" href="{{ route('admin.skoring.index') }}">
                 <span class="menu-icon"><i class="ri-slideshow-2-line" aria-hidden="true"></i></span>
                 <span class="menu-label">Variabel Skoring &amp; Bobot</span>
-            </a>
+            </a> --}}
             <a class="menu-item {{ nav_active('admin.kategori-permohonan.*') }}"
                 href="{{ route('admin.kategori-permohonan.index') }}">
                 <span class="menu-icon"><i class="ri-file-list-3-line" aria-hidden="true"></i></span>

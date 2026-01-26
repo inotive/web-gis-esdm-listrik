@@ -901,7 +901,15 @@
                 {{-- <a href="#home" class="nav-link">Beranda</a>
                 <a href="#alur" class="nav-link">Alur Permohonan</a>
                 <a href="#faq" class="nav-link">FAQ</a> --}}
-                <a href="{{ route('login') }}" class="btn-login">Masuk</a>
+                @auth
+                    @if(auth()->user()->hasRole(['superadmin', 'admin']))
+                        <a href="{{ route('admin.dashboard') }}" class="btn-login">Masuk</a>
+                    @else
+                        <a href="{{ route('landing') }}" class="btn-login">Masuk</a>
+                    @endif
+                @else
+                    <a href="{{ route('login') }}" class="btn-login">Masuk</a>
+                @endauth
             </div>
         </div>
     </nav>
@@ -1002,7 +1010,10 @@
 
             <div class="steps-grid">
                 <!-- Step 1 -->
-                <a href="{{ route('login') }}" class="step-card-link">
+                @php
+                    $step1Route = auth()->check() ? route('landing') : route('login');
+                @endphp
+                <a href="{{ $step1Route }}" class="step-card-link">
                     <div class="step-card">
                         <div class="step-icon-container">
                             <div class="step-icon-wrapper">
@@ -1016,7 +1027,15 @@
                 </a>
 
                 <!-- Step 2 -->
-                <a href="{{ route('admin.dashboard') }}" class="step-card-link">
+                @php
+                    $step2Route = route('login');
+                    if(auth()->check()) {
+                        $step2Route = auth()->user()->hasRole(['superadmin', 'admin']) 
+                            ? route('admin.dashboard') 
+                            : route('landing');
+                    }
+                @endphp
+                <a href="{{ $step2Route }}" class="step-card-link">
                     <div class="step-card">
                         <div class="step-icon-container">
                             <div class="step-icon-wrapper">

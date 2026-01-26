@@ -20,10 +20,14 @@ class PermohonanUser extends Model
         'status',
         'jawaban',
         'keterangan',
+        'approved_by',
+        'approved_at',
+        'approval_notes',
     ];
 
     protected $casts = [
         'jawaban' => 'array',
+        'approved_at' => 'datetime',
     ];
 
     /**
@@ -56,5 +60,13 @@ class PermohonanUser extends Model
     public function perusahaan(): BelongsTo
     {
         return $this->belongsTo(Perusahaan::class, 'perusahaan_id');
+    }
+
+    /**
+     * Relasi: PermohonanUser belongs to User (approver)
+     */
+    public function approver(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 }

@@ -8,12 +8,13 @@ use App\Models\PermohonanUser;
 use App\Models\PermohonanQuestion;
 use App\Models\PermohonanQuestionOption;
 use App\Models\PerizinanListrik;
-use App\Models\Perusahaan;
 use App\Models\RegRegency;
 use App\Models\RegDistrict;
 use App\Models\RegVillage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\PermohonanImport;
 
 class PermohonanController extends Controller
 {
@@ -24,17 +25,33 @@ class PermohonanController extends Controller
     {
         $perPage = (int) $request->get('per_page', 10);
         $q = $request->get('q');
-        $tab = $request->get('tab', 'perizinan');
+        $tab = $request->get('tab', 'permohonan');
         $status = $request->get('status', '');
         $jenis = $request->get('jenis', '');
 
+        // Per-column filters for Perizinan tab
+        $filterPerizinanNama = $request->get('filter_perizinan_nama');
+        $filterPerizinanKabupaten = $request->get('filter_perizinan_kabupaten');
+        $filterPerizinanJenis = $request->get('filter_perizinan_jenis');
+        $filterPerizinanNoIzin = $request->get('filter_perizinan_no_izin');
+        $filterPerizinanTglTerbit = $request->get('filter_perizinan_tgl_terbit');
+        $filterPerizinanTglAkhir = $request->get('filter_perizinan_tgl_akhir');
+        $filterPerizinanStatus = $request->get('filter_perizinan_status');
+        $filterPerizinanKapasitas = $request->get('filter_perizinan_kapasitas');
+
+        // Per-column filters for Permohonan tab
+        $filterPermohonanPengguna = $request->get('filter_permohonan_pengguna');
+        $filterPermohonanKategori = $request->get('filter_permohonan_kategori');
+        $filterPermohonanStatus = $request->get('filter_permohonan_status');
+        $filterPermohonanTanggal = $request->get('filter_permohonan_tanggal');
+
         $query = Permohonan::withCount('questions');
 
-        // Search by name or jenis_permohonan
         if ($q) {
-            $query->where(function ($query) use ($q) {
-                $query->where('nama', 'like', '%' . $q . '%')
-                    ->orWhere('jenis_permohonan', 'like', '%' . $q . '%');
+            $query->whereHas('user', function ($sub) use ($q) {
+                $sub->where('name', 'like', "%{$q}%");
+            })->orWhereHas('permohonan', function ($sub) use ($q) {
+                $sub->where('nama', 'like', "%{$q}%");
             });
         }
 
@@ -47,8 +64,13 @@ class PermohonanController extends Controller
         // =========================================
         $queryPerizinan = PerizinanListrik::query();
 
-        // Search
-        if ($q && $tab === 'perizinan') {
+        // Check if any per-column filters are active for Perizinan
+        $hasPerColumnFiltersPerizinan = $filterPerizinanNama || $filterPerizinanKabupaten ||
+            $filterPerizinanJenis || $filterPerizinanNoIzin || $filterPerizinanTglTerbit ||
+            $filterPerizinanTglAkhir || $filterPerizinanStatus || $filterPerizinanKapasitas;
+
+        // Global search (only if no per-column filters)
+        if ($q && $tab === 'perizinan' && !$hasPerColumnFiltersPerizinan) {
             $queryPerizinan->where(function ($qry) use ($q) {
                 $qry->where('nama_pemohon', 'like', "%{$q}%")
                     ->orWhere('kabupaten_kota', 'like', "%{$q}%")
@@ -57,7 +79,64 @@ class PermohonanController extends Controller
             });
         }
 
-        // Filter by status (berdasarkan tanggal_akhir)
+        // Per-column filters (take priority over global search)
+        if ($filterPerizinanNama) {
+            $queryPerizinan->where('nama_pemohon', 'like', '%' . $filterPerizinanNama . '%');
+        }
+
+        if ($filterPerizinanKabupaten) {
+            $queryPerizinan->where('kabupaten_kota', 'like', '%' . $filterPerizinanKabupaten . '%');
+        }
+
+        if ($filterPerizinanJenis) {
+            $queryPerizinan->where('jenis', 'like', '%' . $filterPerizinanJenis . '%');
+        }
+
+        if ($filterPerizinanNoIzin) {
+            $queryPerizinan->where('no_surat_izin', 'like', '%' . $filterPerizinanNoIzin . '%');
+        }
+
+        if ($filterPerizinanTglTerbit) {
+            $queryPerizinan->whereDate('tanggal_terbit', $filterPerizinanTglTerbit);
+        }
+
+        if ($filterPerizinanTglAkhir) {
+            $queryPerizinan->whereDate('tanggal_akhir', $filterPerizinanTglAkhir);
+        }
+
+        if ($filterPerizinanStatus) {
+            $today = now();
+            $statusLower = strtolower($filterPerizinanStatus);
+
+            if (str_contains($statusLower, 'aktif') && !str_contains($statusLower, 'berakhir')) {
+                // Sedang Aktif
+                $queryPerizinan->whereNotNull('tanggal_akhir')
+                    ->where('tanggal_akhir', '>', $today->copy()->addDays(30))
+                    ->where('tanggal_akhir', '>', '1901-01-01');
+            } elseif (str_contains($statusLower, 'mau') || str_contains($statusLower, 'warning')) {
+                // Mau Berakhir
+                $queryPerizinan->whereNotNull('tanggal_akhir')
+                    ->where('tanggal_akhir', '>=', $today)
+                    ->where('tanggal_akhir', '<=', $today->copy()->addDays(30))
+                    ->where('tanggal_akhir', '>', '1901-01-01');
+            } elseif (str_contains($statusLower, 'berakhir') || str_contains($statusLower, 'expired')) {
+                // Berakhir
+                $queryPerizinan->where(function ($subQuery) use ($today) {
+                    $subQuery->whereNull('tanggal_akhir')
+                        ->orWhere(function ($q) use ($today) {
+                            $q->whereNotNull('tanggal_akhir')
+                                ->where('tanggal_akhir', '<', $today)
+                                ->where('tanggal_akhir', '>', '1901-01-01');
+                        });
+                });
+            }
+        }
+
+        if ($filterPerizinanKapasitas) {
+            $queryPerizinan->where('kapasitas', 'like', '%' . $filterPerizinanKapasitas . '%');
+        }
+
+        // Filter by status (berdasarkan tanggal_akhir) - from dropdown
         if ($status) {
             $today = now();
             if ($status === 'aktif') {
@@ -73,8 +152,8 @@ class PermohonanController extends Controller
                     ->where('tanggal_akhir', '>', '1901-01-01');
             } elseif ($status === 'berakhir') {
                 // Berakhir: tanggal_akhir NULL ATAU sudah lewat
-                $queryPerizinan->where(function ($query) use ($today) {
-                    $query->whereNull('tanggal_akhir')
+                $queryPerizinan->where(function ($subQuery) use ($today) {
+                    $subQuery->whereNull('tanggal_akhir')
                         ->orWhere(function ($q) use ($today) {
                             $q->whereNotNull('tanggal_akhir')
                                 ->where('tanggal_akhir', '<', $today)
@@ -84,7 +163,7 @@ class PermohonanController extends Controller
             }
         }
 
-        // Filter by jenis
+        // Filter by jenis - from dropdown
         if ($jenis) {
             $queryPerizinan->where('jenis', 'like', "%{$jenis}%");
         }
@@ -157,7 +236,34 @@ class PermohonanController extends Controller
         // =========================================
         // TAB 2: Data Permohonan dari PermohonanUser
         // =========================================
-        $permohonanUsers = PermohonanUser::with(['permohonan', 'user'])
+        $queryPermohonanUser = PermohonanUser::with(['permohonan', 'user']);
+
+        // Check if any per-column filters are active for Permohonan
+        $hasPerColumnFiltersPermohonan = $filterPermohonanPengguna || $filterPermohonanKategori ||
+            $filterPermohonanStatus || $filterPermohonanTanggal;
+
+        // Per-column filters for Permohonan tab
+        if ($filterPermohonanPengguna) {
+            $queryPermohonanUser->whereHas('user', function ($subQuery) use ($filterPermohonanPengguna) {
+                $subQuery->where('name', 'like', '%' . $filterPermohonanPengguna . '%');
+            });
+        }
+
+        if ($filterPermohonanKategori) {
+            $queryPermohonanUser->whereHas('permohonan', function ($subQuery) use ($filterPermohonanKategori) {
+                $subQuery->where('nama', 'like', '%' . $filterPermohonanKategori . '%');
+            });
+        }
+
+        if ($filterPermohonanStatus) {
+            $queryPermohonanUser->where('status', 'like', '%' . $filterPermohonanStatus . '%');
+        }
+
+        if ($filterPermohonanTanggal) {
+            $queryPermohonanUser->whereDate('created_at', $filterPermohonanTanggal);
+        }
+
+        $permohonanUsers = $queryPermohonanUser
             ->orderBy('created_at', 'desc')
             ->paginate($perPage, ['*'], 'page_permohonan_user')
             ->withQueryString();
@@ -166,18 +272,44 @@ class PermohonanController extends Controller
         $regencies = RegRegency::orderBy('name')->get(['id', 'name']);
 
         return view('admin.permohonan.index', [
-            'title' => 'Perizinan dan Permohonan',
-            'permohonans' => $permohonans,
-            'perizinanItems' => $perizinanItems,
+            'title' => 'Data Permohonan Masuk',
             'permohonanUsers' => $permohonanUsers,
-            'jenisOptions' => $jenisOptions,
+            'perizinanItems' => $perizinanItems,
             'perizinanStats' => $perizinanStats,
-            'tab' => $tab,
+            'jenisOptions' => $jenisOptions,
+            'regencies' => $regencies,
             'q' => $q,
             'status' => $status,
             'jenis' => $jenis,
-            'regencies' => $regencies,
+            'tab' => $tab,
         ]);
+    }
+
+    /**
+     * Show import form
+     */
+    public function import(Request $request)
+    {
+        return view('admin.permohonan.import', [
+            'title' => 'Import Data Permohonan',
+        ]);
+    }
+
+    /**
+     * Process import
+     */
+    public function importProcess(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:10240',
+        ]);
+
+        try {
+            Excel::import(new PermohonanImport, $request->file('file'));
+            return redirect()->route('admin.permohonan.index')->with('success', 'Data permohonan berhasil diimport.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal import data: ' . $e->getMessage());
+        }
     }
 
     /**

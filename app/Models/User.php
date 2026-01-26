@@ -33,6 +33,9 @@ class User extends Authenticatable
         'address',
         'village_id',
         'identity_type',
+        'is_verified',
+        'verified_at',
+        'verified_by',
     ];
 
     /**
@@ -53,6 +56,8 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'is_verified' => 'boolean',
+        'verified_at' => 'datetime',
     ];
 
     public function getRoleSelectAttribute()
@@ -78,5 +83,21 @@ class User extends Authenticatable
     public function village()
     {
         return $this->belongsTo(RegVillage::class, 'village_id');
+    }
+
+    /**
+     * Relationship: User who verified this user
+     */
+    public function verifiedBy()
+    {
+        return $this->belongsTo(User::class, 'verified_by');
+    }
+
+    /**
+     * Scope: Get only unverified users
+     */
+    public function scopeUnverified($query)
+    {
+        return $query->where('is_verified', false);
     }
 }

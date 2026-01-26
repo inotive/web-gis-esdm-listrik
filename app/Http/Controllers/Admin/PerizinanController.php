@@ -11,6 +11,8 @@ use App\Helpers\UploadFile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\PerizinanImport;
 
 class PerizinanController extends Controller
 {
@@ -20,7 +22,53 @@ class PerizinanController extends Controller
      */
     public function index(Request $request)
     {
-        return redirect()->route('admin.permohonan.index');
+        $query = Perizinan::with('perusahaan');
+
+        if ($request->has('q')) {
+            $q = $request->q;
+            $query->where(function($sub) use ($q) {
+                $sub->where('nama', 'like', "%{$q}%")
+                    ->orWhere('no_pengajuan', 'like', "%{$q}%")
+                    ->orWhere('jenis', 'like', "%{$q}%")
+                    ->orWhereHas('perusahaan', function($p) use ($q) {
+                        $p->where('nama', 'like', "%{$q}%");
+                    });
+            });
+        }
+
+        $perizinans = $query->orderBy('created_at', 'desc')->paginate(10);
+
+        return view('admin.perizinan.index', [
+            'title' => 'Manajemen Data Perizinan',
+            'perizinans' => $perizinans
+        ]);
+    }
+
+    /**
+     * Show import form
+     */
+    public function import(Request $request)
+    {
+        return view('admin.perizinan.import', [
+            'title' => 'Import Data Perizinan',
+        ]);
+    }
+
+    /**
+     * Process import
+     */
+    public function importProcess(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:10240',
+        ]);
+
+        try {
+            Excel::import(new PerizinanImport, $request->file('file'));
+            return redirect()->route('admin.perizinan.index')->with('success', 'Data perizinan berhasil diimport.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal import data: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -50,6 +98,7 @@ class PerizinanController extends Controller
             'no_surat_keluar' => 'nullable|string|max:255',
             'tanggal' => 'nullable|date',
             'lokasi' => 'nullable|string',
+            'status_kelistrikan' => 'required|in:berlistrik_pln,berlistrik_non_pln,tidak_berlistrik',
             'titik_koordinat' => 'nullable|string|max:255',
             'jumlah_kapasitas' => 'nullable|integer',
             'total_kapasitas_kva' => 'nullable|numeric',
@@ -115,6 +164,7 @@ class PerizinanController extends Controller
             'no_surat_keluar' => 'nullable|string|max:255',
             'tanggal' => 'nullable|date',
             'lokasi' => 'nullable|string',
+            'status_kelistrikan' => 'required|in:berlistrik_pln,berlistrik_non_pln,tidak_berlistrik',
             'titik_koordinat' => 'nullable|string|max:255',
             'jumlah_kapasitas' => 'nullable|integer',
             'total_kapasitas_kva' => 'nullable|numeric',
@@ -214,7 +264,6 @@ class PerizinanController extends Controller
             return redirect()->route('admin.perizinan.show', $perizinan->id)
                 ->with('success', 'Dokumen berhasil ditambahkan.');
         } catch (\Exception $e) {
-            dd($e->getMessage());
             DB::rollBack();
             return back()
                 ->withInput()
@@ -259,6 +308,38 @@ class PerizinanController extends Controller
             return back()
                 ->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
+    }
+
+    public function getMapData()
+    {
+        $data = Perizinan::select('id', 'nama', 'titik_koordinat', 'status_kelistrikan', 'lokasi')
+            ->whereNotNull('titik_koordinat')
+            ->where('titik_koordinat', '!=', '') 
+            ->get();
+
+        $formattedData = $data->map(function($item) {
+            $color = match($item->status_kelistrikan) {
+                'berlistrik_pln' => 'green',     
+                'berlistrik_non_pln' => 'yellow', 
+                'tidak_berlistrik' => 'red',      
+                default => 'blue'                 
+            };
+
+            $coords = array_map('trim', explode(',', $item->titik_koordinat));
+            $lat = isset($coords[0]) && is_numeric($coords[0]) ? (float)$coords[0] : 0;
+            $lng = isset($coords[1]) && is_numeric($coords[1]) ? (float)$coords[1] : 0;
+
+            return [
+                'id' => $item->id,
+                'title' => $item->nama,
+                'lat' => $lat,
+                'lng' => $lng,
+                'color' => $color,
+                'status_label' => ucwords(str_replace('_', ' ', $item->status_kelistrikan ?? '')),
+                'lokasi' => $item->lokasi
+            ];
+        });
+        return response()->json($formattedData);
     }
 }
 

@@ -183,6 +183,36 @@
             border-top-right-radius: 0;
         }
 
+        /* Filter Row Styling */
+        .table-desa thead tr.filter-row th {
+            padding: 8px 20px;
+            background: #F8FAFC;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        .filter-input {
+            width: 100%;
+            height: 32px;
+            padding: 0 10px;
+            border: 1px solid #DBDFE9;
+            border-radius: 6px;
+            background: #fff;
+            font-size: 11px;
+            color: #252F4A;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .filter-input::placeholder {
+            color: #9CA3AF;
+            font-style: italic;
+        }
+
+        .filter-input:focus {
+            border-color: #17C653;
+            box-shadow: 0 0 0 3px rgba(23, 198, 83, 0.1);
+        }
+
         .table-desa tbody td {
             padding: 23px 20px;
             border-bottom: 1px solid #F1F1F4;
@@ -655,6 +685,19 @@
                             <th>Status Berlistrik</th>
                             <th class="col-aksi">Aksi</th>
                         </tr>
+                        {{-- Filter Row --}}
+                        <tr class="filter-row">
+                            <th class="col-no"></th>
+                            <th><input type="text" class="filter-input" placeholder="Filter nama desa..."
+                                    data-column="nama"></th>
+                            <th><input type="text" class="filter-input" placeholder="Filter kecamatan..."
+                                    data-column="kecamatan"></th>
+                            <th><input type="text" class="filter-input" placeholder="Filter kabupaten..."
+                                    data-column="kabupaten"></th>
+                            <th><input type="text" class="filter-input" placeholder="Filter status..."
+                                    data-column="status"></th>
+                            <th class="col-aksi"></th>
+                        </tr>
                     </thead>
                     <tbody>
                         @forelse ($desas as $i => $desa)
@@ -703,26 +746,31 @@
                 </table>
 
                 <div class="table-footer">
-                    <div class="show-wrap">
-                        <span>Show</span>
-                        <form id="perPageForm" method="GET" action="#">
-                            <input type="hidden" name="q" value="{{ request('q') }}">
-                            <input type="hidden" name="by" value="{{ request('by') }}">
-                            <input type="hidden" name="val" value="{{ request('val') }}">
-                            <select class="form-select" name="per_page" aria-label="Jumlah baris per halaman">
-                                @foreach ([10, 25, 50, 100] as $pp)
-                                    <option value="{{ $pp }}"
-                                        {{ (string) request('per_page', '10') === (string) $pp ? 'selected' : '' }}>
-                                        {{ $pp }}</option>
-                                @endforeach
-                            </select>
-                        </form>
-                        <span>per page</span>
+                    <div class="table-footer-left">
+                        <div class="summary">Menampilkan {{ $desas->count() }} data</div>
                     </div>
+                    <div class="table-footer-right">
+                        <div class="show-wrap">
+                            <span>Show</span>
+                            <form id="perPageForm" method="GET" action="#">
+                                <input type="hidden" name="q" value="{{ request('q') }}">
+                                <input type="hidden" name="by" value="{{ request('by') }}">
+                                <input type="hidden" name="val" value="{{ request('val') }}">
+                                <select class="form-select" name="per_page" aria-label="Jumlah baris per halaman">
+                                    @foreach ([10, 25, 50, 100] as $pp)
+                                        <option value="{{ $pp }}"
+                                            {{ (string) request('per_page', '10') === (string) $pp ? 'selected' : '' }}>
+                                            {{ $pp }}</option>
+                                    @endforeach
+                                </select>
+                            </form>
+                            <span>per page</span>
+                        </div>
 
-                    <nav aria-label="Pagination">
-                        {{ $desas->appends(request()->query())->links('pagination::bootstrap-4') }}
-                    </nav>
+                        <nav aria-label="Pagination">
+                            {{ $desas->appends(request()->query())->links('pagination::bootstrap-4') }}
+                        </nav>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1042,4 +1090,71 @@
             margin: 1.5rem auto 1rem !important;
         }
     </style>
+
+    <script>
+        // ========== Column Filter Functionality ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterInputs = document.querySelectorAll('.filter-input');
+            const tableRows = document.querySelectorAll('.table-desa tbody tr');
+
+            filterInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    tableRows.forEach(row => {
+                        // Skip empty state row
+                        if (row.querySelector('td[colspan]')) return;
+
+                        // Check all filters to determine if row should be visible
+                        let allFiltersMatch = true;
+                        filterInputs.forEach((filterInput) => {
+                            const filterVal = filterInput.value.toLowerCase()
+                                .trim();
+                            if (filterVal) {
+                                const columnIndex = Array.from(filterInput.closest(
+                                    'tr').children).indexOf(filterInput.closest(
+                                    'th'));
+                                const targetCell = row.children[columnIndex];
+                                if (targetCell) {
+                                    const targetText = targetCell.textContent
+                                        .toLowerCase().trim();
+                                    if (!targetText.includes(filterVal)) {
+                                        allFiltersMatch = false;
+                                    }
+                                }
+                            }
+                        });
+
+                        // Show/hide row based on all filters
+                        if (allFiltersMatch) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+
+                    // Update row count
+                    updateVisibleRowCount();
+                });
+            });
+
+            // Function to update visible row count
+            function updateVisibleRowCount() {
+                const visibleRows = Array.from(tableRows).filter(row => {
+                    return row.style.display !== 'none' && !row.querySelector('td[colspan]');
+                });
+
+                const summary = document.querySelector('.summary');
+                if (summary) {
+                    const total = tableRows.length - (document.querySelector('.table-desa tbody tr td[colspan]') ?
+                        1 : 0);
+                    const visible = visibleRows.length;
+
+                    if (visible < total) {
+                        summary.textContent = `Menampilkan ${visible} dari ${total} data (filtered)`;
+                    } else {
+                        summary.textContent = `Menampilkan ${visible} data`;
+                    }
+                }
+            }
+        });
+    </script>
 @endpush
