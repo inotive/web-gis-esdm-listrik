@@ -135,7 +135,8 @@
     </div>
 
     <section class="card">
-        <form method="POST" action="{{ route('admin.permohonan-user.store', $permohonanId) }}" id="permohonanForm">
+        <form method="POST" action="{{ route('admin.permohonan-user.store', $permohonanId) }}" id="permohonanForm"
+            enctype="multipart/form-data">
             @csrf
 
             <div class="form-group">

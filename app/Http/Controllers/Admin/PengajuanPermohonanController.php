@@ -41,8 +41,8 @@ class PengajuanPermohonanController extends Controller
 
         // Search by permohonan name or keterangan
         if ($q) {
-            $query->where(function($query) use ($q) {
-                $query->whereHas('permohonan', function($query) use ($q) {
+            $query->where(function ($query) use ($q) {
+                $query->whereHas('permohonan', function ($query) use ($q) {
                     $query->where('nama', 'like', '%' . $q . '%');
                 })->orWhere('keterangan', 'like', '%' . $q . '%');
             });
@@ -111,7 +111,7 @@ class PengajuanPermohonanController extends Controller
         $userRole = Auth::user()->roles()->first()->name ?? null;
 
         // Validate permohonan belongs to user's role
-        $permohonan = Permohonan::with(['questions.options' => function($query) {
+        $permohonan = Permohonan::with(['questions.options' => function ($query) {
             $query->orderBy('id');
         }])->where('id', $permohonanId)
             ->where('jenis_permohonan', $userRole)
@@ -144,6 +144,7 @@ class PengajuanPermohonanController extends Controller
             'jawaban' => 'nullable|array',
             'keterangan' => 'nullable|string',
         ]);
+
 
         \Log::info('Store Permohonan - Validated Data:', $validated);
 
@@ -195,6 +196,28 @@ class PengajuanPermohonanController extends Controller
 
         \Log::info('Store Permohonan - Processed Jawaban:', $jawaban);
 
+        // Handle File Uploads
+        if ($request->hasFile('jawaban')) {
+            $files = $request->file('jawaban');
+            foreach ($files as $questionId => $fileOrFiles) {
+                if (is_array($fileOrFiles)) {
+                    // Multiple files
+                    $storedFiles = [];
+                    foreach ($fileOrFiles as $file) {
+                        if ($file->isValid()) {
+                            $storedFiles[] = $this->storeFile($file, 'permohonan-jawaban');
+                        }
+                    }
+                    $jawaban[$questionId] = $storedFiles;
+                } else {
+                    // Single file
+                    if ($fileOrFiles->isValid()) {
+                        $jawaban[$questionId] = $this->storeFile($fileOrFiles, 'permohonan-jawaban');
+                    }
+                }
+            }
+        }
+
         DB::beginTransaction();
         try {
             $dataToInsert = [
@@ -242,7 +265,7 @@ class PengajuanPermohonanController extends Controller
         }
 
         $pengajuanPermohonan->load([
-            'permohonan.questions.options' => function($query) {
+            'permohonan.questions.options' => function ($query) {
                 $query->orderBy('id');
             },
             'documents.dokumen',
@@ -277,7 +300,7 @@ class PengajuanPermohonanController extends Controller
                 ->withErrors(['error' => 'Hanya permohonan dengan status Pending yang dapat diedit.']);
         }
 
-        $pengajuanPermohonan->load(['permohonan.questions.options' => function($query) {
+        $pengajuanPermohonan->load(['permohonan.questions.options' => function ($query) {
             $query->orderBy('id');
         }]);
 

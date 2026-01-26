@@ -130,10 +130,8 @@ class ImportedFeatureController extends Controller
                 $query->where('imported_json_features.regency_id', $request->regency_id);
             }
 
-            // Buffer the output
             $features = [];
 
-            // Use cursor for memory efficient iteration
             foreach ($query->cursor() as $item) {
                 $properties = $item->properties ? json_decode($item->properties, true) : [];
 
