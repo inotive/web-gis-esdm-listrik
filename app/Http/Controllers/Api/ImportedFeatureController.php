@@ -83,7 +83,7 @@ class ImportedFeatureController extends Controller
         $cacheKey = 'geojson_data_' . md5(json_encode($params));
 
         // Attempt to get from cache (Forever)
-        $jsonContent = \Illuminate\Support\Facades\Cache::rememberForever($cacheKey, function () use ($request) {
+        $jsonContent = \Illuminate\Support\Facades\Cache::remember($cacheKey, 60 * 60 * 24, function () use ($request) {
             $query = ImportedJsonFeature::query();
 
             // Select only necessary columns
@@ -136,18 +136,7 @@ class ImportedFeatureController extends Controller
             // Use cursor for memory efficient iteration
             foreach ($query->cursor() as $item) {
                 $properties = $item->properties ? json_decode($item->properties, true) : [];
-                $properties['db_id'] = $item->id;
-                $properties['kategori'] = $item->kategori;
-                $properties['sub_kategori'] = $item->sub_kategori;
-                $properties['sub_subkategori'] = $item->sub_subkategori;
-                $properties['regency_id'] = $item->regency_id;
 
-                // Add video link from joined column
-                if ($item->video_link_joined) {
-                    $properties['video_360_link'] = $item->video_link_joined;
-                }
-
-                // Decode geometry if it's a JSON string
                 $geometry = $item->geometry ? json_decode($item->geometry) : null;
 
                 $features[] = [
