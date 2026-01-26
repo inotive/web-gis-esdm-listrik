@@ -85,18 +85,18 @@ class DokumenController extends Controller
             // Search in all folders (ignore current folder restriction when searching)
             $query = Dokumen::when(!$isAdmin, function ($query) {
                 return $query->where('user_id', auth()->id());
-            })->where(function($q) use ($search) {
+            })->where(function ($q) use ($search) {
                 $q->where('nama', 'like', '%' . $search . '%')
-                  ->orWhere('mime_type', 'like', '%' . $search . '%');
+                    ->orWhere('mime_type', 'like', '%' . $search . '%');
             })
-            ->with(['user', 'children', 'parent']);
+                ->with(['user', 'children', 'parent']);
         } else {
             // Normal view: only show items in current folder
-        $query = Dokumen::where('parent_id', $folderId ?: null)
-        ->when(!$isAdmin, function ($query) {
-            return $query->where('user_id', auth()->id());
-        })
-            ->with(['user', 'children']);
+            $query = Dokumen::where('parent_id', $folderId ?: null)
+                ->when(!$isAdmin, function ($query) {
+                    return $query->where('user_id', auth()->id());
+                })
+                ->with(['user', 'children']);
         }
 
         // Apply sorting
@@ -111,12 +111,12 @@ class DokumenController extends Controller
                 $files = $allItems->where('tipe', 'file');
 
                 // Natural sort folders
-                $sortedFolders = $folders->sortBy(function($item) {
+                $sortedFolders = $folders->sortBy(function ($item) {
                     return $this->naturalSortKey($item->nama);
                 }, SORT_NATURAL | SORT_FLAG_CASE);
 
                 // Natural sort files
-                $sortedFiles = $files->sortBy(function($item) {
+                $sortedFiles = $files->sortBy(function ($item) {
                     return $this->naturalSortKey($item->nama);
                 }, SORT_NATURAL | SORT_FLAG_CASE);
 
@@ -190,11 +190,11 @@ class DokumenController extends Controller
                 $folders = $allItems->where('tipe', 'folder');
                 $files = $allItems->where('tipe', 'file');
 
-                $sortedFolders = $folders->sortBy(function($item) {
+                $sortedFolders = $folders->sortBy(function ($item) {
                     return $this->naturalSortKey($item->nama);
                 }, SORT_NATURAL | SORT_FLAG_CASE);
 
-                $sortedFiles = $files->sortBy(function($item) {
+                $sortedFiles = $files->sortBy(function ($item) {
                     return $this->naturalSortKey($item->nama);
                 }, SORT_NATURAL | SORT_FLAG_CASE);
 

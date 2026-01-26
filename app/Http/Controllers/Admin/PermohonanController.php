@@ -47,17 +47,13 @@ class PermohonanController extends Controller
 
         $query = Permohonan::withCount('questions');
 
-        if ($q) {
-            $query->whereHas('user', function ($sub) use ($q) {
-                $sub->where('name', 'like', "%{$q}%");
-            })->orWhereHas('permohonan', function ($sub) use ($q) {
-                $sub->where('nama', 'like', "%{$q}%");
-            });
-        }
-
-        $permohonans = $query->orderBy('created_at', 'desc')
-            ->paginate($perPage, ['*'], 'page_permohonan')
-            ->withQueryString();
+        // if ($q) {
+        //     $query->whereHas('user', function ($sub) use ($q) {
+        //         $sub->where('name', 'like', "%{$q}%");
+        //     })->orWhereHas('permohonan', function ($sub) use ($q) {
+        //         $sub->where('nama', 'like', "%{$q}%");
+        //     });
+        // }
 
         // =========================================
         // TAB 1: Data Perizinan (dari database perizinan_listriks)
