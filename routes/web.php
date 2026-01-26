@@ -79,13 +79,6 @@ Route::get('/api/check-email', function (Illuminate\Http\Request $request) {
 });
 
 Route::get('/', [HomeController::class, 'index']);
-Route::get('/', function () {
-    $infrastrukturCount = InfrastrukturJaringan::count();
-    $garduCount = Gardu::count();
-    $pembangkitCount = PembangkitLokal::count();
-
-    return view('home', compact('infrastrukturCount', 'garduCount', 'pembangkitCount'));
-});
 
 Route::get('/home', function () {
     return view('home');

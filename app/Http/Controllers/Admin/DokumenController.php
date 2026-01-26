@@ -15,6 +15,51 @@ class DokumenController extends Controller
     use UploadFile;
 
     /**
+     * Helper method for natural sorting with month name support
+     */
+    private function naturalSortKey($name)
+    {
+        // Map Indonesian month names to numbers for proper sorting
+        $monthMap = [
+            'JANUARI' => '01',
+            'FEBRUARI' => '02',
+            'MARET' => '03',
+            'APRIL' => '04',
+            'MEI' => '05',
+            'JUNI' => '06',
+            'JULI' => '07',
+            'AGUSTUS' => '08',
+            'SEPTEMBER' => '09',
+            'OKTOBER' => '10',
+            'NOVEMBER' => '11',
+            'DESEMBER' => '12',
+        ];
+
+        // Check if the name is a month name (case insensitive)
+        $upperName = strtoupper(trim($name));
+
+        // Check for pattern like "10. OKTOBER" or "1. JANUARI"
+        if (preg_match('/^(\d+)\.\s*(.+)$/', $upperName, $matches)) {
+            $number = str_pad($matches[1], 2, '0', STR_PAD_LEFT);
+            $monthName = trim($matches[2]);
+
+            if (isset($monthMap[$monthName])) {
+                return $number . '_' . $monthMap[$monthName];
+            }
+
+            return $number . '_' . $monthName;
+        }
+
+        // Check if it's just a month name
+        if (isset($monthMap[$upperName])) {
+            return $monthMap[$upperName] . '_' . $upperName;
+        }
+
+        // For other names, return as is for natural sorting
+        return $name;
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
@@ -57,33 +102,124 @@ class DokumenController extends Controller
         // Apply sorting
         switch ($sortBy) {
             case 'name_asc':
-                $query->orderBy('tipe', 'desc')->orderBy('nama', 'asc');
-                break;
             case 'name_desc':
-                $query->orderBy('tipe', 'desc')->orderBy('nama', 'desc');
+                // Get all items first for natural sorting
+                $allItems = $query->get();
+
+                // Separate folders and files
+                $folders = $allItems->where('tipe', 'folder');
+                $files = $allItems->where('tipe', 'file');
+
+                // Natural sort folders
+                $sortedFolders = $folders->sortBy(function($item) {
+                    return $this->naturalSortKey($item->nama);
+                }, SORT_NATURAL | SORT_FLAG_CASE);
+
+                // Natural sort files
+                $sortedFiles = $files->sortBy(function($item) {
+                    return $this->naturalSortKey($item->nama);
+                }, SORT_NATURAL | SORT_FLAG_CASE);
+
+                // Reverse if descending
+                if ($sortBy === 'name_desc') {
+                    $sortedFolders = $sortedFolders->reverse();
+                    $sortedFiles = $sortedFiles->reverse();
+                }
+
+                // Merge folders first, then files
+                $sorted = $sortedFolders->merge($sortedFiles);
+
+                // Manual pagination
+                $perPage = 50;
+                $currentPage = request()->get('page', 1);
+                $offset = ($currentPage - 1) * $perPage;
+
+                $paginatedItems = $sorted->slice($offset, $perPage)->values();
+
+                $dokumens = new \Illuminate\Pagination\LengthAwarePaginator(
+                    $paginatedItems,
+                    $sorted->count(),
+                    $perPage,
+                    $currentPage,
+                    ['path' => request()->url(), 'query' => request()->query()]
+                );
+
+                $dokumens->appends([
+                    'folder' => $folderId,
+                    'sort' => $sortBy,
+                    'q' => $search,
+                ]);
                 break;
+
             case 'date_asc':
                 $query->orderBy('tipe', 'desc')->orderBy('created_at', 'asc');
+                $dokumens = $query->paginate(50)->appends([
+                    'folder' => $folderId,
+                    'sort' => $sortBy,
+                    'q' => $search,
+                ]);
                 break;
             case 'date_desc':
                 $query->orderBy('tipe', 'desc')->orderBy('created_at', 'desc');
+                $dokumens = $query->paginate(50)->appends([
+                    'folder' => $folderId,
+                    'sort' => $sortBy,
+                    'q' => $search,
+                ]);
                 break;
             case 'size_asc':
                 $query->orderBy('tipe', 'desc')->orderBy('size', 'asc');
+                $dokumens = $query->paginate(50)->appends([
+                    'folder' => $folderId,
+                    'sort' => $sortBy,
+                    'q' => $search,
+                ]);
                 break;
             case 'size_desc':
                 $query->orderBy('tipe', 'desc')->orderBy('size', 'desc');
+                $dokumens = $query->paginate(50)->appends([
+                    'folder' => $folderId,
+                    'sort' => $sortBy,
+                    'q' => $search,
+                ]);
                 break;
             default:
-                $query->orderBy('tipe', 'desc')->orderBy('nama', 'asc');
-        }
+                // Default: natural sort by name ascending
+                $allItems = $query->get();
 
-        // Add pagination (50 items per page for better performance)
-        $dokumens = $query->paginate(50)->appends([
-            'folder' => $folderId,
-            'sort' => $sortBy,
-            'q' => $search,
-        ]);
+                $folders = $allItems->where('tipe', 'folder');
+                $files = $allItems->where('tipe', 'file');
+
+                $sortedFolders = $folders->sortBy(function($item) {
+                    return $this->naturalSortKey($item->nama);
+                }, SORT_NATURAL | SORT_FLAG_CASE);
+
+                $sortedFiles = $files->sortBy(function($item) {
+                    return $this->naturalSortKey($item->nama);
+                }, SORT_NATURAL | SORT_FLAG_CASE);
+
+                $sorted = $sortedFolders->merge($sortedFiles);
+
+                $perPage = 50;
+                $currentPage = request()->get('page', 1);
+                $offset = ($currentPage - 1) * $perPage;
+
+                $paginatedItems = $sorted->slice($offset, $perPage)->values();
+
+                $dokumens = new \Illuminate\Pagination\LengthAwarePaginator(
+                    $paginatedItems,
+                    $sorted->count(),
+                    $perPage,
+                    $currentPage,
+                    ['path' => request()->url(), 'query' => request()->query()]
+                );
+
+                $dokumens->appends([
+                    'folder' => $folderId,
+                    'sort' => $sortBy,
+                    'q' => $search,
+                ]);
+        }
 
         // Get breadcrumbs
         $breadcrumbs = [];

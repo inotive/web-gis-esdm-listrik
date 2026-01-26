@@ -114,18 +114,19 @@
             <span class="menu-label">Data Pelanggan</span>
         </a> -->
 
-            <a class="menu-item {{ nav_active('admin.data-infrastruktur.*', 'admin.infrastruktur.*', 'admin.gardu.*', 'admin.pembangkit.*') }}"
+            {{-- <a class="menu-item {{ nav_active('admin.data-infrastruktur.*', 'admin.infrastruktur.*', 'admin.gardu.*', 'admin.pembangkit.*') }}"
                 href="{{ route('admin.data-infrastruktur.index') }}">
                 <span class="menu-icon"><i class="ri-plug-line"></i></span>
                 <span class="menu-label">Data Infrastruktur</span>
-            </a>
+            </a> --}}
 
             <a class="menu-item {{ nav_active('admin.jalan.*') }}" href="{{ route('admin.jalan.index') }}">
                 <span class="menu-icon"><i class="ri-road-map-line" aria-hidden="true"></i></span>
                 <span class="menu-label">Data Jalan &amp; Aksesbilitas</span>
             </a>
 
-            <a class="menu-item {{ nav_active('admin.rencana-pengembangan.*') }}" href="{{ route('admin.rencana-pengembangan.index') }}">
+            <a class="menu-item {{ nav_active('admin.rencana-pengembangan.*') }}"
+                href="{{ route('admin.rencana-pengembangan.index') }}">
                 <span class="menu-icon"><i class="ri-lightbulb-flash-line" aria-hidden="true"></i></span>
                 <span class="menu-label">Rencana Pengembangan Bantuan</span>
             </a>
