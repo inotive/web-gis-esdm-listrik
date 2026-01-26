@@ -40,24 +40,27 @@ class DokumenController extends Controller
             // Search in all folders (ignore current folder restriction when searching)
             $query = Dokumen::when(!$isAdmin, function ($query) {
                 return $query->where('user_id', auth()->id());
-            })->where(function($q) use ($search) {
+            })->where(function ($q) use ($search) {
                 $q->where('nama', 'like', '%' . $search . '%')
-                  ->orWhere('mime_type', 'like', '%' . $search . '%');
+                    ->orWhere('mime_type', 'like', '%' . $search . '%');
             })
-            ->with(['user', 'children', 'parent']);
+                ->with(['user', 'children', 'parent']);
         } else {
             // Normal view: only show items in current folder
-        $query = Dokumen::where('parent_id', $folderId ?: null)
-        ->when(!$isAdmin, function ($query) {
-            return $query->where('user_id', auth()->id());
-        })
-            ->with(['user', 'children']);
+            $query = Dokumen::where('parent_id', $folderId ?: null)
+                ->when(!$isAdmin, function ($query) {
+                    return $query->where('user_id', auth()->id());
+                })
+                ->with(['user', 'children']);
         }
 
         // Apply sorting
         switch ($sortBy) {
             case 'name_asc':
-                $query->orderBy('tipe', 'desc')->orderBy('nama', 'asc');
+                $query->orderBy('tipe', 'desc')
+                    ->orderByRaw("CASE WHEN nama REGEXP '^[0-9]' THEN 1 ELSE 2 END ASC")
+                    ->orderByRaw("CAST(nama AS UNSIGNED) ASC")
+                    ->orderBy('nama', 'asc');
                 break;
             case 'name_desc':
                 $query->orderBy('tipe', 'desc')->orderBy('nama', 'desc');
