@@ -1132,19 +1132,7 @@
                 // Trigger Initial Load
                 loadFeatureStructure();
 
-                // ================== TOGGLE PANEL FUNCTIONALITY ==================
-                // Get toggle button
-                const toggleButton = layerFilter.querySelector('.lf-toggle-btn');
-                const filterBody = layerFilter.querySelector('.lf-body');
 
-                // Toggle panel handler
-                toggleButton.addEventListener('click', () => {
-                    layerFilter.classList.toggle('lf-collapsed');
-                    toggleButton.textContent = layerFilter.classList.contains('lf-collapsed') ? '▶' :
-                        '▼';
-                });
-
-                view.ui.add(layerFilter, 'top-left');
 
                 // ================== WIDGETS ==================
                 const bm_osm = Basemap.fromId("osm");

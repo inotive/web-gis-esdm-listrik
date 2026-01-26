@@ -13,6 +13,11 @@ class ImportJsonVideoSeeder extends Seeder
      */
     public function run(): void
     {
+
+        // Clear Cache to ensure fresh data is used
+        $this->command->info('Clearing cache...');
+        \Illuminate\Support\Facades\Cache::flush();
+
         ini_set('memory_limit', '-1');
         DB::disableQueryLog();
         DB::table('json_videos')->truncate();

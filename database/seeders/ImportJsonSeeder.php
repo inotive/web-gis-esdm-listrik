@@ -21,6 +21,10 @@ class ImportJsonSeeder extends Seeder
         // Disable Foreign Key Check
         \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
 
+        // Clear Cache to ensure fresh data is used
+        $this->command->info('Clearing cache...');
+        \Illuminate\Support\Facades\Cache::flush();
+
         DB::table('json_videos')->truncate();
         DB::table('imported_json_features')->truncate();
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
