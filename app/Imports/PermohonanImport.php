@@ -33,6 +33,7 @@ class PermohonanImport implements ToModel, WithHeadingRow
              // Create dummy user for import
              $user = User::create([
                  'name' => $row['nama_pemohon'],
+                 'username' => Str::slug($row['nama_pemohon']) . rand(100, 999), // Generate username
                  'email' => Str::slug($row['nama_pemohon']) . '_' . rand(100,999) . '@import.com',
                  'password' => bcrypt('password'), // default password
                  'role' => 'user' // Asumsi ada field role atau menggunakan spatie
@@ -47,19 +48,61 @@ class PermohonanImport implements ToModel, WithHeadingRow
             $permohonan = Permohonan::where('nama', 'like', '%' . $row['jenis_permohonan'] . '%')->first();
         }
 
-        // Jika jenis permohonan tidak ditemukan, cari default atau skip
-        if (!$permohonan) {
-            $permohonan = Permohonan::first(); // Fallback ke permohonan pertama
+        // Jika jenis permohonan tidak ditemukan, cari default atau create baru
+        if (!$permohonan && !empty($row['jenis_permohonan'])) {
+            $permohonan = Permohonan::create([
+                'nama' => $row['jenis_permohonan'],
+                'jenis_permohonan' => 'Imported', // Default type
+                'keterangan' => 'Otomatis dibuat dari import'
+            ]);
+        } elseif (!$permohonan) {
+             // Fallback terakhir jika row['jenis_permohonan'] kosong
+             $permohonan = Permohonan::first(); 
         }
 
         if (!$permohonan) return null;
+
+        // 3. Map Columns to Questions (Auto-create questions if needed)
+        // Daftar kolom yang ingin dijadikan "Pertanyaan" / Field dinamis
+        $columnsToMap = [
+            'status_kelistrikan' => 'Status Kelistrikan',
+            'titik_koordinat' => 'Titik Koordinat',
+            'jumlah_kapasitas' => 'Jumlah Kapasitas',
+            'total_kapasitas_kva' => 'Total Kapasitas (kVA)',
+            'jenis_penggunaan' => 'Jenis Penggunaan',
+            'sifat_penggunaan' => 'Sifat Penggunaan',
+            'catatan' => 'Catatan',
+            'lokasi' => 'Lokasi'
+        ];
+
+        $jawaban = [];
+
+        foreach ($columnsToMap as $colKey => $questionText) {
+            if (isset($row[$colKey])) {
+                // Find or create question for this Permohonan
+                $question = \App\Models\PermohonanQuestion::firstOrCreate(
+                    [
+                        'permohonan_id' => $permohonan->id,
+                        'pertanyaan' => $questionText
+                    ],
+                    [
+                        'urutan' => 99, // Urutan default di akhir
+                        'tipe' => 'text',
+                        'wajib' => false
+                    ]
+                );
+
+                // Map answer to question ID
+                $jawaban[$question->id] = $row[$colKey];
+            }
+        }
 
         return new PermohonanUser([
             'permohonan_id' => $permohonan->id,
             'user_id'       => $user->id,
             'status'        => $this->mapStatus($row['status'] ?? 'pending'),
             'keterangan'    => $row['keterangan'] ?? null,
-            'jawaban'       => null, // JSON jawaban kosong dulu
+            'jawaban'       => $jawaban, // Simpan jawaban yang sudah dimap
             'created_at'    => now(),
             'updated_at'    => now(),
         ]);

@@ -60,14 +60,16 @@ class PerizinanImport implements ToModel, WithHeadingRow
     private function transformDate($value, $format = 'Y-m-d')
     {
         if (empty($value)) return null;
+
         try {
-            return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value);
-        } catch (\ErrorException $e) {
-            try {
-                return Carbon::parse($value);
-            } catch (\Exception $e) {
-                return null;
+            // Check if value is numeric (Excel serial date)
+            if (is_numeric($value)) {
+                return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value);
             }
+            // Otherwise parse as string
+            return Carbon::parse($value);
+        } catch (\Exception $e) {
+            return null;
         }
     }
 

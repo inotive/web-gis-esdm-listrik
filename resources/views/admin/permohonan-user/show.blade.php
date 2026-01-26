@@ -606,6 +606,25 @@
   <section class="card">
     <h2 class="section-title">Detail Pengajuan</h2>
 
+    @if($permohonanUser->permohonan->questions->isEmpty())
+       <div class="empty-state">
+          <p>Tidak ada pertanyaan yang dikonfigurasi untuk permohonan ini.</p>
+          {{-- Fallback: Display raw answers if any --}}
+          @if(!empty($permohonanUser->jawaban))
+            <h4 style="margin-top: 20px; text-align: left;">Data Import:</h4>
+            <div style="text-align: left;">
+             @foreach($permohonanUser->jawaban as $qId => $ans)
+                @php
+                    $q = \App\Models\PermohonanQuestion::find($qId);
+                    $label = $q ? $q->pertanyaan : "Field #$qId";
+                @endphp
+                <div class="mb-2"><strong>{{ $label }}:</strong> {{ is_array($ans) ? implode(', ', $ans) : $ans }}</div>
+             @endforeach
+            </div>
+          @endif
+       </div>
+    @endif
+
     @foreach ($permohonanUser->permohonan->questions as $index => $question)
       @php
         $questionId = $question->id;
