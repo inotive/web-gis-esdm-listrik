@@ -95,7 +95,7 @@ class RencanaPengembanganController extends Controller
         // Get filter options
         $regencies = RegRegency::orderBy('name')->get(['id', 'name']);
         $districts = RegDistrict::orderBy('name')->get(['id', 'name']);
-        $prioritasOptions = ['Prioritas 1 RKTS', 'Prioritas 1 SUTM'];
+        $prioritasOptions = ['Prioritas 1 PLTS', 'Prioritas 1 SUTM'];
 
         // Get unique values from database for filters (maintain score order 5 to 1)
         $uniqueAksesibilitas = collect(array_keys(RencanaPengembanganBantuan::getAksesibilitasOptions()));
