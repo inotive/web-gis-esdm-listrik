@@ -5,7 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\RekapElektrifikasi;
 use App\Models\PerizinanListrik;
+use App\Imports\RekapElektrifikasiImport;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Validator;
 
 class RekapDataController extends Controller
 {
@@ -232,5 +236,82 @@ class RekapDataController extends Controller
             'XX'
         ];
         return $romanNumerals[$number - 1] ?? (string) $number;
+    }
+    /**
+     * Download template import Excel
+     */
+    public function downloadTemplate()
+    {
+        // Headers for the Excel file
+        $headers = [
+            'No',
+            'Kabupaten Kota',
+            'Jumlah Desa',
+            'Jumlah KK',
+            'Jumlah Penduduk',
+            'Desa Berlistrik PLN',
+            'Desa Berlistrik Non PLN',
+            'Desa Berlistrik Jumlah',
+            'Desa Belum Berlistrik',
+            'KK Berlistrik PLN',
+            'KK Berlistrik Non PLN',
+            'KK Berlistrik Jumlah',
+            'Rasio Desa Berlistrik',
+            'Jumlah KK Belum Berlistrik',
+            'Rasio Elektrifikasi'
+        ];
+
+        // Example data
+        $data = [
+            $headers,
+            [
+                'I', 'Balikpapan', 34, 218833, 644315, 34, 0, 34, 0, 193587, 0, 193587, 100, 25246, 88.46
+            ],
+            [
+                'II', 'Berau', 110, 72644, 223556, 66, 44, 110, 0, 51135, 6671, 57806, 100, 14838, 79.57
+            ]
+        ];
+
+        // Create a callback to generate excel
+        $callback = function() use ($data) {
+            $file = fopen('php://output', 'w');
+            foreach ($data as $row) {
+                fputcsv($file, $row);
+            }
+            fclose($file);
+        };
+
+        // Return stream
+        return Response::stream($callback, 200, [
+            "Content-Type" => "text/csv",
+            "Content-Disposition" => "attachment; filename=template_rekap_data.csv",
+        ]);
+    }
+
+    /**
+     * Process Import Excel
+     */
+    public function import(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'file' => 'required|mimes:xlsx,xls,csv',
+            'tahun' => 'required|integer|min:2000|max:'.(date('Y')+2),
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        try {
+            $tahun = $request->input('tahun');
+            $file = $request->file('file');
+
+            Excel::import(new RekapElektrifikasiImport($tahun), $file);
+
+            return redirect()->route('admin.rekap-data.index', ['tahun' => $tahun])
+                ->with('success', 'Data berhasil diimport untuk tahun ' . $tahun);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal import data: ' . $e->getMessage());
+        }
     }
 }

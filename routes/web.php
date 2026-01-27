@@ -320,6 +320,8 @@ Route::group(['middleware' => ['auth', 'verified_user'], 'as' => 'admin.', 'pref
 
     // Rekap Data
     Route::group(['as' => 'rekap-data.', 'prefix' => 'rekap-data'], function () {
+        Route::get('/template', [RekapDataController::class, 'downloadTemplate'])->name('template');
+        Route::post('/import', [RekapDataController::class, 'import'])->name('import');
         Route::get('/', [RekapDataController::class, 'index'])->name('index');
         Route::get('/detail/{kabupaten}', [RekapDataController::class, 'detail'])->name('detail');
     });
