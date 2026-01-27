@@ -148,9 +148,9 @@ class ImportedFeatureController extends Controller
                         $properties = ['Prioritas' => $prioritas] + $properties;
                     }
                     if (isset($properties['Rencana Sumber Listrik'])) {
-                        $properties['color'] = 'red';
+                        $geometry['color'] = 'red';
                         if (str_contains($properties['Rencana Sumber Listrik'], 'SUTM')) {
-                            $properties['color'] = 'yellow';
+                            $geometry['color'] = 'yellow';
                         }
                     }
                 }
