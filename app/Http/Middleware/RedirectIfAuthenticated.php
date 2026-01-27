@@ -21,7 +21,16 @@ class RedirectIfAuthenticated
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
-                return to_route('admin.dashboard'); 
+                // Check Email Verification First
+                if (!Auth::guard($guard)->user()->hasVerifiedEmail()) {
+                    return to_route('verification.notice');
+                }
+                
+                // Then Check Admin Approval
+                if (!Auth::guard($guard)->user()->is_verified) {
+                    return to_route('pending-verification');
+                }
+                return to_route('admin.dashboard');
             }
         }
 

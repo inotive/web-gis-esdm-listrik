@@ -16,7 +16,7 @@ class UserController extends Controller
 
     public function index()
     {
-        $db = User::latest()->get();
+        $db = User::where('is_verified', true)->latest()->get();
         $pendingUsers = User::unverified()->latest()->get();
 
         $view = [

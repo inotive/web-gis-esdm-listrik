@@ -49,6 +49,7 @@ use App\Models\PembangkitLokal;
 |--------------------------------------------------------------------------
 */
 
+Auth::routes(['verify' => true, 'login' => false, 'register' => false]);
 Route::get('login', [LoginController::class, 'show'])->middleware('guest')->name('login');
 Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('register', [RegisterController::class, 'register'])->name('register.perform');
@@ -89,7 +90,7 @@ Route::get('/home', function () {
 Route::get('/landing', [LandingPageController::class, 'index'])
     ->name('landing');
 
-Route::group(['middleware' => ['auth', 'verified_user'], 'as' => 'admin.', 'prefix' => 'admin'], function () {
+Route::group(['middleware' => ['auth', 'verified', 'verified_user'], 'as' => 'admin.', 'prefix' => 'admin'], function () {
 
     Route::group(['middleware' => [], 'as' => 'profile.', 'prefix' => 'profile'], function () {
         Route::get('profile/{profile}', [ProfileController::class, 'profile'])->name('index');
