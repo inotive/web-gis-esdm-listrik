@@ -80,80 +80,103 @@ class ImportedFeatureController extends Controller
         // Generate Cache Key
         $params = $request->all();
         ksort($params); // Ensure consistent key order
-        $cacheKey = 'geojson_data_' . md5(json_encode($params));
+        $cacheKey = 'geojson_data_v3_' . md5(json_encode($params));
 
         // Attempt to get from cache (Forever)
-        $jsonContent = \Illuminate\Support\Facades\Cache::remember($cacheKey, 60 * 60 * 24, function () use ($request) {
-            $query = ImportedJsonFeature::query();
+        // $jsonContent = \Illuminate\Support\Facades\Cache::remember($cacheKey, 60 * 60 * 24, function () use ($request) {
+        $query = ImportedJsonFeature::query();
 
-            // Select only necessary columns
-            $query->select([
-                'imported_json_features.id',
-                'imported_json_features.kategori',
-                'imported_json_features.sub_kategori',
-                'imported_json_features.sub_subkategori',
-                'imported_json_features.regency_id',
-                'imported_json_features.properties',
-                'imported_json_features.geometry'
-            ]);
+        // Select only necessary columns
+        $query->select([
+            'imported_json_features.id',
+            'imported_json_features.kategori',
+            'imported_json_features.sub_kategori',
+            'imported_json_features.sub_subkategori',
+            'imported_json_features.regency_id',
+            'imported_json_features.properties',
+            'imported_json_features.geometry'
+        ]);
 
-            // Use Join for efficiency
-            $query->leftJoin('json_videos', 'imported_json_features.id', '=', 'json_videos.imported_json_features_id');
+        // Use Join for efficiency
+        $query->leftJoin('json_videos', 'imported_json_features.id', '=', 'json_videos.imported_json_features_id');
 
-            // Add video link to selection
-            $query->addSelect('json_videos.link as video_link_joined');
+        // Add video link to selection
+        $query->addSelect('json_videos.link as video_link_joined');
 
-            if ($request->has('kategori')) {
-                $query->where('imported_json_features.kategori', $request->kategori);
-            }
+        if ($request->has('kategori')) {
+            $query->where('imported_json_features.kategori', $request->kategori);
+        }
 
-            if ($request->has('sub_kategori')) {
-                $val = $request->sub_kategori;
-                if ($val === 'null' || $val === '') {
-                    $query->whereNull('imported_json_features.sub_kategori');
+        if ($request->has('sub_kategori')) {
+            $val = $request->sub_kategori;
+            if ($val === 'null' || $val === '') {
+                $query->whereNull('imported_json_features.sub_kategori');
+            } else {
+                if (str_contains($val, '/')) {
+                    $parts = explode('/', $val, 2);
+                    $sub = $parts[0];
+                    $subsub = $parts[1];
+
+                    $query->where('imported_json_features.sub_kategori', $sub)
+                        ->where('imported_json_features.sub_subkategori', $subsub);
                 } else {
-                    if (str_contains($val, '/')) {
-                        $parts = explode('/', $val, 2);
-                        $sub = $parts[0];
-                        $subsub = $parts[1];
+                    $query->where('imported_json_features.sub_kategori', $val)
+                        ->whereNull('imported_json_features.sub_subkategori');
+                }
+            }
+        }
 
-                        $query->where('imported_json_features.sub_kategori', $sub)
-                            ->where('imported_json_features.sub_subkategori', $subsub);
-                    } else {
-                        $query->where('imported_json_features.sub_kategori', $val)
-                            ->whereNull('imported_json_features.sub_subkategori');
+        if ($request->has('regency_id') && $request->regency_id) {
+            $query->where('imported_json_features.regency_id', $request->regency_id);
+        }
+
+        // Ensure we only retrieve features with valid geometry
+        $query->whereNotNull('imported_json_features.geometry')
+            ->where('imported_json_features.geometry', '!=', '');
+
+        $features = [];
+
+        foreach ($query->cursor() as $item) {
+            $properties = $item->properties ?: [];
+
+            $geometry = $item->geometry ?: [];
+
+            if ($item->sub_subkategori === 'Rencana Bantuan Lokasi Pemukiman') {
+                if (isset($properties['Prioritas'])) {
+                    $prioritas = $properties['Prioritas'];
+                    unset($properties['Prioritas']);
+                    $properties = ['Prioritas' => $prioritas] + $properties;
+                }
+                if (isset($properties['Rencana Sumber Listrik'])) {
+                    $properties['color'] = 'red';
+                    if (str_contains($properties['Rencana Sumber Listrik'], 'SUTM')) {
+                        $properties['color'] = 'yellow';
                     }
                 }
             }
 
-            if ($request->has('regency_id') && $request->regency_id) {
-                $query->where('imported_json_features.regency_id', $request->regency_id);
+
+
+            // Skip if geometry is invalid
+            if (!$geometry) {
+                continue;
             }
 
-            $features = [];
+            $features[] = [
+                'type' => 'Feature',
+                'properties' => $properties,
+                'geometry' => $geometry
+            ];
+        }
 
-            foreach ($query->cursor() as $item) {
-                $properties = $item->properties ? json_decode($item->properties, true) : [];
-
-                $geometry = $item->geometry ? json_decode($item->geometry) : null;
-
-                $features[] = [
-                    'type' => 'Feature',
-                    'properties' => $properties,
-                    'geometry' => $geometry
-                ];
-            }
-
-            return json_encode([
-                'type' => 'FeatureCollection',
-                'features' => $features
-            ]);
-        });
+        return json_encode([
+            'type' => 'FeatureCollection',
+            'features' => $features
+        ]);
+        // });
 
         return response($jsonContent, 200, [
             'Content-Type' => 'application/json',
-            // Disable browser cache so it always checks the server (which is fast due to server-side cache)
-            // This ensures that when you run the seeder (and flush server cache), the browser sees the new data.
             'Cache-Control' => 'no-cache, no-store, must-revalidate'
         ]);
     }

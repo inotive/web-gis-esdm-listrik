@@ -718,17 +718,43 @@
                                                     'picture-marker')
                                                     return;
 
-                                                const svgUrl =
+                                                const defaultSvgUrl =
                                                     createLocationPinSvg(
                                                         color);
+
+                                                // Create UniqueValueRenderer to handle per-feature colors
                                                 layer.renderer = {
-                                                    type: "simple",
-                                                    symbol: {
+                                                    type: "unique-value",
+                                                    field: "color",
+                                                    defaultSymbol: {
                                                         type: "picture-marker",
-                                                        url: svgUrl,
+                                                        url: defaultSvgUrl,
                                                         width: "32px",
                                                         height: "32px"
-                                                    }
+                                                    },
+                                                    uniqueValueInfos: [{
+                                                            value: "yellow",
+                                                            symbol: {
+                                                                type: "picture-marker",
+                                                                url: createLocationPinSvg(
+                                                                    "yellow"
+                                                                ),
+                                                                width: "32px",
+                                                                height: "32px"
+                                                            }
+                                                        },
+                                                        {
+                                                            value: "red",
+                                                            symbol: {
+                                                                type: "picture-marker",
+                                                                url: createLocationPinSvg(
+                                                                    "red"
+                                                                ),
+                                                                width: "32px",
+                                                                height: "32px"
+                                                            }
+                                                        }
+                                                    ]
                                                 };
                                             } else if (type ===
                                                 "polyline") {

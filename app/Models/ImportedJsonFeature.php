@@ -18,5 +18,6 @@ class ImportedJsonFeature extends Model
 
     protected $casts = [
         'properties' => 'array',
+        'geometry' => 'array',
     ];
 }
