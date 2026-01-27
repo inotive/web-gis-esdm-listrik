@@ -345,7 +345,32 @@
         </div>
     </div>
 
-    <!-- Summary Cards -->
+    <!-- Permohonan Summary Cards -->
+    <div class="section-title"><i class="ri-file-list-3-line"></i> Statistik Permohonan</div>
+    <div class="summary-grid">
+        <div class="summary-card" style="border-left: 4px solid #3B82F6;">
+            <div class="summary-icon" style="background: #EFF6FF; color: #3B82F6;"><i class="ri-folder-open-line"></i></div>
+            <div class="summary-value">{{ number_format($totalPermohonan) }}</div>
+            <div class="summary-label">Total Permohonan</div>
+        </div>
+        <div class="summary-card" style="border-left: 4px solid #F59E0B;">
+            <div class="summary-icon" style="background: #FEF3C7; color: #F59E0B;"><i class="ri-time-line"></i></div>
+            <div class="summary-value">{{ number_format($permohonanPending) }}</div>
+            <div class="summary-label">Menunggu Approval</div>
+        </div>
+        <div class="summary-card" style="border-left: 4px solid #10B981;">
+            <div class="summary-icon" style="background: #D1FAE5; color: #10B981;"><i class="ri-checkbox-circle-line"></i></div>
+            <div class="summary-value">{{ number_format($permohonanApproved) }}</div>
+            <div class="summary-label">Disetujui</div>
+        </div>
+        <div class="summary-card" style="border-left: 4px solid #EF4444;">
+            <div class="summary-icon" style="background: #FEE2E2; color: #EF4444;"><i class="ri-close-circle-line"></i></div>
+            <div class="summary-value">{{ number_format($permohonanRejected) }}</div>
+            <div class="summary-label">Ditolak</div>
+        </div>
+    </div>
+
+    <!-- Summary Cards (Existing) -->
     <div class="summary-grid">
         <div class="summary-card">
             <div class="summary-icon"><i class="ri-government-line"></i></div>

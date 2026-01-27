@@ -249,6 +249,11 @@ class DashboardController extends Controller
             'topPrioritas' => $topPrioritas,
             // Tahun data
             'tahunData' => $latestYear,
+            // Permohonan Stats
+            'totalPermohonan' => \App\Models\PermohonanUser::count(),
+            'permohonanPending' => \App\Models\PermohonanUser::whereIn('status', ['pending', 'proses'])->count(),
+            'permohonanApproved' => \App\Models\PermohonanUser::where('status', 'selesai')->count(),
+            'permohonanRejected' => \App\Models\PermohonanUser::where('status', 'ditolak')->count(),
         ]);
     }
 }
