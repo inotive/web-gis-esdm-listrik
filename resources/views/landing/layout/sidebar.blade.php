@@ -57,7 +57,7 @@
         </a>
         @endif
 
-         <a class="menu-item {{ nav_active('admin.rekap-data.*') }}" href="{{ route('admin.rekap-data.index') }}">
+        <a class="menu-item {{ nav_active('admin.rekap-data.*') }}" href="{{ route('admin.rekap-data.index') }}">
             <span class="menu-icon"><i class="ri-file-text-line" aria-hidden="true"></i></span>
             <span class="menu-label">Rekap Data</span>
         </a>

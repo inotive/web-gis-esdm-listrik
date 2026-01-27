@@ -36,6 +36,7 @@ class User extends Authenticatable
         'is_verified',
         'verified_at',
         'verified_by',
+        'perusahaan_id',
     ];
 
     /**

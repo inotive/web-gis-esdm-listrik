@@ -84,10 +84,10 @@
                                 <a href="{{ route('admin.perizinan.edit', $item->id) }}" class="btn btn-sm btn-warning text-white" title="Edit">
                                     <i class="ri-pencil-line"></i>
                                 </a>
-                                <form action="{{ route('admin.perizinan.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
+                                <form action="{{ route('admin.perizinan.destroy', $item->id) }}" method="POST" class="form-delete-perizinan" data-name="{{ $item->nama }}">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
+                                    <button type="button" class="btn btn-sm btn-danger btn-delete-trigger" title="Hapus">
                                         <i class="ri-delete-bin-line"></i>
                                     </button>
                                 </form>
@@ -114,3 +114,66 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // ========== Delete Confirmation ==========
+        document.querySelectorAll('.btn-delete-trigger').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const form = this.closest('.form-delete-perizinan');
+                const name = form.dataset.name;
+
+                Swal.fire({
+                    title: 'Konfirmasi Hapus',
+                    html: `Apakah Anda yakin ingin menghapus data perizinan <strong>${name}</strong>?<br><small class="text-muted">Data yang dihapus tidak dapat dikembalikan.</small>`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#94a3b8',
+                    confirmButtonText: '<i class="ri-delete-bin-line"></i> Ya, Hapus!',
+                    cancelButtonText: 'Batal',
+                    reverseButtons: true,
+                    customClass: {
+                        confirmButton: 'btn btn-danger',
+                        cancelButton: 'btn btn-secondary me-3'
+                    },
+                    buttonsStyling: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+
+        // ========== SweetAlert Notifications (From Controller) ==========
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: '{{ session('success') }}',
+                timer: 3000,
+                timerProgressBar: true,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end',
+                customClass: {
+                    popup: 'swal-custom-toast'
+                }
+            });
+        @endif
+
+        @if(session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: '{{ session('error') }}',
+                confirmButtonColor: '#ef4444',
+                confirmButtonText: 'OK'
+            });
+        @endif
+    });
+</script>
+@endpush

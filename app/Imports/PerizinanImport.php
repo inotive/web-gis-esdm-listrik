@@ -30,7 +30,10 @@ class PerizinanImport implements ToModel, WithHeadingRow
         // Kita paksa cari atau create.
         if (!$perusahaan && !empty($row['nama_perusahaan'])) {
             $perusahaan = Perusahaan::create([
-                'nama' => $row['nama_perusahaan']
+                'nama' => $row['nama_perusahaan'],
+                'kontak' => $row['kontak'] ?? null,
+                'alamat' => $row['lokasi'] ?? null, // Map lokasi to alamat as best effort
+                // 'kabupaten_kota' => ... // if available in row
             ]);
         }
         

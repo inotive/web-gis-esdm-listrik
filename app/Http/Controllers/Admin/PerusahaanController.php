@@ -87,12 +87,9 @@ class PerusahaanController extends Controller
     {
         $perusahaan->load('village.district.regency');
 
-        // Load real perizinan data from database
-        $perizinanData = \DB::table('perizinan_listriks')
-            ->where('perusahaan_id', $perusahaan->id)
-            ->orWhere('nama_perusahaan', 'like', "%{$perusahaan->nama}%")
-            ->orderBy('created_at', 'desc')
-            ->get();
+        // Load real perizinan data from database via relationship
+        // We use the relationship defined in Perusahaan model: 'perizinans'
+        $perizinanData = $perusahaan->perizinans()->orderBy('created_at', 'desc')->get();
 
         // Load infrastructure data
         $infrastrukturJaringans = $perusahaan->infrastrukturJaringans()->get();
