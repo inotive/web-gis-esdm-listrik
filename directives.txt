@@ -1,0 +1,88 @@
+3:@section('title', 'Dashboard ESDM - Detail Permohonan')
+5:@push('styles')
+523:@endpush
+525:@section('content')
+551:      @if($isAdmin && $permohonanUser->status !== 'selesai' && $permohonanUser->status !== 'ditolak')
+562:      @endif
+602:    @if($permohonanUser->keterangan)
+607:    @endif
+613:    @if($permohonanUser->permohonan->questions->isEmpty())
+617:          @if(!empty($permohonanUser->jawaban))
+620:             @foreach($permohonanUser->jawaban as $qId => $ans)
+626:             @endforeach
+628:          @endif
+630:    @endif
+632:    @foreach ($permohonanUser->permohonan->questions as $index => $question)
+641:          @if ($question->wajib)
+643:          @endif
+647:          @if($answer === null || $answer === '')
+670:                @if($selectedOptions->count() > 0)
+672:                    @foreach($selectedOptions as $option)
+674:                    @endforeach
+678:                @endif
+684:          @endif
+687:    @endforeach
+690:  @if($permohonanUser->documents && $permohonanUser->documents->count() > 0)
+694:      @if($isAdmin)
+699:      @endif
+702:    @foreach($permohonanUser->documents as $document)
+707:            @if($document->masa_berlaku)
+709:              @if($document->masa_berlaku->isPast())
+715:              @endif
+718:            @endif
+722:          @if($document->dokumen && $document->dokumen->path)
+732:          @endif
+733:          @if($isAdmin)
+745:          @endif
+748:    @endforeach
+754:      @if($isAdmin)
+759:      @endif
+769:  @endif
+772:  @if($isAdmin && $permohonanUser->status !== 'selesai')
+838:            @if ($isAdmin && $permohonanUser->status !== 'selesai' && $permohonanUser->status !== 'ditolak')
+849:            @endif
+889:        @if ($permohonanUser->keterangan)
+894:        @endif
+900:        @foreach ($permohonanUser->permohonan->questions as $index => $question)
+909:                    @if ($question->wajib)
+911:                    @endif
+915:                    @if ($answer === null || $answer === '')
+939:                                @if ($selectedOptions->count() > 0)
+941:                                        @foreach ($selectedOptions as $option)
+943:                                        @endforeach
+947:                                @endif
+951:                                @if ($answer)
+961:                                @endif
+965:                                @if ($answer)
+970:                                        @foreach ($files as $file)
+979:                                        @endforeach
+981:                                @endif
+987:                    @endif
+990:        @endforeach
+993:    @if ($permohonanUser->documents && $permohonanUser->documents->count() > 0)
+997:                @if ($isAdmin)
+1002:                @endif
+1005:            @foreach ($permohonanUser->documents as $document)
+1010:                            @if ($document->masa_berlaku)
+1012:                                @if ($document->masa_berlaku->isPast())
+1019:                                @endif
+1022:                            @endif
+1026:                        @if ($document->dokumen && $document->dokumen->path)
+1034:                        @endif
+1035:                        @if ($isAdmin)
+1047:                        @endif
+1050:            @endforeach
+1056:                @if ($isAdmin)
+1061:                @endif
+1074:    @endif
+1077:    @if ($isAdmin && $permohonanUser->status !== 'selesai')
+1142:    @endif
+1145:    @if ($isAdmin && $permohonanUser->status !== 'selesai' && $permohonanUser->status !== 'ditolak')
+1179:    @endif
+1243:@endsection
+1245:@push('scripts')
+1414:            @if (session('success'))
+1432:            @endif
+1435:            @if (session('error') || $errors->any())
+1463:            @endif
+1556:@endpush

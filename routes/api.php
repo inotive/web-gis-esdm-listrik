@@ -118,6 +118,10 @@ Route::get('/wilayah/villages', [WilayahController::class, 'getVillages']);
 // PT Hasil Lokasi Survei ESDM
 Route::get('/hasil-lokasi-survei-esdm', [HasilLokasiSurveiEsdmController::class, 'index']);
 
+// Dynamic Features API
+Route::get('/features/structure', [App\Http\Controllers\Api\ImportedFeatureController::class, 'getStructure']);
+Route::get('/features/data', [App\Http\Controllers\Api\ImportedFeatureController::class, 'getData']);
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });

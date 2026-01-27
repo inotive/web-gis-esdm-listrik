@@ -3,72 +3,203 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\DataJalanNasional;
+use App\Models\LN_Jalan_Balikpapan;
+use App\Models\LN_Jalan_Berau;
+use App\Models\LN_Jalan_Bontang;
+use App\Models\LN_Jalan_Kubar;
+use App\Models\LN_Jalan_KutaiKartanegara;
+use App\Models\LN_Jalan_Kutim;
+use App\Models\LN_Jalan_Paser;
+use App\Models\LN_Jalan_PPU;
+use App\Models\LN_Jalan_Samarinda;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class JalanAksesController extends Controller
 {
     public function index(Request $request)
     {
-        $query = DataJalanNasional::query();
+        // Define all jalan models with their kabupaten names and column mappings
+        $jalanModels = [
+            'Balikpapan' => [
+                'model' => LN_Jalan_Balikpapan::class,
+                'columns' => [
+                    'kecamatan' => 'Kecamatan',
+                    'fungsi' => 'FUNGSI',
+                    'nama_jalan' => 'NAMA_RUAS',
+                    'panjang' => 'PANJANG',
+                ]
+            ],
+            'Berau' => [
+                'model' => LN_Jalan_Berau::class,
+                'columns' => [
+                    'kecamatan' => 'NULL',
+                    'fungsi' => 'FUNGSI',
+                    'nama_jalan' => 'NAMA_RUAS',
+                    'panjang' => 'PANJANG',
+                ]
+            ],
+            'Bontang' => [
+                'model' => LN_Jalan_Bontang::class,
+                'columns' => [
+                    'kecamatan' => 'Kecamatan',
+                    'fungsi' => 'Fungsi',
+                    'nama_jalan' => 'Nm_Ruas',
+                    'panjang' => 'Panjang',
+                ]
+            ],
+            'Kutai Barat' => [
+                'model' => LN_Jalan_Kubar::class,
+                'columns' => [
+                    'kecamatan' => 'NULL',
+                    'fungsi' => 'Fungsi',
+                    'nama_jalan' => 'Nm_Ruas',
+                    'panjang' => 'Panjang',
+                ]
+            ],
+            'Kutai Kartanegara' => [
+                'model' => LN_Jalan_KutaiKartanegara::class,
+                'columns' => [
+                    'kecamatan' => 'KECAMATAN',
+                    'fungsi' => 'FUNGSI',
+                    'nama_jalan' => 'NAMA_BARU',
+                    'panjang' => 'Panjang',
+                ]
+            ],
+            'Kutai Timur' => [
+                'model' => LN_Jalan_Kutim::class,
+                'columns' => [
+                    'kecamatan' => 'Kecamatan',
+                    'fungsi' => 'Fungsi',
+                    'nama_jalan' => 'Nm_Ruas',
+                    'panjang' => 'Panjang',
+                ]
+            ],
+            'Paser' => [
+                'model' => LN_Jalan_Paser::class,
+                'columns' => [
+                    'kecamatan' => 'Kecamatan',
+                    'fungsi' => 'Fungsi',
+                    'nama_jalan' => 'Nm_Ruas',
+                    'panjang' => 'Panjang',
+                ]
+            ],
+            'Penajam Paser Utara' => [
+                'model' => LN_Jalan_PPU::class,
+                'columns' => [
+                    'kecamatan' => 'NULL',
+                    'fungsi' => 'NULL',
+                    'nama_jalan' => 'Name',
+                    'panjang' => 'Shape_Leng',
+                ]
+            ],
+            'Samarinda' => [
+                'model' => LN_Jalan_Samarinda::class,
+                'columns' => [
+                    'kecamatan' => 'Kecamatan',
+                    'fungsi' => 'Fungsi',
+                    'nama_jalan' => 'Nm_Ruas',
+                    'panjang' => 'Panjang',
+                ]
+            ],
+        ];
 
-        // Search by nama jalan
-        if ($request->filled('q')) {
-            $query->where('nama_jln', 'like', '%' . $request->q . '%');
+        // Build union query to combine all tables
+        $queries = [];
+        foreach ($jalanModels as $kabupaten => $config) {
+            $modelClass = $config['model'];
+            $columns = $config['columns'];
+
+            $query = $modelClass::query()
+                ->select(
+                    DB::raw("'{$kabupaten}' as kabupaten_kota"),
+                    DB::raw("{$columns['kecamatan']} as kecamatan"),
+                    DB::raw("{$columns['fungsi']} as fungsi_jal"),
+                    DB::raw("{$columns['nama_jalan']} as nama_jln"),
+                    DB::raw("{$columns['panjang']} as panjang"),
+                    DB::raw("NULL as sumber"),
+                    'id'
+                );
+
+            // Apply filters
+            if ($request->filled('q')) {
+                $query->where($columns['nama_jalan'], 'like', '%' . $request->q . '%');
+            }
+
+            if ($request->filled('kecamatan') && $columns['kecamatan'] !== 'NULL') {
+                $query->where($columns['kecamatan'], $request->kecamatan);
+            }
+
+            if ($request->filled('fungsi') && $columns['fungsi'] !== 'NULL') {
+                $query->where($columns['fungsi'], $request->fungsi);
+            }
+
+            $queries[] = $query;
         }
 
-        // Filter by kabupaten/kota
+        // Combine all queries with UNION
+        $combinedQuery = $queries[0];
+        for ($i = 1; $i < count($queries); $i++) {
+            $combinedQuery = $combinedQuery->union($queries[$i]);
+        }
+
+        // Apply kabupaten filter after union
         if ($request->filled('kabupaten')) {
-            $query->where('kabupaten_kota', $request->kabupaten);
+            $combinedQuery = DB::table(DB::raw("({$combinedQuery->toSql()}) as combined"))
+                ->mergeBindings($combinedQuery->getQuery())
+                ->where('kabupaten_kota', $request->kabupaten);
+        } else {
+            $combinedQuery = DB::table(DB::raw("({$combinedQuery->toSql()}) as combined"))
+                ->mergeBindings($combinedQuery->getQuery());
         }
 
-        // Filter by kecamatan
-        if ($request->filled('kecamatan')) {
-            $query->where('kecamatan', $request->kecamatan);
-        }
-
-        // Filter by fungsi jalan
-        if ($request->filled('fungsi')) {
-            $query->where('fungsi_jal', $request->fungsi);
-        }
-
-        // Filter by sumber
-        if ($request->filled('sumber')) {
-            $query->where('sumber', $request->sumber);
-        }
-
-        // Order: prioritize data with kabupaten_kota first
-        $query->orderByRaw('CASE WHEN kabupaten_kota IS NOT NULL THEN 0 ELSE 1 END')
-              ->orderBy('id', 'asc');
-
-        // Pagination
+        // Order and paginate
         $perPage = $request->input('per_page', 10);
-        $jalan = $query->paginate($perPage)->withQueryString();
-
-        // Get unique values for filters
-        $kabupatenList = DataJalanNasional::select('kabupaten_kota')
-            ->distinct()
-            ->whereNotNull('kabupaten_kota')
+        $jalan = $combinedQuery
             ->orderBy('kabupaten_kota')
-            ->pluck('kabupaten_kota');
+            ->orderBy('id')
+            ->paginate($perPage)
+            ->withQueryString();
 
-        $kecamatanList = DataJalanNasional::select('kecamatan')
-            ->distinct()
-            ->whereNotNull('kecamatan')
-            ->orderBy('kecamatan')
-            ->pluck('kecamatan');
+        // Get unique values for filters from all tables
+        $kabupatenList = collect(array_keys($jalanModels))->sort()->values();
 
-        $fungsiFungsi = DataJalanNasional::select('fungsi_jal')
-            ->distinct()
-            ->whereNotNull('fungsi_jal')
-            ->orderBy('fungsi_jal')
-            ->pluck('fungsi_jal');
+        // Get unique kecamatan from all tables
+        $kecamatanList = collect();
+        foreach ($jalanModels as $config) {
+            $modelClass = $config['model'];
+            $kecamatanCol = $config['columns']['kecamatan'];
 
-        $sumberList = DataJalanNasional::select('sumber')
-            ->distinct()
-            ->whereNotNull('sumber')
-            ->orderBy('sumber')
-            ->pluck('sumber');
+            if ($kecamatanCol !== 'NULL') {
+                $kecamatanList = $kecamatanList->merge(
+                    $modelClass::select(DB::raw("{$kecamatanCol} as kecamatan"))
+                        ->distinct()
+                        ->whereNotNull($kecamatanCol)
+                        ->pluck('kecamatan')
+                );
+            }
+        }
+        $kecamatanList = $kecamatanList->unique()->sort()->values();
+
+        // Get unique fungsi from all tables
+        $fungsiFungsi = collect();
+        foreach ($jalanModels as $config) {
+            $modelClass = $config['model'];
+            $fungsiCol = $config['columns']['fungsi'];
+
+            if ($fungsiCol !== 'NULL') {
+                $fungsiFungsi = $fungsiFungsi->merge(
+                    $modelClass::select(DB::raw("{$fungsiCol} as fungsi"))
+                        ->distinct()
+                        ->whereNotNull($fungsiCol)
+                        ->pluck('fungsi')
+                );
+            }
+        }
+        $fungsiFungsi = $fungsiFungsi->unique()->sort()->values();
+
+        // Sumber is not available in these tables, so we'll provide an empty collection
+        $sumberList = collect();
 
         return view('admin.jalan_akses.index', compact('jalan', 'kabupatenList', 'kecamatanList', 'fungsiFungsi', 'sumberList'));
     }

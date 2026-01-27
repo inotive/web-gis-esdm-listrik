@@ -355,6 +355,13 @@
                             <input class="form-input" type="text" name="name" placeholder="Masukkan Nama Lengkap" required />
                         </div>
 
+
+
+                        <div class="form-group" id="companyNameGroup" style="display: none;">
+                            <label class="form-label">Nama Perusahaan (Nama PT)</label>
+                            <input class="form-input" type="text" name="company_name" placeholder="Masukkan Nama Perusahaan" />
+                        </div>
+
                         <div class="form-group">
                             <label class="form-label">Username</label>
                             <input class="form-input" type="text" name="username" id="username" placeholder="Masukkan Username" required />
@@ -363,14 +370,20 @@
 
                         <div class="form-group">
                             <label class="form-label" id="jabatanLabel">Jabatan</label>
-                            <input class="form-input" type="text" name="jabatan" placeholder="Masukkan Nama Desa/Perusahaan" required />
+                            <input class="form-input" type="text" name="jabatan" placeholder="Masukkan Jabatan" required />
                         </div>
+                        
+                        <!-- Rest of the form -->
 
                         <div class="form-group">
                             <label class="form-label">Email</label>
                             <input class="form-input" type="email" name="email" id="email" placeholder="email@mail.com" required />
                             <div id="emailValidation" class="validation-feedback" style="display:none;"></div>
                         </div>
+                        
+                        <!-- ... -->
+                        
+
 
                         <div class="form-group">
                             <label class="form-label">No. Hp</label>
@@ -448,17 +461,29 @@
 
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
-            // --- Form Logic ---
             function toggleForm(role) {
                 const addressLabel = document.getElementById('addressLabel');
-                const jabatanLabel = document.getElementById('jabatanLabel'); // Optional if needed to change
+                const companyGroup = document.getElementById('companyNameGroup');
+                const companyInput = document.querySelector('input[name="company_name"]');
+                const jabatanInput = document.querySelector('input[name="jabatan"]');
 
                 if (role === 'desa') {
                     addressLabel.innerText = 'Alamat Kantor Desa';
-                    // jabatanLabel.innerText = 'Jabatan';
+                    if (companyGroup) {
+                        companyGroup.style.display = 'none';
+                        if (companyInput) {
+                            companyInput.required = false;
+                            companyInput.value = '';
+                        }
+                    }
+                    if (jabatanInput) jabatanInput.placeholder = 'Masukkan Jabatan (Cth: Kepala Desa)';
                 } else {
                     addressLabel.innerText = 'Alamat Perusahaan';
-                    // jabatanLabel.innerText = 'Jabatan';
+                    if (companyGroup) {
+                        companyGroup.style.display = 'block';
+                        if (companyInput) companyInput.required = true;
+                    }
+                    if (jabatanInput) jabatanInput.placeholder = 'Masukkan Jabatan (Cth: Direktur)';
                 }
             }
 

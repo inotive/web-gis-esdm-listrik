@@ -15,37 +15,110 @@ class PermissionSeeder extends Seeder
         try {
             // Clear cache
             app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
-            
+
             echo "🔄 Membersihkan cache permission...\n";
 
             // Permissions definition
             $permissions = [
                 // Dashboard
                 ['name' => 'dashboard.view', 'group' => 'Dashboard', 'display_name' => 'Lihat Dashboard'],
-                
-                
+
                 // Role & Permission Management
                 ['name' => 'role.view', 'group' => 'Role & Permission', 'display_name' => 'Lihat Daftar Role'],
                 ['name' => 'role.create', 'group' => 'Role & Permission', 'display_name' => 'Tambah Role'],
                 ['name' => 'role.edit', 'group' => 'Role & Permission', 'display_name' => 'Edit Role'],
                 ['name' => 'role.delete', 'group' => 'Role & Permission', 'display_name' => 'Hapus Role'],
                 ['name' => 'role.permission', 'group' => 'Role & Permission', 'display_name' => 'Kelola Permission Role'],
-                
+
                 // User Management
                 ['name' => 'user.view', 'group' => 'Manajemen User', 'display_name' => 'Lihat Daftar User'],
                 ['name' => 'user.create', 'group' => 'Manajemen User', 'display_name' => 'Tambah User'],
                 ['name' => 'user.edit', 'group' => 'Manajemen User', 'display_name' => 'Edit User'],
                 ['name' => 'user.delete', 'group' => 'Manajemen User', 'display_name' => 'Hapus User'],
-                
+
+                // Data Desa
+                ['name' => 'desa.view', 'group' => 'Data Desa', 'display_name' => 'Lihat Data Desa'],
+                ['name' => 'desa.create', 'group' => 'Data Desa', 'display_name' => 'Tambah Data Desa'],
+                ['name' => 'desa.edit', 'group' => 'Data Desa', 'display_name' => 'Edit Data Desa'],
+                ['name' => 'desa.delete', 'group' => 'Data Desa', 'display_name' => 'Hapus Data Desa'],
+                ['name' => 'desa.export', 'group' => 'Data Desa', 'display_name' => 'Export Data Desa'],
+
+                // Data Perusahaan
+                ['name' => 'perusahaan.view', 'group' => 'Data Perusahaan', 'display_name' => 'Lihat Data Perusahaan'],
+                ['name' => 'perusahaan.create', 'group' => 'Data Perusahaan', 'display_name' => 'Tambah Perusahaan'],
+                ['name' => 'perusahaan.edit', 'group' => 'Data Perusahaan', 'display_name' => 'Edit Perusahaan'],
+                ['name' => 'perusahaan.delete', 'group' => 'Data Perusahaan', 'display_name' => 'Hapus Perusahaan'],
+                ['name' => 'perusahaan.show', 'group' => 'Data Perusahaan', 'display_name' => 'Detail Perusahaan'],
+
+                // Data Infrastruktur
+                ['name' => 'infrastruktur.view', 'group' => 'Data Infrastruktur', 'display_name' => 'Lihat Data Infrastruktur'],
+                ['name' => 'infrastruktur.gardu.view', 'group' => 'Data Infrastruktur', 'display_name' => 'Lihat Data Gardu'],
+                ['name' => 'infrastruktur.gardu.create', 'group' => 'Data Infrastruktur', 'display_name' => 'Tambah Gardu'],
+                ['name' => 'infrastruktur.gardu.edit', 'group' => 'Data Infrastruktur', 'display_name' => 'Edit Gardu'],
+                ['name' => 'infrastruktur.gardu.delete', 'group' => 'Data Infrastruktur', 'display_name' => 'Hapus Gardu'],
+                ['name' => 'infrastruktur.jaringan.view', 'group' => 'Data Infrastruktur', 'display_name' => 'Lihat Data Jaringan'],
+                ['name' => 'infrastruktur.jaringan.create', 'group' => 'Data Infrastruktur', 'display_name' => 'Tambah Jaringan'],
+                ['name' => 'infrastruktur.jaringan.edit', 'group' => 'Data Infrastruktur', 'display_name' => 'Edit Jaringan'],
+                ['name' => 'infrastruktur.jaringan.delete', 'group' => 'Data Infrastruktur', 'display_name' => 'Hapus Jaringan'],
+                ['name' => 'infrastruktur.pembangkit.view', 'group' => 'Data Infrastruktur', 'display_name' => 'Lihat Data Pembangkit'],
+                ['name' => 'infrastruktur.pembangkit.create', 'group' => 'Data Infrastruktur', 'display_name' => 'Tambah Pembangkit'],
+                ['name' => 'infrastruktur.pembangkit.edit', 'group' => 'Data Infrastruktur', 'display_name' => 'Edit Pembangkit'],
+                ['name' => 'infrastruktur.pembangkit.delete', 'group' => 'Data Infrastruktur', 'display_name' => 'Hapus Pembangkit'],
+
+                // Data Jalan & Aksesibilitas
+                ['name' => 'jalan.view', 'group' => 'Data Jalan', 'display_name' => 'Lihat Data Jalan'],
+                ['name' => 'jalan.create', 'group' => 'Data Jalan', 'display_name' => 'Tambah Data Jalan'],
+                ['name' => 'jalan.edit', 'group' => 'Data Jalan', 'display_name' => 'Edit Data Jalan'],
+                ['name' => 'jalan.delete', 'group' => 'Data Jalan', 'display_name' => 'Hapus Data Jalan'],
+
+                // Perizinan dan Permohonan
+                ['name' => 'perizinan.view', 'group' => 'Perizinan', 'display_name' => 'Lihat Data Perizinan'],
+                ['name' => 'perizinan.create', 'group' => 'Perizinan', 'display_name' => 'Tambah Perizinan'],
+                ['name' => 'perizinan.edit', 'group' => 'Perizinan', 'display_name' => 'Edit Perizinan'],
+                ['name' => 'perizinan.delete', 'group' => 'Perizinan', 'display_name' => 'Hapus Perizinan'],
+                ['name' => 'perizinan.approve', 'group' => 'Perizinan', 'display_name' => 'Approve Perizinan'],
+                ['name' => 'permohonan.view', 'group' => 'Perizinan', 'display_name' => 'Lihat Data Permohonan'],
+                ['name' => 'permohonan.create', 'group' => 'Perizinan', 'display_name' => 'Tambah Permohonan'],
+                ['name' => 'permohonan.edit', 'group' => 'Perizinan', 'display_name' => 'Edit Permohonan'],
+                ['name' => 'permohonan.delete', 'group' => 'Perizinan', 'display_name' => 'Hapus Permohonan'],
+                ['name' => 'permohonan.process', 'group' => 'Perizinan', 'display_name' => 'Proses Permohonan'],
+
+                // Dokumen
+                ['name' => 'dokumen.view', 'group' => 'Dokumen', 'display_name' => 'Lihat Dokumen'],
+                ['name' => 'dokumen.create', 'group' => 'Dokumen', 'display_name' => 'Upload Dokumen'],
+                ['name' => 'dokumen.edit', 'group' => 'Dokumen', 'display_name' => 'Edit Dokumen'],
+                ['name' => 'dokumen.delete', 'group' => 'Dokumen', 'display_name' => 'Hapus Dokumen'],
+                ['name' => 'dokumen.download', 'group' => 'Dokumen', 'display_name' => 'Download Dokumen'],
+
+                // Kategori Permohonan
+                ['name' => 'kategori_permohonan.view', 'group' => 'Kategori Permohonan', 'display_name' => 'Lihat Kategori Permohonan'],
+                ['name' => 'kategori_permohonan.create', 'group' => 'Kategori Permohonan', 'display_name' => 'Tambah Kategori'],
+                ['name' => 'kategori_permohonan.edit', 'group' => 'Kategori Permohonan', 'display_name' => 'Edit Kategori'],
+                ['name' => 'kategori_permohonan.delete', 'group' => 'Kategori Permohonan', 'display_name' => 'Hapus Kategori'],
+
+                // Manajemen Pengguna (Perusahaan)
+                ['name' => 'pengguna.view', 'group' => 'Manajemen Pengguna', 'display_name' => 'Lihat Pengguna Perusahaan'],
+                ['name' => 'pengguna.create', 'group' => 'Manajemen Pengguna', 'display_name' => 'Tambah Pengguna'],
+                ['name' => 'pengguna.edit', 'group' => 'Manajemen Pengguna', 'display_name' => 'Edit Pengguna'],
+                ['name' => 'pengguna.delete', 'group' => 'Manajemen Pengguna', 'display_name' => 'Hapus Pengguna'],
+                ['name' => 'pengguna.reset_password', 'group' => 'Manajemen Pengguna', 'display_name' => 'Reset Password Pengguna'],
+
+                // Rekap Data
+                ['name' => 'rekap.view', 'group' => 'Rekap Data', 'display_name' => 'Lihat Rekap Data'],
+                ['name' => 'rekap.elektrifikasi', 'group' => 'Rekap Data', 'display_name' => 'Rekap Elektrifikasi'],
+                ['name' => 'rekap.infrastruktur', 'group' => 'Rekap Data', 'display_name' => 'Rekap Infrastruktur'],
+                ['name' => 'rekap.export', 'group' => 'Rekap Data', 'display_name' => 'Export Rekap'],
+
                 // Master Data
                 ['name' => 'kategori_asset.manage', 'group' => 'Master Data', 'display_name' => 'Kelola Kategori Asset'],
                 ['name' => 'status_hukum.manage', 'group' => 'Master Data', 'display_name' => 'Kelola Status Hukum'],
                 ['name' => 'unit_kerja.manage', 'group' => 'Master Data', 'display_name' => 'Kelola Unit Kerja'],
                 ['name' => 'jabatan.manage', 'group' => 'Master Data', 'display_name' => 'Kelola Jabatan'],
+                ['name' => 'wilayah.manage', 'group' => 'Master Data', 'display_name' => 'Kelola Data Wilayah'],
             ];
 
             DB::beginTransaction();
-            
+
             echo "📝 Membuat permissions...\n";
             foreach ($permissions as $permission) {
                 Permission::updateOrCreate(
@@ -59,79 +132,85 @@ class PermissionSeeder extends Seeder
                     ]
                 );
             }
-            
+
             echo "✅ " . count($permissions) . " permissions berhasil dibuat!\n\n";
 
             // Create Roles
             echo "👥 Membuat roles...\n";
-            
+
             $superAdmin = Role::firstOrCreate(
-                ['name' => 'Super Admin', 'guard_name' => 'web']
+                ['name' => 'superadmin', 'guard_name' => 'web']
             );
-            
+
             $admin = Role::firstOrCreate(
-                ['name' => 'Admin', 'guard_name' => 'web']
+                ['name' => 'admin', 'guard_name' => 'web']
             );
-            
+
             $viewer = Role::firstOrCreate(
-                ['name' => 'Viewer', 'guard_name' => 'web']
+                ['name' => 'konsultan', 'guard_name' => 'web']
             );
-            
+
             $operator = Role::firstOrCreate(
-                ['name' => 'Operator', 'guard_name' => 'web']
+                ['name' => 'ppk', 'guard_name' => 'web']
             );
 
             // Assign permissions to roles
             echo "🔗 Assign permissions ke roles...\n";
-            
+
             $allPermissions = Permission::all();
-            
+
             // Super Admin - All permissions
             $superAdmin->syncPermissions($allPermissions);
-            echo "   ✓ Super Admin: " . $superAdmin->permissions->count() . " permissions\n";
-            
-            // Admin - All permissions
-            $admin->syncPermissions($allPermissions);
-            echo "   ✓ Admin: " . $admin->permissions->count() . " permissions\n";
-            
-            // Viewer - Read only
-            $viewerPermissions = Permission::whereIn('name', [
-                'dashboard.view',
-                'asset.view',
-                'asset.peta',
-                'asset.rekapitulasi',
-                'asset.column.kode',
-                'asset.column.kategori_tanah',
-                'asset.column.unit_kerja',
-                'asset.column.kabupaten',
-                'asset.column.kecamatan',
-            ])->get();
+            echo "   ✓ superadmin: " . $superAdmin->permissions->count() . " permissions (ALL)\n";
+
+            // Admin - All permissions except role management
+            $adminPermissions = Permission::where('group', '!=', 'Role & Permission')->get();
+            $admin->syncPermissions($adminPermissions);
+            echo "   ✓ admin: " . $admin->permissions->count() . " permissions\n";
+
+            // Viewer - Read only permissions
+            $viewerPermissions = Permission::where('name', 'like', '%.view')
+                ->orWhere('name', 'like', '%.show')
+                ->orWhere('name', 'like', '%.download')
+                ->orWhere('name', 'dashboard.view')
+                ->get();
             $viewer->syncPermissions($viewerPermissions);
-            echo "   ✓ Viewer: " . $viewer->permissions->count() . " permissions\n";
-            
-            // Operator - Create & Edit
-            $operatorPermissions = Permission::whereIn('name', [
-                'dashboard.view',
-                'asset.view',
-                'asset.create',
-                'asset.edit',
-                'asset.peta',
-                'asset.dokumen',
-                'asset.column.kode',
-                'asset.column.kategori_tanah',
-                'asset.column.unit_kerja',
-                'asset.column.status_hukum',
-                'asset.column.asal',
-                'asset.column.kabupaten',
-                'asset.column.kecamatan',
-                'asset.column.sertifikat',
-                'asset.column.aksi',
-            ])->get();
+            echo "   ✓ konsultan: " . $viewer->permissions->count() . " permissions (Read Only)\n";
+
+            // Operator - Create, Edit, View (no delete, no approve)
+            $operatorPermissions = Permission::where(function ($query) {
+                $query->where('name', 'like', '%.view')
+                    ->orWhere('name', 'like', '%.show')
+                    ->orWhere('name', 'like', '%.create')
+                    ->orWhere('name', 'like', '%.edit')
+                    ->orWhere('name', 'like', '%.download')
+                    ->orWhere('name', 'dashboard.view');
+            })
+                ->where('group', '!=', 'Role & Permission')
+                ->where('group', '!=', 'Manajemen User')
+                ->get();
             $operator->syncPermissions($operatorPermissions);
-            echo "   ✓ Operator: " . $operator->permissions->count() . " permissions\n";
+            echo "   ✓ ppk: " . $operator->permissions->count() . " permissions (CRUD except Delete)\n";
+
+            // Desa & Perusahaan roles
+            $desa = Role::firstOrCreate(['name' => 'desa', 'guard_name' => 'web']);
+            $perusahaan = Role::firstOrCreate(['name' => 'perusahaan', 'guard_name' => 'web']);
+
+            $frontendPermissions = Permission::where(function ($q) {
+                $q->where('name', 'permohonan.view')
+                    ->orWhere('name', 'permohonan.create')
+                    ->orWhere('name', 'permohonan.edit')
+                    ->orWhere('name', 'dokumen.view')
+                    ->orWhere('name', 'dokumen.download');
+            })->get();
+
+            $desa->syncPermissions($frontendPermissions);
+            $perusahaan->syncPermissions($frontendPermissions);
+            echo "   ✓ desa: " . $desa->permissions->count() . " permissions\n";
+            echo "   ✓ perusahaan: " . $perusahaan->permissions->count() . " permissions\n";
 
             DB::commit();
-            
+
             // Clear cache
             app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 

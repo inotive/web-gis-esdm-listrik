@@ -99,6 +99,66 @@
             font-weight: 600;
         }
 
+        /* Tabs Navigation */
+        .detail-tabs {
+            display: flex;
+            gap: 4px;
+            background: #F1F5F9;
+            padding: 4px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748B;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            color: #1E293B;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: #0077B6;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-btn .badge {
+            background: #E2E8F0;
+            color: #475569;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .tab-btn.active .badge {
+            background: #0077B6;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
         /* Section Title */
         .section-title {
             display: flex;
@@ -123,7 +183,7 @@
             font-weight: 600;
         }
 
-        /* Perizinan Table */
+        /* Table Container */
         .table-container {
             background: white;
             border-radius: 12px;
@@ -131,13 +191,14 @@
             overflow: hidden;
         }
 
-        .table-perizinan {
+        /* Common Table Styles */
+        .data-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 13px;
         }
 
-        .table-perizinan thead th {
+        .data-table thead th {
             background: #F8FAFC;
             color: #4B5675;
             font-weight: 500;
@@ -146,18 +207,18 @@
             border-bottom: 1px solid #E5E7EB;
         }
 
-        .table-perizinan tbody td {
+        .data-table tbody td {
             padding: 14px 16px;
             border-bottom: 1px solid #F1F5F9;
             color: #374151;
             vertical-align: top;
         }
 
-        .table-perizinan tbody tr:last-child td {
+        .data-table tbody tr:last-child td {
             border-bottom: none;
         }
 
-        .table-perizinan tbody tr:hover {
+        .data-table tbody tr:hover {
             background: #F8FAFC;
         }
 
@@ -172,12 +233,14 @@
             color: #0077B6;
         }
 
-        .jenis-izin {
+        .jenis-izin,
+        .nama-bold {
             font-weight: 500;
             color: #111827;
         }
 
-        .tanggal {
+        .tanggal,
+        .text-muted {
             font-size: 12px;
             color: #6B7280;
         }
@@ -192,9 +255,21 @@
             font-weight: 600;
         }
 
-        .status-aktif {
+        .status-aktif,
+        .status-approved {
             background: #ECFDF5;
             color: #059669;
+        }
+
+        .status-pending {
+            background: #FEF3C7;
+            color: #D97706;
+        }
+
+        .status-rejected,
+        .status-expired {
+            background: #FEE2E2;
+            color: #DC2626;
         }
 
         .status-warning {
@@ -202,14 +277,33 @@
             color: #D97706;
         }
 
-        .status-expired {
-            background: #FEE2E2;
-            color: #DC2626;
+        .status-database {
+            background: #DBEAFE;
+            color: #1E40AF;
         }
 
         .keterangan {
             font-size: 12px;
             color: #6B7280;
+        }
+
+        /* Document Link */
+        .doc-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: #EFF6FF;
+            color: #2563EB;
+            border-radius: 6px;
+            font-size: 12px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .doc-link:hover {
+            background: #DBEAFE;
+            color: #1D4ED8;
         }
 
         /* Empty State */
@@ -267,7 +361,72 @@
             transform: translateY(-1px);
         }
 
+        /* Summary Stats */
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid #E5E7EB;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 22px;
+        }
+
+        .stat-card-icon.perizinan {
+            background: linear-gradient(135deg, #0077B6 0%, #00B4D8 100%);
+            color: white;
+        }
+
+        .stat-card-icon.permohonan {
+            background: linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%);
+            color: white;
+        }
+
+        .stat-card-icon.dokumen {
+            background: linear-gradient(135deg, #059669 0%, #34D399 100%);
+            color: white;
+        }
+
+        .stat-card-icon.infrastruktur {
+            background: linear-gradient(135deg, #F59E0B 0%, #FCD34D 100%);
+            color: white;
+        }
+
+        .stat-card-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        .stat-card-label {
+            font-size: 13px;
+            color: #6B7280;
+        }
+
         /* Responsive */
+        @media (max-width: 1024px) {
+            .summary-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
         @media (max-width: 768px) {
             .detail-grid {
                 grid-template-columns: 1fr;
@@ -277,6 +436,14 @@
                 flex-direction: column;
                 align-items: center;
                 text-align: center;
+            }
+
+            .detail-tabs {
+                flex-direction: column;
+            }
+
+            .summary-stats {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -301,6 +468,40 @@
         </div>
     </div>
 
+    <!-- Summary Stats -->
+    <div class="summary-stats">
+        <div class="stat-card">
+            <div class="stat-card-icon perizinan">
+                <i class="ri-file-shield-2-line"></i>
+            </div>
+            <div class="stat-card-value">{{ count($perizinanData) }}</div>
+            <div class="stat-card-label">Total Perizinan</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-icon permohonan">
+                <i class="ri-file-list-3-line"></i>
+            </div>
+            <div class="stat-card-value">{{ count($permohonanData) }}</div>
+            <div class="stat-card-label">Total Permohonan</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-icon dokumen">
+                <i class="ri-folder-2-line"></i>
+            </div>
+            <div class="stat-card-value">{{ count($dokumenData) }}</div>
+            <div class="stat-card-label">Total Dokumen</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-icon infrastruktur">
+                <i class="ri-building-4-line"></i>
+            </div>
+            <div class="stat-card-value">
+                {{ $perusahaan->pembangkitListriks->count() + $perusahaan->gardus->count() + $perusahaan->infrastrukturJaringans->count() }}
+            </div>
+            <div class="stat-card-label">Infrastruktur</div>
+        </div>
+    </div>
+
     <!-- Company Info Card -->
     <div class="company-card">
         <div class="company-header">
@@ -322,6 +523,10 @@
                 <div class="detail-item-value">{{ $perusahaan->alamat ?? '-' }}</div>
             </div>
             <div class="detail-item">
+                <div class="detail-item-label">Kontak</div>
+                <div class="detail-item-value">{{ $perusahaan->kontak ?? '-' }}</div>
+            </div>
+            <div class="detail-item">
                 <div class="detail-item-label">Desa/Kelurahan</div>
                 <div class="detail-item-value">{{ $perusahaan->village->name ?? '-' }}</div>
             </div>
@@ -331,81 +536,299 @@
             </div>
             <div class="detail-item">
                 <div class="detail-item-label">Kabupaten/Kota</div>
-                <div class="detail-item-value">{{ $perusahaan->village->district->regency->name ?? '-' }}</div>
+                <div class="detail-item-value">
+                    {{ $perusahaan->kabupaten_kota ?? $perusahaan->village->district->regency->name ?? '-' }}</div>
             </div>
             <div class="detail-item">
                 <div class="detail-item-label">Tanggal Terdaftar</div>
                 <div class="detail-item-value">{{ $perusahaan->created_at->translatedFormat('d F Y') }}</div>
             </div>
-            <div class="detail-item">
-                <div class="detail-item-label">Terakhir Diperbarui</div>
-                <div class="detail-item-value">{{ $perusahaan->updated_at->translatedFormat('d F Y, H:i') }}</div>
-            </div>
         </div>
     </div>
 
-    <!-- Perizinan Section -->
-    <div class="section-title">
-        <i class="ri-file-shield-2-line"></i>
-        <span>Detail Perizinan</span>
-        <span class="badge">{{ count($perizinanData) }}</span>
+    <!-- Tabs Navigation -->
+    <div class="detail-tabs">
+        <button class="tab-btn active" data-tab="perizinan">
+            <i class="ri-file-shield-2-line"></i>
+            History Perizinan
+            <span class="badge">{{ count($perizinanData) }}</span>
+        </button>
+        <button class="tab-btn" data-tab="permohonan">
+            <i class="ri-file-list-3-line"></i>
+            Permohonan
+            <span class="badge">{{ count($permohonanData) }}</span>
+        </button>
+        <button class="tab-btn" data-tab="dokumen">
+            <i class="ri-folder-2-line"></i>
+            Dokumen
+            <span class="badge">{{ count($dokumenData) }}</span>
+        </button>
     </div>
 
-    <div class="table-container">
-        @if(count($perizinanData) > 0)
-            <table class="table-perizinan">
-                <thead>
-                    <tr>
-                        <th class="col-no">No</th>
-                        <th>Nomor Izin</th>
-                        <th>Jenis Izin</th>
-                        <th>Tanggal Terbit</th>
-                        <th>Tanggal Berlaku</th>
-                        <th>Status</th>
-                        <th>Keterangan</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($perizinanData as $index => $izin)
+    <!-- Tab Content: Perizinan -->
+    <div class="tab-content active" id="tab-perizinan">
+        <div class="section-title">
+            <i class="ri-file-shield-2-line"></i>
+            <span>History Perizinan</span>
+            <span class="badge">{{ count($perizinanData) }}</span>
+        </div>
+
+        <div class="table-container">
+            @if(count($perizinanData) > 0)
+                <table class="data-table">
+                    <thead>
                         <tr>
-                            <td class="col-no">{{ $index + 1 }}</td>
-                            <td class="no-izin">{{ $izin['no_izin'] }}</td>
-                            <td class="jenis-izin">{{ $izin['jenis_izin'] }}</td>
-                            <td class="tanggal">
-                                {{ $izin['tanggal_terbit'] ? \Carbon\Carbon::parse($izin['tanggal_terbit'])->translatedFormat('d M Y') : '-' }}
-                            </td>
-                            <td class="tanggal">
-                                {{ $izin['tanggal_berlaku'] ? \Carbon\Carbon::parse($izin['tanggal_berlaku'])->translatedFormat('d M Y') : 'Tidak Terbatas' }}
-                            </td>
-                            <td>
-                                @php
-                                    $statusClass = 'status-aktif';
-                                    if ($izin['status'] === 'Perlu Diperpanjang') {
-                                        $statusClass = 'status-warning';
-                                    } elseif ($izin['status'] === 'Expired' || $izin['status'] === 'Tidak Aktif') {
-                                        $statusClass = 'status-expired';
-                                    }
-                                @endphp
-                                <span class="status-badge {{ $statusClass }}">
-                                    {{ $izin['status'] }}
-                                </span>
-                            </td>
-                            <td class="keterangan">{{ $izin['keterangan'] }}</td>
+                            <th class="col-no">No</th>
+                            <th>No. Surat Izin</th>
+                            <th>Jenis Izin</th>
+                            <th>Tanggal Terbit</th>
+                            <th>Tanggal Akhir</th>
+                            <th>Lokasi</th>
+                            <th>Kapasitas</th>
+                            <th>Status</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        @else
-            <div class="empty-state">
-                <i class="ri-file-shield-line"></i>
-                <p>Belum ada data perizinan untuk perusahaan ini</p>
-            </div>
-        @endif
+                    </thead>
+                    <tbody>
+                        @foreach($perizinanData as $index => $izin)
+                            <tr>
+                                <td class="col-no">{{ $index + 1 }}</td>
+                                <td class="no-izin">{{ $izin['no_izin'] }}</td>
+                                <td>
+                                    <span class="status-badge status-aktif">{{ $izin['jenis_izin'] }}</span>
+                                </td>
+                                <td class="tanggal">
+                                    {{ $izin['tanggal_terbit'] ? \Carbon\Carbon::parse($izin['tanggal_terbit'])->translatedFormat('d M Y') : '-' }}
+                                </td>
+                                <td class="tanggal">
+                                    {{ $izin['tanggal_akhir'] ? \Carbon\Carbon::parse($izin['tanggal_akhir'])->translatedFormat('d M Y') : '-' }}
+                                </td>
+                                <td>{{ $izin['lokasi'] ?? '-' }}</td>
+                                <td>{{ $izin['kapasitas'] ? number_format($izin['kapasitas'], 2, ',', '.') . ' kVA' : '-' }}</td>
+                                <td>
+                                    @php
+                                        $statusClass = 'status-expired';
+                                        if ($izin['status'] === 'Aktif') {
+                                            $statusClass = 'status-aktif';
+                                        } elseif ($izin['status'] === 'Mau Berakhir') {
+                                            $statusClass = 'status-warning';
+                                        }
+                                    @endphp
+                                    <span class="status-badge {{ $statusClass }}">
+                                        {{ $izin['status'] }}
+                                    </span>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @else
+                <div class="empty-state">
+                    <i class="ri-file-shield-line"></i>
+                    <p>Belum ada data perizinan untuk perusahaan ini</p>
+                </div>
+            @endif
+        </div>
+    </div>
+
+    <!-- Tab Content: Permohonan -->
+    <div class="tab-content" id="tab-permohonan">
+        <div class="section-title">
+            <i class="ri-file-list-3-line"></i>
+            <span>Data Permohonan</span>
+            <span class="badge">{{ count($permohonanData) }}</span>
+        </div>
+
+        <div class="table-container">
+            @if(count($permohonanData) > 0)
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th class="col-no">No</th>
+                            <th>Jenis Permohonan</th>
+                            <th>Pengaju</th>
+                            <th>Tanggal Pengajuan</th>
+                            <th>Status</th>
+                            <th>Keterangan</th>
+                            <th>Dokumen</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($permohonanData as $index => $permohonan)
+                            <tr>
+                                <td class="col-no">{{ $index + 1 }}</td>
+                                <td class="nama-bold">{{ $permohonan['jenis_permohonan'] }}</td>
+                                <td>{{ $permohonan['user'] }}</td>
+                                <td class="tanggal">
+                                    {{ $permohonan['tanggal_pengajuan'] ? \Carbon\Carbon::parse($permohonan['tanggal_pengajuan'])->translatedFormat('d M Y') : '-' }}
+                                </td>
+                                <td>
+                                    @php
+                                        $statusClass = 'status-pending';
+                                        $statusText = ucfirst($permohonan['status']);
+                                        if (in_array(strtolower($permohonan['status']), ['approved', 'disetujui', 'selesai'])) {
+                                            $statusClass = 'status-approved';
+                                        } elseif (in_array(strtolower($permohonan['status']), ['rejected', 'ditolak'])) {
+                                            $statusClass = 'status-rejected';
+                                        }
+                                    @endphp
+                                    <span class="status-badge {{ $statusClass }}">
+                                        {{ $statusText }}
+                                    </span>
+                                </td>
+                                <td class="keterangan">{{ $permohonan['keterangan'] ?? '-' }}</td>
+                                <td>
+                                    @if(count($permohonan['documents']) > 0)
+                                        @foreach($permohonan['documents'] as $doc)
+                                            @if($doc->dokumen)
+                                                <a href="{{ asset('storage/' . $doc->dokumen->path) }}" target="_blank" class="doc-link">
+                                                    <i class="ri-file-line"></i>
+                                                    {{ Str::limit($doc->nama ?? $doc->dokumen->nama, 20) }}
+                                                </a>
+                                            @endif
+                                        @endforeach
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @else
+                <div class="empty-state">
+                    <i class="ri-file-list-line"></i>
+                    <p>Belum ada data permohonan untuk perusahaan ini</p>
+                </div>
+            @endif
+        </div>
+    </div>
+
+    <!-- Tab Content: Dokumen -->
+    <div class="tab-content" id="tab-dokumen">
+        <div class="section-title">
+            <i class="ri-folder-2-line"></i>
+            <span>Dokumen Perusahaan</span>
+            <span class="badge">{{ count($dokumenData) }}</span>
+        </div>
+
+        <div class="table-container">
+            @if(count($dokumenData) > 0)
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th class="col-no">No</th>
+                            <th>Nama Dokumen</th>
+                            <th>Tipe</th>
+                            <th>Sumber</th>
+                            <th>Ukuran</th>
+                            <th>Tanggal</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($dokumenData as $index => $doc)
+                            <tr>
+                                <td class="col-no">{{ $index + 1 }}</td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        @if(isset($doc['tipe']) && $doc['tipe'] === 'folder')
+                                            <i class="ri-folder-fill" style="color: #F59E0B; font-size: 18px;"></i>
+                                        @else
+                                            <i class="ri-file-text-fill" style="color: #22C55E; font-size: 18px;"></i>
+                                        @endif
+                                        <span class="nama-bold">{{ $doc['nama'] }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    @if(isset($doc['tipe']))
+                                        <span class="status-badge {{ $doc['tipe'] === 'folder' ? 'status-warning' : 'status-aktif' }}">
+                                            {{ ucfirst($doc['tipe']) }}
+                                        </span>
+                                    @else
+                                        <span class="status-badge status-aktif">File</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @php
+                                        $source = $doc['source'] ?? 'unknown';
+                                        $sourceBadgeClass = 'status-aktif';
+                                        $sourceLabel = $doc['perizinan_nama'] ?? 'Dokumen';
+                                        
+                                        if ($source === 'dokumen_db') {
+                                            $sourceBadgeClass = 'status-database';
+                                            $sourceLabel = 'Database Dokumen';
+                                        } elseif ($source === 'perizinan') {
+                                            $sourceBadgeClass = 'status-aktif';
+                                        } elseif ($source === 'permohonan') {
+                                            $sourceBadgeClass = 'status-warning';
+                                        }
+                                    @endphp
+                                    <span class="status-badge {{ $sourceBadgeClass }}">{{ $sourceLabel }}</span>
+                                </td>
+                                <td class="text-muted">
+                                    {{ $doc['size'] ?? '-' }}
+                                </td>
+                                <td class="tanggal">
+                                    {{ $doc['tanggal_terbit'] ? \Carbon\Carbon::parse($doc['tanggal_terbit'])->translatedFormat('d M Y') : '-' }}
+                                </td>
+                                <td>
+                                    @if(isset($doc['source']) && $doc['source'] === 'dokumen_db')
+                                        @if(isset($doc['tipe']) && $doc['tipe'] === 'folder')
+                                            <a href="{{ route('admin.dokumen.index', ['folder' => $doc['id']]) }}" class="doc-link">
+                                                <i class="ri-folder-open-line"></i>
+                                                Buka
+                                            </a>
+                                        @elseif(isset($doc['path']) && $doc['path'])
+                                            <a href="{{ asset('storage/' . $doc['path']) }}" target="_blank" class="doc-link">
+                                                <i class="ri-eye-line"></i>
+                                                Lihat
+                                            </a>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    @elseif($doc['dokumen'] && $doc['dokumen']->path)
+                                        <a href="{{ asset('storage/' . $doc['dokumen']->path) }}" target="_blank" class="doc-link">
+                                            <i class="ri-eye-line"></i>
+                                            Lihat
+                                        </a>
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @else
+                <div class="empty-state">
+                    <i class="ri-folder-line"></i>
+                    <p>Belum ada dokumen untuk perusahaan ini</p>
+                </div>
+            @endif
+        </div>
     </div>
 @endsection
 
 @push('scripts')
     <script>
-        // Any additional scripts can go here
+        document.addEventListener('DOMContentLoaded', function () {
+            // Tab switching functionality
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const tabId = this.dataset.tab;
+
+                    // Remove active class from all buttons and contents
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+
+                    // Add active class to clicked button and corresponding content
+                    this.classList.add('active');
+                    document.getElementById('tab-' + tabId).classList.add('active');
+                });
+            });
+        });
     </script>
 @endpush

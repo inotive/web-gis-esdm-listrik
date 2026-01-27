@@ -15,6 +15,51 @@ class DokumenController extends Controller
     use UploadFile;
 
     /**
+     * Helper method for natural sorting with month name support
+     */
+    private function naturalSortKey($name)
+    {
+        // Map Indonesian month names to numbers for proper sorting
+        $monthMap = [
+            'JANUARI' => '01',
+            'FEBRUARI' => '02',
+            'MARET' => '03',
+            'APRIL' => '04',
+            'MEI' => '05',
+            'JUNI' => '06',
+            'JULI' => '07',
+            'AGUSTUS' => '08',
+            'SEPTEMBER' => '09',
+            'OKTOBER' => '10',
+            'NOVEMBER' => '11',
+            'DESEMBER' => '12',
+        ];
+
+        // Check if the name is a month name (case insensitive)
+        $upperName = strtoupper(trim($name));
+
+        // Check for pattern like "10. OKTOBER" or "1. JANUARI"
+        if (preg_match('/^(\d+)\.\s*(.+)$/', $upperName, $matches)) {
+            $number = str_pad($matches[1], 2, '0', STR_PAD_LEFT);
+            $monthName = trim($matches[2]);
+
+            if (isset($monthMap[$monthName])) {
+                return $number . '_' . $monthMap[$monthName];
+            }
+
+            return $number . '_' . $monthName;
+        }
+
+        // Check if it's just a month name
+        if (isset($monthMap[$upperName])) {
+            return $monthMap[$upperName] . '_' . $upperName;
+        }
+
+        // For other names, return as is for natural sorting
+        return $name;
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
@@ -40,45 +85,141 @@ class DokumenController extends Controller
             // Search in all folders (ignore current folder restriction when searching)
             $query = Dokumen::when(!$isAdmin, function ($query) {
                 return $query->where('user_id', auth()->id());
-            })->where(function($q) use ($search) {
+            })->where(function ($q) use ($search) {
                 $q->where('nama', 'like', '%' . $search . '%')
-                  ->orWhere('mime_type', 'like', '%' . $search . '%');
+                    ->orWhere('mime_type', 'like', '%' . $search . '%');
             })
-            ->with(['user', 'children', 'parent']);
+                ->with(['user', 'children', 'parent']);
         } else {
             // Normal view: only show items in current folder
-        $query = Dokumen::where('parent_id', $folderId ?: null)
-        ->when(!$isAdmin, function ($query) {
-            return $query->where('user_id', auth()->id());
-        })
-            ->with(['user', 'children']);
+            $query = Dokumen::where('parent_id', $folderId ?: null)
+                ->when(!$isAdmin, function ($query) {
+                    return $query->where('user_id', auth()->id());
+                })
+                ->with(['user', 'children']);
         }
 
         // Apply sorting
         switch ($sortBy) {
             case 'name_asc':
-                $query->orderBy('tipe', 'desc')->orderBy('nama', 'asc');
-                break;
             case 'name_desc':
-                $query->orderBy('tipe', 'desc')->orderBy('nama', 'desc');
+                // Get all items first for natural sorting
+                $allItems = $query->get();
+
+                // Separate folders and files
+                $folders = $allItems->where('tipe', 'folder');
+                $files = $allItems->where('tipe', 'file');
+
+                // Natural sort folders
+                $sortedFolders = $folders->sortBy(function ($item) {
+                    return $this->naturalSortKey($item->nama);
+                }, SORT_NATURAL | SORT_FLAG_CASE);
+
+                // Natural sort files
+                $sortedFiles = $files->sortBy(function ($item) {
+                    return $this->naturalSortKey($item->nama);
+                }, SORT_NATURAL | SORT_FLAG_CASE);
+
+                // Reverse if descending
+                if ($sortBy === 'name_desc') {
+                    $sortedFolders = $sortedFolders->reverse();
+                    $sortedFiles = $sortedFiles->reverse();
+                }
+
+                // Merge folders first, then files
+                $sorted = $sortedFolders->merge($sortedFiles);
+
+                // Manual pagination
+                $perPage = 50;
+                $currentPage = request()->get('page', 1);
+                $offset = ($currentPage - 1) * $perPage;
+
+                $paginatedItems = $sorted->slice($offset, $perPage)->values();
+
+                $dokumens = new \Illuminate\Pagination\LengthAwarePaginator(
+                    $paginatedItems,
+                    $sorted->count(),
+                    $perPage,
+                    $currentPage,
+                    ['path' => request()->url(), 'query' => request()->query()]
+                );
+
+                $dokumens->appends([
+                    'folder' => $folderId,
+                    'sort' => $sortBy,
+                    'q' => $search,
+                ]);
                 break;
+
             case 'date_asc':
                 $query->orderBy('tipe', 'desc')->orderBy('created_at', 'asc');
+                $dokumens = $query->paginate(50)->appends([
+                    'folder' => $folderId,
+                    'sort' => $sortBy,
+                    'q' => $search,
+                ]);
                 break;
             case 'date_desc':
                 $query->orderBy('tipe', 'desc')->orderBy('created_at', 'desc');
+                $dokumens = $query->paginate(50)->appends([
+                    'folder' => $folderId,
+                    'sort' => $sortBy,
+                    'q' => $search,
+                ]);
                 break;
             case 'size_asc':
                 $query->orderBy('tipe', 'desc')->orderBy('size', 'asc');
+                $dokumens = $query->paginate(50)->appends([
+                    'folder' => $folderId,
+                    'sort' => $sortBy,
+                    'q' => $search,
+                ]);
                 break;
             case 'size_desc':
                 $query->orderBy('tipe', 'desc')->orderBy('size', 'desc');
+                $dokumens = $query->paginate(50)->appends([
+                    'folder' => $folderId,
+                    'sort' => $sortBy,
+                    'q' => $search,
+                ]);
                 break;
             default:
-                $query->orderBy('tipe', 'desc')->orderBy('nama', 'asc');
-        }
+                // Default: natural sort by name ascending
+                $allItems = $query->get();
 
-        $dokumens = $query->get();
+                $folders = $allItems->where('tipe', 'folder');
+                $files = $allItems->where('tipe', 'file');
+
+                $sortedFolders = $folders->sortBy(function ($item) {
+                    return $this->naturalSortKey($item->nama);
+                }, SORT_NATURAL | SORT_FLAG_CASE);
+
+                $sortedFiles = $files->sortBy(function ($item) {
+                    return $this->naturalSortKey($item->nama);
+                }, SORT_NATURAL | SORT_FLAG_CASE);
+
+                $sorted = $sortedFolders->merge($sortedFiles);
+
+                $perPage = 50;
+                $currentPage = request()->get('page', 1);
+                $offset = ($currentPage - 1) * $perPage;
+
+                $paginatedItems = $sorted->slice($offset, $perPage)->values();
+
+                $dokumens = new \Illuminate\Pagination\LengthAwarePaginator(
+                    $paginatedItems,
+                    $sorted->count(),
+                    $perPage,
+                    $currentPage,
+                    ['path' => request()->url(), 'query' => request()->query()]
+                );
+
+                $dokumens->appends([
+                    'folder' => $folderId,
+                    'sort' => $sortBy,
+                    'q' => $search,
+                ]);
+        }
 
         // Get breadcrumbs
         $breadcrumbs = [];
@@ -151,19 +292,28 @@ class DokumenController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'files' => 'required|array',
-            'files.*' => 'file|max:10240|mimes:doc,docx,xlsx,jpg,jpeg,png,pdf', // Max 10MB, allowed types
+            'files.*' => 'file|max:10240|mimes:doc,docx,xlsx,xls,ppt,pptx,jpg,jpeg,png,pdf', // Max 10MB, allowed types
             'parent_id' => 'nullable|exists:dokumens,id',
         ], [
-            'files.*.mimes' => 'Tipe file yang diperbolehkan: doc, docx, xlsx, jpg, jpeg, png, pdf.',
+            'files.*.mimes' => 'Tipe file yang diperbolehkan: doc, docx, xlsx, xls, ppt, pptx, jpg, jpeg, png, pdf.',
             'files.*.max' => 'Ukuran file maksimal adalah 10MB per file.',
         ]);
 
         if ($validator->fails()) {
+            // Check if AJAX request
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first(),
+                    'errors' => $validator->errors()
+                ], 422);
+            }
             return back()->withErrors($validator)->withInput();
         }
 
         $parentId = $request->parent_id ?: null;
         $uploadedCount = 0;
+        $skippedCount = 0;
 
         foreach ($request->file('files') as $file) {
             // Check if file name already exists in same parent
@@ -173,18 +323,21 @@ class DokumenController extends Controller
                 ->first();
 
             if ($existing) {
+                $skippedCount++;
                 continue; // Skip duplicate
             }
 
             // Store file using trait method
             $fileName = $this->storeFile($file, 'dokumen');
+
+            // Path lengkap dengan folder dokumen
             $filePath = 'dokumen/' . $fileName;
 
             Dokumen::create([
                 'nama' => $file->getClientOriginalName(),
                 'tipe' => 'file',
                 'parent_id' => $parentId,
-                'path' => $fileName,
+                'path' => $filePath, // Simpan path lengkap
                 'mime_type' => $file->getMimeType(),
                 'size' => $file->getSize(),
                 'user_id' => auth()->id(),
@@ -193,6 +346,28 @@ class DokumenController extends Controller
             $uploadedCount++;
         }
 
+        // Check if AJAX request
+        if ($request->ajax() || $request->wantsJson()) {
+            if ($uploadedCount > 0) {
+                $message = $uploadedCount . ' file berhasil diupload.';
+                if ($skippedCount > 0) {
+                    $message .= ' ' . $skippedCount . ' file dilewati (duplikat).';
+                }
+                return response()->json([
+                    'success' => true,
+                    'message' => $message,
+                    'uploaded' => $uploadedCount,
+                    'skipped' => $skippedCount,
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak ada file yang berhasil diupload.',
+            ], 400);
+        }
+
+        // Regular form submission
         $redirectUrl = route('admin.dokumen.index');
         if ($request->folder) {
             $redirectUrl = route('admin.dokumen.index', ['folder' => $request->folder]);
@@ -202,7 +377,11 @@ class DokumenController extends Controller
         }
 
         if ($uploadedCount > 0) {
-            return redirect($redirectUrl)->with('success', $uploadedCount . ' file berhasil diupload.');
+            $message = $uploadedCount . ' file berhasil diupload.';
+            if ($skippedCount > 0) {
+                $message .= ' ' . $skippedCount . ' file dilewati (duplikat).';
+            }
+            return redirect($redirectUrl)->with('success', $message);
         }
 
         return redirect($redirectUrl)->withErrors(['files' => 'Tidak ada file yang berhasil diupload.']);

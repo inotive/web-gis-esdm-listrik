@@ -14,6 +14,7 @@ use App\Models\PembangkitLokal;
 use App\Models\Perusahaan;
 use App\Models\Permohonan;
 use App\Models\RekapElektrifikasi;
+use App\Models\RencanaPengembanganBantuan;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -135,8 +136,8 @@ class DashboardController extends Controller
                     'total_gardu' => $perusahaan->gardus->count(),
                     'total_jaringan_km' => $perusahaan->infrastrukturJaringans->sum('panjang_jaringan'),
                     'total_pembangkit' => $perusahaan->pembangkitLokals->count(),
-                    'total_infrastruktur' => $perusahaan->gardus->count() + 
-                                            $perusahaan->infrastrukturJaringans->count() + 
+                    'total_infrastruktur' => $perusahaan->gardus->count() +
+                                            $perusahaan->infrastrukturJaringans->count() +
                                             $perusahaan->pembangkitLokals->count(),
                 ];
             })
@@ -198,6 +199,15 @@ class DashboardController extends Controller
         $lowRasio = collect($elektrifikasiData)->sortBy('rasio')->take(3)->values();
         $desaBelumBanyak = collect($elektrifikasiData)->where('desa_belum', '>', 0)->sortByDesc('desa_belum')->take(3)->values();
 
+        // ==========================================
+        // TOP 10 PRIORITAS (Rencana Pengembangan Bantuan)
+        // ==========================================
+        // $topPrioritas = RencanaPengembanganBantuan::with(['regency', 'district', 'village'])
+        //     ->orderBy('total_skor', 'desc')
+        //     ->take(10)
+        //     ->get();
+        $topPrioritas = collect([]);
+
         return view('admin.dashboard.index', [
             'title' => 'Dashboard Admin',
             // Statistik Utama
@@ -235,6 +245,8 @@ class DashboardController extends Controller
             'topRasio' => $topRasio,
             'lowRasio' => $lowRasio,
             'desaBelumBanyak' => $desaBelumBanyak,
+            // Top 10 Prioritas
+            'topPrioritas' => $topPrioritas,
             // Tahun data
             'tahunData' => $latestYear,
         ]);

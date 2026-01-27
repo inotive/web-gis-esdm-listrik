@@ -19,9 +19,14 @@ class DesaController extends Controller
         $regencyId = $request->get('regency_id');
         $districtId = $request->get('district_id');
 
-        $query = RegVillage::with(['district.regency']);
+        $filterNama = $request->get('filter_desa_nama');
+        $filterKecamatan = $request->get('filter_desa_kecamatan');
+        $filterKabupaten = $request->get('filter_desa_kabupaten');
+        $filterStatus = $request->get('filter_desa_status');
 
-        // Search by name
+        $query = RegVillage::with(['district.regency', 'dataBerlistrik']);
+
+        // Search by name (Global)
         if ($q) {
             $query->where('name', 'like', '%' . $q . '%');
         }
@@ -38,6 +43,44 @@ class DesaController extends Controller
             $query->where('district_id', $districtId);
         }
 
+        // Column Filters
+        if ($filterNama) {
+            $query->where('name', 'like', '%' . $filterNama . '%');
+        }
+
+        if ($filterKecamatan) {
+            $query->whereHas('district', function ($q) use ($filterKecamatan) {
+                $q->where('name', 'like', '%' . $filterKecamatan . '%');
+            });
+        }
+
+        if ($filterKabupaten) {
+            $query->whereHas('district.regency', function ($q) use ($filterKabupaten) {
+                $q->where('name', 'like', '%' . $filterKabupaten . '%');
+            });
+        }
+
+        if ($filterStatus) {
+            // Find village names that match the status in ImportedJsonFeature
+            $matchingFeatures = \App\Models\ImportedJsonFeature::where('sub_kategori', 'Status Desa Berlistrik')
+                ->where('properties->StatusDesa', 'like', '%' . $filterStatus . '%')
+                ->get();
+            
+            $matchingNames = [];
+            foreach ($matchingFeatures as $feature) {
+                $props = $feature->properties;
+                if (!empty($props['Nama_Desa'])) $matchingNames[] = $props['Nama_Desa'];
+                if (!empty($props['Desa'])) $matchingNames[] = $props['Desa'];
+            }
+            
+            if (!empty($matchingNames)) {
+                $query->whereIn('name', array_unique($matchingNames));
+            } else {
+                // If filter exists but no matches found, return empty result
+                $query->whereRaw('1 = 0');
+            }
+        }
+
         $desas = $query->orderBy('name', 'asc')
             ->paginate($perPage)
             ->withQueryString();
@@ -48,11 +91,41 @@ class DesaController extends Controller
             ? RegDistrict::where('regency_id', $regencyId)->orderBy('name')->get(['id', 'name'])
             : collect([]);
 
+        // Fetch status berlistrik data from ImportedJsonFeature
+        $desaNames = $desas->pluck('name')->toArray();
+
+        // Fetch features matching the names for the specific category
+        // Note: Using whereJsonContains or similar might be slow or not supported on all DBs for array values in JSON.
+        // Since we have a pagination of 10-100, we can fetch by iterating OR just fetch all for this page.
+        // A simple LIKE query or whereIn on a virtual column would be ideal, but for portability/simplicity with small batch:
+        // We will fetch based on the assumption we can filter by 'propertis->desa'.
+
+        $statusFeatures = \App\Models\ImportedJsonFeature::where('sub_kategori', 'Status Desa Berlistrik')
+            ->get()
+            ->filter(function ($feature) use ($desaNames) {
+                // Determine matching key from properties
+                // User example had "Desa" and "Nama_Desa".
+                $props = $feature->properties;
+                $name = $props['Nama_Desa'] ?? $props['Desa'] ?? null;
+
+                return $name && in_array($name, $desaNames);
+            })
+            ->keyBy(function ($feature) {
+                $props = $feature->properties;
+                return $props['Nama_Desa'] ?? $props['Desa'];
+            });
+
+        // Pass map of [desa_name => feature]
+        $statusMap = $statusFeatures->map(function ($feature) {
+            return $feature->properties;
+        });
+
         return view('admin.desa.index', [
             'title'     => "Manajemen Data Desa",
             'desas'     => $desas,
             'regencies' => $regencies,
             'districts' => $districts,
+            'statusMap' => $statusMap,
         ]);
     }
 
@@ -103,9 +176,81 @@ class DesaController extends Controller
             ]);
         }
 
+        // Update Desa
         $desa->update($data);
 
-        return redirect()->route('admin.desa.index')->with('success', 'Data desa berhasil diperbarui.');
+        // Update ImportedJsonFeature properties
+        // We look for the feature associated with THIS desa (using its previous name or current name if we assume 1-1 link)
+        // Since we just updated the name in $desa, we should check if there was a linked feature.
+        // It's ambiguous if the name changed, so we rely on the fact that usually features are matched by name.
+        // But if name changed, we might lose the link unless we find it by old name.
+        // For now, let's assume we find by the *old* name (available if we hadn't updated yet, but we just did).
+        // Actually, $desa was loaded before update. But 'update' changes the instance attributes in memory too.
+        // However, we can use `getOriginal('name')` to be safe if needed, but since we already updated:
+
+        $originalName = $desa->getOriginal('name');
+        $newName = $data['name'];
+        $statusBerlistrik = $request->input('status_berlistrik');
+
+        if ($statusBerlistrik) {
+            // Find feature by old name to preserve link if name changed
+            $feature = \App\Models\ImportedJsonFeature::where('sub_kategori', 'Status Desa Berlistrik')
+                ->where(function ($q) use ($originalName, $newName) {
+                    $q->where('properties->Nama_Desa', $originalName)
+                        ->orWhere('properties->Desa', $originalName)
+                        ->orWhere('properties->Nama_Desa', $newName)
+                        ->orWhere('properties->Desa', $newName);
+                })
+                ->first();
+
+            if ($feature) {
+                $props = $feature->properties;
+
+                // Update Status
+                $props['StatusDesa'] = $statusBerlistrik;
+
+                // Update Name if changed to keep link alive
+                if (isset($props['Nama_Desa'])) {
+                    $props['Nama_Desa'] = $newName;
+                }
+                if (isset($props['Desa'])) {
+                    $props['Desa'] = $newName;
+                }
+                
+                // Ensure Kecamatan/Kabupaten is synced
+                if ($desa->district) {
+                    $props['Kecamatan'] = $desa->district->name;
+                    if ($desa->district->regency) {
+                        $props['Kab_Kota'] = $desa->district->regency->name;
+                    }
+                }
+
+                $feature->properties = $props;
+                $feature->save();
+            } else {
+                // Feature not found, create new one to store status
+                $sample = \App\Models\ImportedJsonFeature::where('sub_kategori', 'Status Desa Berlistrik')->first();
+                $kategori = $sample ? $sample->kategori : 'status-desa-berlistrik'; // Fallback
+                
+                $props = [
+                    'Nama_Desa' => $newName,
+                    'Desa' => $newName,
+                    'StatusDesa' => $statusBerlistrik,
+                    'Kecamatan' => $desa->district->name ?? '',
+                    'Kab_Kota' => $desa->district->regency->name ?? '',
+                    'Provinsi' => 'KALIMANTAN TIMUR',
+                ];
+
+                \App\Models\ImportedJsonFeature::create([
+                    'kategori' => $kategori,
+                    'sub_kategori' => 'Status Desa Berlistrik',
+                    'regency_id' => $desa->district->regency_id ?? null,
+                    'properties' => $props
+                ]);
+            }
+        }
+
+        return redirect()->route('admin.desa.index')->with('success', 'Data desa dan status berlistrik berhasil diperbarui.');
     }
 
     // DESTROY

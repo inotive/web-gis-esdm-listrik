@@ -16,13 +16,18 @@ class PermohonanUser extends Model
     protected $fillable = [
         'permohonan_id',
         'user_id',
+        'perusahaan_id',
         'status',
         'jawaban',
         'keterangan',
+        'approved_by',
+        'approved_at',
+        'approval_notes',
     ];
 
     protected $casts = [
         'jawaban' => 'array',
+        'approved_at' => 'datetime',
     ];
 
     /**
@@ -47,5 +52,21 @@ class PermohonanUser extends Model
     public function documents(): HasMany
     {
         return $this->hasMany(PermohonanUserDocument::class, 'permohonan_user_id');
+    }
+
+    /**
+     * Relasi: PermohonanUser belongs to Perusahaan
+     */
+    public function perusahaan(): BelongsTo
+    {
+        return $this->belongsTo(Perusahaan::class, 'perusahaan_id');
+    }
+
+    /**
+     * Relasi: PermohonanUser belongs to User (approver)
+     */
+    public function approver(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 }

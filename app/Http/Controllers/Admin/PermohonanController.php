@@ -7,6 +7,8 @@ use App\Models\Permohonan;
 use App\Models\PermohonanUser;
 use App\Models\PermohonanQuestion;
 use App\Models\PermohonanQuestionOption;
+use App\Models\Perizinan;
+use App\Models\PerizinanListrik;
 use App\Models\RegRegency;
 use App\Models\RegDistrict;
 use App\Models\RegVillage;
@@ -26,36 +28,80 @@ class PermohonanController extends Controller
     {
         $perPage = (int) $request->get('per_page', 10);
         $q = $request->get('q');
+        $tab = $request->get('tab', 'permohonan');
         $status = $request->get('status', '');
+        $jenis = $request->get('jenis', '');
 
-        // Data Permohonan dari PermohonanUser (Permohonan Masuk)
-        $query = PermohonanUser::with(['permohonan', 'user']);
+        // Per-column filters for Perizinan tab
+        $filterPerizinanNama = $request->get('filter_perizinan_nama');
+        $filterPerizinanKabupaten = $request->get('filter_perizinan_kabupaten');
+        $filterPerizinanJenis = $request->get('filter_perizinan_jenis');
+        $filterPerizinanNoIzin = $request->get('filter_perizinan_no_izin');
+        $filterPerizinanTglTerbit = $request->get('filter_perizinan_tgl_terbit');
+        $filterPerizinanTglAkhir = $request->get('filter_perizinan_tgl_akhir');
+        $filterPerizinanStatus = $request->get('filter_perizinan_status');
+        $filterPerizinanKapasitas = $request->get('filter_perizinan_kapasitas');
 
-        if ($q) {
-            $query->whereHas('user', function ($sub) use ($q) {
-                $sub->where('name', 'like', "%{$q}%");
-            })->orWhereHas('permohonan', function ($sub) use ($q) {
-                $sub->where('nama', 'like', "%{$q}%");
+        // Per-column filters for Permohonan tab
+        $filterPermohonanPengguna = $request->get('filter_permohonan_pengguna');
+        $filterPermohonanKategori = $request->get('filter_permohonan_kategori');
+        $filterPermohonanStatus = $request->get('filter_permohonan_status');
+        $filterPermohonanTanggal = $request->get('filter_permohonan_tanggal');
+
+        $query = Permohonan::withCount('questions');
+
+        // if ($q) {
+        //     $query->whereHas('user', function ($sub) use ($q) {
+        //         $sub->where('name', 'like', "%{$q}%");
+        //     })->orWhereHas('permohonan', function ($sub) use ($q) {
+        //         $sub->where('nama', 'like', "%{$q}%");
+        //     });
+        // }
+
+        // =========================================
+        // TAB 2: Data Permohonan dari PermohonanUser
+        // =========================================
+        $queryPermohonanUser = PermohonanUser::with(['permohonan', 'user']);
+
+        // Check if any per-column filters are active for Permohonan
+        $hasPerColumnFiltersPermohonan = $filterPermohonanPengguna || $filterPermohonanKategori ||
+            $filterPermohonanStatus || $filterPermohonanTanggal;
+
+        // Per-column filters for Permohonan tab
+        if ($filterPermohonanPengguna) {
+            $queryPermohonanUser->whereHas('user', function ($subQuery) use ($filterPermohonanPengguna) {
+                $subQuery->where('name', 'like', '%' . $filterPermohonanPengguna . '%');
             });
         }
 
-        if ($status) {
-            $query->where('status', $status);
+        if ($filterPermohonanKategori) {
+            $queryPermohonanUser->whereHas('permohonan', function ($subQuery) use ($filterPermohonanKategori) {
+                $subQuery->where('nama', 'like', '%' . $filterPermohonanKategori . '%');
+            });
         }
 
-        $permohonanUsers = $query->orderBy('created_at', 'desc')
-            ->paginate($perPage)
+        if ($filterPermohonanStatus) {
+            $queryPermohonanUser->where('status', 'like', '%' . $filterPermohonanStatus . '%');
+        }
+
+        if ($filterPermohonanTanggal) {
+            $queryPermohonanUser->whereDate('created_at', $filterPermohonanTanggal);
+        }
+
+        $permohonanUsers = $queryPermohonanUser
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage, ['*'], 'page_permohonan_user')
             ->withQueryString();
 
-        // Untuk filter dropdown (hanya UI)
+        // Untuk filter dropdown (tidak digunakan untuk filtering, hanya UI)
         $regencies = RegRegency::orderBy('name')->get(['id', 'name']);
 
         return view('admin.permohonan.index', [
-            'title' => 'Data Permohonan Masuk',
+            'title' => 'Manajemen Permohonan',
             'permohonanUsers' => $permohonanUsers,
             'regencies' => $regencies,
             'q' => $q,
-            'status' => $status,
+            'tab' => $tab,
         ]);
     }
 
