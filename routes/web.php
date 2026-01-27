@@ -49,7 +49,16 @@ use App\Models\PembangkitLokal;
 |--------------------------------------------------------------------------
 */
 
-Auth::routes(['verify' => true, 'login' => false, 'register' => false]);
+Auth::routes(['verify' => true, 'login' => false, 'register' => false, 'reset' => false]);
+
+// Password Reset Routes (OTP Based)
+Route::get('password/reset', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('password/email', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetOtp'])->name('password.email');
+Route::get('password/otp', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'showOtpForm'])->name('password.otp');
+Route::post('password/verify-otp', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'verifyOtp'])->name('password.verify-otp');
+Route::get('password/reset-new', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'showResetForm'])->name('password.reset-new');
+Route::post('password/update', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'resetPassword'])->name('password.update-new');
+
 Route::get('login', [LoginController::class, 'show'])->middleware('guest')->name('login');
 Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('register', [RegisterController::class, 'register'])->name('register.perform');
