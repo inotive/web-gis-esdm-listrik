@@ -61,8 +61,13 @@ class LoginController extends Controller
             
             // Ambil user yg baru login
             $user = auth()->user();
+
+            // Check if Email is verified
+            if (!$user->hasVerifiedEmail()) {
+                return redirect()->route('verification.notice');
+            }
             
-            // Check if user is verified
+            // Check if user is verified (by Admin)
             if (!$user->is_verified) {
                 return redirect()->route('pending-verification')
                     ->with('info', 'Akun Anda sedang menunggu verifikasi dari administrator.');

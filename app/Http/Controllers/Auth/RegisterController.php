@@ -59,6 +59,7 @@ class RegisterController extends Controller
             'address' => ['required', 'string'],
             'village_id' => ['required', 'exists:reg_villages,id'],
             'company_name' => ['required_if:identity_type,perusahaan', 'nullable', 'string', 'max:255'],
+            'document_verification' => ['nullable', 'file', 'mimes:pdf', 'max:2048'], // Max 2MB
         ]);
     }
 
@@ -70,6 +71,15 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+        $documentPath = null;
+        if (request()->hasFile('document_verification')) {
+            $file = request()->file('document_verification');
+            $documentPath = $file->store('verification_docs', 'public');
+        } elseif (isset($data['document_verification']) && $data['document_verification'] instanceof \Illuminate\Http\UploadedFile) {
+            // Fallback if request() is not available (though it usually is globally)
+            $documentPath = $data['document_verification']->store('verification_docs', 'public');
+        }
+
         $user = User::create([
             'name' => $data['name'],
             'username' => $data['username'],
@@ -81,8 +91,8 @@ class RegisterController extends Controller
             'address' => $data['address'],
             'village_id' => $data['village_id'],
             'identity_type' => $data['identity_type'],
-            'status' => 'aktif',
-            'company_name' => $data['company_name'] ?? null,
+            'status' => 'tidak aktif',
+            'document_verification_path' => $documentPath,
         ]);
 
         // Create Perusahaan record if identity_type is perusahaan
@@ -107,5 +117,29 @@ class RegisterController extends Controller
         }
 
         return $user;
+    }
+
+    /**
+     * Handle a registration request for the application.
+     * Overrides RegistersUsers trait to prevent auto-login.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     */
+    public function register(\Illuminate\Http\Request $request)
+    {
+        $this->validator($request->all())->validate();
+
+        event(new \Illuminate\Auth\Events\Registered($user = $this->create($request->all())));
+
+        $this->guard()->login($user);
+
+        if ($response = $this->registered($request, $user)) {
+            return $response;
+        }
+
+        return $request->wantsJson()
+                    ? new \Illuminate\Http\JsonResponse([], 201)
+                    : redirect($this->redirectPath());
     }
 }
