@@ -202,10 +202,11 @@ class DashboardController extends Controller
         // ==========================================
         // TOP 10 PRIORITAS (Rencana Pengembangan Bantuan)
         // ==========================================
-        $topPrioritas = RencanaPengembanganBantuan::with(['regency', 'district', 'village'])
-            ->orderBy('total_skor', 'desc')
-            ->take(10)
-            ->get();
+        // $topPrioritas = RencanaPengembanganBantuan::with(['regency', 'district', 'village'])
+        //     ->orderBy('total_skor', 'desc')
+        //     ->take(10)
+        //     ->get();
+        $topPrioritas = collect([]);
 
         return view('admin.dashboard.index', [
             'title' => 'Dashboard Admin',
@@ -248,6 +249,11 @@ class DashboardController extends Controller
             'topPrioritas' => $topPrioritas,
             // Tahun data
             'tahunData' => $latestYear,
+            // Permohonan Stats
+            'totalPermohonan' => \App\Models\PermohonanUser::count(),
+            'permohonanPending' => \App\Models\PermohonanUser::whereIn('status', ['pending', 'proses'])->count(),
+            'permohonanApproved' => \App\Models\PermohonanUser::where('status', 'selesai')->count(),
+            'permohonanRejected' => \App\Models\PermohonanUser::where('status', 'ditolak')->count(),
         ]);
     }
 }

@@ -462,6 +462,7 @@
                                 <div class="checkbox" id="remember-checkbox"></div>
                                 <span class="remember-text">Ingat saya</span>
                             </div>
+                            <a href="{{ route('password.request') }}" class="forgot-password">Lupa Password?</a>
                         </div>
 
                         <button type="submit" class="login-button">

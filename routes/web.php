@@ -49,6 +49,16 @@ use App\Models\PembangkitLokal;
 |--------------------------------------------------------------------------
 */
 
+Auth::routes(['verify' => true, 'login' => false, 'register' => false, 'reset' => false]);
+
+// Password Reset Routes (OTP Based)
+Route::get('password/reset', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('password/email', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetOtp'])->name('password.email');
+Route::get('password/otp', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'showOtpForm'])->name('password.otp');
+Route::post('password/verify-otp', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'verifyOtp'])->name('password.verify-otp');
+Route::get('password/reset-new', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'showResetForm'])->name('password.reset-new');
+Route::post('password/update', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'resetPassword'])->name('password.update-new');
+
 Route::get('login', [LoginController::class, 'show'])->middleware('guest')->name('login');
 Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('register', [RegisterController::class, 'register'])->name('register.perform');
@@ -89,7 +99,7 @@ Route::get('/home', function () {
 Route::get('/landing', [LandingPageController::class, 'index'])
     ->name('landing');
 
-Route::group(['middleware' => ['auth', 'verified_user'], 'as' => 'admin.', 'prefix' => 'admin'], function () {
+Route::group(['middleware' => ['auth', 'verified', 'verified_user'], 'as' => 'admin.', 'prefix' => 'admin'], function () {
 
     Route::group(['middleware' => [], 'as' => 'profile.', 'prefix' => 'profile'], function () {
         Route::get('profile/{profile}', [ProfileController::class, 'profile'])->name('index');
@@ -236,6 +246,7 @@ Route::group(['middleware' => ['auth', 'verified_user'], 'as' => 'admin.', 'pref
     // Permohonan
     Route::group(['as' => 'permohonan.', 'prefix' => 'permohonan'], function () {
         Route::get('/import', [PermohonanController::class, 'import'])->name('import');
+        Route::get('/import/template', [PermohonanController::class, 'downloadTemplate'])->name('import.template');
         Route::post('/import', [PermohonanController::class, 'importProcess'])->name('import.process');
 
         Route::get('/', [PermohonanController::class, 'index'])->name('index');
@@ -253,6 +264,7 @@ Route::group(['middleware' => ['auth', 'verified_user'], 'as' => 'admin.', 'pref
     // Perizinan
     Route::group(['as' => 'perizinan.', 'prefix' => 'perizinan'], function () {
         Route::get('/import', [PerizinanController::class, 'import'])->name('import');
+        Route::get('/import/template', [PerizinanController::class, 'downloadTemplate'])->name('import.template');
         Route::post('/import', [PerizinanController::class, 'importProcess'])->name('import.process');
 
         Route::get('/', [PerizinanController::class, 'index'])->name('index');
@@ -318,6 +330,8 @@ Route::group(['middleware' => ['auth', 'verified_user'], 'as' => 'admin.', 'pref
 
     // Rekap Data
     Route::group(['as' => 'rekap-data.', 'prefix' => 'rekap-data'], function () {
+        Route::get('/template', [RekapDataController::class, 'downloadTemplate'])->name('template');
+        Route::post('/import', [RekapDataController::class, 'import'])->name('import');
         Route::get('/', [RekapDataController::class, 'index'])->name('index');
         Route::get('/detail/{kabupaten}', [RekapDataController::class, 'detail'])->name('detail');
     });

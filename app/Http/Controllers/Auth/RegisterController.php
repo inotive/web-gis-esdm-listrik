@@ -58,6 +58,8 @@ class RegisterController extends Controller
             'phone' => ['required', 'string', 'max:20', 'regex:/^[0-9+\-\s()]+$/'],
             'address' => ['required', 'string'],
             'village_id' => ['required', 'exists:reg_villages,id'],
+            'company_name' => ['required_if:identity_type,perusahaan', 'nullable', 'string', 'max:255'],
+            'document_verification' => ['nullable', 'file', 'mimes:pdf', 'max:2048'], // Max 2MB
         ]);
     }
 
@@ -69,18 +71,45 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+        $documentPath = null;
+        if (request()->hasFile('document_verification')) {
+            $file = request()->file('document_verification');
+            $documentPath = $file->store('verification_docs', 'public');
+        } elseif (isset($data['document_verification']) && $data['document_verification'] instanceof \Illuminate\Http\UploadedFile) {
+            // Fallback if request() is not available (though it usually is globally)
+            $documentPath = $data['document_verification']->store('verification_docs', 'public');
+        }
+
         $user = User::create([
             'name' => $data['name'],
             'username' => $data['username'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'jabatan' => $data['jabatan'],
+            'company_name' => $data['company_name'] ?? null,
             'phone' => $data['phone'],
             'address' => $data['address'],
             'village_id' => $data['village_id'],
             'identity_type' => $data['identity_type'],
-            'status' => 'aktif',
+            'status' => 'tidak aktif',
+            'document_verification_path' => $documentPath,
         ]);
+
+        // Create Perusahaan record if identity_type is perusahaan
+        if ($data['identity_type'] === 'perusahaan') {
+            $perusahaan = \App\Models\Perusahaan::create([
+                'nama' => $data['company_name'],
+                'village_id' => $data['village_id'],
+                'alamat' => $data['address'],
+                'kontak' => $data['phone'],
+                'jenis_usaha' => 'Lainnya', // Default or null
+                // 'kabupaten_kota' we skip for now as we have village_id relation
+            ]);
+
+            // Update user with perusahaan_id
+            $user->perusahaan_id = $perusahaan->id;
+            $user->save();
+        }
 
         // Assign role (pastikan role sudah ada di database)
         if (isset($data['identity_type'])) {
@@ -88,5 +117,29 @@ class RegisterController extends Controller
         }
 
         return $user;
+    }
+
+    /**
+     * Handle a registration request for the application.
+     * Overrides RegistersUsers trait to prevent auto-login.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     */
+    public function register(\Illuminate\Http\Request $request)
+    {
+        $this->validator($request->all())->validate();
+
+        event(new \Illuminate\Auth\Events\Registered($user = $this->create($request->all())));
+
+        $this->guard()->login($user);
+
+        if ($response = $this->registered($request, $user)) {
+            return $response;
+        }
+
+        return $request->wantsJson()
+                    ? new \Illuminate\Http\JsonResponse([], 201)
+                    : redirect($this->redirectPath());
     }
 }

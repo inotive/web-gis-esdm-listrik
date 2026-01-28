@@ -30,7 +30,10 @@ class PerizinanImport implements ToModel, WithHeadingRow
         // Kita paksa cari atau create.
         if (!$perusahaan && !empty($row['nama_perusahaan'])) {
             $perusahaan = Perusahaan::create([
-                'nama' => $row['nama_perusahaan']
+                'nama' => $row['nama_perusahaan'],
+                'kontak' => $row['kontak'] ?? null,
+                'alamat' => $row['lokasi'] ?? null, // Map lokasi to alamat as best effort
+                // 'kabupaten_kota' => ... // if available in row
             ]);
         }
         
@@ -39,10 +42,10 @@ class PerizinanImport implements ToModel, WithHeadingRow
         }
 
         return new Perizinan([
-            'nama'              => $row['nama_perizinan'] ?? $row['nama'] ?? '-',
+            'nama'              => $row['nama_pemohon'] ?? $row['nama_perizinan'] ?? $row['nama'] ?? '-',
             'perusahaan_id'     => $perusahaan->id,
             'kontak'            => $row['kontak'] ?? null,
-            'jenis'             => $row['jenis_perizinan'] ?? $row['jenis'] ?? 'Izin Usaha',
+            'jenis'             => $row['jenis_permohonan'] ?? $row['jenis_perizinan'] ?? $row['jenis'] ?? 'Izin Usaha',
             'no_pengajuan'      => $row['no_pengajuan'] ?? null,
             'no_surat_keluar'   => $row['no_surat_keluar'] ?? null,
             'tanggal'           => $this->transformDate($row['tanggal'] ?? null),
@@ -60,14 +63,16 @@ class PerizinanImport implements ToModel, WithHeadingRow
     private function transformDate($value, $format = 'Y-m-d')
     {
         if (empty($value)) return null;
+
         try {
-            return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value);
-        } catch (\ErrorException $e) {
-            try {
-                return Carbon::parse($value);
-            } catch (\Exception $e) {
-                return null;
+            // Check if value is numeric (Excel serial date)
+            if (is_numeric($value)) {
+                return \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value);
             }
+            // Otherwise parse as string
+            return Carbon::parse($value);
+        } catch (\Exception $e) {
+            return null;
         }
     }
 

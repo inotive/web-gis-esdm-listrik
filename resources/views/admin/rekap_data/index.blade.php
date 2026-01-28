@@ -445,9 +445,49 @@
                 @endforeach
             </select>
             <div class="action-buttons">
+                <a href="{{ route('admin.rekap-data.template') }}" class="btn-export print" style="background: #6366f1; text-decoration: none;">
+                    <i class="ri-download-line"></i> Download Template
+                </a>
+                <button class="btn-export excel" onclick="openImportModal()">
+                    <i class="ri-upload-line"></i> Import Data
+                </button>
                 <button class="btn-export excel"><i class="ri-file-excel-2-line"></i> Export Excel</button>
                 <button class="btn-export pdf"><i class="ri-file-pdf-2-line"></i> Export PDF</button>
                 <button class="btn-export print" onclick="window.print()"><i class="ri-printer-line"></i> Cetak</button>
+            </div>
+        </div>
+
+        <!-- Import Modal -->
+        <div id="importModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+            <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 400px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                <span class="close" onclick="closeImportModal()" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+                <h3 style="margin-top: 0; color: #111827; font-size: 18px; font-weight: 600;">Import Data Rekap</h3>
+                
+                <form action="{{ route('admin.rekap-data.import') }}" method="POST" enctype="multipart/form-data" style="margin-top: 16px;">
+                    @csrf
+                    <div style="margin-bottom: 16px;">
+                        <label for="importTahun" style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 4px;">Pilih Tahun</label>
+                        <select name="tahun" id="importTahun" class="year-select" style="width: 100%;" required>
+                             @php
+                                    $years = isset($availableYears) && $availableYears->isNotEmpty()
+                                    ? $availableYears->merge(collect(range(2018, 2027)))->unique()->sortDesc()
+                                    : collect(range(2018, 2027))->sortDesc();
+                            @endphp
+                            @foreach($years as $y)
+                                <option value="{{ $y }}">{{ $y }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label for="importFile" style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 4px;">File Excel/CSV</label>
+                        <input type="file" name="file" id="importFile" accept=".xlsx, .xls, .csv" required style="width: 100%; font-size: 14px; color: #6b7280; file-selector-button: border: 0; file-selector-button: background: #f3f4f6; file-selector-button: padding: 8px 12px; file-selector-button: border-radius: 6px; file-selector-button: margin-right: 12px;">
+                    </div>
+
+                    <button type="submit" class="btn-export excel" style="width: 100%; justify-content: center;">
+                        <i class="ri-upload-cloud-line"></i> Upload & Import
+                    </button>
+                </form>
             </div>
         </div>
 
@@ -681,5 +721,22 @@
                 window.location.href = '{{ route("admin.rekap-data.index") }}?tahun=' + this.value;
             });
         });
+
+        // Modal Functions
+        function openImportModal() {
+            document.getElementById('importModal').style.display = 'block';
+        }
+
+        function closeImportModal() {
+            document.getElementById('importModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            var modal = document.getElementById('importModal');
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
     </script>
 @endpush

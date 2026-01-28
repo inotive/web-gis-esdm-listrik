@@ -19,9 +19,14 @@ class DesaController extends Controller
         $regencyId = $request->get('regency_id');
         $districtId = $request->get('district_id');
 
+        $filterNama = $request->get('filter_desa_nama');
+        $filterKecamatan = $request->get('filter_desa_kecamatan');
+        $filterKabupaten = $request->get('filter_desa_kabupaten');
+        $filterStatus = $request->get('filter_desa_status');
+
         $query = RegVillage::with(['district.regency', 'dataBerlistrik']);
 
-        // Search by name
+        // Search by name (Global)
         if ($q) {
             $query->where('name', 'like', '%' . $q . '%');
         }
@@ -36,6 +41,44 @@ class DesaController extends Controller
         // Filter by district
         if ($districtId) {
             $query->where('district_id', $districtId);
+        }
+
+        // Column Filters
+        if ($filterNama) {
+            $query->where('name', 'like', '%' . $filterNama . '%');
+        }
+
+        if ($filterKecamatan) {
+            $query->whereHas('district', function ($q) use ($filterKecamatan) {
+                $q->where('name', 'like', '%' . $filterKecamatan . '%');
+            });
+        }
+
+        if ($filterKabupaten) {
+            $query->whereHas('district.regency', function ($q) use ($filterKabupaten) {
+                $q->where('name', 'like', '%' . $filterKabupaten . '%');
+            });
+        }
+
+        if ($filterStatus) {
+            // Find village names that match the status in ImportedJsonFeature
+            $matchingFeatures = \App\Models\ImportedJsonFeature::where('sub_kategori', 'Status Desa Berlistrik')
+                ->where('properties->StatusDesa', 'like', '%' . $filterStatus . '%')
+                ->get();
+            
+            $matchingNames = [];
+            foreach ($matchingFeatures as $feature) {
+                $props = $feature->properties;
+                if (!empty($props['Nama_Desa'])) $matchingNames[] = $props['Nama_Desa'];
+                if (!empty($props['Desa'])) $matchingNames[] = $props['Desa'];
+            }
+            
+            if (!empty($matchingNames)) {
+                $query->whereIn('name', array_unique($matchingNames));
+            } else {
+                // If filter exists but no matches found, return empty result
+                $query->whereRaw('1 = 0');
+            }
         }
 
         $desas = $query->orderBy('name', 'asc')
@@ -152,9 +195,11 @@ class DesaController extends Controller
         if ($statusBerlistrik) {
             // Find feature by old name to preserve link if name changed
             $feature = \App\Models\ImportedJsonFeature::where('sub_kategori', 'Status Desa Berlistrik')
-                ->where(function ($q) use ($originalName) {
+                ->where(function ($q) use ($originalName, $newName) {
                     $q->where('properties->Nama_Desa', $originalName)
-                        ->orWhere('properties->Desa', $originalName);
+                        ->orWhere('properties->Desa', $originalName)
+                        ->orWhere('properties->Nama_Desa', $newName)
+                        ->orWhere('properties->Desa', $newName);
                 })
                 ->first();
 
@@ -171,9 +216,37 @@ class DesaController extends Controller
                 if (isset($props['Desa'])) {
                     $props['Desa'] = $newName;
                 }
+                
+                // Ensure Kecamatan/Kabupaten is synced
+                if ($desa->district) {
+                    $props['Kecamatan'] = $desa->district->name;
+                    if ($desa->district->regency) {
+                        $props['Kab_Kota'] = $desa->district->regency->name;
+                    }
+                }
 
                 $feature->properties = $props;
                 $feature->save();
+            } else {
+                // Feature not found, create new one to store status
+                $sample = \App\Models\ImportedJsonFeature::where('sub_kategori', 'Status Desa Berlistrik')->first();
+                $kategori = $sample ? $sample->kategori : 'status-desa-berlistrik'; // Fallback
+                
+                $props = [
+                    'Nama_Desa' => $newName,
+                    'Desa' => $newName,
+                    'StatusDesa' => $statusBerlistrik,
+                    'Kecamatan' => $desa->district->name ?? '',
+                    'Kab_Kota' => $desa->district->regency->name ?? '',
+                    'Provinsi' => 'KALIMANTAN TIMUR',
+                ];
+
+                \App\Models\ImportedJsonFeature::create([
+                    'kategori' => $kategori,
+                    'sub_kategori' => 'Status Desa Berlistrik',
+                    'regency_id' => $desa->district->regency_id ?? null,
+                    'properties' => $props
+                ]);
             }
         }
 

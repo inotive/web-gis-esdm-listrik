@@ -31,11 +31,23 @@
                     </div>
 
                     <div class="alert alert-info">
-                        <strong>Petunjuk Import:</strong>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <strong>Petunjuk Import:</strong>
+                            <a href="{{ route('admin.permohonan.import.template') }}" class="btn btn-sm btn-light border">
+                                <i class="ri-file-download-line"></i> Download Template
+                            </a>
+                        </div>
                         <ul class="mb-0 pl-3">
-                            <li>Pastikan format file sesuai dengan template.</li>
-                            <li>Kolom wajib: <b>nama_pemohon</b> (sesuai nama user), <b>jenis_permohonan</b>.</li>
-                            <li>Jika user tidak ditemukan, sistem akan mencoba membuat user baru (dummy).</li>
+                            <li>Pastikan format file sesuai dengan template yang disediakan.</li>
+                            <li>Kolom wajib: <b>nama_pemohon</b>, <b>jenis_permohonan</b>.</li>
+                            <li>Kolom <b>status_kelistrikan</b> harap diisi: 
+                                <ul>
+                                    <li><b>Berlistrik PLN</b></li>
+                                    <li><b>Berlistrik NON-PLN</b></li>
+                                    <li><b>Tidak Berlistrik</b></li>
+                                </ul>
+                            </li>
+                            <li>Jika perusahaan tidak ditemukan, sistem akan mencoba membuat perusahaan baru.</li>
                         </ul>
                     </div>
 

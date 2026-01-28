@@ -688,14 +688,16 @@
                         {{-- Filter Row --}}
                         <tr class="filter-row">
                             <th class="col-no"></th>
-                            <th><input type="text" class="filter-input" placeholder="Filter nama desa..."
-                                    data-column="nama"></th>
-                            <th><input type="text" class="filter-input" placeholder="Filter kecamatan..."
-                                    data-column="kecamatan"></th>
-                            <th><input type="text" class="filter-input" placeholder="Filter kabupaten..."
-                                    data-column="kabupaten"></th>
-                            <th><input type="text" class="filter-input" placeholder="Filter status..."
-                                    data-column="status"></th>
+                            <th><input type="text" class="filter-input-server" name="filter_desa_nama"
+                                    value="{{ request('filter_desa_nama') }}" placeholder="Filter nama desa..."></th>
+                            <th><input type="text" class="filter-input-server" name="filter_desa_kecamatan"
+                                    value="{{ request('filter_desa_kecamatan') }}" placeholder="Filter kecamatan...">
+                            </th>
+                            <th><input type="text" class="filter-input-server" name="filter_desa_kabupaten"
+                                    value="{{ request('filter_desa_kabupaten') }}" placeholder="Filter kabupaten...">
+                            </th>
+                            <th><input type="text" class="filter-input-server" name="filter_desa_status"
+                                    value="{{ request('filter_desa_status') }}" placeholder="Filter status..."></th>
                             <th class="col-aksi"></th>
                         </tr>
                     </thead>
@@ -720,7 +722,11 @@
                                             $statusUpper = strtoupper($status);
                                         @endphp
 
-                                        @if (str_contains($statusUpper, 'BELUM') || str_contains($statusUpper, 'TIDAK'))
+                                        @if (str_contains($statusUpper, 'PLN') && !str_contains($statusUpper, 'NON'))
+                                            <span class="badge badge-success">{{ $status }}</span>
+                                        @elseif(str_contains($statusUpper, 'NON-PLN') || str_contains($statusUpper, 'NON PLN'))
+                                            <span class="badge badge-warning" style="background-color: #FEF3C7; color: #92400E;">{{ $status }}</span>
+                                        @elseif(str_contains($statusUpper, 'BELUM') || str_contains($statusUpper, 'TIDAK'))
                                             <span class="badge badge-danger"
                                                 style="background-color: #FEE2E2; color: #EF4444;">{{ $status }}</span>
                                         @elseif(str_contains($statusUpper, 'TERLAYANI') || str_contains($statusUpper, 'BERLISTRIK'))
@@ -1106,68 +1112,37 @@
     </style>
 
     <script>
-        // ========== Column Filter Functionality ==========
+        // ========== Server-Side Column Filter Functionality ==========
         document.addEventListener('DOMContentLoaded', function() {
-            const filterInputs = document.querySelectorAll('.filter-input');
-            const tableRows = document.querySelectorAll('.table-desa tbody tr');
+            const filterInputs = document.querySelectorAll('.filter-input-server');
 
             filterInputs.forEach(input => {
-                input.addEventListener('input', function() {
-                    tableRows.forEach(row => {
-                        // Skip empty state row
-                        if (row.querySelector('td[colspan]')) return;
-
-                        // Check all filters to determine if row should be visible
-                        let allFiltersMatch = true;
-                        filterInputs.forEach((filterInput) => {
-                            const filterVal = filterInput.value.toLowerCase()
-                                .trim();
-                            if (filterVal) {
-                                const columnIndex = Array.from(filterInput.closest(
-                                    'tr').children).indexOf(filterInput.closest(
-                                    'th'));
-                                const targetCell = row.children[columnIndex];
-                                if (targetCell) {
-                                    const targetText = targetCell.textContent
-                                        .toLowerCase().trim();
-                                    if (!targetText.includes(filterVal)) {
-                                        allFiltersMatch = false;
-                                    }
-                                }
-                            }
-                        });
-
-                        // Show/hide row based on all filters
-                        if (allFiltersMatch) {
-                            row.style.display = '';
-                        } else {
-                            row.style.display = 'none';
-                        }
-                    });
-
-                    // Update row count
-                    updateVisibleRowCount();
+                // Remove 'input' event listener to prevent auto-reload while typing
+                // Only trigger on Enter key
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault(); // Prevent default form submission if inside form
+                        applyFilters();
+                    }
                 });
             });
 
-            // Function to update visible row count
-            function updateVisibleRowCount() {
-                const visibleRows = Array.from(tableRows).filter(row => {
-                    return row.style.display !== 'none' && !row.querySelector('td[colspan]');
+            function applyFilters() {
+                const url = new URL(window.location.href);
+                
+                // Update params from filter inputs
+                filterInputs.forEach(input => {
+                    if (input.value.trim()) {
+                        url.searchParams.set(input.name, input.value.trim());
+                    } else {
+                        url.searchParams.delete(input.name);
+                    }
                 });
 
-                const summary = document.querySelector('.summary');
-                if (summary) {
-                    const total = tableRows.length - (document.querySelector('.table-desa tbody tr td[colspan]') ?
-                        1 : 0);
-                    const visible = visibleRows.length;
+                // Reset page to 1 when filtering
+                url.searchParams.set('page', '1');
 
-                    if (visible < total) {
-                        summary.textContent = `Menampilkan ${visible} dari ${total} data (filtered)`;
-                    } else {
-                        summary.textContent = `Menampilkan ${visible} data`;
-                    }
-                }
+                window.location.href = url.toString();
             }
         });
     </script>

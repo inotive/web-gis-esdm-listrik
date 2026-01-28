@@ -51,12 +51,15 @@
         </a>
 
 
-        @if (!in_array($userRole ?? null, ['desa', 'perusahaan']))
-            <a class="menu-item {{ nav_active('admin.permohonan.*') }}" href="{{ route('admin.permohonan.index') }}">
-                <span class="menu-icon"><i class="ri-file-list-3-line" aria-hidden="true"></i></span>
-                <span class="menu-label">Perizinan dan Permohonan</span>
-            </a>
-        @endif
+        <a class="menu-item {{ nav_active('admin.permohonan.*') }}" href="{{ route('admin.permohonan.index') }}">
+            <span class="menu-icon"><i class="ri-file-list-3-line" aria-hidden="true"></i></span>
+            <span class="menu-label">Data Permohonan</span>
+        </a>
+
+        <a class="menu-item {{ nav_active('admin.perizinan.*') }}" href="{{ route('admin.perizinan.index') }}">
+            <span class="menu-icon"><i class="ri-file-shield-2-line" aria-hidden="true"></i></span>
+            <span class="menu-label">Data Perizinan</span>
+        </a>
 
         <a class="menu-item {{ nav_active('admin.rekap-data.*') }}" href="{{ route('admin.rekap-data.index') }}">
             <span class="menu-icon"><i class="ri-file-text-line" aria-hidden="true"></i></span>

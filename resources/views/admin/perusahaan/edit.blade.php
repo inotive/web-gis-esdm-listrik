@@ -33,7 +33,7 @@
           <label class="label">Kabupaten/Kota</label>
           <select name="regency_id" id="eRegency" class="input" required>
             @foreach($regencies as $r)
-              <option value="{{ $r->id }}" @selected($perusahaan->village->district->regency_id===$r->id)>{{ $r->name }}</option>
+              <option value="{{ $r->id }}" @selected($perusahaan->village?->district?->regency_id === $r->id)>{{ $r->name }}</option>
             @endforeach
           </select>
         </div>
@@ -43,7 +43,7 @@
           <label class="label">Kecamatan</label>
           <select name="district_id" id="eDistrict" class="input" required>
             @foreach($districts as $d)
-              <option value="{{ $d->id }}" @selected($perusahaan->village->district_id===$d->id)>{{ $d->name }}</option>
+              <option value="{{ $d->id }}" @selected($perusahaan->village?->district_id === $d->id)>{{ $d->name }}</option>
             @endforeach
           </select>
         </div>

@@ -333,7 +333,7 @@
                     <h1 class="login-title">Register</h1>
                     <p class="login-subtitle">Lengkapi data diri Anda untuk membuat akun baru pada sistem.</p>
 
-                    <form id="registerForm" method="POST" action="{{ route('register.perform') }}">
+                    <form id="registerForm" method="POST" action="{{ route('register.perform') }}" enctype="multipart/form-data">
                         @csrf
                         
                         <div class="form-group">
@@ -355,6 +355,13 @@
                             <input class="form-input" type="text" name="name" placeholder="Masukkan Nama Lengkap" required />
                         </div>
 
+
+
+                        <div class="form-group" id="companyNameGroup" style="display: none;">
+                            <label class="form-label">Nama Perusahaan (Nama PT)</label>
+                            <input class="form-input" type="text" name="company_name" placeholder="Masukkan Nama Perusahaan" />
+                        </div>
+
                         <div class="form-group">
                             <label class="form-label">Username</label>
                             <input class="form-input" type="text" name="username" id="username" placeholder="Masukkan Username" required />
@@ -363,14 +370,20 @@
 
                         <div class="form-group">
                             <label class="form-label" id="jabatanLabel">Jabatan</label>
-                            <input class="form-input" type="text" name="jabatan" placeholder="Masukkan Nama Desa/Perusahaan" required />
+                            <input class="form-input" type="text" name="jabatan" placeholder="Masukkan Jabatan" required />
                         </div>
+                        
+                        <!-- Rest of the form -->
 
                         <div class="form-group">
                             <label class="form-label">Email</label>
                             <input class="form-input" type="email" name="email" id="email" placeholder="email@mail.com" required />
                             <div id="emailValidation" class="validation-feedback" style="display:none;"></div>
                         </div>
+                        
+                        <!-- ... -->
+                        
+
 
                         <div class="form-group">
                             <label class="form-label">No. Hp</label>
@@ -402,6 +415,13 @@
                         <div class="form-group">
                             <label class="form-label" id="addressLabel">Alamat Kantor Desa</label>
                             <textarea class="form-textarea" name="address" rows="3" placeholder="Cth: Jl. Pahlawan No.78 RT.002" required style="resize: vertical"></textarea>
+                        </div>
+
+                        <div class="form-group" id="documentGroup">
+                            <label class="form-label">Dokumen Pendukung (Opsional)</label>
+                            <div style="margin-bottom: 8px; font-size: 13px; color: var(--gray-600);">Upload dokumen pendukung (contoh: SK Kepala Desa / Surat Resmi)</div>
+                            <input class="form-input" type="file" name="document_verification" accept=".pdf" />
+                            <div style="font-size: 12px; color: var(--gray-500); margin-top: 4px;">Hanya format PDF yang diperbolehkan</div>
                         </div>
 
                         <div class="form-group">
@@ -448,17 +468,33 @@
 
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
-            // --- Form Logic ---
             function toggleForm(role) {
                 const addressLabel = document.getElementById('addressLabel');
-                const jabatanLabel = document.getElementById('jabatanLabel'); // Optional if needed to change
+                const companyGroup = document.getElementById('companyNameGroup');
+                const companyInput = document.querySelector('input[name="company_name"]');
+                const documentGroup = document.getElementById('documentGroup');
 
                 if (role === 'desa') {
                     addressLabel.innerText = 'Alamat Kantor Desa';
-                    // jabatanLabel.innerText = 'Jabatan';
+                    if (companyGroup) {
+                        companyGroup.style.display = 'none';
+                        if (companyInput) {
+                            companyInput.required = false;
+                            companyInput.value = '';
+                        }
+                    }
+                    if (documentGroup) documentGroup.style.display = 'block';
+
+                    if (jabatanInput) jabatanInput.placeholder = 'Masukkan Jabatan (Cth: Kepala Desa)';
                 } else {
                     addressLabel.innerText = 'Alamat Perusahaan';
-                    // jabatanLabel.innerText = 'Jabatan';
+                    if (companyGroup) {
+                        companyGroup.style.display = 'block';
+                        if (companyInput) companyInput.required = true;
+                    }
+                    if (documentGroup) documentGroup.style.display = 'none';
+                    
+                    if (jabatanInput) jabatanInput.placeholder = 'Masukkan Jabatan (Cth: Direktur)';
                 }
             }
 
