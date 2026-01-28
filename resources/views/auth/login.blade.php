@@ -10,7 +10,7 @@
         <title>Login - Dinas ESDM Kalimantan Timur</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css" />
         <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
         <style>
             * {
                 -webkit-font-smoothing: antialiased;
@@ -18,20 +18,20 @@
             }
 
             :root {
-                --white: rgba(255, 255, 255, 1);
-                --gray-900: rgba(24, 29, 39, 1);
-                --gray-600: rgba(83, 88, 98, 1);
-                --gray-700: rgba(65, 70, 81, 1);
-                --gray-500: rgba(113, 118, 128, 1);
-                --gray-300: rgba(213, 215, 218, 1);
+                --white: #ffffff;
+                --gray-900: #111827;
+                --gray-600: #4B5563;
+                --gray-700: #374151;
+                --gray-500: #6B7280;
+                --gray-300: #D1D5DB;
                 --gray-100: #F3F4F6;
                 --primary: #059669;
                 --primary-dark: #047857;
                 --primary-light: #10B981;
                 --primary-bg: rgba(5, 150, 105, 0.08);
-                --shadow-xs: 0px 1px 2px 0px rgba(10, 13, 18, 0.05);
-                --shadow-md: 0px 4px 8px -2px rgba(10, 13, 18, 0.1);
-                --shadow-lg: 0px 12px 24px -4px rgba(10, 13, 18, 0.12);
+                --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+                --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
                 --border-radius: 12px;
                 --transition: all 0.3s ease;
             }
@@ -41,8 +41,8 @@
                 margin: 0;
                 padding: 0;
                 height: 100%;
-                font-family: "Inter", Helvetica, Arial, sans-serif;
-                background-color: #f8f9fa;
+                font-family: 'Plus Jakarta Sans', sans-serif;
+                background-color: #ffffff;
                 overflow: hidden;
             }
 

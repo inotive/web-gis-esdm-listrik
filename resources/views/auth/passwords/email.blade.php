@@ -8,16 +8,16 @@
     <meta charset="utf-8" />
     <title>{{ $title ?? 'Lupa Password' }} - Dinas ESDM Kalimantan Timur</title>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         /* Reusing styles from login.blade.php for consistency */
-        * { box-sizing: border-box; }
-        body { margin: 0; padding: 0; font-family: "Inter", sans-serif; background-color: #f8f9fa; height: 100vh; overflow: hidden; }
+        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        body { margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; background-color: #ffffff; height: 100vh; overflow: hidden; }
         .login-container { display: flex; height: 100vh; width: 100%; }
         .login-form-section { flex: 1; padding: 40px; background-color: white; display: grid; place-items: center; position: relative; }
         
         .login-content { max-width: 440px; width: 100%; margin: 0 auto; }
-        .login-title { font-size: 32px; font-weight: 700; color: #181d27; margin-bottom: 8px; font-family: "Patrick Hand", cursive; text-align: center; } /* Matching the sketch font vibe */
+        .login-title { font-size: 32px; font-weight: 700; color: #111827; margin-bottom: 8px; text-align: center; letter-spacing: -0.025em; }
         .login-subtitle { font-size: 16px; color: #535862; margin-bottom: 32px; text-align: center; line-height: 1.5; }
         
         .form-label { display: block; font-size: 14px; font-weight: 600; color: #414651; margin-bottom: 8px; }

@@ -95,21 +95,14 @@ class RegisterController extends Controller
             'document_verification_path' => $documentPath,
         ]);
 
-        // Create Perusahaan record if identity_type is perusahaan
+        // Create Perusahaan record logic moved to Admin Approval (UserController@approve)
+        // We only verify that identity_type is set correctly
+        
+        /* 
         if ($data['identity_type'] === 'perusahaan') {
-            $perusahaan = \App\Models\Perusahaan::create([
-                'nama' => $data['company_name'],
-                'village_id' => $data['village_id'],
-                'alamat' => $data['address'],
-                'kontak' => $data['phone'],
-                'jenis_usaha' => 'Lainnya', // Default or null
-                // 'kabupaten_kota' we skip for now as we have village_id relation
-            ]);
-
-            // Update user with perusahaan_id
-            $user->perusahaan_id = $perusahaan->id;
-            $user->save();
-        }
+             Logic moved to UserController::approve
+        } 
+        */
 
         // Assign role (pastikan role sudah ada di database)
         if (isset($data['identity_type'])) {

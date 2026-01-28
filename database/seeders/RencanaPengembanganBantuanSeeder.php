@@ -28,7 +28,9 @@ class RencanaPengembanganBantuanSeeder extends Seeder
 
         try {
             // Load spreadsheet
-            $spreadsheet = IOFactory::load($filePath);
+            $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+            $reader->setReadDataOnly(true);
+            $spreadsheet = $reader->load($filePath);
             $worksheet = $spreadsheet->getActiveSheet();
             $rows = $worksheet->toArray();
 

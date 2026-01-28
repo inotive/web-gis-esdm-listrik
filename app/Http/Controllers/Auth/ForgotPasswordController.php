@@ -121,6 +121,11 @@ class ForgotPasswordController extends Controller
              return back()->withErrors(['email' => 'User tidak ditemukan']);
         }
 
+        // Check if new password is same as old password
+        if (Hash::check($request->password, $user->password)) {
+            return back()->withErrors(['password' => 'Password tidak boleh sama dengan password lama']);
+        }
+
         $user->forceFill([
             'password' => Hash::make($request->password)
         ])->save(); // No need to remember token update as we are manual
