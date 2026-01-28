@@ -238,6 +238,9 @@ class PengajuanPermohonanController extends Controller
 
             DB::commit();
 
+            // Dispatch Notification Job
+            \App\Jobs\ProcessNewPermohonanNotification::dispatch($permohonanUser->id);
+
             return redirect()->route('admin.pengajuan-permohonan.index')
                 ->with('success', 'Permohonan berhasil diajukan.');
         } catch (\Exception $e) {
