@@ -178,10 +178,24 @@ class UserController extends Controller
      */
     public function approve(User $user)
     {
+        // If user is 'perusahaan' and doesn't have a perusahaan_id yet, create it now
+        if ($user->identity_type === 'perusahaan' && !$user->perusahaan_id && $user->company_name) {
+            $perusahaan = \App\Models\Perusahaan::create([
+                'nama' => $user->company_name,
+                'village_id' => $user->village_id, // Assuming this is available on user or passed during reg
+                'alamat' => $user->address,
+                'kontak' => $user->phone,
+                'jenis_usaha' => 'Lainnya',
+            ]);
+            
+            $user->perusahaan_id = $perusahaan->id;
+        }
+
         $user->update([
             'is_verified' => true,
             'verified_at' => now(),
-            'verified_by' => auth()->id()
+            'verified_by' => auth()->id(),
+            'perusahaan_id' => $user->perusahaan_id // Ensure this saves if updated above
         ]);
 
         $notifikasi = [

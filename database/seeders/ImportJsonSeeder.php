@@ -135,7 +135,7 @@ class ImportJsonSeeder extends Seeder
                 continue;
             }
 
-            $featuresToInsert = [];
+
             foreach ($data['features'] as $feature) {
                 // Transform properties if matches specific category
                 $props = $feature['properties'] ?? [];
@@ -236,7 +236,7 @@ class ImportJsonSeeder extends Seeder
                 $properties = isset($props) ? json_encode($props) : null;
                 $geometry = isset($feature['geometry']) ? json_encode($feature['geometry']) : null;
 
-                $featuresToInsert[] = [
+                $featureData = [
                     'kategori' => Str::slug($kategori),
                     'sub_kategori' => $subKategori,
                     'sub_subkategori' => $subSubKategori,
@@ -247,15 +247,11 @@ class ImportJsonSeeder extends Seeder
                     'updated_at' => now(),
                 ];
 
-                if (count($featuresToInsert) >= 50) {
-                    DB::table('imported_json_features')->insert($featuresToInsert);
-                    $featuresToInsert = [];
-                }
+                // Insert immediately to avoid packet size limits with large geometries
+                DB::table('imported_json_features')->insert($featureData);
             }
 
-            if (!empty($featuresToInsert)) {
-                DB::table('imported_json_features')->insert($featuresToInsert);
-            }
+
         }
 
         $this->command->info('JSON import completed.');

@@ -136,6 +136,11 @@
 
                     <div class="row">
                         @foreach($permissions as $group => $groupPermissions)
+                        {{-- HIDE SPECIFIC PERMISSIONS --}}
+                        @if(in_array($group, ['Data Infrastruktur', 'Data Jalan']))
+                            @continue
+                        @endif
+
                         <div class="col-md-6">
                             <div class="permission-card">
                                 <div class="permission-group-title">

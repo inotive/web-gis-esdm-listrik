@@ -8,14 +8,14 @@
     <meta charset="utf-8" />
     <title>{{ $title ?? 'Buat Password Baru' }} - Dinas ESDM Kalimantan Timur</title>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; }
-        body { margin: 0; padding: 0; font-family: "Inter", sans-serif; background-color: #f8f9fa; height: 100vh; overflow: hidden; }
+        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        body { margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; background-color: #ffffff; height: 100vh; overflow: hidden; }
         .login-container { display: flex; height: 100vh; width: 100%; }
         .login-form-section { flex: 1; padding: 40px; background-color: white; display: grid; place-items: center; }
         .login-content { max-width: 440px; width: 100%; margin: 0 auto; }
-        .login-title { font-size: 32px; font-weight: 700; color: #181d27; margin-bottom: 8px; font-family: "Patrick Hand", cursive; text-align: center; }
+        .login-title { font-size: 32px; font-weight: 700; color: #111827; margin-bottom: 8px; text-align: center; letter-spacing: -0.025em; }
         .login-subtitle { font-size: 16px; color: #535862; margin-bottom: 32px; text-align: center; line-height: 1.5; }
         
         .success-text { color: #059669; font-size: 14px; margin-bottom: 30px; text-align: center; }
@@ -25,10 +25,11 @@
         .form-input:focus { outline: none; border-color: #059669; box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.1); }
         
         .password-wrapper { position: relative; margin-bottom: 20px; }
-        .password-toggle { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #535862; font-size: 20px; }
+        .password-toggle { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #535862; font-size: 20px; display: grid; place-items: center; transition: all 0.3s; }
+        .password-toggle:hover { color: #059669; }
 
-        .login-button { width: 100%; padding: 14px; background: white; border: 2px solid #181d27; color: #181d27; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s; margin-top: 10px; }
-        .login-button:hover { background: #f0f2f5; }
+        .login-button { width: 100%; padding: 16px 24px; background: linear-gradient(135deg, #059669 0%, #10B981 100%); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s; margin-top: 10px; box-shadow: 0 4px 14px 0 rgba(5, 150, 105, 0.35); }
+        .login-button:hover { background: linear-gradient(135deg, #047857 0%, #059669 100%); transform: translateY(-2px); box-shadow: 0 6px 20px 0 rgba(5, 150, 105, 0.45); }
         
         .is-invalid { border-color: #ef4444; }
         .invalid-feedback { color: #ef4444; font-size: 13px; margin-top: 4px; }
@@ -79,6 +80,7 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         function togglePassword(id) {
             const input = document.getElementById(id);
@@ -93,6 +95,28 @@
                 icon.classList.add('ri-eye-off-line');
             }
         }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            @if($errors->any())
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: "{{ $errors->first() }}",
+                    confirmButtonText: 'Tutup',
+                    confirmButtonColor: '#059669'
+                });
+            @endif
+
+            @if(session('status'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: "{{ session('status') }}",
+                    confirmButtonText: 'Ok',
+                    confirmButtonColor: '#059669'
+                });
+            @endif
+        });
     </script>
 </body>
 </html>

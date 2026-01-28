@@ -1,0 +1,71 @@
+
+   INFO  Seeding database.  
+
+Clearing cache...
+Processing: Administrasi/BATAS DESA.json
+File: Administrasi -> Kategori: Administrasi, Sub: BATAS DESA, SubSub: 
+Processing: Administrasi/BATAS KABUPATEN KOTA.json
+File: Administrasi -> Kategori: Administrasi, Sub: BATAS KABUPATEN KOTA, SubSub: 
+Processing: Administrasi/BATAS KALTIM FULL.json
+File: Administrasi -> Kategori: Administrasi, Sub: BATAS KALTIM FULL, SubSub: 
+Processing: Administrasi/BATAS KALTIM KABUPATEN KOTA.json
+File: Administrasi -> Kategori: Administrasi, Sub: BATAS KALTIM KABUPATEN KOTA, SubSub: 
+Processing: Administrasi/BATAS KALTIM KK KECAMATAN.json
+File: Administrasi -> Kategori: Administrasi, Sub: BATAS KALTIM KK KECAMATAN, SubSub: 
+Processing: Administrasi/BATAS KECAMATAN.json
+File: Administrasi -> Kategori: Administrasi, Sub: BATAS KECAMATAN, SubSub: 
+Processing: Administrasi/BATAS NEGARA.json
+File: Administrasi -> Kategori: Administrasi, Sub: BATAS NEGARA, SubSub: 
+Processing: Administrasi/BATAS PROVINSI.json
+File: Administrasi -> Kategori: Administrasi, Sub: BATAS PROVINSI, SubSub: 
+Processing: Data Jaringan/Kab. Berau/Distribusi/SUTM.json
+File: Data Jaringan/Kab. Berau/Distribusi -> Kategori: Data Jaringan, Sub: Kab. Berau, SubSub: Distribusi
+Processing: Data Jaringan/Kab. Berau/Transmisi/Transmisi Berau.json
+File: Data Jaringan/Kab. Berau/Transmisi -> Kategori: Data Jaringan, Sub: Kab. Berau, SubSub: Transmisi
+Processing: Data Jaringan/Kab. Kutai Barat/Distribusi/SUTM.json
+File: Data Jaringan/Kab. Kutai Barat/Distribusi -> Kategori: Data Jaringan, Sub: Kab. Kutai Barat, SubSub: Distribusi
+Processing: Data Jaringan/Kab. Kutai Barat/Transmisi/Transmisi Kutai Barat.json
+File: Data Jaringan/Kab. Kutai Barat/Transmisi -> Kategori: Data Jaringan, Sub: Kab. Kutai Barat, SubSub: Transmisi
+Processing: Data Jaringan/Kab. Kutai Timur/Distribusi/SUTM.json
+File: Data Jaringan/Kab. Kutai Timur/Distribusi -> Kategori: Data Jaringan, Sub: Kab. Kutai Timur, SubSub: Distribusi
+Processing: Data Jaringan/Kab. Kutai Timur/Distribusi/SUTR.json
+File: Data Jaringan/Kab. Kutai Timur/Distribusi -> Kategori: Data Jaringan, Sub: Kab. Kutai Timur, SubSub: Distribusi
+Processing: Data Jaringan/Kab. Kutai Timur/Transmisi/Transmisi Kutai Timur.json
+File: Data Jaringan/Kab. Kutai Timur/Transmisi -> Kategori: Data Jaringan, Sub: Kab. Kutai Timur, SubSub: Transmisi
+Processing: Data Jaringan/Kab. Mahakam Ulu/Distribusi/SUTM.json
+File: Data Jaringan/Kab. Mahakam Ulu/Distribusi -> Kategori: Data Jaringan, Sub: Kab. Mahakam Ulu, SubSub: Distribusi
+Processing: Data Jaringan/Kab. Mahakam Ulu/Distribusi/SUTR.json
+File: Data Jaringan/Kab. Mahakam Ulu/Distribusi -> Kategori: Data Jaringan, Sub: Kab. Mahakam Ulu, SubSub: Distribusi
+Processing: Data Jaringan/Kab. Mahakam Ulu/Transmisi/Transmisi Mahakam Ulu.json
+File: Data Jaringan/Kab. Mahakam Ulu/Transmisi -> Kategori: Data Jaringan, Sub: Kab. Mahakam Ulu, SubSub: Transmisi
+Processing: Data Jaringan/Kab. PPU/Distribusi/SUTM.json
+File: Data Jaringan/Kab. PPU/Distribusi -> Kategori: Data Jaringan, Sub: Kab. PPU, SubSub: Distribusi
+Processing: Data Jaringan/Kab. PPU/Transmisi/Transmisi Penajam Paser Utara.json
+File: Data Jaringan/Kab. PPU/Transmisi -> Kategori: Data Jaringan, Sub: Kab. PPU, SubSub: Transmisi
+Processing: Data Jaringan/Kab. Paser/Distribusi/SUTM.json
+File: Data Jaringan/Kab. Paser/Distribusi -> Kategori: Data Jaringan, Sub: Kab. Paser, SubSub: Distribusi
+
+   Illuminate\Database\QueryException 
+
+  SQLSTATE[42S02]: Base table or view not found: 1146 Table 'web_gis_esdm.imported_json_features' doesn't exist (Connection: mysql, SQL: insert into `imported_json_features` (`kategori`, `sub_kategori`, `sub_subkategori`, `regency_id`, `properties`, `geometry`, `created_at`, `updated_at`) values (data-jaringan, Kab. Paser, Distribusi, 6401, {"Jalan":"SUTM","WADMKC":"Batu Sopang","WADMKD":"Sungai Terik","WADMKK":"Paser"}, {"type":"LineString","coordinates":[[115.92366405000007,-1.81735503799996,0],[115.92363040000009,-1.81722439999993,0],[115.92349020000006,-1.816835198999968,0],[115.9222545,-1.815112298999964,0],[115.92192740000007,-1.814800898999977,0],[115.921752,-1.814624599999945,0],[115.92116420000002,-1.814038098999958,0],[115.92074370000012,-1.813581398999929,0],[115.920427,-1.813005398999962,0],[115.92032415200003,-1.812854577999929,0]]}, 2026-01-28 00:34:41, 2026-01-28 00:34:41))
+
+  at vendor/laravel/framework/src/Illuminate/Database/Connection.php:829
+    825▕                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+    826▕                 );
+    827▕             }
+    828▕ 
+  ➜ 829▕             throw new QueryException(
+    830▕                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+    831▕             );
+    832▕         }
+    833▕     }
+
+      [2m+6 vendor frames [22m
+
+  7   database/seeders/ImportJsonSeeder.php:251
+      Illuminate\Database\Query\Builder::insert()
+      [2m+22 vendor frames [22m
+
+  30  artisan:35
+      Illuminate\Foundation\Console\Kernel::handle()
+

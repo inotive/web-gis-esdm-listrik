@@ -7,29 +7,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta charset="utf-8" />
     <title>{{ $title ?? 'Verifikasi OTP' }} - Dinas ESDM Kalimantan Timur</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; }
-        body { margin: 0; padding: 0; font-family: "Inter", sans-serif; background-color: #f8f9fa; height: 100vh; overflow: hidden; }
+        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        body { margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; background-color: #ffffff; height: 100vh; overflow: hidden; }
         .login-container { display: flex; height: 100vh; width: 100%; }
         .login-form-section { flex: 1; padding: 40px; background-color: white; display: grid; place-items: center; }
         .login-content { max-width: 440px; width: 100%; margin: 0 auto; text-align: center; }
-        .login-title { font-size: 32px; font-weight: 700; color: #181d27; margin-bottom: 8px; font-family: "Patrick Hand", cursive; }
+        .login-title { font-size: 32px; font-weight: 700; color: #111827; margin-bottom: 8px; letter-spacing: -0.025em; }
         .login-subtitle { font-size: 16px; color: #535862; margin-bottom: 24px; line-height: 1.5; }
         
         .otp-display { 
-            border: 2px solid #535862; border-radius: 8px; padding: 10px; margin-bottom: 24px; display: inline-block; width: 100%; font-family: "Patrick Hand", cursive; font-size: 18px; color: #181d27;
+            border: 2px solid #535862; border-radius: 8px; padding: 10px; margin-bottom: 24px; display: inline-block; width: 100%; font-size: 18px; color: #181d27; font-weight: 500;
         }
 
         .otp-inputs { display: flex; gap: 10px; justify-content: center; margin-bottom: 24px; }
         .otp-input { width: 50px; height: 50px; text-align: center; font-size: 24px; border: 2px solid #d5d7da; border-radius: 8px; font-weight: bold; }
         .otp-input:focus { border-color: #059669; outline: none; }
         /* Fallback single input if JS fails */
-        .otp-input-single { width: 100%; height: 50px; text-align: center; font-size: 24px; border: 2px solid #d5d7da; border-radius: 8px; font-weight: bold; letter-spacing: 10px; }
-        .otp-input-single:focus { border-color: #059669; outline: none; }
+        .otp-input-single { width: 100%; height: 50px; text-align: center; font-size: 24px; border: 2px solid #d5d7da; border-radius: 8px; font-weight: bold; letter-spacing: 12px; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .otp-input-single:focus { border-color: #059669; outline: none; box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.1); }
 
-        .btn-verify { width: 100%; padding: 14px; background: white; border: 2px solid #181d27; color: #181d27; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s; margin-bottom: 24px; }
-        .btn-verify:hover { background: #f0f2f5; }
+        .btn-verify { width: 100%; padding: 16px 24px; background: linear-gradient(135deg, #059669 0%, #10B981 100%); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s; margin-top: 24px; margin-bottom: 24px; box-shadow: 0 4px 14px 0 rgba(5, 150, 105, 0.35); }
+        .btn-verify:hover { background: linear-gradient(135deg, #047857 0%, #059669 100%); transform: translateY(-2px); box-shadow: 0 6px 20px 0 rgba(5, 150, 105, 0.45); }
 
         .btn-resend { background: none; border: 1px solid #535862; border-radius: 8px; padding: 8px 16px; cursor: pointer; font-size: 14px; color: #535862; margin-top: 10px; }
         .btn-resend:hover { background: #f0f2f5; color: #181d27; }

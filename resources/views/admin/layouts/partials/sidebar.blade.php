@@ -123,10 +123,12 @@
                 <span class="menu-label">Data Infrastruktur</span>
             </a> --}}
 
+            @if (!in_array($userRole, ['admin', 'superadmin']))
             <a class="menu-item {{ nav_active('admin.jalan.*') }}" href="{{ route('admin.jalan.index') }}">
                 <span class="menu-icon"><i class="ri-road-map-line" aria-hidden="true"></i></span>
                 <span class="menu-label">Data Jalan &amp; Aksesbilitas</span>
             </a>
+            @endif
 
             <a class="menu-item {{ nav_active('admin.rencana-pengembangan.*') }}"
                 href="{{ route('admin.rencana-pengembangan.index') }}">

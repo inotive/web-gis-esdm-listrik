@@ -1,0 +1,29 @@
+
+   INFO  Seeding database.  
+
+Clearing cache...
+Processing: Administrasi/BATAS DESA.json
+File: Administrasi -> Kategori: Administrasi, Sub: BATAS DESA, SubSub: 
+
+   ErrorException 
+
+  Undefined variable $featureData
+
+  at database/seeders/ImportJsonSeeder.php:251
+    247▕                     'updated_at' => now(),
+    248▕                 ];
+    249▕ 
+    250▕                 // Insert immediately to avoid packet size limits with large geometries
+  ➜ 251▕                 DB::table('imported_json_features')->insert($featureData);
+    252▕             }
+    253▕ 
+    254▕             if (!empty($featuresToInsert)) {
+    255▕                 DB::table('imported_json_features')->insert($featuresToInsert);
+
+  1   database/seeders/ImportJsonSeeder.php:251
+      Illuminate\Foundation\Bootstrap\HandleExceptions::{closure:Illuminate\Foundation\Bootstrap\HandleExceptions::forwardsTo():254}()
+      [2m+22 vendor frames [22m
+
+  24  artisan:35
+      Illuminate\Foundation\Console\Kernel::handle()
+

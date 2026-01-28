@@ -1,0 +1,7 @@
+
+   INFO  Seeding database.  
+
+Membaca file Excel...
+Data lama dihapus.
+Inserted 100 rows...
+✓ Selesai! Total 133 data berhasil di-seed.

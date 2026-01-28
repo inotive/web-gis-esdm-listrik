@@ -67,6 +67,7 @@ class UserSeeder extends Seeder
                     'email' => $value['email'],
                     'password' => bcrypt('123123'),
                     'is_verified' => $value['is_verified'],
+                    'email_verified_at' => now(),
                 ]);
 
                 $user->syncRoles([$value['role']]);
