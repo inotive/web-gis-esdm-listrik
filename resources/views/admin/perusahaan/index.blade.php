@@ -624,8 +624,32 @@
                         placeholder="Cari Nama / Kota / Kab..." autocomplete="off" id="globalSearch">
                 </div>
 
+                {{-- Filter Berdasarkan --}}
+                <div class="input-group w-filter has-select">
+                    <select class="form-select auto-submit" name="regency_id" id="filterRegency">
+                        <option value="">Semua Kabupaten/Kota</option>
+                        @foreach ($regencies as $rg)
+                            <option value="{{ $rg->id }}" @selected(request('regency_id') == $rg->id)>{{ $rg->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                {{-- Filter Kecamatan --}}
+                <div class="input-group w-filter has-select" id="filterDistrictWrapper"
+                    style="{{ request('regency_id') ? '' : 'display: none;' }}">
+                    <select class="form-select auto-submit" name="district_id" id="filterDistrict">
+                        <option value="">Semua Kecamatan</option>
+                        @foreach ($districts as $dc)
+                            <option value="{{ $dc->id }}" @selected(request('district_id') == $dc->id)>{{ $dc->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
                 {{-- Clear Search Button --}}
                 @if (request('q') ||
+                        request('regency_id') ||
+                        request('district_id') ||
                         request('filter_nama') ||
                         request('filter_alamat') ||
                         request('filter_kontak') ||
@@ -658,43 +682,7 @@
                             <th class="col-aksi">Aksi</th>
                         </tr>
                         {{-- Filter Row --}}
-                        <tr class="filter-row">
-                            <th class="col-no"></th>
-                            <th>
-                                <input type="text" class="filter-input filter-backend" name="filter_nama"
-                                    value="{{ request('filter_nama') }}" placeholder="Filter nama..." data-column="nama">
-                            </th>
-                            <th></th>
-                            <th>
-                                <input type="text" class="filter-input filter-backend" name="filter_alamat"
-                                    value="{{ request('filter_alamat') }}" placeholder="Filter alamat..."
-                                    data-column="alamat">
-                            </th>
-                            <th>
-                                <input type="text" class="filter-input filter-backend" name="filter_kontak"
-                                    value="{{ request('filter_kontak') }}" placeholder="Filter kontak..."
-                                    data-column="kontak">
-                            </th>
-                            <th>
-                                <input type="text" class="filter-input filter-backend" name="filter_desa"
-                                    value="{{ request('filter_desa') }}" placeholder="Filter desa..." data-column="desa">
-                            </th>
-                            <th>
-                                <input type="text" class="filter-input filter-backend" name="filter_kecamatan"
-                                    value="{{ request('filter_kecamatan') }}" placeholder="Filter kecamatan..."
-                                    data-column="kecamatan">
-                            </th>
-                            <th>
-                                <input type="text" class="filter-input filter-backend" name="filter_kabupaten"
-                                    value="{{ request('filter_kabupaten') }}" placeholder="Filter kabupaten..."
-                                    data-column="kabupaten">
-                            </th>
-                            <th>
-                                <input type="date" class="filter-input filter-backend" name="filter_tanggal"
-                                    value="{{ request('filter_tanggal') }}" data-column="tanggal">
-                            </th>
-                            <th class="col-aksi"></th>
-                        </tr>
+
                     </thead>
                     <tbody>
                         @forelse ($perusahaans as $i => $perusahaan)
@@ -793,6 +781,8 @@
                         <span>Show</span>
                         <form id="perPageForm" method="GET" action="#">
                             <input type="hidden" name="q" value="{{ request('q') }}">
+                            <input type="hidden" name="regency_id" value="{{ request('regency_id') }}">
+                            <input type="hidden" name="district_id" value="{{ request('district_id') }}">
                             <input type="hidden" name="filter_nama" value="{{ request('filter_nama') }}">
                             <input type="hidden" name="filter_alamat" value="{{ request('filter_alamat') }}">
                             <input type="hidden" name="filter_kontak" value="{{ request('filter_kontak') }}">

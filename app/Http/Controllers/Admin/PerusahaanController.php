@@ -22,6 +22,8 @@ class PerusahaanController extends Controller
     {
         $perPage = (int) $request->get('per_page', 10);
         $q = $request->get('q'); // Global search
+        $regencyId = $request->get('regency_id');
+        $districtId = $request->get('district_id');
 
         // Per-column filters
         $filterNama = $request->get('filter_nama');
@@ -95,13 +97,46 @@ class PerusahaanController extends Controller
             $query->whereDate('created_at', $filterTanggal);
         }
 
+        // Filter by regency
+        // Filter by regency
+        if ($regencyId) {
+            $query->where(function ($q) use ($regencyId) {
+                // Check relationship
+                $q->whereHas('village.district', function ($subQ) use ($regencyId) {
+                    $subQ->where('regency_id', $regencyId);
+                });
+
+                // OR check string column if regency name matches
+                $regency = RegRegency::find($regencyId);
+                if ($regency) {
+                    $q->orWhere('kabupaten_kota', 'like', '%' . $regency->name . '%');
+                }
+            });
+        }
+
+        // Filter by district
+        if ($districtId) {
+            $query->whereHas('village', function ($q) use ($districtId) {
+                $q->where('district_id', $districtId);
+            });
+        }
+
         $perusahaans = $query->orderBy('created_at', 'desc')
             ->paginate($perPage)
             ->withQueryString();
 
+
+        // Untuk filter dropdown
+        $regencies = RegRegency::orderBy('name')->get(['id', 'name']);
+        $districts = $regencyId
+            ? RegDistrict::where('regency_id', $regencyId)->orderBy('name')->get(['id', 'name'])
+            : collect([]);
+
         return view('admin.perusahaan.index', [
             'title' => "Manajemen Data Perusahaan",
             'perusahaans' => $perusahaans,
+            'regencies' => $regencies,
+            'districts' => $districts,
         ]);
     }
 

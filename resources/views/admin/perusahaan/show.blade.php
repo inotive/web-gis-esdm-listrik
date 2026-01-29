@@ -460,12 +460,12 @@
             <div class="page-meta">Detail Perusahaan</div>
             <div class="page-title">{{ $perusahaan->nama }}</div>
         </div>
-        <div class="page-actions">
+        {{-- <div class="page-actions">
             <a href="{{ route('admin.perusahaan.edit', $perusahaan) }}" class="btn btn-primary">
                 <i class="ri-edit-line"></i>
                 Edit Perusahaan
             </a>
-        </div>
+        </div> --}}
     </div>
 
     <!-- Summary Stats -->
