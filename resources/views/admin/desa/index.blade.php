@@ -781,6 +781,9 @@
                             <span>Show</span>
                             <form id="perPageForm" method="GET" action="#">
                                 <input type="hidden" name="q" value="{{ request('q') }}">
+                                <input type="hidden" name="regency_id" value="{{ request('regency_id') }}">
+                                <input type="hidden" name="district_id" value="{{ request('district_id') }}">
+                                <input type="hidden" name="status" value="{{ request('status') }}">
                                 <input type="hidden" name="by" value="{{ request('by') }}">
                                 <input type="hidden" name="val" value="{{ request('val') }}">
                                 <select class="form-select" name="per_page" aria-label="Jumlah baris per halaman">
