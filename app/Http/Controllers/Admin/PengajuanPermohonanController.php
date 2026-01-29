@@ -145,6 +145,8 @@ class PengajuanPermohonanController extends Controller
             'keterangan' => 'nullable|string',
         ]);
 
+        // dd($validated);
+
 
         \Log::info('Store Permohonan - Validated Data:', $validated);
 
@@ -188,7 +190,27 @@ class PengajuanPermohonanController extends Controller
         // Process checkbox answers (convert array values to integers)
         foreach ($jawaban as $key => $value) {
             if (is_array($value)) {
-                $jawaban[$key] = array_map('intval', $value);
+                // Check if array contains UploadedFile objects
+                $hasFile = false;
+                foreach ($value as $item) {
+                    if ($item instanceof \Illuminate\Http\UploadedFile) {
+                        $hasFile = true;
+                        break;
+                    }
+                }
+
+                if ($hasFile) {
+                    //upload file
+                    foreach ($value as $item) {
+                        $files = $item;
+                        if ($files->isValid()) {
+                            $storedFiles[] = $this->storeFile($files, 'permohonan-jawaban');
+                        }
+                        $jawaban[$key] = $storedFiles;
+                    }
+                }
+
+                // $jawaban[$key] = array_map('intval', $value);
             } elseif (is_numeric($value)) {
                 $jawaban[$key] = (int) $value;
             }
