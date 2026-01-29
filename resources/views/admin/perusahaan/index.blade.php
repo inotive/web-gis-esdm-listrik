@@ -648,6 +648,7 @@
                         <tr>
                             <th class="col-no">No</th>
                             <th>Nama Perusahaan</th>
+                            <th>Nama Pimpinan</th>
                             <th>Alamat</th>
                             <th>Kontak</th>
                             <th>Desa/Kelurahan</th>
@@ -663,6 +664,7 @@
                                 <input type="text" class="filter-input filter-backend" name="filter_nama"
                                     value="{{ request('filter_nama') }}" placeholder="Filter nama..." data-column="nama">
                             </th>
+                            <th></th>
                             <th>
                                 <input type="text" class="filter-input filter-backend" name="filter_alamat"
                                     value="{{ request('filter_alamat') }}" placeholder="Filter alamat..."
@@ -699,6 +701,13 @@
                             <tr class="clickable-row" data-href="{{ route('admin.perusahaan.show', $perusahaan) }}">
                                 <td class="col-no">{{ $perusahaans->firstItem() + $i }}</td>
                                 <td><strong>{{ $perusahaan->nama }}</strong></td>
+                                <td>
+                                    @if ($perusahaan->nama_pimpinan)
+                                        {{ $perusahaan->nama_pimpinan }}
+                                    @else
+                                        <span class="badge-empty">Belum ada</span>
+                                    @endif
+                                </td>
                                 <td>
                                     @if ($perusahaan->alamat)
                                         {{ $perusahaan->alamat }}
@@ -750,6 +759,7 @@
                                     </a>
                                     <button type="button" class="btn-ico edit btn-edit-perusahaan"
                                         data-id="{{ $perusahaan->id }}" data-nama="{{ $perusahaan->nama }}"
+                                        data-nama-pimpinan="{{ $perusahaan->nama_pimpinan ?? '' }}"
                                         data-alamat="{{ $perusahaan->alamat ?? '' }}"
                                         data-kontak="{{ $perusahaan->kontak ?? '' }}"
                                         data-kabupaten-kota="{{ $perusahaan->kabupaten_kota ?? '' }}"

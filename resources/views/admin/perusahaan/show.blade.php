@@ -519,6 +519,10 @@
 
         <div class="detail-grid">
             <div class="detail-item">
+                <div class="detail-item-label">Nama Pimpinan</div>
+                <div class="detail-item-value">{{ $perusahaan->nama_pimpinan ?? '-' }}</div>
+            </div>
+            <div class="detail-item">
                 <div class="detail-item-label">Alamat</div>
                 <div class="detail-item-value">{{ $perusahaan->alamat ?? '-' }}</div>
             </div>
@@ -537,7 +541,7 @@
             <div class="detail-item">
                 <div class="detail-item-label">Kabupaten/Kota</div>
                 <div class="detail-item-value">
-                    {{ $perusahaan->kabupaten_kota ?? $perusahaan->village->district->regency->name ?? '-' }}</div>
+                    {{ $perusahaan->kabupaten_kota ?? ($perusahaan->village->district->regency->name ?? '-') }}</div>
             </div>
             <div class="detail-item">
                 <div class="detail-item-label">Tanggal Terdaftar</div>
@@ -574,7 +578,7 @@
         </div>
 
         <div class="table-container">
-            @if(count($perizinanData) > 0)
+            @if (count($perizinanData) > 0)
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -589,7 +593,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($perizinanData as $index => $izin)
+                        @foreach ($perizinanData as $index => $izin)
                             <tr>
                                 <td class="col-no">{{ $index + 1 }}</td>
                                 <td class="no-izin">{{ $izin['no_izin'] }}</td>
@@ -603,7 +607,8 @@
                                     {{ $izin['tanggal_akhir'] ? \Carbon\Carbon::parse($izin['tanggal_akhir'])->translatedFormat('d M Y') : '-' }}
                                 </td>
                                 <td>{{ $izin['lokasi'] ?? '-' }}</td>
-                                <td>{{ $izin['kapasitas'] ? number_format($izin['kapasitas'], 2, ',', '.') . ' kVA' : '-' }}</td>
+                                <td>{{ $izin['kapasitas'] ? number_format($izin['kapasitas'], 2, ',', '.') . ' kVA' : '-' }}
+                                </td>
                                 <td>
                                     @php
                                         $statusClass = 'status-expired';
@@ -639,7 +644,7 @@
         </div>
 
         <div class="table-container">
-            @if(count($permohonanData) > 0)
+            @if (count($permohonanData) > 0)
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -653,7 +658,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($permohonanData as $index => $permohonan)
+                        @foreach ($permohonanData as $index => $permohonan)
                             <tr>
                                 <td class="col-no">{{ $index + 1 }}</td>
                                 <td class="nama-bold">{{ $permohonan['jenis_permohonan'] }}</td>
@@ -665,9 +670,17 @@
                                     @php
                                         $statusClass = 'status-pending';
                                         $statusText = ucfirst($permohonan['status']);
-                                        if (in_array(strtolower($permohonan['status']), ['approved', 'disetujui', 'selesai'])) {
+                                        if (
+                                            in_array(strtolower($permohonan['status']), [
+                                                'approved',
+                                                'disetujui',
+                                                'selesai',
+                                            ])
+                                        ) {
                                             $statusClass = 'status-approved';
-                                        } elseif (in_array(strtolower($permohonan['status']), ['rejected', 'ditolak'])) {
+                                        } elseif (
+                                            in_array(strtolower($permohonan['status']), ['rejected', 'ditolak'])
+                                        ) {
                                             $statusClass = 'status-rejected';
                                         }
                                     @endphp
@@ -677,10 +690,11 @@
                                 </td>
                                 <td class="keterangan">{{ $permohonan['keterangan'] ?? '-' }}</td>
                                 <td>
-                                    @if(count($permohonan['documents']) > 0)
-                                        @foreach($permohonan['documents'] as $doc)
-                                            @if($doc->dokumen)
-                                                <a href="{{ asset('storage/' . $doc->dokumen->path) }}" target="_blank" class="doc-link">
+                                    @if (count($permohonan['documents']) > 0)
+                                        @foreach ($permohonan['documents'] as $doc)
+                                            @if ($doc->dokumen)
+                                                <a href="{{ asset('storage/' . $doc->dokumen->path) }}" target="_blank"
+                                                    class="doc-link">
                                                     <i class="ri-file-line"></i>
                                                     {{ Str::limit($doc->nama ?? $doc->dokumen->nama, 20) }}
                                                 </a>
@@ -712,7 +726,7 @@
         </div>
 
         <div class="table-container">
-            @if(count($dokumenData) > 0)
+            @if (count($dokumenData) > 0)
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -726,12 +740,12 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($dokumenData as $index => $doc)
+                        @foreach ($dokumenData as $index => $doc)
                             <tr>
                                 <td class="col-no">{{ $index + 1 }}</td>
                                 <td>
                                     <div style="display: flex; align-items: center; gap: 8px;">
-                                        @if(isset($doc['tipe']) && $doc['tipe'] === 'folder')
+                                        @if (isset($doc['tipe']) && $doc['tipe'] === 'folder')
                                             <i class="ri-folder-fill" style="color: #F59E0B; font-size: 18px;"></i>
                                         @else
                                             <i class="ri-file-text-fill" style="color: #22C55E; font-size: 18px;"></i>
@@ -740,8 +754,9 @@
                                     </div>
                                 </td>
                                 <td>
-                                    @if(isset($doc['tipe']))
-                                        <span class="status-badge {{ $doc['tipe'] === 'folder' ? 'status-warning' : 'status-aktif' }}">
+                                    @if (isset($doc['tipe']))
+                                        <span
+                                            class="status-badge {{ $doc['tipe'] === 'folder' ? 'status-warning' : 'status-aktif' }}">
                                             {{ ucfirst($doc['tipe']) }}
                                         </span>
                                     @else
@@ -753,7 +768,7 @@
                                         $source = $doc['source'] ?? 'unknown';
                                         $sourceBadgeClass = 'status-aktif';
                                         $sourceLabel = $doc['perizinan_nama'] ?? 'Dokumen';
-                                        
+
                                         if ($source === 'dokumen_db') {
                                             $sourceBadgeClass = 'status-database';
                                             $sourceLabel = 'Database Dokumen';
@@ -772,14 +787,16 @@
                                     {{ $doc['tanggal_terbit'] ? \Carbon\Carbon::parse($doc['tanggal_terbit'])->translatedFormat('d M Y') : '-' }}
                                 </td>
                                 <td>
-                                    @if(isset($doc['source']) && $doc['source'] === 'dokumen_db')
-                                        @if(isset($doc['tipe']) && $doc['tipe'] === 'folder')
-                                            <a href="{{ route('admin.dokumen.index', ['folder' => $doc['id']]) }}" class="doc-link">
+                                    @if (isset($doc['source']) && $doc['source'] === 'dokumen_db')
+                                        @if (isset($doc['tipe']) && $doc['tipe'] === 'folder')
+                                            <a href="{{ route('admin.dokumen.index', ['folder' => $doc['id']]) }}"
+                                                class="doc-link">
                                                 <i class="ri-folder-open-line"></i>
                                                 Buka
                                             </a>
                                         @elseif(isset($doc['path']) && $doc['path'])
-                                            <a href="{{ asset('storage/' . $doc['path']) }}" target="_blank" class="doc-link">
+                                            <a href="{{ asset('storage/' . $doc['path']) }}" target="_blank"
+                                                class="doc-link">
                                                 <i class="ri-eye-line"></i>
                                                 Lihat
                                             </a>
@@ -787,7 +804,8 @@
                                             <span class="text-muted">-</span>
                                         @endif
                                     @elseif($doc['dokumen'] && $doc['dokumen']->path)
-                                        <a href="{{ asset('storage/' . $doc['dokumen']->path) }}" target="_blank" class="doc-link">
+                                        <a href="{{ asset('storage/' . $doc['dokumen']->path) }}" target="_blank"
+                                            class="doc-link">
                                             <i class="ri-eye-line"></i>
                                             Lihat
                                         </a>
@@ -811,13 +829,13 @@
 
 @push('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             // Tab switching functionality
             const tabButtons = document.querySelectorAll('.tab-btn');
             const tabContents = document.querySelectorAll('.tab-content');
 
             tabButtons.forEach(button => {
-                button.addEventListener('click', function () {
+                button.addEventListener('click', function() {
                     const tabId = this.dataset.tab;
 
                     // Remove active class from all buttons and contents

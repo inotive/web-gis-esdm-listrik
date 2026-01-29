@@ -95,7 +95,7 @@ class PerusahaanController extends Controller
             $query->whereDate('created_at', $filterTanggal);
         }
 
-        $perusahaans = $query->orderBy('nama', 'asc')
+        $perusahaans = $query->orderBy('created_at', 'desc')
             ->paginate($perPage)
             ->withQueryString();
 
@@ -386,12 +386,14 @@ class PerusahaanController extends Controller
         return $request->validate([
             'village_id' => ['nullable', 'exists:reg_villages,id'],
             'nama' => ['required', 'string', 'max:255'],
+            'nama_pimpinan' => ['nullable', 'string', 'max:255'],
             'alamat' => ['nullable', 'string'],
             'kontak' => ['nullable', 'string', 'max:255'],
             'kabupaten_kota' => ['nullable', 'string', 'max:255'],
         ], [], [
             'village_id' => 'Desa',
             'nama' => 'Nama Perusahaan',
+            'nama_pimpinan' => 'Nama Pimpinan',
             'alamat' => 'Alamat',
             'kontak' => 'Kontak',
             'kabupaten_kota' => 'Kabupaten/Kota',
