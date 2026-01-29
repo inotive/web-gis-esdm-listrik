@@ -7,6 +7,7 @@ use App\Models\RegVillage;
 use App\Models\RegDistrict;
 use App\Models\RegRegency;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\ValidationException;
 
 class DesaController extends Controller
@@ -73,12 +74,13 @@ class DesaController extends Controller
                 if (!empty($props['Desa'])) $matchingNames[] = $props['Desa'];
             }
 
-            if (!empty($matchingNames)) {
-                $query->whereIn('name', array_unique($matchingNames));
-            } else {
-                // If filter exists but no matches found, return empty result
-                $query->whereRaw('1 = 0');
-            }
+            // Filter by (Found in JSON Feature) OR (Found in Local Column)
+            $query->where(function ($q) use ($matchingNames, $filterStatus) {
+                if (!empty($matchingNames)) {
+                    $q->whereIn('name', array_unique($matchingNames));
+                }
+                $q->orWhere('status_berlistrik', 'like', '%' . $filterStatus . '%');
+            });
         }
 
         // Toolbar Filter: Status Listrik
@@ -92,7 +94,6 @@ class DesaController extends Controller
                     if ($statusToolbar === 'Belum Terlayani Listrik') {
                         return str_contains($s, 'BELUM') || str_contains($s, 'TIDAK');
                     } elseif ($statusToolbar === 'Terlayani Listrik') {
-                        // Must NOT be Belum/Tidak, and MUST be Terlayani/Berlistrik
                         $isDanger = str_contains($s, 'BELUM') || str_contains($s, 'TIDAK');
                         if ($isDanger) return false;
                         return str_contains($s, 'TERLAYANI') || str_contains($s, 'BERLISTRIK');
@@ -107,14 +108,25 @@ class DesaController extends Controller
                 if (!empty($props['Desa'])) $matchingNames[] = $props['Desa'];
             }
 
-            if (!empty($matchingNames)) {
-                $query->whereIn('name', array_unique($matchingNames));
-            } else {
-                $query->whereRaw('1 = 0');
-            }
+            // Filter by (Found in JSON Feature) OR (Found in Local Column)
+            $query->where(function ($q) use ($matchingNames, $statusToolbar) {
+                if (!empty($matchingNames)) {
+                    $q->whereIn('name', array_unique($matchingNames));
+                }
+                // Logic for local column matching the toolbar selection
+                if ($statusToolbar === 'Belum Terlayani Listrik') {
+                    $q->orWhere('status_berlistrik', 'like', '%Belum%')
+                        ->orWhere('status_berlistrik', 'like', '%Tidak%');
+                } elseif ($statusToolbar === 'Terlayani Listrik') {
+                    $q->orWhere('status_berlistrik', 'like', '%Terlayani%')
+                        ->orWhere('status_berlistrik', 'like', '%Berlistrik%');
+                } else {
+                    $q->orWhere('status_berlistrik', $statusToolbar);
+                }
+            });
         }
 
-        $desas = $query->orderBy('name', 'asc')
+        $desas = $query->orderBy('created_at', 'desc')
             ->paginate($perPage)
             ->withQueryString();
 
@@ -167,6 +179,7 @@ class DesaController extends Controller
     {
         $data = $this->validatedData($request);
 
+
         // Cek bahwa district_id valid
         $district = RegDistrict::find($data['district_id']);
         if (!$district) {
@@ -177,6 +190,14 @@ class DesaController extends Controller
 
         // Generate ID: district_id (6 digit) + nomor urut (4 digit)
         $data['id'] = $this->generateVillageId($data['district_id']);
+
+        // Add status_berlistrik if present (User Request: "ketika tambah data tambahkan status berlistrik untuk tabel desa saja")
+        if ($request->has('status_berlistrik')) {
+            $data['status_berlistrik'] = $request->input('status_berlistrik');
+        }
+
+        $generateId = $this->generateVillageId($data['district_id']);
+        $data['id'] = $generateId;
 
         RegVillage::create($data);
 
@@ -209,24 +230,21 @@ class DesaController extends Controller
             ]);
         }
 
-        // Update Desa
-        $desa->update($data);
-
-        // Update ImportedJsonFeature properties
-        // We look for the feature associated with THIS desa (using its previous name or current name if we assume 1-1 link)
-        // Since we just updated the name in $desa, we should check if there was a linked feature.
-        // It's ambiguous if the name changed, so we rely on the fact that usually features are matched by name.
-        // But if name changed, we might lose the link unless we find it by old name.
-        // For now, let's assume we find by the *old* name (available if we hadn't updated yet, but we just did).
-        // Actually, $desa was loaded before update. But 'update' changes the instance attributes in memory too.
-        // However, we can use `getOriginal('name')` to be safe if needed, but since we already updated:
-
+        // Capture previous name for syncing
         $originalName = $desa->getOriginal('name');
         $newName = $data['name'];
         $statusBerlistrik = $request->input('status_berlistrik');
 
+        // Update Desa (User Request: "ketika update update ke tabel desa")
         if ($statusBerlistrik) {
-            // Find feature by old name to preserve link if name changed
+            $data['status_berlistrik'] = $statusBerlistrik;
+        }
+
+        $desa->update($data);
+
+        // Update ImportedJsonFeature properties (User Request: "ketika data ada di tabel ImportedJsonFeature maka update juga d situ")
+        // NOTE: only update if exists. Do NOT create if missing.
+        if ($statusBerlistrik) {
             $feature = \App\Models\ImportedJsonFeature::where('sub_kategori', 'Status Desa Berlistrik')
                 ->where(function ($q) use ($originalName, $newName) {
                     $q->where('properties->Nama_Desa', $originalName)
@@ -250,7 +268,7 @@ class DesaController extends Controller
                     $props['Desa'] = $newName;
                 }
 
-                // Ensure Kecamatan/Kabupaten is synced
+                // Update Region info
                 if ($desa->district) {
                     $props['Kecamatan'] = $desa->district->name;
                     if ($desa->district->regency) {
@@ -260,30 +278,12 @@ class DesaController extends Controller
 
                 $feature->properties = $props;
                 $feature->save();
-            } else {
-                // Feature not found, create new one to store status
-                $sample = \App\Models\ImportedJsonFeature::where('sub_kategori', 'Status Desa Berlistrik')->first();
-                $kategori = $sample ? $sample->kategori : 'status-desa-berlistrik'; // Fallback
-
-                $props = [
-                    'Nama_Desa' => $newName,
-                    'Desa' => $newName,
-                    'StatusDesa' => $statusBerlistrik,
-                    'Kecamatan' => $desa->district->name ?? '',
-                    'Kab_Kota' => $desa->district->regency->name ?? '',
-                    'Provinsi' => 'KALIMANTAN TIMUR',
-                ];
-
-                \App\Models\ImportedJsonFeature::create([
-                    'kategori' => $kategori,
-                    'sub_kategori' => 'Status Desa Berlistrik',
-                    'regency_id' => $desa->district->regency_id ?? null,
-                    'properties' => $props
-                ]);
             }
         }
 
-        return redirect()->route('admin.desa.index')->with('success', 'Data desa dan status berlistrik berhasil diperbarui.');
+        Cache::flush();
+
+        return redirect()->route('admin.desa.index')->with('success', 'Data desa berhasil diperbarui.');
     }
 
     // DESTROY
@@ -299,9 +299,11 @@ class DesaController extends Controller
         return $request->validate([
             'district_id' => ['required', 'exists:reg_districts,id'],
             'name'        => ['required', 'string', 'max:255'],
+            'status_berlistrik' => ['required', 'string', 'max:255'],
         ], [], [
             'district_id' => 'Kecamatan',
             'name'        => 'Nama Desa',
+            'status_berlistrik' => 'Status Berlistrik',
         ]);
     }
 

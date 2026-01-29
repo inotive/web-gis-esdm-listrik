@@ -725,18 +725,15 @@
                                 <td>{{ $desa->district->regency->name ?? '-' }}</td>
                                 <td>
                                     @php
-                                        // $desa->name might differ slightly in casing or trim, but usually matches if database is consistent.
-                                        // We use the direct name match as keys were set by name.
+                                        // Priority 1: From ImportedJsonFeature map
+                                        // Priority 2: From local table (status_berlistrik)
+                                        // dd($desa->status_berlistrik);
                                         $statusProps = $statusMap[$desa->name] ?? null;
+                                        $status = $statusProps['StatusDesa'] ?? ($desa->status_berlistrik ?? '');
+                                        $statusUpper = strtoupper($status);
                                     @endphp
 
-                                    @if ($statusProps)
-                                        @php
-                                            // Check 'StatusDesa' field
-                                            $status = $statusProps['StatusDesa'] ?? '';
-                                            $statusUpper = strtoupper($status);
-                                        @endphp
-
+                                    @if ($status)
                                         @if (str_contains($statusUpper, 'BELUM') || str_contains($statusUpper, 'TIDAK'))
                                             <span class="badge-status badge-status-danger">{{ $status }}</span>
                                         @elseif(str_contains($statusUpper, 'TERLAYANI') || str_contains($statusUpper, 'BERLISTRIK'))
@@ -752,8 +749,8 @@
                                     <button type="button" class="btn-ico edit btn-edit-desa" data-id="{{ $desa->id }}"
                                         data-name="{{ $desa->name }}"
                                         data-regency-id="{{ $desa->district->regency_id ?? '' }}"
-                                        data-district-id="{{ $desa->district_id }}"
-                                        data-status="{{ $statusProps['StatusDesa'] ?? '' }}" title="Edit">
+                                        data-district-id="{{ $desa->district_id }}" data-status="{{ $status }}"
+                                        title="Edit">
                                         <i class="fa-solid fa-pen-to-square"></i>
                                     </button>
                                     <form action="{{ route('admin.desa.destroy', $desa) }}" method="POST"
