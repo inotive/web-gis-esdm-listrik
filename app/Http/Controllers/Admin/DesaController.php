@@ -65,18 +65,51 @@ class DesaController extends Controller
             $matchingFeatures = \App\Models\ImportedJsonFeature::where('sub_kategori', 'Status Desa Berlistrik')
                 ->where('properties->StatusDesa', 'like', '%' . $filterStatus . '%')
                 ->get();
-            
+
             $matchingNames = [];
             foreach ($matchingFeatures as $feature) {
                 $props = $feature->properties;
                 if (!empty($props['Nama_Desa'])) $matchingNames[] = $props['Nama_Desa'];
                 if (!empty($props['Desa'])) $matchingNames[] = $props['Desa'];
             }
-            
+
             if (!empty($matchingNames)) {
                 $query->whereIn('name', array_unique($matchingNames));
             } else {
                 // If filter exists but no matches found, return empty result
+                $query->whereRaw('1 = 0');
+            }
+        }
+
+        // Toolbar Filter: Status Listrik
+        $statusToolbar = $request->get('status');
+        if ($statusToolbar) {
+            $matchingFeatures = \App\Models\ImportedJsonFeature::where('sub_kategori', 'Status Desa Berlistrik')
+                ->get()
+                ->filter(function ($feature) use ($statusToolbar) {
+                    $s = strtoupper($feature->properties['StatusDesa'] ?? '');
+
+                    if ($statusToolbar === 'Belum Terlayani Listrik') {
+                        return str_contains($s, 'BELUM') || str_contains($s, 'TIDAK');
+                    } elseif ($statusToolbar === 'Terlayani Listrik') {
+                        // Must NOT be Belum/Tidak, and MUST be Terlayani/Berlistrik
+                        $isDanger = str_contains($s, 'BELUM') || str_contains($s, 'TIDAK');
+                        if ($isDanger) return false;
+                        return str_contains($s, 'TERLAYANI') || str_contains($s, 'BERLISTRIK');
+                    }
+                    return false;
+                });
+
+            $matchingNames = [];
+            foreach ($matchingFeatures as $feature) {
+                $props = $feature->properties;
+                if (!empty($props['Nama_Desa'])) $matchingNames[] = $props['Nama_Desa'];
+                if (!empty($props['Desa'])) $matchingNames[] = $props['Desa'];
+            }
+
+            if (!empty($matchingNames)) {
+                $query->whereIn('name', array_unique($matchingNames));
+            } else {
                 $query->whereRaw('1 = 0');
             }
         }
@@ -216,7 +249,7 @@ class DesaController extends Controller
                 if (isset($props['Desa'])) {
                     $props['Desa'] = $newName;
                 }
-                
+
                 // Ensure Kecamatan/Kabupaten is synced
                 if ($desa->district) {
                     $props['Kecamatan'] = $desa->district->name;
@@ -231,7 +264,7 @@ class DesaController extends Controller
                 // Feature not found, create new one to store status
                 $sample = \App\Models\ImportedJsonFeature::where('sub_kategori', 'Status Desa Berlistrik')->first();
                 $kategori = $sample ? $sample->kategori : 'status-desa-berlistrik'; // Fallback
-                
+
                 $props = [
                     'Nama_Desa' => $newName,
                     'Desa' => $newName,

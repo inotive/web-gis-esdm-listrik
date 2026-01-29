@@ -290,7 +290,7 @@
         }
 
         /* Badge Styles for Status Berlistrik */
-        .badge {
+        .badge-status {
             display: inline-block;
             padding: 4px 12px;
             font-size: 11px;
@@ -301,22 +301,27 @@
             white-space: nowrap;
         }
 
-        .badge-success {
+        .badge-status-success {
             background-color: #D1FAE5;
             color: #065F46;
         }
 
-        .badge-info {
+        .badge-status-info {
             background-color: #DBEAFE;
             color: #1E40AF;
         }
 
-        .badge-warning {
+        .badge-status-warning {
             background-color: #FEF3C7;
             color: #92400E;
         }
 
-        .badge-secondary {
+        .badge-status-danger {
+            background-color: #FEE2E2;
+            color: #EF4444;
+        }
+
+        .badge-status-secondary {
             background-color: #F3F4F6;
             color: #6B7280;
         }
@@ -670,6 +675,31 @@
                         </select>
                     </div>
                 @endif
+
+                {{-- Filter Status Listrik --}}
+                <div class="input-group w-filter has-select">
+                    <select class="form-select" name="status" id="filterStatus">
+                        <option value="">Semua Status</option>
+                        <option value="Terlayani Listrik" @selected(request('status') == 'Terlayani Listrik')>Terlayani Listrik</option>
+                        <option value="Belum Terlayani Listrik" @selected(request('status') == 'Belum Terlayani Listrik')>Belum Terlayani Listrik
+                        </option>
+                    </select>
+                </div>
+
+                {{-- Clear Search Button --}}
+                @if (request('q') ||
+                        request('regency_id') ||
+                        request('district_id') ||
+                        request('status') ||
+                        request('filter_desa_nama') ||
+                        request('filter_desa_kecamatan') ||
+                        request('filter_desa_kabupaten') ||
+                        request('filter_desa_status'))
+                    <a href="{{ route('admin.desa.index') }}" class="btn-ghost">
+                        <i class="ri-close-circle-line"></i>
+                        Clear
+                    </a>
+                @endif
             </form>
         </div>
 
@@ -682,23 +712,8 @@
                             <th>Nama Desa</th>
                             <th>Kecamatan</th>
                             <th>Kabupaten/Kota</th>
-                            <th>Status Berlistrik</th>
+                            <th>Status Listrik</th>
                             <th class="col-aksi">Aksi</th>
-                        </tr>
-                        {{-- Filter Row --}}
-                        <tr class="filter-row">
-                            <th class="col-no"></th>
-                            <th><input type="text" class="filter-input-server" name="filter_desa_nama"
-                                    value="{{ request('filter_desa_nama') }}" placeholder="Filter nama desa..."></th>
-                            <th><input type="text" class="filter-input-server" name="filter_desa_kecamatan"
-                                    value="{{ request('filter_desa_kecamatan') }}" placeholder="Filter kecamatan...">
-                            </th>
-                            <th><input type="text" class="filter-input-server" name="filter_desa_kabupaten"
-                                    value="{{ request('filter_desa_kabupaten') }}" placeholder="Filter kabupaten...">
-                            </th>
-                            <th><input type="text" class="filter-input-server" name="filter_desa_status"
-                                    value="{{ request('filter_desa_status') }}" placeholder="Filter status..."></th>
-                            <th class="col-aksi"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -722,20 +737,15 @@
                                             $statusUpper = strtoupper($status);
                                         @endphp
 
-                                        @if (str_contains($statusUpper, 'PLN') && !str_contains($statusUpper, 'NON'))
-                                            <span class="badge badge-success">{{ $status }}</span>
-                                        @elseif(str_contains($statusUpper, 'NON-PLN') || str_contains($statusUpper, 'NON PLN'))
-                                            <span class="badge badge-warning" style="background-color: #FEF3C7; color: #92400E;">{{ $status }}</span>
-                                        @elseif(str_contains($statusUpper, 'BELUM') || str_contains($statusUpper, 'TIDAK'))
-                                            <span class="badge badge-danger"
-                                                style="background-color: #FEE2E2; color: #EF4444;">{{ $status }}</span>
+                                        @if (str_contains($statusUpper, 'BELUM') || str_contains($statusUpper, 'TIDAK'))
+                                            <span class="badge-status badge-status-danger">{{ $status }}</span>
                                         @elseif(str_contains($statusUpper, 'TERLAYANI') || str_contains($statusUpper, 'BERLISTRIK'))
-                                            <span class="badge badge-success">{{ $status }}</span>
+                                            <span class="badge-status badge-status-success">{{ $status }}</span>
                                         @else
-                                            <span class="badge badge-info">{{ $status }}</span>
+                                            <span class="badge-status badge-status-info">{{ $status }}</span>
                                         @endif
                                     @else
-                                        <span class="badge badge-secondary">Tidak Ada Data</span>
+                                        <span class="badge-status badge-status-secondary">Tidak Ada Data</span>
                                     @endif
                                 </td>
                                 <td class="col-aksi">
@@ -930,6 +940,22 @@
                         });
                     }
 
+                    // Filter Status
+                    if ($('#filterStatus').length && !$('#filterStatus').hasClass(
+                            'select2-hidden-accessible')) {
+                        $('#filterStatus').select2({
+                            placeholder: 'Semua Status',
+                            allowClear: true,
+                            width: '100%',
+                            minimumResultsForSearch: Infinity,
+                            language: {
+                                noResults: function() {
+                                    return "Tidak ada hasil";
+                                }
+                            }
+                        });
+                    }
+
                     // Per Page Selector
                     if ($('select[name="per_page"]').length && !$('select[name="per_page"]').hasClass(
                             'select2-hidden-accessible')) {
@@ -1014,7 +1040,7 @@
 
                 // ========== Auto submit on Select2 change ==========
                 // Handle auto-submit for filter form
-                $('#filterRegency, #filterDistrict').on('change', function() {
+                $('#filterRegency, #filterDistrict, #filterStatus').on('change', function() {
                     // Small delay to ensure Select2 value is set
                     setTimeout(() => {
                         const form = document.getElementById('filterForm');
@@ -1112,37 +1138,68 @@
     </style>
 
     <script>
-        // ========== Server-Side Column Filter Functionality ==========
+        // ========== Column Filter Functionality ==========
         document.addEventListener('DOMContentLoaded', function() {
-            const filterInputs = document.querySelectorAll('.filter-input-server');
+            const filterInputs = document.querySelectorAll('.filter-input');
+            const tableRows = document.querySelectorAll('.table-desa tbody tr');
 
             filterInputs.forEach(input => {
-                // Remove 'input' event listener to prevent auto-reload while typing
-                // Only trigger on Enter key
-                input.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault(); // Prevent default form submission if inside form
-                        applyFilters();
-                    }
+                input.addEventListener('input', function() {
+                    tableRows.forEach(row => {
+                        // Skip empty state row
+                        if (row.querySelector('td[colspan]')) return;
+
+                        // Check all filters to determine if row should be visible
+                        let allFiltersMatch = true;
+                        filterInputs.forEach((filterInput) => {
+                            const filterVal = filterInput.value.toLowerCase()
+                                .trim();
+                            if (filterVal) {
+                                const columnIndex = Array.from(filterInput.closest(
+                                    'tr').children).indexOf(filterInput.closest(
+                                    'th'));
+                                const targetCell = row.children[columnIndex];
+                                if (targetCell) {
+                                    const targetText = targetCell.textContent
+                                        .toLowerCase().trim();
+                                    if (!targetText.includes(filterVal)) {
+                                        allFiltersMatch = false;
+                                    }
+                                }
+                            }
+                        });
+
+                        // Show/hide row based on all filters
+                        if (allFiltersMatch) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+
+                    // Update row count
+                    updateVisibleRowCount();
                 });
             });
 
-            function applyFilters() {
-                const url = new URL(window.location.href);
-                
-                // Update params from filter inputs
-                filterInputs.forEach(input => {
-                    if (input.value.trim()) {
-                        url.searchParams.set(input.name, input.value.trim());
-                    } else {
-                        url.searchParams.delete(input.name);
-                    }
+            // Function to update visible row count
+            function updateVisibleRowCount() {
+                const visibleRows = Array.from(tableRows).filter(row => {
+                    return row.style.display !== 'none' && !row.querySelector('td[colspan]');
                 });
 
-                // Reset page to 1 when filtering
-                url.searchParams.set('page', '1');
+                const summary = document.querySelector('.summary');
+                if (summary) {
+                    const total = tableRows.length - (document.querySelector('.table-desa tbody tr td[colspan]') ?
+                        1 : 0);
+                    const visible = visibleRows.length;
 
-                window.location.href = url.toString();
+                    if (visible < total) {
+                        summary.textContent = `Menampilkan ${visible} dari ${total} data (filtered)`;
+                    } else {
+                        summary.textContent = `Menampilkan ${visible} data`;
+                    }
+                }
             }
         });
     </script>
