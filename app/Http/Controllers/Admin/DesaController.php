@@ -259,29 +259,13 @@ class DesaController extends Controller
 
                 // Update Status
                 $props['StatusDesa'] = $statusBerlistrik;
-
-                // Update Name if changed to keep link alive
-                if (isset($props['Nama_Desa'])) {
-                    $props['Nama_Desa'] = $newName;
-                }
-                if (isset($props['Desa'])) {
-                    $props['Desa'] = $newName;
-                }
-
-                // Update Region info
-                if ($desa->district) {
-                    $props['Kecamatan'] = $desa->district->name;
-                    if ($desa->district->regency) {
-                        $props['Kab_Kota'] = $desa->district->regency->name;
-                    }
-                }
-
                 $feature->properties = $props;
                 $feature->save();
+
+                Cache::flush();
             }
         }
 
-        Cache::flush();
 
         return redirect()->route('admin.desa.index')->with('success', 'Data desa berhasil diperbarui.');
     }
