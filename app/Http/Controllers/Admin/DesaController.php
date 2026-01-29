@@ -151,13 +151,13 @@ class DesaController extends Controller
                 // Determine matching key from properties
                 // User example had "Desa" and "Nama_Desa".
                 $props = $feature->properties;
-                $name = $props['Nama_Desa'] ?? $props['Desa'] ?? null;
+                $name = $props['Desa'] ?? null;
 
                 return $name && in_array($name, $desaNames);
             })
             ->keyBy(function ($feature) {
                 $props = $feature->properties;
-                return $props['Nama_Desa'] ?? $props['Desa'];
+                return $props['Desa'] ?? $props['Desa'];
             });
 
         // Pass map of [desa_name => feature]
@@ -259,6 +259,26 @@ class DesaController extends Controller
 
                 // Update Status
                 $props['StatusDesa'] = $statusBerlistrik;
+                $feature->properties = $props;
+                $feature->save();
+
+                Cache::flush();
+            }
+
+            $feature = \App\Models\ImportedJsonFeature::where('sub_kategori', 'Status Desa Berlistrik dengan Bantuan')
+                ->where(function ($q) use ($originalName, $newName) {
+                    $q->where('properties->Nama_Desa', $originalName)
+                        ->orWhere('properties->Desa', $originalName)
+                        ->orWhere('properties->Nama_Desa', $newName)
+                        ->orWhere('properties->Desa', $newName);
+                })
+                ->first();
+
+            if ($feature) {
+                $props = $feature->properties;
+
+                // Update Status
+                $props['Status_Des'] = $statusBerlistrik;
                 $feature->properties = $props;
                 $feature->save();
 
