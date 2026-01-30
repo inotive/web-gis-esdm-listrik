@@ -83,6 +83,7 @@
             const fmt = (n) => (n === null || n === undefined || isNaN(n)) ? "-" : Number(n).toLocaleString('id-ID');
 
             require([
+                "esri/config",
                 "esri/Map",
                 "esri/Basemap",
                 "esri/views/MapView",
@@ -103,6 +104,7 @@
                 "esri/geometry/Circle",
                 "esri/widgets/Print"
             ], function(
+                esriConfig,
                 Map,
                 Basemap,
                 MapView,
@@ -123,6 +125,22 @@
                 Circle,
                 Print
             ) {
+
+                // ================== INTERCEPTORS ==================
+                // Intercept GeoJSON requests to move geometry.color -> properties.color
+                esriConfig.request.interceptors.push({
+                    urls: "{{ url('/api/features/data') }}",
+                    after: function(response) {
+                        if (response.data && response.data.features) {
+                            response.data.features.forEach(function(feature) {
+                                if (feature.geometry && feature.geometry.color) {
+                                    if (!feature.properties) feature.properties = {};
+                                    feature.properties.color = feature.geometry.color;
+                                }
+                            });
+                        }
+                    }
+                });
 
                 // ================== MAP & VIEW ==================
                 const map = new Map({
@@ -718,17 +736,43 @@
                                                     'picture-marker')
                                                     return;
 
-                                                const svgUrl =
+                                                const defaultSvgUrl =
                                                     createLocationPinSvg(
                                                         color);
+
+                                                // Create UniqueValueRenderer to handle per-feature colors
                                                 layer.renderer = {
-                                                    type: "simple",
-                                                    symbol: {
+                                                    type: "unique-value",
+                                                    field: "color",
+                                                    defaultSymbol: {
                                                         type: "picture-marker",
-                                                        url: svgUrl,
+                                                        url: defaultSvgUrl,
                                                         width: "32px",
                                                         height: "32px"
-                                                    }
+                                                    },
+                                                    uniqueValueInfos: [{
+                                                            value: "yellow",
+                                                            symbol: {
+                                                                type: "picture-marker",
+                                                                url: createLocationPinSvg(
+                                                                    "yellow"
+                                                                ),
+                                                                width: "32px",
+                                                                height: "32px"
+                                                            }
+                                                        },
+                                                        {
+                                                            value: "red",
+                                                            symbol: {
+                                                                type: "picture-marker",
+                                                                url: createLocationPinSvg(
+                                                                    "red"
+                                                                ),
+                                                                width: "32px",
+                                                                height: "32px"
+                                                            }
+                                                        }
+                                                    ]
                                                 };
                                             } else if (type ===
                                                 "polyline") {

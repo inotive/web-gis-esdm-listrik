@@ -20,13 +20,4 @@ class ImportedJsonFeature extends Model
         'properties' => 'array',
         'geometry' => 'array',
     ];
-
-    protected $fillable = [
-        'kategori',
-        'sub_kategori',
-        'sub_subkategori',
-        'regency_id',
-        'properties',
-        'geometry',
-    ];
 }

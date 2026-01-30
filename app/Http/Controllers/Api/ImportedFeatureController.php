@@ -80,7 +80,7 @@ class ImportedFeatureController extends Controller
         // Generate Cache Key
         $params = $request->all();
         ksort($params); // Ensure consistent key order
-        $cacheKey = 'geojson_data_' . md5(json_encode($params));
+        $cacheKey = 'geojson_data_v3_' . md5(json_encode($params));
 
         // Attempt to get from cache (Forever)
         $jsonContent = \Illuminate\Support\Facades\Cache::remember($cacheKey, 60 * 60 * 24, function () use ($request) {
@@ -130,12 +130,37 @@ class ImportedFeatureController extends Controller
                 $query->where('imported_json_features.regency_id', $request->regency_id);
             }
 
+            // Ensure we only retrieve features with valid geometry
+            $query->whereNotNull('imported_json_features.geometry')
+                ->where('imported_json_features.geometry', '!=', '');
+
             $features = [];
 
             foreach ($query->cursor() as $item) {
-                $properties = $item->properties ? json_decode($item->properties, true) : [];
+                $properties = $item->properties ?: [];
 
-                $geometry = $item->geometry ? json_decode($item->geometry) : null;
+                $geometry = $item->geometry ?: [];
+
+                if ($item->sub_subkategori === 'Rencana Bantuan Lokasi Pemukiman') {
+                    if (isset($properties['Prioritas'])) {
+                        $prioritas = $properties['Prioritas'];
+                        unset($properties['Prioritas']);
+                        $properties = ['Prioritas' => $prioritas] + $properties;
+                    }
+                    if (isset($properties['Rencana Sumber Listrik'])) {
+                        $geometry['color'] = 'red';
+                        if (str_contains($properties['Rencana Sumber Listrik'], 'SUTM')) {
+                            $geometry['color'] = 'yellow';
+                        }
+                    }
+                }
+
+
+
+                // Skip if geometry is invalid
+                if (!$geometry) {
+                    continue;
+                }
 
                 $features[] = [
                     'type' => 'Feature',
@@ -152,8 +177,6 @@ class ImportedFeatureController extends Controller
 
         return response($jsonContent, 200, [
             'Content-Type' => 'application/json',
-            // Disable browser cache so it always checks the server (which is fast due to server-side cache)
-            // This ensures that when you run the seeder (and flush server cache), the browser sees the new data.
             'Cache-Control' => 'no-cache, no-store, must-revalidate'
         ]);
     }
