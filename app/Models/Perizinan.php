@@ -21,6 +21,8 @@ class Perizinan extends Model
         'no_pengajuan',
         'no_surat_keluar',
         'tanggal',
+        'tanggal_akhir',
+        'status_izin',
         'lokasi',
         'status_kelistrikan',
         'titik_koordinat',
@@ -29,10 +31,12 @@ class Perizinan extends Model
         'jenis_penggunaan',
         'sifat_penggunaan',
         'catatan',
+        'file_izin',
     ];
 
     protected $casts = [
         'tanggal' => 'date',
+        'tanggal_akhir' => 'date',
         'total_kapasitas_kva' => 'decimal:2',
     ];
 

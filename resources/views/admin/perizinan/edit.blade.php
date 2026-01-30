@@ -141,6 +141,8 @@
       </div>
     </div>
 
+
+
     <div class="form-row">
       <div class="form-group">
         <label class="label">No. Pengajuan</label>
@@ -156,15 +158,23 @@
         @error('no_surat_keluar')
           <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
         @enderror
-      </div>
     </div>
 
-    <div class="form-group">
-      <label class="label">Tanggal</label>
-      <input type="date" name="tanggal" class="input" value="{{ old('tanggal', $perizinan->tanggal ? $perizinan->tanggal->format('Y-m-d') : '') }}">
-      @error('tanggal')
-        <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
-      @enderror
+    <div class="form-row">
+      <div class="form-group">
+        <label class="label">Tanggal Terbit</label>
+        <input type="date" name="tanggal" class="input" value="{{ old('tanggal', $perizinan->tanggal ? $perizinan->tanggal->format('Y-m-d') : '') }}">
+        @error('tanggal')
+          <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
+        @enderror
+      </div>
+      <div class="form-group">
+        <label class="label">Tanggal Berakhir</label>
+        <input type="date" name="tanggal_akhir" class="input" value="{{ old('tanggal_akhir', $perizinan->tanggal_akhir ? $perizinan->tanggal_akhir->format('Y-m-d') : '') }}">
+        @error('tanggal_akhir')
+          <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
+        @enderror
+      </div>
     </div>
 
     <div class="form-group">
@@ -202,6 +212,8 @@
       @enderror
     </div>
 
+
+
     <div class="form-row">
       <div class="form-group">
         <label class="label">Jumlah Kapasitas</label>
@@ -218,7 +230,6 @@
           <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
         @enderror
       </div>
-    </div>
 
     <div class="form-row">
       <div class="form-group">

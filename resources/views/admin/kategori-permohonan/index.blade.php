@@ -124,9 +124,11 @@
         }
 
         .col-aksi {
-            width: 120px;
+            width: 160px;
+            min-width: 160px;
             text-align: center;
             vertical-align: middle;
+            white-space: nowrap;
         }
 
         .col-aksi>* {
@@ -155,6 +157,11 @@
         /* Edit icon - Kuning */
         .btn-ico.edit {
             color: #f59e0b;
+        }
+
+        /* Detail icon - Blue */
+        .btn-ico.view {
+            color: #0077B6;
         }
 
         /* Delete icon - Merah */
@@ -418,8 +425,8 @@
                                 <td>{{ $permohonan->questions_count ?? 0 }}</td>
                                 <td>{{ $permohonan->keterangan ?? '-' }}</td>
                                 <td class="col-aksi">
-                                    <a href="{{ route('admin.kategori-permohonan.show', $permohonan) }}" class="btn-ico"
-                                        title="Detail" style="color: #009ef7;">
+                                    <a href="{{ route('admin.kategori-permohonan.show', $permohonan) }}" class="btn-ico view"
+                                        title="Detail">
                                         <i class="fa-solid fa-eye"></i>
                                     </a>
                                     <a href="{{ route('admin.kategori-permohonan.edit', $permohonan) }}"

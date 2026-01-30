@@ -49,6 +49,7 @@ class PerizinanImport implements ToModel, WithHeadingRow
             'no_pengajuan'      => $row['no_pengajuan'] ?? null,
             'no_surat_keluar'   => $row['no_surat_keluar'] ?? null,
             'tanggal'           => $this->transformDate($row['tanggal'] ?? null),
+            'tanggal_akhir'     => $this->transformDate($row['tanggal_akhir'] ?? null),
             'lokasi'            => $row['lokasi'] ?? null,
             'status_kelistrikan'=> $this->mapStatus($row['status_kelistrikan'] ?? null),
             'titik_koordinat'   => $row['titik_koordinat'] ?? null,

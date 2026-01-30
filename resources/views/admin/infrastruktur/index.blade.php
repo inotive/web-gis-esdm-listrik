@@ -3,6 +3,7 @@
 @section('title', 'Dashboard ESDM - Infrastruktur Jaringan')
 
 @push('styles')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
   /* ========= MODAL STYLING (konsisten dengan data-wilayah) ========= */
   .modal-overlay{
@@ -101,14 +102,16 @@
   .table-wilayah tbody tr:hover{ background:#FCFCFC; }
 
   .col-no{ width:48px; text-align:center; color:#071437; }
-  .col-aksi{ width:120px; text-align:center; vertical-align:middle; }
+  .col-aksi{ width:160px; min-width:160px; text-align:center; vertical-align:middle; white-space:nowrap; }
 
   .btn-ico{ width:24px; height:24px; display:inline-flex; align-items:center; justify-content:center; border:none; background:transparent; cursor:pointer; transition:transform .2s; padding:0; margin:0 6px; vertical-align:middle; }
   .btn-ico:hover{ transform:scale(1.1); }
   .btn-ico svg{ width:24px; height:24px; display:block; }
-  .btn-ico.edit svg path{ stroke:#DFA000; }
-  .btn-ico.edit svg circle{ fill:#DFA000; }
-  .btn-ico.danger svg path{ stroke:#F8285A; }
+  
+  /* Edit icon - Orange/Yellow */
+  .btn-ico.edit { color: #f59e0b; }
+  /* Delete icon - Red */
+  .btn-ico.danger { color: #ef4444; }
 
   /* Footer */
   .table-footer{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px; padding:14px 20px; border-top:1px solid #F1F1F4; background:#fff; }
@@ -209,13 +212,14 @@
                   data-jenis="{{ $it->jenis }}"
                   data-panjang="{{ $it->panjang_jaringan }}"
                 >
-                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="2" fill="#DFA000"/><path d="M12 5L9 8M12 5L15 8M12 5V3M12 19L9 16M12 19L15 16M12 19V21M19 12L16 9M19 12L16 15M19 12H21M5 12L8 9M5 12L8 15M5 12H3" stroke="#DFA000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                >
+                  <i class="fa-solid fa-pen-to-square" style="font-size:16px;"></i>
                 </button>
 
                 <form action="{{ route('admin.infrastruktur.destroy', $it) }}" method="POST" style="display:inline-block;margin:0" onsubmit="return confirm('Hapus data ini?')">
                   @csrf @method('DELETE')
                   <button type="submit" class="btn-ico danger" title="Hapus">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 20H15M10 4H14M7 7H17L16 20H8L7 7Z" stroke="#F8285A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <i class="fa-solid fa-trash" style="font-size:16px;"></i>
                   </button>
                 </form>
               </td>

@@ -96,7 +96,7 @@
 </div>
 
 <section class="card">
-  <form method="POST" action="{{ route('admin.perizinan.store') }}">
+  <form method="POST" action="{{ route('admin.perizinan.store') }}" enctype="multipart/form-data">
     @csrf
 
     <div class="form-group">
@@ -139,7 +139,6 @@
         @enderror
       </div>
     </div>
-
     <div class="form-row">
       <div class="form-group">
         <label class="label">No. Pengajuan</label>
@@ -158,12 +157,21 @@
       </div>
     </div>
 
-    <div class="form-group">
-      <label class="label">Tanggal</label>
-      <input type="date" name="tanggal" class="input" value="{{ old('tanggal') }}">
-      @error('tanggal')
-        <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
-      @enderror
+    <div class="form-row">
+      <div class="form-group">
+        <label class="label">Tanggal Terbit</label>
+        <input type="date" name="tanggal" class="input" value="{{ old('tanggal') }}">
+        @error('tanggal')
+          <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
+        @enderror
+      </div>
+      <div class="form-group">
+        <label class="label">Tanggal Berakhir</label>
+        <input type="date" name="tanggal_akhir" class="input" value="{{ old('tanggal_akhir') }}">
+        @error('tanggal_akhir')
+          <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
+        @enderror
+      </div>
     </div>
 
     <div class="form-group">
@@ -202,45 +210,37 @@
     </div>
 
     <div class="form-row">
-      <div class="form-group">
-        <label class="label">Jumlah Kapasitas</label>
-        <input type="number" name="jumlah_kapasitas" class="input" value="{{ old('jumlah_kapasitas') }}" placeholder="Masukkan jumlah kapasitas" min="0">
-        @error('jumlah_kapasitas')
-          <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
-        @enderror
-      </div>
 
-      <div class="form-group">
-        <label class="label">Total Kapasitas (kVA)</label>
-        <input type="number" name="total_kapasitas_kva" class="input" value="{{ old('total_kapasitas_kva') }}" placeholder="Masukkan total kapasitas" step="0.01" min="0">
-        @error('total_kapasitas_kva')
-          <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
-        @enderror
-      </div>
+
+    <div class="form-group">
+      <label class="label">Jenis Penggunaan</label>
+      <input type="text" name="jenis_penggunaan" class="input" value="{{ old('jenis_penggunaan') }}" placeholder="Masukkan jenis penggunaan">
+      @error('jenis_penggunaan')
+        <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
+      @enderror
     </div>
 
-    <div class="form-row">
-      <div class="form-group">
-        <label class="label">Jenis Penggunaan</label>
-        <input type="text" name="jenis_penggunaan" class="input" value="{{ old('jenis_penggunaan') }}" placeholder="Masukkan jenis penggunaan">
-        @error('jenis_penggunaan')
-          <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
-        @enderror
-      </div>
-
-      <div class="form-group">
-        <label class="label">Sifat Penggunaan</label>
-        <input type="text" name="sifat_penggunaan" class="input" value="{{ old('sifat_penggunaan') }}" placeholder="Masukkan sifat penggunaan">
-        @error('sifat_penggunaan')
-          <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
-        @enderror
-      </div>
+    <div class="form-group">
+      <label class="label">Sifat Penggunaan</label>
+      <input type="text" name="sifat_penggunaan" class="input" value="{{ old('sifat_penggunaan') }}" placeholder="Masukkan sifat penggunaan">
+      @error('sifat_penggunaan')
+        <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
+      @enderror
     </div>
 
     <div class="form-group">
       <label class="label">Catatan</label>
       <textarea name="catatan" class="input" rows="3" placeholder="Masukkan catatan">{{ old('catatan') }}</textarea>
       @error('catatan')
+        <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
+      @enderror
+    </div>
+
+    <div class="form-group">
+      <label class="label">Upload File Izin (Opsional)</label>
+      <input type="file" name="file_izin" class="input" accept="application/pdf" style="padding-top: 10px;">
+      <small style="color: #6B7280; font-size: 12px; margin-top: 4px; display: block;">Format: PDF. Maksimal Ukuran: 10MB.</small>
+      @error('file_izin')
         <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
       @enderror
     </div>

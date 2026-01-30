@@ -3,6 +3,7 @@
 @section('title', 'Dashboard ESDM - Rekap Data')
 
 @push('styles')
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Tab Navigation */
         .tab-navigation {
@@ -144,6 +145,14 @@
 
         .table-rekap tbody tr:nth-child(even) td {
             background: #FAFAFA;
+        }
+
+        .col-aksi {
+            width: 160px;
+            min-width: 160px;
+            text-align: center;
+            vertical-align: middle;
+            white-space: nowrap;
         }
 
         .col-no {
@@ -635,7 +644,7 @@
                             <th>IUPTLS</th>
                             <th>Rekomtek SKTP</th>
                             <th>Kapasitas (kVA)</th>
-                            <th>Aksi</th>
+                            <th class="col-aksi">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -652,10 +661,10 @@
                                 <td class="col-number">{{ number_format($data['jumlah_iuptls']) }}</td>
                                 <td class="col-number">{{ number_format($data['rekomtek_sktp']) }}</td>
                                 <td class="col-number">{{ number_format($data['jumlah_kapasitas'], 2) }}</td>
-                                <td>
+                                <td class="col-aksi">
                                     <a href="{{ route('admin.rekap-data.detail', ['kabupaten' => urlencode($data['kabupaten_kota'])]) }}"
-                                        class="btn-ico" title="Lihat Detail" style="color:#059669;">
-                                        <i class="ri-eye-line"></i>
+                                        class="btn-ico view" title="Lihat Detail">
+                                        <i class="fa-solid fa-eye"></i>
                                     </a>
                                 </td>
                             </tr>

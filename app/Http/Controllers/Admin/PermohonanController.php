@@ -96,12 +96,76 @@ class PermohonanController extends Controller
         // Untuk filter dropdown (tidak digunakan untuk filtering, hanya UI)
         $regencies = RegRegency::orderBy('name')->get(['id', 'name']);
 
+        // =========================================
+        // TAB 3: Data Perizinan (Merged from PerizinanController)
+        // =========================================
+        $queryPerizinan = Perizinan::with('perusahaan');
+
+        if ($request->has('q')) {
+            $q = $request->q;
+            $queryPerizinan->where(function($sub) use ($q) {
+                $sub->where('nama', 'like', "%{$q}%")
+                    ->orWhere('no_pengajuan', 'like', "%{$q}%")
+                    ->orWhere('jenis', 'like', "%{$q}%")
+                    ->orWhereHas('perusahaan', function($p) use ($q) {
+                        $p->where('nama', 'like', "%{$q}%");
+                    });
+            });
+        }
+
+        if ($filterPerizinanNama) {
+            $queryPerizinan->where('nama', 'like', "%{$filterPerizinanNama}%");
+        }
+        if ($filterPerizinanJenis) {
+            $queryPerizinan->where('jenis', 'like', "%{$filterPerizinanJenis}%");
+        }
+        if ($filterPerizinanNoIzin) {
+             $queryPerizinan->where('no_surat_keluar', 'like', "%{$filterPerizinanNoIzin}%");
+        }
+        if ($filterPerizinanTglTerbit) {
+            $queryPerizinan->whereDate('tanggal', $filterPerizinanTglTerbit);
+        }
+        if ($filterPerizinanStatus) {
+            $queryPerizinan->where('status_kelistrikan', 'like', "%{$filterPerizinanStatus}%");
+        }
+        if ($filterPerizinanKapasitas) {
+            $queryPerizinan->where('total_kapasitas_kva', 'like', "%{$filterPerizinanKapasitas}%");
+        }
+
+        // Calculate Statistics for Perizinan Tab
+        // We act on a clone of the base query (without pagination/ordering if possible, 
+        // essentially all active perizinan, or filtered ones? Usually stats are for total data or filtered data.
+        // Let's stick to ALL data for the cards, like rekap data, unless user wants filtered stats.
+        // Re-using rekap data logic: Total Perizinan, IUPTLS, Rekomtek SKTP, Total Kapasitas
+        
+        // Simple counts from Perizinan table
+        $now = now();
+        $statsPerizinan = [
+            'total_perizinan' => Perizinan::count(),
+            'total_iuptls' => Perizinan::where('jenis', 'like', '%IUPTLS%')->count(),
+            'total_rekomtek_sktp' => Perizinan::where(function($q) {
+                $q->where('jenis', 'like', '%SKTP%') // Prioritize SKTP check if separated
+                  ->orWhere('jenis', 'like', '%Rekomtek%');
+            })->count(),
+            'sedang_aktif' => Perizinan::whereDate('tanggal_akhir', '>', $now)->count(),
+            'mau_berakhir' => Perizinan::whereDate('tanggal_akhir', '>', $now)
+                                       ->whereDate('tanggal_akhir', '<=', $now->copy()->addDays(30))
+                                       ->count(),
+            'berakhir' => Perizinan::whereDate('tanggal_akhir', '<', $now)->count(),
+        ];
+
+        $perizinans = $queryPerizinan->orderBy('created_at', 'desc')
+            ->paginate($perPage, ['*'], 'page_perizinan')
+            ->withQueryString();
+
         return view('admin.permohonan.index', [
             'title' => 'Manajemen Permohonan',
             'permohonanUsers' => $permohonanUsers,
+            'perizinans' => $perizinans,
             'regencies' => $regencies,
             'q' => $q,
             'tab' => $tab,
+            'statsPerizinan' => $statsPerizinan,
         ]);
     }
 

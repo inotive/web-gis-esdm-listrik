@@ -236,9 +236,11 @@
         }
 
         .col-aksi {
-            width: 120px;
+            width: 160px;
+            min-width: 160px;
             text-align: center;
             vertical-align: middle;
+            white-space: nowrap;
         }
 
         .col-aksi>* {

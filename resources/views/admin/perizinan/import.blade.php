@@ -39,7 +39,7 @@
                         </div>
                         <ul class="mb-0 pl-3">
                             <li>Pastikan format file sesuai dengan template yang disediakan.</li>
-                            <li>Kolom wajib: <b>nama_perizinan</b>, <b>nama_perusahaan</b>, <b>status_kelistrikan</b>.</li>
+                            <li>Kolom wajib: <b>nama_perizinan</b>, <b>nama_perusahaan</b>, <b>status_kelistrikan</b>. (Opsional: <b>tanggal, tanggal_akhir</b> untuk status aktif).</li>
                             <li>Kolom <b>status_kelistrikan</b> harap diisi: 
                                 <ul>
                                     <li><b>Berlistrik PLN</b></li>

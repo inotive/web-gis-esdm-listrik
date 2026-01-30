@@ -22,28 +22,8 @@ class PerizinanController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-
     {
-        $query = Perizinan::with('perusahaan');
-
-        if ($request->has('q')) {
-            $q = $request->q;
-            $query->where(function($sub) use ($q) {
-                $sub->where('nama', 'like', "%{$q}%")
-                    ->orWhere('no_pengajuan', 'like', "%{$q}%")
-                    ->orWhere('jenis', 'like', "%{$q}%")
-                    ->orWhereHas('perusahaan', function($p) use ($q) {
-                        $p->where('nama', 'like', "%{$q}%");
-                    });
-            });
-        }
-
-        $perizinans = $query->orderBy('created_at', 'desc')->paginate(10);
-
-        return view('admin.perizinan.index', [
-            'title' => 'Manajemen Data Perizinan',
-            'perizinans' => $perizinans
-        ]);
+        return redirect()->route('admin.permohonan.index', ['tab' => 'perizinan']);
     }
 
     /**
@@ -105,8 +85,10 @@ class PerizinanController extends Controller
             'kontak' => 'nullable|string|max:255',
             'jenis' => 'required|string|max:255',
             'no_pengajuan' => 'nullable|string|max:255',
+            'no_pengajuan' => 'nullable|string|max:255',
             'no_surat_keluar' => 'nullable|string|max:255',
             'tanggal' => 'nullable|date',
+            'tanggal_akhir' => 'nullable|date|after_or_equal:tanggal',
             'lokasi' => 'nullable|string',
             'status_kelistrikan' => 'required|in:berlistrik_pln,berlistrik_non_pln,tidak_berlistrik',
             'titik_koordinat' => 'nullable|string|max:255',
@@ -115,11 +97,28 @@ class PerizinanController extends Controller
             'jenis_penggunaan' => 'nullable|string|max:255',
             'sifat_penggunaan' => 'nullable|string|max:255',
             'catatan' => 'nullable|string',
+            'file_izin' => 'nullable|mimes:pdf|max:10240',
         ]);
 
         DB::beginTransaction();
         try {
             $perizinan = Perizinan::create($validated);
+
+            // Handle File Upload
+            if ($request->hasFile('file_izin')) {
+                $file = $request->file('file_izin');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $path = $file->storeAs('perizinan_docs', $filename, 'public');
+
+                PerizinanDocument::create([
+                    'perizinan_id' => $perizinan->id,
+                    'filename' => $filename,
+                    'path' => $path,
+                    'extension' => $file->getClientOriginalExtension(),
+                    'size' => $file->getSize(),
+                    'description' => 'File Izin Utama',
+                ]);
+            }
 
             DB::commit();
 
@@ -189,7 +188,7 @@ class PerizinanController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.perizinan.index')
+            return redirect()->route('admin.permohonan.index', ['tab' => 'perizinan'])
                 ->with('success', 'Perizinan berhasil diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -210,7 +209,7 @@ class PerizinanController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.perizinan.index')
+            return redirect()->route('admin.permohonan.index', ['tab' => 'perizinan'])
                 ->with('success', 'Perizinan berhasil dihapus.');
         } catch (\Exception $e) {
             DB::rollBack();

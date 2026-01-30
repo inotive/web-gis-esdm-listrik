@@ -40,11 +40,13 @@
   .col-no{ width:48px; text-align:center; color:#071437; }
   .col-name{ min-width:170px; }
   .col-email{ min-width:180px; }
-  .col-aksi{ width:120px; text-align:center; vertical-align:middle; }
+  .col-aksi{ width:160px; min-width:160px; text-align:center; vertical-align:middle; white-space:nowrap; }
 
   .btn-ico{ width:24px; height:24px; display:inline-flex; align-items:center; justify-content:center; border:none; background:transparent; cursor:pointer; transition:transform .2s; padding:0; margin:0 6px; vertical-align:middle; }
+  .btn-ico.view{ color:#0077B6; }
   .btn-ico.edit{ color:#f59e0b; }
   .btn-ico.delete{ color:#ef4444; }
+  .btn-ico.approve{ color:#10b981; }
   .btn-ico:hover{ transform:scale(1.1); }
 
   /* Footer */
