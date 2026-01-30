@@ -211,7 +211,7 @@
             </div>
 
             <div style="margin-top: 24px; display: flex; gap: 10px;">
-                <a href="{{ route('admin.permohonan.index') }}" class="btn">
+                <a href="{{ route('admin.kategori-permohonan.index') }}" class="btn">
                     <i class="ri-arrow-go-back-line"></i> Kembali
                 </a>
                 <button type="submit" class="btn btn-primary">
@@ -356,7 +356,7 @@
 
         function removeOption(questionIndex, optionIndex) {
             const optionItem = document.querySelector(
-            `#options_list_${questionIndex} [data-option-index="${optionIndex}"]`);
+                `#options_list_${questionIndex} [data-option-index="${optionIndex}"]`);
             if (optionItem) {
                 optionItem.remove();
                 reindexOptions(questionIndex);

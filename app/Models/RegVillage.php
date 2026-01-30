@@ -29,7 +29,7 @@ class RegVillage extends Model
     /**
      * Timestamps
      */
-    public $timestamps = false;
+    public $timestamps = true;
 
     /**
      * Fillable fields
@@ -38,6 +38,7 @@ class RegVillage extends Model
         'id',
         'district_id',
         'name',
+        'status_berlistrik',
     ];
 
     /**
@@ -95,24 +96,5 @@ class RegVillage extends Model
     public function getSumberListrikAttribute(): ?string
     {
         return $this->dataBerlistrik?->sumber_listrik;
-    }
-
-    /**
-     * Helper: Get status berlistrik badge
-     */
-    public function getStatusBerlistrikAttribute(): string
-    {
-        if (!$this->dataBerlistrik) {
-            return '<span class="badge badge-secondary">Tidak Ada Data</span>';
-        }
-
-        $sumber = $this->dataBerlistrik->sumber_listrik;
-        if ($sumber === 'PLN') {
-            return '<span class="badge badge-success">Berlistrik PLN</span>';
-        } elseif ($sumber === 'Non-PLN') {
-            return '<span class="badge badge-info">Berlistrik Non-PLN</span>';
-        }
-
-        return '<span class="badge badge-warning">Berlistrik</span>';
     }
 }

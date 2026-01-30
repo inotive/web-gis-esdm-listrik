@@ -108,6 +108,12 @@ Route::group(['middleware' => ['auth', 'verified', 'verified_user'], 'as' => 'ad
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // Notification Routes
+    Route::get('/notifications', [App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/list', [App\Http\Controllers\Admin\NotificationController::class, 'list'])->name('notifications.list');
+    Route::post('/notifications/{id}/read', [App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
+    Route::post('/notifications/read-all', [App\Http\Controllers\Admin\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+
 
 
     Route::group(['as' => 'hak-akses.', 'prefix' => 'hak-akses'], function () {
