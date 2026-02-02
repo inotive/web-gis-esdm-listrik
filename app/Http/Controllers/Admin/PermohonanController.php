@@ -113,24 +113,74 @@ class PermohonanController extends Controller
             });
         }
 
+
         if ($filterPerizinanNama) {
             $queryPerizinan->where('nama', 'like', "%{$filterPerizinanNama}%");
         }
+        
+        // Filter Kabupaten/Kota
+        if ($filterPerizinanKabupaten) {
+            $queryPerizinan->whereHas('perusahaan', function($subQuery) use ($filterPerizinanKabupaten) {
+                $subQuery->where('kabupaten_kota', 'like', "%{$filterPerizinanKabupaten}%");
+            });
+        }
+        
+        // Filter Jenis - support both dropdown and text input
         if ($filterPerizinanJenis) {
             $queryPerizinan->where('jenis', 'like', "%{$filterPerizinanJenis}%");
         }
+        
+        // Global dropdown filter Jenis (from toolbar)
+        if ($jenis && $jenis !== '') {
+            $queryPerizinan->where('jenis', $jenis);
+        }
+        
         if ($filterPerizinanNoIzin) {
              $queryPerizinan->where('no_surat_keluar', 'like', "%{$filterPerizinanNoIzin}%");
         }
+        
+        // Filter Tanggal Terbit
         if ($filterPerizinanTglTerbit) {
             $queryPerizinan->whereDate('tanggal', $filterPerizinanTglTerbit);
         }
-        if ($filterPerizinanStatus) {
-            $queryPerizinan->where('status_kelistrikan', 'like', "%{$filterPerizinanStatus}%");
+        
+        // Filter Tanggal Akhir
+        if ($filterPerizinanTglAkhir) {
+            $queryPerizinan->whereDate('tanggal_akhir', $filterPerizinanTglAkhir);
         }
+        
+        // Filter Status - support both dropdown and text input
+        if ($filterPerizinanStatus) {
+            // Map status filter to status_izin calculation logic
+            if (stripos($filterPerizinanStatus, 'aktif') !== false && stripos($filterPerizinanStatus, 'berakhir') === false) {
+                // "Sedang Aktif" - tanggal_akhir > now
+                $queryPerizinan->whereDate('tanggal_akhir', '>', now());
+            } elseif (stripos($filterPerizinanStatus, 'mau') !== false || stripos($filterPerizinanStatus, 'akan') !== false) {
+                // "Mau Berakhir" - tanggal_akhir between now and 30 days
+                $queryPerizinan->whereDate('tanggal_akhir', '>', now())
+                              ->whereDate('tanggal_akhir', '<=', now()->copy()->addDays(30));
+            } elseif (stripos($filterPerizinanStatus, 'berakhir') !== false) {
+                // "Berakhir" - tanggal_akhir < now
+                $queryPerizinan->whereDate('tanggal_akhir', '<', now());
+            }
+        }
+        
+        // Global dropdown filter Status (from toolbar)
+        if ($status && $status !== '') {
+            if ($status === 'Sedang Aktif') {
+                $queryPerizinan->whereDate('tanggal_akhir', '>', now());
+            } elseif ($status === 'Mau Berakhir') {
+                $queryPerizinan->whereDate('tanggal_akhir', '>', now())
+                              ->whereDate('tanggal_akhir', '<=', now()->copy()->addDays(30));
+            } elseif ($status === 'Berakhir') {
+                $queryPerizinan->whereDate('tanggal_akhir', '<', now());
+            }
+        }
+        
         if ($filterPerizinanKapasitas) {
             $queryPerizinan->where('total_kapasitas_kva', 'like', "%{$filterPerizinanKapasitas}%");
         }
+
 
         // Calculate Statistics for Perizinan Tab
         // We act on a clone of the base query (without pagination/ordering if possible, 

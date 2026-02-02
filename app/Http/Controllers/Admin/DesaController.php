@@ -86,43 +86,52 @@ class DesaController extends Controller
         // Toolbar Filter: Status Listrik
         $statusToolbar = $request->get('status');
         if ($statusToolbar) {
-            $matchingFeatures = \App\Models\ImportedJsonFeature::where('sub_kategori', 'Status Desa Berlistrik')
-                ->get()
-                ->filter(function ($feature) use ($statusToolbar) {
-                    $s = strtoupper($feature->properties['StatusDesa'] ?? '');
-
-                    if ($statusToolbar === 'Belum Terlayani Listrik') {
-                        return str_contains($s, 'BELUM') || str_contains($s, 'TIDAK');
-                    } elseif ($statusToolbar === 'Terlayani Listrik') {
-                        $isDanger = str_contains($s, 'BELUM') || str_contains($s, 'TIDAK');
-                        if ($isDanger) return false;
-                        return str_contains($s, 'TERLAYANI') || str_contains($s, 'BERLISTRIK');
-                    }
-                    return false;
-                });
-
+            // Optimize: use chunk to process records in batches and prevent memory exhaustion
             $matchingNames = [];
-            foreach ($matchingFeatures as $feature) {
-                $props = $feature->properties;
-                if (!empty($props['Nama_Desa'])) $matchingNames[] = $props['Nama_Desa'];
-                if (!empty($props['Desa'])) $matchingNames[] = $props['Desa'];
-            }
+            \App\Models\ImportedJsonFeature::where('sub_kategori', 'Status Desa Berlistrik')
+                ->select('id', 'properties')
+                ->chunk(200, function ($features) use ($statusToolbar, &$matchingNames) {
+                    foreach ($features as $feature) {
+                        $s = strtoupper($feature->properties['StatusDesa'] ?? '');
+                        
+                        $matches = false;
+                        if ($statusToolbar === 'Belum Terlayani Listrik') {
+                            $matches = str_contains($s, 'BELUM') || str_contains($s, 'TIDAK');
+                        } elseif ($statusToolbar === 'Terlayani Listrik') {
+                            $isDanger = str_contains($s, 'BELUM') || str_contains($s, 'TIDAK');
+                            if (!$isDanger) {
+                                $matches = str_contains($s, 'TERLAYANI') || str_contains($s, 'BERLISTRIK');
+                            }
+                        }
+                        
+                        if ($matches) {
+                            $props = $feature->properties;
+                            if (!empty($props['Nama_Desa'])) $matchingNames[] = $props['Nama_Desa'];
+                            if (!empty($props['Desa'])) $matchingNames[] = $props['Desa'];
+                        }
+                    }
+                });
 
             // Filter by (Found in JSON Feature) OR (Found in Local Column)
             $query->where(function ($q) use ($matchingNames, $statusToolbar) {
+                // First condition: match by names from JSON features
                 if (!empty($matchingNames)) {
                     $q->whereIn('name', array_unique($matchingNames));
                 }
-                // Logic for local column matching the toolbar selection
-                if ($statusToolbar === 'Belum Terlayani Listrik') {
-                    $q->orWhere('status_berlistrik', 'like', '%Belum%')
-                        ->orWhere('status_berlistrik', 'like', '%Tidak%');
-                } elseif ($statusToolbar === 'Terlayani Listrik') {
-                    $q->orWhere('status_berlistrik', 'like', '%Terlayani%')
-                        ->orWhere('status_berlistrik', 'like', '%Berlistrik%');
-                } else {
-                    $q->orWhere('status_berlistrik', $statusToolbar);
-                }
+                
+                // Second condition: match by local column status_berlistrik
+                // Use orWhere with a nested where to properly group the conditions
+                $q->orWhere(function ($subQ) use ($statusToolbar) {
+                    if ($statusToolbar === 'Belum Terlayani Listrik') {
+                        $subQ->where('status_berlistrik', 'like', '%Belum%')
+                            ->orWhere('status_berlistrik', 'like', '%Tidak%');
+                    } elseif ($statusToolbar === 'Terlayani Listrik') {
+                        $subQ->where('status_berlistrik', 'like', '%Terlayani%')
+                            ->orWhere('status_berlistrik', 'like', '%Berlistrik%');
+                    } else {
+                        $subQ->where('status_berlistrik', $statusToolbar);
+                    }
+                });
             });
         }
 
@@ -145,20 +154,27 @@ class DesaController extends Controller
         // A simple LIKE query or whereIn on a virtual column would be ideal, but for portability/simplicity with small batch:
         // We will fetch based on the assumption we can filter by 'propertis->desa'.
 
-        $statusFeatures = \App\Models\ImportedJsonFeature::where('sub_kategori', 'Status Desa Berlistrik')
-            ->get()
-            ->filter(function ($feature) use ($desaNames) {
-                // Determine matching key from properties
-                // User example had "Desa" and "Nama_Desa".
-                $props = $feature->properties;
-                $name = $props['Desa'] ?? null;
+        // Optimize: use chunk to process records in batches and prevent memory exhaustion
+        $statusFeatures = collect([]);
+        if (!empty($desaNames)) {
+            \App\Models\ImportedJsonFeature::where('sub_kategori', 'Status Desa Berlistrik')
+                ->select('id', 'properties')
+                ->chunk(200, function ($features) use ($desaNames, &$statusFeatures) {
+                    foreach ($features as $feature) {
+                        // Determine matching key from properties
+                        $props = $feature->properties;
+                        $name = $props['Desa'] ?? null;
 
-                return $name && in_array($name, $desaNames);
-            })
-            ->keyBy(function ($feature) {
-                $props = $feature->properties;
-                return $props['Desa'] ?? $props['Desa'];
-            });
+                        if ($name && in_array($name, $desaNames)) {
+                            // Use name as key to prevent duplicates
+                            $statusFeatures[$name] = $feature;
+                        }
+                    }
+                });
+            
+            // Convert to collection for consistency
+            $statusFeatures = collect($statusFeatures);
+        }
 
         // Pass map of [desa_name => feature]
         $statusMap = $statusFeatures->map(function ($feature) {

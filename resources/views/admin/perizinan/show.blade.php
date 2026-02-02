@@ -190,9 +190,9 @@
     font-weight: 600;
     text-transform: uppercase;
   }
-  .badge-pln { background: #D1FAE5; color: #065F46; } /* Hijau */
-  .badge-non-pln { background: #FEF3C7; color: #92400E; } /* Kuning */
-  .badge-none { background: #FEE2E2; color: #991B1B; } /* Merah */
+  .badge-pln { background: #D1FAE5; color: #065F46; } /* Hijau - PLN */
+  .badge-non-pln { background: #FEF3C7; color: #92400E; } /* Kuning - Non-PLN */
+  .badge-none { background: #FEE2E2; color: #991B1B; } /* Merah - Tidak Berlistrik */
 
   /* Modal Styling */
   .modal {
@@ -476,14 +476,18 @@
   <div class="detail-row">
     <div class="detail-label">Status Kelistrikan</div>
     <div class="detail-value">
-    @if($perizinan->status_kelistrikan == 'berlistrik_pln')
-      <span class="badge badge-pln">Berlistrik PLN</span>
-    @elseif($perizinan->status_kelistrikan == 'berlistrik_non_pln')
-      <span class="badge badge-non-pln">Berlistrik Non-PLN</span>
-    @elseif($perizinan->status_kelistrikan == 'tidak_berlistrik')
-      <span class="badge badge-none">Tidak Berlistrik</span>
+    @if($perizinan->status_kelistrikan)
+      @if($perizinan->status_kelistrikan == 'berlistrik_pln')
+        <span style="display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-transform: uppercase; background: #D1FAE5; color: #065F46;">Berlistrik PLN</span>
+      @elseif($perizinan->status_kelistrikan == 'berlistrik_non_pln')
+        <span style="display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-transform: uppercase; background: #FEF3C7; color: #92400E;">Berlistrik Non-PLN</span>
+      @elseif($perizinan->status_kelistrikan == 'tidak_berlistrik')
+        <span style="display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-transform: uppercase; background: #FEE2E2; color: #991B1B;">Tidak Berlistrik</span>
+      @else
+        <span style="color: #9CA3AF; font-style: italic;">{{ $perizinan->status_kelistrikan }} (format tidak dikenal)</span>
+      @endif
     @else
-      -
+      <span style="color: #9CA3AF; font-style: italic;">Belum diisi</span>
     @endif
     </div>
   </div>

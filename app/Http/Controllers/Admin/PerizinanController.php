@@ -172,6 +172,7 @@ class PerizinanController extends Controller
             'no_pengajuan' => 'nullable|string|max:255',
             'no_surat_keluar' => 'nullable|string|max:255',
             'tanggal' => 'nullable|date',
+            'tanggal_akhir' => 'nullable|date|after_or_equal:tanggal',
             'lokasi' => 'nullable|string',
             'status_kelistrikan' => 'required|in:berlistrik_pln,berlistrik_non_pln,tidak_berlistrik',
             'titik_koordinat' => 'nullable|string|max:255',

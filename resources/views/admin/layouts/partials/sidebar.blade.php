@@ -53,7 +53,7 @@
 
         <a class="menu-item {{ nav_active('admin.permohonan.*', 'admin.perizinan.*') }}" href="{{ route('admin.permohonan.index') }}">
             <span class="menu-icon"><i class="ri-file-list-3-line" aria-hidden="true"></i></span>
-            <span class="menu-label">Data Permohonan dan Perizinan</span>
+            <span class="menu-label">Permohonan dan Perizinan</span>
         </a>
 
         <a class="menu-item {{ nav_active('admin.rekap-data.*') }}" href="{{ route('admin.rekap-data.index') }}">

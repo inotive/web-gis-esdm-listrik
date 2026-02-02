@@ -237,14 +237,14 @@
         }
 
         .summary-card-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
-            margin-bottom: 10px;
+            font-size: 16px;
+            margin-bottom: 12px;
         }
 
         /* Card Variations */
@@ -256,15 +256,18 @@
         .card-pink .summary-card-icon { background: #FCE7F3; color: #DB2777; }
 
         .summary-card-value {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 700;
             color: #111827;
-            margin-bottom: 2px;
+            margin-bottom: 4px;
+            line-height: 1;
         }
 
         .summary-card-label {
-            font-size: 13px;
+            font-size: 11px;
+            font-weight: 500;
             color: #6B7280;
+            line-height: 1.2;
         }
 
         @media (max-width: 1200px) {
@@ -291,7 +294,7 @@
     <div class="page-head">
         <div>
             <div class="page-meta">{{ now()->translatedFormat('l, d F Y') }}</div>
-            <div class="page-title">Manajemen Permohonan & Perizinan</div>
+            <div class="page-title">Permohonan & Perizinan</div>
         </div>
     </div>
 
@@ -315,9 +318,10 @@
              <a href="{{ route('admin.permohonan.import') }}" class="btn btn-secondary me-2">
                 <i class="ri-file-excel-2-line"></i> Import
             </a>
-            <a href="{{ route('admin.permohonan.create') }}" class="btn btn-primary">
+            {{-- Tombol Buat Permohonan di-hide karena sekarang menggunakan fitur import saja --}}
+            {{-- <a href="{{ route('admin.permohonan.create') }}" class="btn btn-primary">
                 <i class="ri-add-line"></i> Buat Permohonan
-            </a>
+            </a> --}}
         </div>
 
         <section class="card">
@@ -499,18 +503,45 @@
                     <input type="hidden" name="per_page" value="{{ request('per_page', 10) }}">
                     {{-- Global Search for Perizinan --}}
                     <input type="hidden" name="q" value="{{ request('q') }}">
+                    <input type="hidden" name="jenis" value="{{ request('jenis') }}">
+                    <input type="hidden" name="status" value="{{ request('status') }}">
 
                     <input type="hidden" name="filter_perizinan_nama" value="{{ request('filter_perizinan_nama') }}">
+                    <input type="hidden" name="filter_perizinan_kabupaten" value="{{ request('filter_perizinan_kabupaten') }}">
                     <input type="hidden" name="filter_perizinan_jenis" value="{{ request('filter_perizinan_jenis') }}">
                     <input type="hidden" name="filter_perizinan_no_izin" value="{{ request('filter_perizinan_no_izin') }}">
+                    <input type="hidden" name="filter_perizinan_tgl_terbit" value="{{ request('filter_perizinan_tgl_terbit') }}">
+                    <input type="hidden" name="filter_perizinan_tgl_akhir" value="{{ request('filter_perizinan_tgl_akhir') }}">
                     <input type="hidden" name="filter_perizinan_status" value="{{ request('filter_perizinan_status') }}">
+                    <input type="hidden" name="filter_perizinan_kapasitas" value="{{ request('filter_perizinan_kapasitas') }}">
                     
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between align-items-center gap-2">
+                        {{-- Search Bar --}}
                         <div class="input-group" style="width: 300px;">
                             <span class="input-group-text"><i class="ri-search-line"></i></span>
-                            <input type="text" name="q" class="form-control" placeholder="Cari perizinan..." value="{{ request('q') }}" onchange="this.form.submit()">
+                            <input type="text" name="q" class="form-control" placeholder="Cari Perumahan, No. Izin..." value="{{ request('q') }}" onchange="this.form.submit()">
                         </div>
-                        @if (request('q') || request('filter_perizinan_nama') || request('filter_perizinan_jenis'))
+                        
+                        {{-- Dropdown Filters --}}
+                        <div class="d-flex gap-2">
+                            {{-- Filter Semua Status --}}
+                            <select name="status" class="form-select" style="width: auto; min-width: 150px;" onchange="this.form.submit()">
+                                <option value="">Semua Status</option>
+                                <option value="Sedang Aktif" {{ request('status') == 'Sedang Aktif' ? 'selected' : '' }}>Sedang Aktif</option>
+                                <option value="Mau Berakhir" {{ request('status') == 'Mau Berakhir' ? 'selected' : '' }}>Mau Berakhir</option>
+                                <option value="Berakhir" {{ request('status') == 'Berakhir' ? 'selected' : '' }}>Berakhir</option>
+                            </select>
+                            
+                            {{-- Filter Semua Jenis Izin --}}
+                            <select name="jenis" class="form-select" style="width: auto; min-width: 180px;" onchange="this.form.submit()">
+                                <option value="">Semua Jenis Izin</option>
+                                <option value="IUPTLS" {{ request('jenis') == 'IUPTLS' ? 'selected' : '' }}>IUPTLS</option>
+                                <option value="SKTP" {{ request('jenis') == 'SKTP' ? 'selected' : '' }}>SKTP</option>
+                            </select>
+                        </div>
+                        
+                        {{-- Reset Button --}}
+                        @if (request('q') || request('jenis') || request('status') || request('filter_perizinan_nama') || request('filter_perizinan_jenis') || request('filter_perizinan_kabupaten') || request('filter_perizinan_tgl_terbit') || request('filter_perizinan_tgl_akhir'))
                             <a href="{{ route('admin.permohonan.index', ['tab' => 'perizinan']) }}" class="btn-reset">
                                 <i class="ri-refresh-line"></i> Reset
                             </a>
@@ -538,11 +569,11 @@
                             <tr class="filter-row">
                                 <th class="col-no"></th>
                                 <th><input type="text" class="filter-input-perizinan filter-backend" name="filter_perizinan_nama" value="{{ request('filter_perizinan_nama') }}" placeholder="Filter nama..."></th>
-                                <th></th>
+                                <th><input type="text" class="filter-input-perizinan filter-backend" name="filter_perizinan_kabupaten" value="{{ request('filter_perizinan_kabupaten') }}" placeholder="Filter kabupaten..."></th>
                                 <th><input type="text" class="filter-input-perizinan filter-backend" name="filter_perizinan_jenis" value="{{ request('filter_perizinan_jenis') }}" placeholder="Filter jenis..."></th>
                                 <th><input type="text" class="filter-input-perizinan filter-backend" name="filter_perizinan_no_izin" value="{{ request('filter_perizinan_no_izin') }}" placeholder="Filter no izin..."></th>
-                                <th></th>
-                                <th></th>
+                                <th><input type="date" class="filter-input-perizinan filter-backend" name="filter_perizinan_tgl_terbit" value="{{ request('filter_perizinan_tgl_terbit') }}" placeholder="MM/DD/YYYY"></th>
+                                <th><input type="date" class="filter-input-perizinan filter-backend" name="filter_perizinan_tgl_akhir" value="{{ request('filter_perizinan_tgl_akhir') }}" placeholder="MM/DD/YYYY"></th>
                                 <th><input type="text" class="filter-input-perizinan filter-backend" name="filter_perizinan_status" value="{{ request('filter_perizinan_status') }}" placeholder="Filter status..."></th>
                                 <th><input type="text" class="filter-input-perizinan filter-backend" name="filter_perizinan_kapasitas" value="{{ request('filter_perizinan_kapasitas') }}" placeholder="Filter kapasitas..."></th>
                                 <th class="col-aksi"></th>
