@@ -97,6 +97,21 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
+            @if(session('password_reset_success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'Password Anda berhasil diubah. Silakan login dengan password baru Anda.',
+                    confirmButtonText: 'Login Sekarang',
+                    confirmButtonColor: '#059669',
+                    allowOutsideClick: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "{{ route('login') }}";
+                    }
+                });
+            @endif
+
             @if($errors->any())
                 Swal.fire({
                     icon: 'error',

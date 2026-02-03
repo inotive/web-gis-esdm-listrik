@@ -132,8 +132,8 @@ class ForgotPasswordController extends Controller
 
         // Delete OTP
         DB::table('password_reset_tokens')->where('email', $request->email)->delete();
-        session()->forget('otp_verified_email');
-
-        return redirect()->route('login')->with('status', 'Password berhasil diubah. Silakan login.');
+        
+        // Keep session for showing success popup, then redirect to login
+        return back()->with('password_reset_success', true);
     }
 }
