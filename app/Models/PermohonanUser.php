@@ -17,6 +17,7 @@ class PermohonanUser extends Model
         'permohonan_id',
         'user_id',
         'perusahaan_id',
+
         'status',
         'jawaban',
         'keterangan',
@@ -62,6 +63,7 @@ class PermohonanUser extends Model
         return $this->belongsTo(Perusahaan::class, 'perusahaan_id');
     }
 
+
     /**
      * Relasi: PermohonanUser belongs to User (approver)
      */
@@ -69,4 +71,6 @@ class PermohonanUser extends Model
     {
         return $this->belongsTo(User::class, 'approved_by');
     }
+
+
 }

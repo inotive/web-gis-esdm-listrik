@@ -100,6 +100,7 @@ class PermohonanImport implements ToModel, WithHeadingRow
         return new PermohonanUser([
             'permohonan_id' => $permohonan->id,
             'user_id'       => $user->id,
+            'data_source'   => 'import',
             'status'        => $this->mapStatus($row['status'] ?? 'pending'),
             'keterangan'    => $row['keterangan'] ?? null,
             'jawaban'       => $jawaban, // Simpan jawaban yang sudah dimap

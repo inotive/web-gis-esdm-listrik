@@ -158,6 +158,7 @@ class PermohonanUserController extends Controller
             $permohonanUser = PermohonanUser::create([
                 'permohonan_id' => $permohonanId,
                 'user_id' => Auth::id(),
+
                 'status' => $validated['status'] ?? 'pending',
                 'jawaban' => $jawaban,
                 'keterangan' => $validated['keterangan'] ?? null,
@@ -230,9 +231,18 @@ class PermohonanUserController extends Controller
             abort(404);
         }
 
-        // Ensure user can only edit their own permohonan
-        if ($permohonanUser->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized action.');
+        $userRole = Auth::user()->roles()->first()->name ?? null;
+        $isAdmin = in_array($userRole, ['admin', 'superadmin']);
+
+        // Authorization check
+        if ($isAdmin) {
+            // Admin can only edit data from import
+
+        } else {
+            // Regular user can only edit their own permohonan
+            if ($permohonanUser->user_id !== Auth::id()) {
+                abort(403, 'Unauthorized action.');
+            }
         }
 
         $permohonanUser->load(['permohonan.questions.options' => function ($query) {
@@ -269,9 +279,18 @@ class PermohonanUserController extends Controller
             abort(404);
         }
 
-        // Ensure user can only update their own permohonan
-        if ($permohonanUser->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized action.');
+        $userRole = Auth::user()->roles()->first()->name ?? null;
+        $isAdmin = in_array($userRole, ['admin', 'superadmin']);
+
+        // Authorization check
+        if ($isAdmin) {
+            // Admin can only edit data from import
+
+        } else {
+            // Regular user can only update their own permohonan
+            if ($permohonanUser->user_id !== Auth::id()) {
+                abort(403, 'Unauthorized action.');
+            }
         }
 
         $validated = $request->validate([

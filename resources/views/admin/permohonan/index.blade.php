@@ -355,7 +355,7 @@
                         <thead>
                             <tr>
                                 <th class="col-no">No</th>
-                                <th>Pengguna</th>
+                                <th>Nama Pemohon</th>
                                 <th>Kategori Permohonan</th>
                                 <th>Status</th>
                                 <th>Tanggal Pengajuan</th>
@@ -366,7 +366,7 @@
                                 <th><input type="text" class="filter-input-permohonan filter-backend"
                                         name="filter_permohonan_pengguna"
                                         value="{{ request('filter_permohonan_pengguna') }}"
-                                        placeholder="Filter pengguna..."></th>
+                                        placeholder="Filter pemohon..."></th>
                                 <th><input type="text" class="filter-input-permohonan filter-backend"
                                         name="filter_permohonan_kategori"
                                         value="{{ request('filter_permohonan_kategori') }}"
@@ -406,16 +406,19 @@
                                     <td class="col-aksi">
                                         <a href="{{ route('admin.permohonan-user.show', [$item->permohonan_id, $item->id]) }}"
                                             class="btn-ico view" title="Lihat Detail"><i class="fa-solid fa-eye"></i></a>
-                                        <a href="{{ route('admin.permohonan-user.edit', [$item->permohonan_id, $item->id]) }}"
-                                            class="btn-ico edit" title="Edit"><i class="fa-solid fa-pen-to-square"></i></a>
-                                        <form action="{{ route('admin.permohonan-user.destroy', [$item->permohonan_id, $item->id]) }}"
-                                            method="POST" style="display:inline-block;margin:0;" class="form-delete-permohonan"
-                                            data-name="{{ $item->user->name ?? 'permohonan ini' }}">
-                                            @csrf @method('DELETE')
-                                            <button type="button" class="btn-ico danger btn-delete-permohonan" title="Hapus">
-                                                <i class="fa-solid fa-trash"></i>
-                                            </button>
-                                        </form>
+                                        @php $isAdmin = in_array(optional(auth()->user()->roles()->first())->name, ['admin', 'superadmin']); @endphp
+                                        @if($isAdmin)
+                                            <a href="{{ route('admin.permohonan-user.edit', [$item->permohonan_id, $item->id]) }}"
+                                                class="btn-ico edit" title="Edit"><i class="fa-solid fa-pen-to-square"></i></a>
+                                            <form action="{{ route('admin.permohonan-user.destroy', [$item->permohonan_id, $item->id]) }}"
+                                                method="POST" style="display:inline-block;margin:0;" class="form-delete-permohonan"
+                                                data-name="{{ $item->user->name ?? 'permohonan ini' }}">
+                                                @csrf @method('DELETE')
+                                                <button type="button" class="btn-ico danger btn-delete-permohonan" title="Hapus">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        @endif
                                     </td>
                                 </tr>
                             @empty

@@ -27,7 +27,9 @@
         }
 
         .info-row {
-            display: flex;
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 16px;
             padding: 12px 0;
             border-bottom: 1px solid #F1F1F4;
         }
@@ -37,14 +39,12 @@
         }
 
         .info-label {
-            width: 200px;
             font-weight: 600;
             color: #64748B;
             font-size: 14px;
         }
 
         .info-value {
-            flex: 1;
             color: #111827;
             font-size: 14px;
         }
@@ -570,24 +570,25 @@
         <div class="info-row">
             <div class="info-label">Status</div>
             <div class="info-value">
-                @php
-                    $statusClass = 'badge-selesai';
-                    $statusText = ucfirst($permohonanUser->status);
-                    $statusMap = [
-                        'pending' => ['text' => 'Menunggu Verifikasi', 'class' => 'badge-pending'],
-                        'diproses' => ['text' => 'Sedang Diproses', 'class' => 'badge-proses'],
-                        'selesai' => ['text' => 'Aktif', 'class' => 'badge-selesai'],
-                        'ditolak' => ['text' => 'Ditolak', 'class' => 'badge-ditolak'],
-                        'expired' => ['text' => 'Expired', 'class' => 'badge-expired'],
-                    ];
-                    if (isset($statusMap[$permohonanUser->status])) {
-                        $statusText = $statusMap[$permohonanUser->status]['text'];
-                        $statusClass = $statusMap[$permohonanUser->status]['class'];
-                    }
-                @endphp
-                <span class="badge {{ $statusClass }}">{{ $statusText }}</span>
-            </div>
+            @if($permohonanUser->status)
+            @if($permohonanUser->status == 'pending')
+                <span style="display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-transform: uppercase; background: #D1FAE5; color: #065F46;">Pending</span>
+            @elseif($permohonanUser->status == 'proses')
+                <span style="display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-transform: uppercase; background: #FEF3C7; color: #92400E;">Proses</span>
+            @elseif($permohonanUser->status == 'selesai')
+                <span style="display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-transform: uppercase; background: #FEE2E2; color: #991B1B;">Selesai</span>
+            @elseif($permohonanUser->status == 'ditolak')
+                <span style="display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-transform: uppercase; background: #FEE2E2; color: #991B1B;">Ditolak</span>
+            @elseif($permohonanUser->status == 'expired')
+                <span style="display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-transform: uppercase; background: #FEE2E2; color: #991B1B;">Expired</span>
+            @else
+                <span style="color: #9CA3AF; font-style: italic;">{{ $permohonanUser->status }} (format tidak dikenal)</span>
+            @endif
+            @else
+            <span style="color: #9CA3AF; font-style: italic;">Belum diisi</span>
+            @endif
         </div>
+    </div>
 
         <div class="info-row">
             <div class="info-label">Pengaju</div>
@@ -605,6 +606,8 @@
                 <div class="info-value">{{ $permohonanUser->keterangan }}</div>
             </div>
         @endif
+
+ 
     </section>
 
     <section class="card">
