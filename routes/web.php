@@ -37,7 +37,8 @@ use App\Http\Controllers\Admin\DataInfrastrukturController;
 use App\Http\Controllers\Admin\KategoriPermohonanController;
 use App\Http\Controllers\Admin\PerizinanController;
 use App\Http\Controllers\Admin\PengajuanPermohonanController;
-
+use App\Http\Controllers\Admin\InspeksiController;
+use App\Http\Controllers\Admin\NotificationController;
 // Models untuk statistik home
 use App\Models\InfrastrukturJaringan;
 use App\Models\Gardu;
@@ -293,6 +294,16 @@ Route::group(['middleware' => ['auth', 'verified', 'verified_user'], 'as' => 'ad
         Route::get('/{permohonan}/edit', [KategoriPermohonanController::class, 'edit'])->name('edit');
         Route::put('/{permohonan}', [KategoriPermohonanController::class, 'update'])->name('update');
         Route::delete('/{permohonan}', [KategoriPermohonanController::class, 'destroy'])->name('destroy');
+    });
+
+    // Inspeksi
+    Route::group(['as' => 'inspeksi.', 'prefix' => 'inspeksi'], function () {
+        Route::get('/', [InspeksiController::class, 'index'])->name('index');
+        Route::get('/create', [InspeksiController::class, 'create'])->name('create');
+        Route::post('/', [InspeksiController::class, 'store'])->name('store');
+        Route::get('/{inspeksi}/edit', [InspeksiController::class, 'edit'])->name('edit');
+        Route::put('/{inspeksi}', [InspeksiController::class, 'update'])->name('update');
+        Route::delete('/{inspeksi}', [InspeksiController::class, 'destroy'])->name('destroy');
     });
 
     // Permohonan User (Old - for admin to manage)
