@@ -99,6 +99,19 @@ class InspeksiController extends Controller
     }
 
     /**
+     * Display the specified inspection.
+     */
+    public function show(Inspeksi $inspeksi)
+    {
+        $inspeksi->load(['perusahaan', 'pengguna']);
+
+        return view('admin.inspeksi.show', [
+            'title' => 'Detail Inspeksi',
+            'inspeksi' => $inspeksi,
+        ]);
+    }
+
+    /**
      * Show the form for editing the specified inspection.
      */
     public function edit(Inspeksi $inspeksi)

@@ -490,9 +490,6 @@
                             <th>Referensi Izin</th>
                             <th>Perusahaan</th>
                             <th>Ditambahkan Oleh</th>
-                            <th>Berita Acara</th>
-                            <th>Lampiran</th>
-                            <th>Catatan</th>
                             <th class="col-aksi">Aksi</th>
                         </tr>
                     </thead>
@@ -504,41 +501,20 @@
                                 <td><strong>{{ $inspeksi->referensi_izin }}</strong></td>
                                 <td>{{ $inspeksi->perusahaan->nama ?? '-' }}</td>
                                 <td>{{ $inspeksi->pengguna->name ?? '-' }}</td>
-                                <td>
-                                    @if ($inspeksi->berita_acara)
-                                        {{ Str::limit($inspeksi->berita_acara, 50) }}
-                                    @else
-                                        <span class="badge-empty">Belum ada</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if ($inspeksi->lampiran)
-                                        <a href="{{ Storage::url($inspeksi->lampiran) }}" target="_blank"
-                                            class="file-link">
-                                            <i class="ri-attachment-line"></i>
-                                            Lihat File
-                                        </a>
-                                    @else
-                                        <span class="badge-empty">Belum ada</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if ($inspeksi->catatan)
-                                        {{ Str::limit($inspeksi->catatan, 50) }}
-                                    @else
-                                        <span class="badge-empty">Belum ada</span>
-                                    @endif
-                                </td>
                                 <td class="col-aksi">
+                                    <a href="{{ route('admin.inspeksi.show', $inspeksi) }}" class="btn-ico"
+                                        style="color: #0077B6;" title="Detail">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
                                     <a href="{{ route('admin.inspeksi.edit', $inspeksi) }}" class="btn-ico edit"
                                         title="Edit">
                                         <i class="fa-solid fa-pen-to-square"></i>
                                     </a>
                                     <form action="{{ route('admin.inspeksi.destroy', $inspeksi) }}" method="POST"
-                                        style="display:inline-block;margin:0;" class="form-delete"
-                                        onsubmit="return confirm('Yakin ingin menghapus data inspeksi ini?')">
+                                        style="display:inline-block;margin:0;" class="form-delete">
                                         @csrf @method('DELETE')
-                                        <button type="submit" class="btn-ico danger" title="Hapus">
+                                        <button type="button" class="btn-ico danger btn-delete" title="Hapus"
+                                            data-id="{{ $inspeksi->id }}" data-nama="{{ $inspeksi->referensi_izin }}">
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
                                     </form>
@@ -546,7 +522,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" style="text-align:center;color:#64748B;padding:40px;">
+                                <td colspan="6" style="text-align:center;color:#64748B;padding:40px;">
                                     Belum ada data
                                 </td>
                             </tr>
@@ -590,6 +566,30 @@
             // Auto submit form when selection changes
             $('.select2-perusahaan').on('change', function() {
                 $(this).closest('form').submit();
+            });
+
+            // Delete confirmation with SweetAlert
+            $('.btn-delete').on('click', function(e) {
+                e.preventDefault();
+                const button = $(this);
+                const form = button.closest('form');
+                const nama = button.data('nama');
+
+                Swal.fire({
+                    title: 'Konfirmasi Hapus',
+                    html: `Apakah Anda yakin ingin menghapus inspeksi dengan referensi <strong>${nama}</strong>?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Ya, Hapus!',
+                    cancelButtonText: 'Batal',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
             });
         });
 

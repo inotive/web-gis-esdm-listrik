@@ -301,6 +301,7 @@ Route::group(['middleware' => ['auth', 'verified', 'verified_user'], 'as' => 'ad
         Route::get('/', [InspeksiController::class, 'index'])->name('index');
         Route::get('/create', [InspeksiController::class, 'create'])->name('create');
         Route::post('/', [InspeksiController::class, 'store'])->name('store');
+        Route::get('/{inspeksi}', [InspeksiController::class, 'show'])->name('show');
         Route::get('/{inspeksi}/edit', [InspeksiController::class, 'edit'])->name('edit');
         Route::put('/{inspeksi}', [InspeksiController::class, 'update'])->name('update');
         Route::delete('/{inspeksi}', [InspeksiController::class, 'destroy'])->name('destroy');
