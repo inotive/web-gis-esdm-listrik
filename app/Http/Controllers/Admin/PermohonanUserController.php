@@ -32,9 +32,9 @@ class PermohonanUserController extends Controller
             ->firstOrFail();
 
         if ($userRole == 'superadmin' || $userRole == 'admin') {
-            $query = PermohonanUser::with('permohonan')->where('permohonan_id', $permohonanId);
+            $query = PermohonanUser::with(['permohonan', 'documents'])->where('permohonan_id', $permohonanId);
         } elseif (in_array($userRole, ['desa', 'perusahaan'])) {
-            $query = Auth::user()->permohonanUsers()->with('permohonan')->where('permohonan_id', $permohonanId);
+            $query = Auth::user()->permohonanUsers()->with(['permohonan', 'documents'])->where('permohonan_id', $permohonanId);
         }
 
         // Search by permohonan name or status
@@ -381,7 +381,7 @@ class PermohonanUserController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.permohonan-user.index', $permohonanId)
+            return redirect()->route('admin.permohonan.index', ['tab' => 'permohonan'])
                 ->with('success', 'Permohonan berhasil diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();

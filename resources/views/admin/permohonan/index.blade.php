@@ -143,6 +143,7 @@
 
         .status-aktif { background: #ECFDF5; color: #059669; }
         .status-menunggu { background: #FEF3C7; color: #D97706; }
+        .status-proses { background: #E0F2FE; color: #0284C7; }
         .status-expired { background: #FEE2E2; color: #DC2626; }
         .status-ditolak { background: #F1F5F9; color: #64748B; }
         
@@ -371,9 +372,16 @@
                                         name="filter_permohonan_kategori"
                                         value="{{ request('filter_permohonan_kategori') }}"
                                         placeholder="Filter kategori..."></th>
-                                <th><input type="text" class="filter-input-permohonan filter-backend"
-                                        name="filter_permohonan_status" value="{{ request('filter_permohonan_status') }}"
-                                        placeholder="Filter status..."></th>
+                                <th>
+                                    <select class="filter-input-permohonan filter-backend"
+                                        name="filter_permohonan_status">
+                                        <option value="">Semua Status</option>
+                                        <option value="pending" {{ request('filter_permohonan_status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                                        <option value="proses" {{ request('filter_permohonan_status') == 'proses' ? 'selected' : '' }}>Proses</option>
+                                        <option value="selesai" {{ request('filter_permohonan_status') == 'selesai' ? 'selected' : '' }}>Selesai</option>
+                                        <option value="ditolak" {{ request('filter_permohonan_status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                                    </select>
+                                </th>
                                 <th><input type="date" class="filter-input-permohonan filter-backend"
                                         name="filter_permohonan_tanggal" value="{{ request('filter_permohonan_tanggal') }}"
                                         placeholder="Filter tanggal..."></th>
@@ -387,10 +395,11 @@
                                     $statusText = ucfirst($item->status);
                                     $statusMap = [
                                         'pending' => ['text' => 'Menunggu Verifikasi', 'class' => 'status-menunggu'],
-                                        'diproses' => ['text' => 'Sedang Diproses', 'class' => 'status-menunggu'],
+                                        'proses' => ['text' => 'Sedang Diproses', 'class' => 'status-proses'],
+                                        'diproses' => ['text' => 'Sedang Diproses', 'class' => 'status-proses'],
                                         'selesai' => ['text' => 'Aktif', 'class' => 'status-aktif'],
                                         'ditolak' => ['text' => 'Ditolak', 'class' => 'status-ditolak'],
-                                        'expired' => ['text' => 'Expired', 'class' => 'status-expired'],
+                                        'expired' => ['text' => 'Kedaluwarsa', 'class' => 'status-expired'],
                                     ];
                                     if (isset($statusMap[$item->status])) {
                                         $statusText = $statusMap[$item->status]['text'];

@@ -125,33 +125,22 @@
             stroke: #6366F1;
         }
 
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
+        /* Status Badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
         }
 
-        .badge-pending {
-            background: #FEF3C7;
-            color: #92400E;
-        }
-
-        .badge-proses {
-            background: #DBEAFE;
-            color: #1E40AF;
-        }
-
-        .badge-selesai {
-            background: #D1FAE5;
-            color: #065F46;
-        }
-
-        .badge-ditolak {
-            background: #FEE2E2;
-            color: #991B1B;
-        }
+        .status-aktif { background: #ECFDF5; color: #059669; }
+        .status-menunggu { background: #FEF3C7; color: #D97706; }
+        .status-proses { background: #E0F2FE; color: #0284C7; }
+        .status-expired { background: #FEE2E2; color: #DC2626; }
+        .status-ditolak { background: #F1F5F9; color: #64748B; }
 
         .btn-secondary {
             display: inline-flex;
@@ -565,19 +554,23 @@
                                 <td class="col-no">{{ $permohonanUsers->firstItem() + $i }}</td>
                                 <td><strong>{{ $permohonanUser->permohonan->nama }}</strong></td>
                                 <td>
-                                    <span class="badge badge-{{ $permohonanUser->status }}">
-                                        @if ($permohonanUser->status === 'pending')
-                                            Pending
-                                        @elseif($permohonanUser->status === 'proses')
-                                            Proses
-                                        @elseif($permohonanUser->status === 'selesai')
-                                            Selesai
-                                        @elseif($permohonanUser->status === 'ditolak')
-                                            Ditolak
-                                        @else
-                                            {{ $permohonanUser->status }}
-                                        @endif
-                                    </span>
+                                    @php
+                                        $statusClass = 'status-aktif';
+                                        $statusText = ucfirst($permohonanUser->status);
+                                        $statusMap = [
+                                            'pending' => ['text' => 'Menunggu Verifikasi', 'class' => 'status-menunggu'],
+                                            'proses' => ['text' => 'Sedang Diproses', 'class' => 'status-proses'],
+                                            'diproses' => ['text' => 'Sedang Diproses', 'class' => 'status-proses'],
+                                            'selesai' => ['text' => 'Aktif', 'class' => 'status-aktif'],
+                                            'ditolak' => ['text' => 'Ditolak', 'class' => 'status-ditolak'],
+                                            'expired' => ['text' => 'Kedaluwarsa', 'class' => 'status-expired'],
+                                        ];
+                                        if (isset($statusMap[$permohonanUser->status])) {
+                                            $statusText = $statusMap[$permohonanUser->status]['text'];
+                                            $statusClass = $statusMap[$permohonanUser->status]['class'];
+                                        }
+                                    @endphp
+                                    <span class="status-badge {{ $statusClass }}">{{ $statusText }}</span>
                                 </td>
                                 <td>{{ $permohonanUser->created_at->translatedFormat('d F Y') }}</td>
                                 <td>{{ $permohonanUser->keterangan ?? '-' }}</td>

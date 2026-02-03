@@ -65,11 +65,32 @@ class PermohonanUser extends Model
 
 
     /**
-     * Relasi: PermohonanUser belongs to User (approver)
+     * Header relation: PermohonanUser belongs to User (approver)
      */
     public function approver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    /**
+     * Get the status attribute.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function getStatusAttribute($value)
+    {
+        if ($value === 'selesai') {
+            // Check if documents relation is loaded to avoid N+1 if possible, or just access it.
+            // Using logic: if any document has expired validity date, status is expired.
+            foreach ($this->documents as $doc) {
+                if ($doc->masa_berlaku && $doc->masa_berlaku->endOfDay()->isPast()) {
+                    return 'expired';
+                }
+            }
+        }
+
+        return $value;
     }
 
 

@@ -288,7 +288,7 @@
             </div>
 
             <div class="form-actions">
-                <a href="{{ route('admin.permohonan-user.index', $permohonanUser->permohonan_id) }}"
+                <a href="{{ route('admin.permohonan.index', ['tab' => 'permohonan']) }}"
                     class="btn btn-secondary">
                     <i class="ri-close-line"></i>
                     Batal

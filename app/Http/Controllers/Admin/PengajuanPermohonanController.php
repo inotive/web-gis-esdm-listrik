@@ -27,7 +27,7 @@ class PengajuanPermohonanController extends Controller
         $permohonanId = $request->get('permohonan_id');
 
         // PENTING: Hanya ambil permohonan milik user yang sedang login
-        $query = Auth::user()->permohonanUsers()->with('permohonan');
+        $query = Auth::user()->permohonanUsers()->with(['permohonan', 'documents']);
 
         // Filter by status
         if ($status && $status !== 'semua') {

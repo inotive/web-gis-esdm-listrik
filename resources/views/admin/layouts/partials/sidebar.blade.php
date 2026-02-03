@@ -61,14 +61,14 @@
             <span class="menu-label">Rekap Data</span>
         </a>
 
-        @if (in_array($userRole ?? null, ['desa', 'perusahaan']))
+        {{-- @if (in_array($userRole ?? null, ['desa', 'perusahaan']))
             <div class="menu-title">Layanan</div>
             <a class="menu-item {{ nav_active('admin.pengajuan-permohonan.*') }}"
                 href="{{ route('admin.pengajuan-permohonan.index') }}">
                 <span class="menu-icon"><i class="ri-file-add-line" aria-hidden="true"></i></span>
                 <span class="menu-label">Pengajuan Permohonan</span>
             </a>
-        @endif
+        @endif --}}
 
 
         {{-- <a class="menu-item {{ nav_active('admin.pemukiman.*') }}" href="{{ route('admin.pemukiman.index') }}">

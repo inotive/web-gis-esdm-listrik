@@ -49,38 +49,22 @@
             font-size: 14px;
         }
 
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
+        /* Status Badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
         }
 
-        .badge-selesai {
-            background: #D1FAE5;
-            color: #065F46;
-        }
-
-        .badge-pending {
-            background: #FEF3C7;
-            color: #D97706;
-        }
-
-        .badge-proses {
-            background: #DBEAFE;
-            color: #1E40AF;
-        }
-
-        .badge-ditolak {
-            background: #FEE2E2;
-            color: #DC2626;
-        }
-
-        .badge-expired {
-            background: #F1F5F9;
-            color: #64748B;
-        }
+        .status-aktif { background: #ECFDF5; color: #059669; }
+        .status-menunggu { background: #FEF3C7; color: #D97706; }
+        .status-proses { background: #E0F2FE; color: #0284C7; }
+        .status-expired { background: #FEE2E2; color: #DC2626; }
+        .status-ditolak { background: #F1F5F9; color: #64748B; }
 
         .question-item {
             background: #FCFCFD;
@@ -570,22 +554,29 @@
         <div class="info-row">
             <div class="info-label">Status</div>
             <div class="info-value">
+            @php
+                $statusClass = 'status-aktif';
+                $statusText = ucfirst($permohonanUser->status ?? 'Belum diisi');
+                $statusMap = [
+                    'pending' => ['text' => 'Menunggu Verifikasi', 'class' => 'status-menunggu'],
+                    'proses' => ['text' => 'Sedang Diproses', 'class' => 'status-proses'],
+                    'diproses' => ['text' => 'Sedang Diproses', 'class' => 'status-proses'],
+                    'selesai' => ['text' => 'Aktif', 'class' => 'status-aktif'],
+                    'ditolak' => ['text' => 'Ditolak', 'class' => 'status-ditolak'],
+                    'expired' => ['text' => 'Kedaluwarsa', 'class' => 'status-expired'],
+                ];
+                if (isset($permohonanUser->status) && isset($statusMap[$permohonanUser->status])) {
+                    $statusText = $statusMap[$permohonanUser->status]['text'];
+                    $statusClass = $statusMap[$permohonanUser->status]['class'];
+                }
+            @endphp
+            
             @if($permohonanUser->status)
-            @if($permohonanUser->status == 'pending')
-                <span style="display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-transform: uppercase; background: #D1FAE5; color: #065F46;">Pending</span>
-            @elseif($permohonanUser->status == 'proses')
-                <span style="display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-transform: uppercase; background: #FEF3C7; color: #92400E;">Proses</span>
-            @elseif($permohonanUser->status == 'selesai')
-                <span style="display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-transform: uppercase; background: #FEE2E2; color: #991B1B;">Selesai</span>
-            @elseif($permohonanUser->status == 'ditolak')
-                <span style="display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-transform: uppercase; background: #FEE2E2; color: #991B1B;">Ditolak</span>
-            @elseif($permohonanUser->status == 'expired')
-                <span style="display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-transform: uppercase; background: #FEE2E2; color: #991B1B;">Expired</span>
+                <span class="status-badge {{ $statusClass }}">
+                    {{ $statusText }}
+                </span>
             @else
-                <span style="color: #9CA3AF; font-style: italic;">{{ $permohonanUser->status }} (format tidak dikenal)</span>
-            @endif
-            @else
-            <span style="color: #9CA3AF; font-style: italic;">Belum diisi</span>
+                <span style="color: #9CA3AF; font-style: italic;">Belum diisi</span>
             @endif
         </div>
     </div>
