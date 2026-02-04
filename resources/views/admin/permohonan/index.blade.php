@@ -541,7 +541,7 @@
                         {{-- Search Bar --}}
                         <div class="input-group" style="width: 300px;">
                             <span class="input-group-text"><i class="ri-search-line"></i></span>
-                            <input type="text" name="q" class="form-control" placeholder="Cari Perumahan, No. Izin..." value="{{ request('q') }}" onchange="this.form.submit()">
+                            <input type="text" name="q" class="form-control" placeholder="Cari Perusahaan, No. Izin..." value="{{ request('q') }}" onchange="this.form.submit()">
                         </div>
                         
                         {{-- Dropdown Filters --}}
@@ -606,8 +606,8 @@
                                 <tr>
                                     <td class="col-no">{{ $perizinans->firstItem() + $i }}</td>
                                     <td>
-                                        <strong>{{ $item->nama }}</strong>
-                                        @if($item->perusahaan) <br><small class="text-muted">{{ $item->perusahaan->nama }}</small> @endif
+                                        <strong>{{ $item->perusahaan ? $item->perusahaan->nama : ($item->nama_perusahaan ?? '-') }}</strong>
+                                        {{-- Optional: Show extra info if needed, but primary name should be bold --}}
                                     </td>
                                     <td>{{ $item->perusahaan->kabupaten_kota ?? '-' }}</td>
                                     <td>

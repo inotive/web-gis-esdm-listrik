@@ -67,10 +67,12 @@ class PerizinanController extends Controller
     public function create()
     {
         $perusahaans = Perusahaan::orderBy('nama', 'asc')->get(['id', 'nama']);
+        $jenisPerizinan = Perizinan::distinct()->whereNotNull('jenis')->orderBy('jenis', 'asc')->pluck('jenis');
 
         return view('admin.perizinan.create', [
             'title' => 'Tambah Perizinan',
             'perusahaans' => $perusahaans,
+            'jenisPerizinan' => $jenisPerizinan,
         ]);
     }
 
@@ -80,18 +82,18 @@ class PerizinanController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama' => 'required|string|max:255',
-            'perusahaan_id' => 'required|exists:perusahaans,id',
+            'nama_perusahaan' => 'required', // Can be ID (int) or Name (string)
             'kontak' => 'nullable|string|max:255',
             'jenis' => 'required|string|max:255',
             'no_pengajuan' => 'nullable|string|max:255',
-            'no_pengajuan' => 'nullable|string|max:255',
             'no_surat_keluar' => 'nullable|string|max:255',
+            'no_surat_izin_terbit' => 'nullable|string|max:255',
             'tanggal' => 'nullable|date',
             'tanggal_akhir' => 'nullable|date|after_or_equal:tanggal',
             'lokasi' => 'nullable|string',
-            'status_kelistrikan' => 'required|in:berlistrik_pln,berlistrik_non_pln,tidak_berlistrik',
             'titik_koordinat' => 'nullable|string|max:255',
+            'jumlah' => 'nullable|integer',
+            'kapasitas' => 'nullable|numeric',
             'jumlah_kapasitas' => 'nullable|integer',
             'total_kapasitas_kva' => 'nullable|numeric',
             'jenis_penggunaan' => 'nullable|string|max:255',
@@ -102,6 +104,35 @@ class PerizinanController extends Controller
 
         DB::beginTransaction();
         try {
+            // Determine if nama_perusahaan is an ID or a Name
+            $inputPerusahaan = $request->nama_perusahaan;
+            $perusahaanId = null;
+            $namaPerusahaan = null;
+
+            if (is_numeric($inputPerusahaan)) {
+                $existing = Perusahaan::find($inputPerusahaan);
+                if ($existing) {
+                    $perusahaanId = $existing->id;
+                    $namaPerusahaan = $existing->nama; // Optional, or keep it null if we prefer relationship
+                } else {
+                     // Numeric but not found?? Treat as name if desired, or error. 
+                     // Assuming it's just a name that happens to be numeric
+                     $namaPerusahaan = $inputPerusahaan;
+                }
+            } else {
+                 $existingByName = Perusahaan::where('nama', $inputPerusahaan)->first();
+                 if ($existingByName) {
+                     $perusahaanId = $existingByName->id;
+                 } else {
+                     $namaPerusahaan = $inputPerusahaan;
+                 }
+            }
+            
+            // Prepare data for creation
+            unset($validated['nama_perusahaan']);
+            $validated['perusahaan_id'] = $perusahaanId;
+            $validated['nama_perusahaan'] = $namaPerusahaan;
+
             $perizinan = Perizinan::create($validated);
 
             // Handle File Upload
@@ -151,11 +182,13 @@ class PerizinanController extends Controller
     public function edit(Perizinan $perizinan)
     {
         $perusahaans = Perusahaan::orderBy('nama', 'asc')->get(['id', 'nama']);
+        $jenisPerizinan = Perizinan::distinct()->whereNotNull('jenis')->orderBy('jenis', 'asc')->pluck('jenis');
 
         return view('admin.perizinan.edit', [
             'title' => 'Edit Perizinan',
             'perizinan' => $perizinan,
             'perusahaans' => $perusahaans,
+            'jenisPerizinan' => $jenisPerizinan,
         ]);
     }
 
@@ -165,27 +198,73 @@ class PerizinanController extends Controller
     public function update(Request $request, Perizinan $perizinan)
     {
         $validated = $request->validate([
-            'nama' => 'required|string|max:255',
-            'perusahaan_id' => 'required|exists:perusahaans,id',
+            'nama_perusahaan' => 'required', // Can be ID or Name
             'kontak' => 'nullable|string|max:255',
             'jenis' => 'required|string|max:255',
             'no_pengajuan' => 'nullable|string|max:255',
             'no_surat_keluar' => 'nullable|string|max:255',
+            'no_surat_izin_terbit' => 'nullable|string|max:255',
             'tanggal' => 'nullable|date',
             'tanggal_akhir' => 'nullable|date|after_or_equal:tanggal',
             'lokasi' => 'nullable|string',
-            'status_kelistrikan' => 'required|in:berlistrik_pln,berlistrik_non_pln,tidak_berlistrik',
             'titik_koordinat' => 'nullable|string|max:255',
+            'jumlah' => 'nullable|integer',
+            'kapasitas' => 'nullable|numeric',
             'jumlah_kapasitas' => 'nullable|integer',
             'total_kapasitas_kva' => 'nullable|numeric',
             'jenis_penggunaan' => 'nullable|string|max:255',
             'sifat_penggunaan' => 'nullable|string|max:255',
             'catatan' => 'nullable|string',
+            'file_izin' => 'nullable|mimes:pdf|max:10240',
         ]);
 
         DB::beginTransaction();
         try {
+            // Determine if nama_perusahaan is an ID or a Name
+            $inputPerusahaan = $request->nama_perusahaan;
+            $perusahaanId = null;
+            $namaPerusahaan = null;
+
+            if (is_numeric($inputPerusahaan)) {
+                $existing = Perusahaan::find($inputPerusahaan);
+                if ($existing) {
+                    $perusahaanId = $existing->id;
+                } else {
+                     $namaPerusahaan = $inputPerusahaan;
+                }
+            } else {
+                 $existingByName = Perusahaan::where('nama', $inputPerusahaan)->first();
+                 if ($existingByName) {
+                     $perusahaanId = $existingByName->id;
+                 } else {
+                     $namaPerusahaan = $inputPerusahaan;
+                 }
+            }
+
+            // Prepare data
+            unset($validated['nama_perusahaan']);
+            $validated['perusahaan_id'] = $perusahaanId;
+            // If we found a linked company, we might want to clear the manual name, or keep it as backup?
+            // Let's clear manual name if linked, otherwise set it.
+            $validated['nama_perusahaan'] = $perusahaanId ? null : $namaPerusahaan;
+
             $perizinan->update($validated);
+
+            // Handle File Upload
+            if ($request->hasFile('file_izin')) {
+                $file = $request->file('file_izin');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $path = $file->storeAs('perizinan_docs', $filename, 'public');
+
+                PerizinanDocument::create([
+                    'perizinan_id' => $perizinan->id,
+                    'filename' => $filename,
+                    'path' => $path,
+                    'extension' => $file->getClientOriginalExtension(),
+                    'size' => $file->getSize(),
+                    'description' => 'File Izin Utama (Updated)',
+                ]);
+            }
 
             DB::commit();
 
@@ -322,30 +401,30 @@ class PerizinanController extends Controller
 
     public function getMapData()
     {
-        $data = Perizinan::select('id', 'nama', 'titik_koordinat', 'status_kelistrikan', 'lokasi')
+        // Removed status_kelistrikan and nama from select as they are dropped
+        $data = Perizinan::select('id', 'titik_koordinat', 'lokasi', 'perusahaan_id', 'nama_perusahaan')
+            ->with(['perusahaan:id,nama']) 
             ->whereNotNull('titik_koordinat')
             ->where('titik_koordinat', '!=', '') 
             ->get();
 
         $formattedData = $data->map(function($item) {
-            $color = match($item->status_kelistrikan) {
-                'berlistrik_pln' => 'green',     
-                'berlistrik_non_pln' => 'yellow', 
-                'tidak_berlistrik' => 'red',      
-                default => 'blue'                 
-            };
+            $color = 'blue'; // Default color since status is removed
 
             $coords = array_map('trim', explode(',', $item->titik_koordinat));
             $lat = isset($coords[0]) && is_numeric($coords[0]) ? (float)$coords[0] : 0;
             $lng = isset($coords[1]) && is_numeric($coords[1]) ? (float)$coords[1] : 0;
+            
+            // Prefer linked company name, fallback to manual name
+            $companyName = $item->perusahaan ? $item->perusahaan->nama : ($item->nama_perusahaan ?? 'Tanpa Nama');
 
             return [
                 'id' => $item->id,
-                'title' => $item->nama,
+                'title' => $companyName,
                 'lat' => $lat,
                 'lng' => $lng,
                 'color' => $color,
-                'status_label' => ucwords(str_replace('_', ' ', $item->status_kelistrikan ?? '')),
+                'status_label' => 'Lokasi Izin', // Generic label
                 'lokasi' => $item->lokasi
             ];
         });

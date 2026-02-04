@@ -3,6 +3,7 @@
 @section('title', 'Tambah Perizinan')
 
 @push('styles')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <style>
   .card {
     border: 1px solid var(--line);
@@ -11,7 +12,28 @@
     padding: 24px;
     margin-top: 18px;
   }
-
+  
+  /* Select2 Custom Styling */
+  .select2-container .select2-selection--single {
+    height: 44px;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 42px;
+    top: 1px;
+    right: 10px;
+  }
+  
+  .select2-container--default .select2-selection--single .select2-selection__rendered {
+    padding-left: 12px;
+    color: #111827;
+    font-size: 14px;
+  }
+  
   .form-group {
     margin-bottom: 20px;
   }
@@ -78,6 +100,16 @@
       grid-template-columns: 1fr;
     }
   }
+
+  .section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #111827;
+    margin-top: 24px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #E5E7EB;
+    padding-bottom: 8px;
+  }
 </style>
 @endpush
 
@@ -88,10 +120,7 @@
     <div class="page-title">Tambah Perizinan</div>
   </div>
   <div class="page-actions">
-    <a href="{{ route('admin.perizinan.index') }}" class="btn btn-secondary">
-      <i class="ri-arrow-left-line"></i>
-      Kembali
-    </a>
+    {{-- Button Removed --}}
   </div>
 </div>
 
@@ -99,30 +128,24 @@
   <form method="POST" action="{{ route('admin.perizinan.store') }}" enctype="multipart/form-data">
     @csrf
 
-    <div class="form-group">
-      <label class="label">Nama <span style="color:#DC2626">*</span></label>
-      <input type="text" name="nama" class="input" value="{{ old('nama') }}" placeholder="Masukkan nama" required>
-      @error('nama')
-        <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
-      @enderror
-    </div>
-
-    <div class="form-group">
-      <label class="label">Perusahaan <span style="color:#DC2626">*</span></label>
-      <select name="perusahaan_id" class="input" required>
-        <option value="" disabled {{ old('perusahaan_id') ? '' : 'selected' }}>Pilih Perusahaan</option>
-        @foreach($perusahaans as $perusahaan)
-          <option value="{{ $perusahaan->id }}" {{ old('perusahaan_id') == $perusahaan->id ? 'selected' : '' }}>
-            {{ $perusahaan->nama }}
-          </option>
-        @endforeach
-      </select>
-      @error('perusahaan_id')
-        <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
-      @enderror
-    </div>
+    <div class="section-title">Data Pemohon/Pelaku Usaha</div>
 
     <div class="form-row">
+      <div class="form-group">
+        <label class="label">Nama Perusahaan <span style="color:#DC2626">*</span></label>
+        <select name="nama_perusahaan" class="select2-perusahaan" style="width: 100%;" required>
+            <option></option>
+            @foreach($perusahaans as $perusahaan)
+              <option value="{{ $perusahaan->id }}" {{ old('nama_perusahaan') == $perusahaan->id ? 'selected' : '' }}>
+                  {{ $perusahaan->nama }}
+              </option>
+            @endforeach
+        </select>
+        @error('nama_perusahaan')
+          <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
+        @enderror
+      </div>
+
       <div class="form-group">
         <label class="label">Kontak</label>
         <input type="text" name="kontak" class="input" value="{{ old('kontak') }}" placeholder="Masukkan kontak">
@@ -130,16 +153,24 @@
           <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
         @enderror
       </div>
+    </div>
 
+    <div class="section-title">Data Perizinan/Non Perizinan</div>
+
+    <div class="form-row">
       <div class="form-group">
-        <label class="label">Jenis <span style="color:#DC2626">*</span></label>
-        <input type="text" name="jenis" class="input" value="{{ old('jenis') }}" placeholder="Contoh: IUJPTL, IUPTLS, SLO, SKTP" required>
+        <label class="label">Jenis Perizinan <span style="color:#DC2626">*</span></label>
+        <select name="jenis" class="select2-jenis" style="width: 100%;" required>
+            <option></option>
+            @foreach($jenisPerizinan as $j)
+                <option value="{{ $j }}" {{ old('jenis') == $j ? 'selected' : '' }}>{{ $j }}</option>
+            @endforeach
+        </select>
         @error('jenis')
           <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
         @enderror
       </div>
-    </div>
-    <div class="form-row">
+
       <div class="form-group">
         <label class="label">No. Pengajuan</label>
         <input type="text" name="no_pengajuan" class="input" value="{{ old('no_pengajuan') }}" placeholder="Masukkan nomor pengajuan">
@@ -147,11 +178,21 @@
           <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
         @enderror
       </div>
+    </div>
 
+    <div class="form-row">
       <div class="form-group">
         <label class="label">No. Surat Keluar (Rekomtek/Pertek)</label>
         <input type="text" name="no_surat_keluar" class="input" value="{{ old('no_surat_keluar') }}" placeholder="Masukkan nomor surat keluar">
         @error('no_surat_keluar')
+          <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
+        @enderror
+      </div>
+
+      <div class="form-group">
+        <label class="label">No. Surat Izin Terbit</label>
+        <input type="text" name="no_surat_izin_terbit" class="input" value="{{ old('no_surat_izin_terbit') }}" placeholder="Masukkan nomor surat izin terbit">
+        @error('no_surat_izin_terbit')
           <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
         @enderror
       </div>
@@ -174,6 +215,8 @@
       </div>
     </div>
 
+    <div class="section-title">Data Pembangkit Listrik</div>
+
     <div class="form-group">
       <label class="label">Lokasi</label>
       <textarea name="lokasi" class="input" rows="3" placeholder="Masukkan lokasi">{{ old('lokasi') }}</textarea>
@@ -190,34 +233,42 @@
       @enderror
     </div>
 
-    <div class="form-group">
-      <label class="label">Status Kelistrikan Desa <span style="color:#DC2626">*</span></label>
-      <select name="status_kelistrikan" class="input" required>
-        <option value="" disabled selected>Pilih Status Kelistrikan</option>
-        <option value="berlistrik_pln" {{ old('status_kelistrikan') == 'berlistrik_pln' ? 'selected' : '' }}>
-          Berlistrik PLN (Hijau)
-        </option>
-        <option value="berlistrik_non_pln" {{ old('status_kelistrikan') == 'berlistrik_non_pln' ? 'selected' : '' }}>
-          Berlistrik Non-PLN (Kuning)
-        </option>
-        <option value="tidak_berlistrik" {{ old('status_kelistrikan') == 'tidak_berlistrik' ? 'selected' : '' }}>
-          Tidak Berlistrik (Merah)
-        </option>
-      </select>
-      @error('status_kelistrikan')
-        <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
-      @enderror
+
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="label">Jumlah Unit</label>
+        <input type="number" name="jumlah" class="input" value="{{ old('jumlah') }}" placeholder="Masukkan jumlah unit" min="0">
+        @error('jumlah')
+          <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
+        @enderror
+      </div>
+
+      <div class="form-group">
+        <label class="label">Kapasitas (per unit)</label>
+        <input type="number" name="kapasitas" class="input" value="{{ old('kapasitas') }}" placeholder="Masukkan kapasitas" step="0.01" min="0">
+        @error('kapasitas')
+          <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
+        @enderror
+      </div>
     </div>
 
     <div class="form-row">
+      <div class="form-group">
+        <label class="label">Total Kapasitas (kVA)</label>
+        <input type="number" name="total_kapasitas_kva" class="input" value="{{ old('total_kapasitas_kva') }}" placeholder="Masukkan total kapasitas" step="0.01" min="0">
+        @error('total_kapasitas_kva')
+          <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
+        @enderror
+      </div>
 
-
-    <div class="form-group">
-      <label class="label">Jenis Penggunaan</label>
-      <input type="text" name="jenis_penggunaan" class="input" value="{{ old('jenis_penggunaan') }}" placeholder="Masukkan jenis penggunaan">
-      @error('jenis_penggunaan')
-        <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
-      @enderror
+      <div class="form-group">
+        <label class="label">Jenis Pembangkit Listrik</label>
+        <input type="text" name="jenis_penggunaan" class="input" value="{{ old('jenis_penggunaan') }}" placeholder="Contoh: PLTS, PLTD">
+        @error('jenis_penggunaan')
+          <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
+        @enderror
+      </div>
     </div>
 
     <div class="form-group">
@@ -227,6 +278,8 @@
         <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>
       @enderror
     </div>
+
+    <div class="section-title">Catatan</div>
 
     <div class="form-group">
       <label class="label">Catatan</label>
@@ -246,8 +299,9 @@
     </div>
 
     <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 32px;">
-      <a href="{{ route('admin.perizinan.index') }}" class="btn btn-secondary">
-        Batal
+      <a href="{{ route('admin.permohonan.index', ['tab' => 'perizinan']) }}" class="btn btn-secondary">
+        <i class="ri-arrow-go-back-line"></i>
+        Kembali
       </a>
       <button type="submit" class="btn btn-primary">
         <i class="ri-save-line"></i>
@@ -259,7 +313,22 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
+  $(document).ready(function() {
+    $('.select2-perusahaan').select2({
+      tags: true,
+      placeholder: "Pilih atau Ketik Nama Perusahaan Baru",
+      allowClear: true
+    });
+
+    $('.select2-jenis').select2({
+      tags: true,
+      placeholder: "Pilih atau Ketik Jenis Perizinan",
+      allowClear: true
+    });
+  });
+
   @if(session('success'))
     Swal.fire({
       icon: 'success',

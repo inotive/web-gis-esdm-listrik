@@ -104,7 +104,7 @@ class PermohonanController extends Controller
         if ($request->has('q')) {
             $q = $request->q;
             $queryPerizinan->where(function($sub) use ($q) {
-                $sub->where('nama', 'like', "%{$q}%")
+                $sub->where('nama_perusahaan', 'like', "%{$q}%")
                     ->orWhere('no_pengajuan', 'like', "%{$q}%")
                     ->orWhere('jenis', 'like', "%{$q}%")
                     ->orWhereHas('perusahaan', function($p) use ($q) {
@@ -115,7 +115,12 @@ class PermohonanController extends Controller
 
 
         if ($filterPerizinanNama) {
-            $queryPerizinan->where('nama', 'like', "%{$filterPerizinanNama}%");
+            $queryPerizinan->where(function($q) use ($filterPerizinanNama) {
+                $q->where('nama_perusahaan', 'like', "%{$filterPerizinanNama}%")
+                  ->orWhereHas('perusahaan', function($sub) use ($filterPerizinanNama) {
+                      $sub->where('nama', 'like', "%{$filterPerizinanNama}%");
+                  });
+            });
         }
         
         // Filter Kabupaten/Kota

@@ -8,9 +8,6 @@
     </div>
 
     <div class="actions">
-        <button class="btn-icon" title="Pesan Masuk"><i class="ri-message-2-line"></i></button>
-        <button class="btn-icon" title="Pesan Masuk"><i class="ri-message-2-line"></i></button>
-
         <!-- Notification Dropdown -->
         <div class="notification-dropdown" id="notificationDropdown">
             <button class="btn-icon" id="notificationBtn" title="Notifikasi">
@@ -34,7 +31,6 @@
                 </div>
             </div>
         </div>
-        <button class="btn-icon" title="Bantuan"><i class="ri-question-line"></i></button>
 
         @php
             $authUser = Auth::user();

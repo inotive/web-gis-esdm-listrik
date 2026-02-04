@@ -14,18 +14,20 @@ class Perizinan extends Model
     protected $table = 'perizinans';
 
     protected $fillable = [
-        'nama',
         'perusahaan_id',
+        'nama_perusahaan',
         'kontak',
         'jenis',
         'no_pengajuan',
         'no_surat_keluar',
+        'no_surat_izin_terbit',
         'tanggal',
         'tanggal_akhir',
         'status_izin',
         'lokasi',
-        'status_kelistrikan',
         'titik_koordinat',
+        'jumlah',
+        'kapasitas',
         'jumlah_kapasitas',
         'total_kapasitas_kva',
         'jenis_penggunaan',
@@ -37,6 +39,7 @@ class Perizinan extends Model
     protected $casts = [
         'tanggal' => 'date',
         'tanggal_akhir' => 'date',
+        'kapasitas' => 'decimal:2',
         'total_kapasitas_kva' => 'decimal:2',
     ];
 
