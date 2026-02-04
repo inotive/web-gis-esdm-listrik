@@ -39,9 +39,9 @@
                         </div>
                         <ul class="mb-0 pl-3">
                             <li>Pastikan format file sesuai dengan template yang disediakan.</li>
-                            <li>Kolom wajib: <b>nama_perizinan</b>, <b>nama_perusahaan</b>, <b>status_kelistrikan</b>. (Opsional: <b>tanggal, tanggal_akhir</b> untuk status aktif).</li>
-                            <li>Status kelistrikan akan otomatis dikonversi (Hijau/Kuning/Merah).</li>
-                            <li>Jika perusahaan belum ada, sistem akan mencoba membuatnya otomatis.</li>
+                            <li>Kolom wajib: <b>nama</b> (sebagai Nama Pemohon/Perusahaan) dan <b>jenis</b>.</li>
+                            <li>Kolom tanggal (tanggal, tanggal_terbit, tanggal_akhir) sebaiknya diisi dengan format tanggal Excel atau YYYY-MM-DD.</li>
+                            <li>Jika perusahaan belum ada, sistem akan mencoba membuatnya otomatis berdasarkan kolom <b>nama</b>.</li>
                         </ul>
                     </div>
 

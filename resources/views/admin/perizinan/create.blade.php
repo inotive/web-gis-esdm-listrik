@@ -182,7 +182,7 @@
 
     <div class="form-row">
       <div class="form-group">
-        <label class="label">No. Surat Keluar (Rekomtek/Pertek)</label>
+        <label class="label">Surat Izin</label>
         <input type="text" name="no_surat_keluar" class="input" value="{{ old('no_surat_keluar') }}" placeholder="Masukkan nomor surat keluar">
         @error('no_surat_keluar')
           <span style="color: #DC2626; font-size: 12px; margin-top: 4px; display: block;">{{ $message }}</span>

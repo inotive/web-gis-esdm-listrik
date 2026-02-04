@@ -33,11 +33,13 @@
         <div class="menu-title">Menu Utama</div>
 
         @can('dashboard.view')
-            <a class="menu-item {{ nav_active('admin.dashboard') }}" href="{{ route('admin.dashboard') }}"
-                @if (nav_active('admin.dashboard')) aria-current="page" @endif>
-                <span class="menu-icon"><i class="ri-dashboard-line" aria-hidden="true"></i></span>
-                <span class="menu-label">Dashboards</span>
-            </a>
+            @if (!in_array($userRole ?? null, ['desa', 'perusahaan']))
+                <a class="menu-item {{ nav_active('admin.dashboard') }}" href="{{ route('admin.dashboard') }}"
+                    @if (nav_active('admin.dashboard')) aria-current="page" @endif>
+                    <span class="menu-icon"><i class="ri-dashboard-line" aria-hidden="true"></i></span>
+                    <span class="menu-label">Dashboards</span>
+                </a>
+            @endif
         @endcan
 
         <a class="menu-item {{ request()->routeIs('landing') ? 'active' : '' }}" href="{{ route('landing') }}">
@@ -51,25 +53,27 @@
         </a>
 
 
+        @if (!in_array($userRole, ['desa', 'perusahaan']))
         <a class="menu-item {{ nav_active('admin.permohonan.*', 'admin.perizinan.*') }}"
             href="{{ route('admin.permohonan.index') }}">
             <span class="menu-icon"><i class="ri-file-list-3-line" aria-hidden="true"></i></span>
             <span class="menu-label">Permohonan dan Perizinan</span>
         </a>
+        @endif
 
         <a class="menu-item {{ nav_active('admin.rekap-data.*') }}" href="{{ route('admin.rekap-data.index') }}">
             <span class="menu-icon"><i class="ri-file-text-line" aria-hidden="true"></i></span>
             <span class="menu-label">Rekap Data</span>
         </a>
 
-        {{-- @if (in_array($userRole ?? null, ['desa', 'perusahaan']))
+        @if (in_array($userRole ?? null, ['desa', 'perusahaan']))
             <div class="menu-title">Layanan</div>
             <a class="menu-item {{ nav_active('admin.pengajuan-permohonan.*') }}"
                 href="{{ route('admin.pengajuan-permohonan.index') }}">
                 <span class="menu-icon"><i class="ri-file-add-line" aria-hidden="true"></i></span>
                 <span class="menu-label">Pengajuan Permohonan</span>
             </a>
-        @endif --}}
+        @endif
 
 
         {{-- <a class="menu-item {{ nav_active('admin.pemukiman.*') }}" href="{{ route('admin.pemukiman.index') }}">

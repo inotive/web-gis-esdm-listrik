@@ -376,10 +376,12 @@
                                     <select class="filter-input-permohonan filter-backend"
                                         name="filter_permohonan_status">
                                         <option value="">Semua Status</option>
-                                        <option value="pending" {{ request('filter_permohonan_status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                                        <option value="proses" {{ request('filter_permohonan_status') == 'proses' ? 'selected' : '' }}>Proses</option>
-                                        <option value="selesai" {{ request('filter_permohonan_status') == 'selesai' ? 'selected' : '' }}>Selesai</option>
-                                        <option value="ditolak" {{ request('filter_permohonan_status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                                        <option value="pending" {{ request('filter_permohonan_status') == 'pending' ? 'selected' : '' }}>Menunggu Verifikasi</option>
+                                        <option value="proses" {{ request('filter_permohonan_status') == 'proses' ? 'selected' : '' }}>Sedang Diproses</option>
+                                        <option value="selesai" {{ request('filter_permohonan_status') == 'selesai' ? 'selected' : '' }}>Aktif</option>
+                                        <option value="ditolak" {{ request('filter_permohonan_status') == 'ditolak' ? 'selected' : '' }}>Ditolak</o
+                                        ption>
+                                        <option value="dibatalkan" {{ request('filter_permohonan_status') == 'dibatalkan' ? 'selected' : '' }}>Dibatalkan</option>
                                     </select>
                                 </th>
                                 <th><input type="date" class="filter-input-permohonan filter-backend"
@@ -396,9 +398,9 @@
                                     $statusMap = [
                                         'pending' => ['text' => 'Menunggu Verifikasi', 'class' => 'status-menunggu'],
                                         'proses' => ['text' => 'Sedang Diproses', 'class' => 'status-proses'],
-                                        'diproses' => ['text' => 'Sedang Diproses', 'class' => 'status-proses'],
                                         'selesai' => ['text' => 'Aktif', 'class' => 'status-aktif'],
                                         'ditolak' => ['text' => 'Ditolak', 'class' => 'status-ditolak'],
+                                        'dibatalkan' => ['text' => 'Dibatalkan', 'class' => 'status-expired'],
                                         'expired' => ['text' => 'Kedaluwarsa', 'class' => 'status-expired'],
                                     ];
                                     if (isset($statusMap[$item->status])) {
@@ -415,8 +417,12 @@
                                     <td class="col-aksi">
                                         <a href="{{ route('admin.permohonan-user.show', [$item->permohonan_id, $item->id]) }}"
                                             class="btn-ico view" title="Lihat Detail"><i class="fa-solid fa-eye"></i></a>
-                                        @php $isAdmin = in_array(optional(auth()->user()->roles()->first())->name, ['admin', 'superadmin']); @endphp
-                                        @if($isAdmin)
+                                        @php 
+                                            $isAdmin = in_array(optional(auth()->user()->roles()->first())->name, ['admin', 'superadmin']);
+                                            $submitterRole = $item->user ? optional($item->user->roles->first())->name : null;
+                                            $isRestricted = in_array($submitterRole, ['desa', 'perusahaan']);
+                                        @endphp
+                                        @if($isAdmin && !$isRestricted)
                                             <a href="{{ route('admin.permohonan-user.edit', [$item->permohonan_id, $item->id]) }}"
                                                 class="btn-ico edit" title="Edit"><i class="fa-solid fa-pen-to-square"></i></a>
                                             <form action="{{ route('admin.permohonan-user.destroy', [$item->permohonan_id, $item->id]) }}"
@@ -581,7 +587,6 @@
                             <tr>
                                 <th class="col-no">No</th>
                                 <th>Nama Pemohon</th>
-                                <th>Kabupaten/Kota</th>
                                 <th>Jenis</th>
                                 <th>No. Surat Izin</th>
                                 <th>Tanggal Terbit</th>
@@ -593,7 +598,6 @@
                             <tr class="filter-row">
                                 <th class="col-no"></th>
                                 <th><input type="text" class="filter-input-perizinan filter-backend" name="filter_perizinan_nama" value="{{ request('filter_perizinan_nama') }}" placeholder="Filter nama..."></th>
-                                <th><input type="text" class="filter-input-perizinan filter-backend" name="filter_perizinan_kabupaten" value="{{ request('filter_perizinan_kabupaten') }}" placeholder="Filter kabupaten..."></th>
                                 <th><input type="text" class="filter-input-perizinan filter-backend" name="filter_perizinan_jenis" value="{{ request('filter_perizinan_jenis') }}" placeholder="Filter jenis..."></th>
                                 <th><input type="text" class="filter-input-perizinan filter-backend" name="filter_perizinan_no_izin" value="{{ request('filter_perizinan_no_izin') }}" placeholder="Filter no izin..."></th>
                                 <th><input type="date" class="filter-input-perizinan filter-backend" name="filter_perizinan_tgl_terbit" value="{{ request('filter_perizinan_tgl_terbit') }}" placeholder="MM/DD/YYYY"></th>
@@ -611,7 +615,6 @@
                                         <strong>{{ $item->perusahaan ? $item->perusahaan->nama : ($item->nama_perusahaan ?? '-') }}</strong>
                                         {{-- Optional: Show extra info if needed, but primary name should be bold --}}
                                     </td>
-                                    <td>{{ $item->perusahaan->kabupaten_kota ?? '-' }}</td>
                                     <td>
                                         <span class="status-badge" style="background:#DCFCE7;color:#16A34A;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;">{{ $item->jenis }}</span>
                                     </td>

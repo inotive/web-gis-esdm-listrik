@@ -49,33 +49,22 @@
             font-size: 14px;
         }
 
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
+        /* Updated Badge Styles to match Index/Reference */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
         }
 
-        .badge-selesai {
-            background: #D1FAE5;
-            color: #065F46;
-        }
-
-        .badge-pending {
-            background: #FEF3C7;
-            color: #D97706;
-        }
-
-        .badge-proses {
-            background: #DBEAFE;
-            color: #1E40AF;
-        }
-
-        .badge-ditolak {
-            background: #FEE2E2;
-            color: #DC2626;
-        }
+        .status-aktif { background: #ECFDF5; color: #059669; }     /* Selesai/Aktif - Green */
+        .status-menunggu { background: #FEF3C7; color: #D97706; }  /* Pending - Orange */
+        .status-proses { background: #E0F2FE; color: #0284C7; }    /* Proses - Blue */
+        .status-expired { background: #FEE2E2; color: #DC2626; }   /* Ditolak/Expired - Red */
+        .status-ditolak { background: #F1F5F9; color: #64748B; }   /* Ditolak - Gray */
 
         .question-item {
             background: #FCFCFD;
@@ -638,13 +627,9 @@
                             <div class="file-preview-container">
                                 {{-- File Thumbnail --}}
                                 @if ($filePath)
-                                    <div class="file-thumbnail"
-                                        @if ($isImage) onclick="openPreviewModal('{{ $filePath }}', '{{ $fileName }}', '{{ $fileExtension }}')" @endif>
+                                    <div class="file-thumbnail">
                                         @if ($isImage)
-                                            <img src="{{ $filePath }}" alt="{{ $fileName }}">
-                                            <div class="file-thumbnail-overlay">
-                                                <i class="ri-eye-line"></i>
-                                            </div>
+                                            <i class="ri-image-2-line file-thumbnail-icon" style="color: #6366f1;"></i>
                                         @elseif ($isPdf)
                                             <i class="ri-file-pdf-line file-thumbnail-icon pdf"></i>
                                         @elseif ($isWord)
@@ -724,20 +709,31 @@
             <div class="info-label">Status</div>
             <div class="info-value">
                 @php
-                    $statusClass = 'badge-selesai';
-                    $statusText = ucfirst($permohonanUser->status);
-                    $statusMap = [
-                        'pending' => ['text' => 'Menunggu Verifikasi', 'class' => 'badge-pending'],
-                        'proses' => ['text' => 'Sedang Diproses', 'class' => 'badge-proses'],
-                        'selesai' => ['text' => 'Selesai', 'class' => 'badge-selesai'],
-                        'ditolak' => ['text' => 'Ditolak', 'class' => 'badge-ditolak'],
-                    ];
-                    if (isset($statusMap[$permohonanUser->status])) {
-                        $statusText = $statusMap[$permohonanUser->status]['text'];
-                        $statusClass = $statusMap[$permohonanUser->status]['class'];
+                    $statusClass = 'status-ditolak';
+                    $statusLabel = $permohonanUser->status;
+                    
+                    if ($permohonanUser->status === 'pending') {
+                        $statusClass = 'status-menunggu';
+                        $statusLabel = 'Pending';
+                    } elseif ($permohonanUser->status === 'proses') {
+                        $statusClass = 'status-proses';
+                        $statusLabel = 'Proses';
+                    } elseif ($permohonanUser->status === 'selesai') {
+                        $statusClass = 'status-aktif';
+                        $statusLabel = 'Aktif';
+                    } elseif ($permohonanUser->status === 'ditolak') {
+                        $statusClass = 'status-expired';
+                        $statusLabel = 'Ditolak';
+                    } elseif ($permohonanUser->status === 'dibatalkan') {
+                        $statusClass = 'status-expired';
+                        $statusLabel = 'Dibatalkan';
+                    } else {
+                            $statusLabel = ucfirst($permohonanUser->status);
                     }
                 @endphp
-                <span class="badge {{ $statusClass }}">{{ $statusText }}</span>
+                <span class="status-badge {{ $statusClass }}">
+                    {{ $statusLabel }}
+                </span>
             </div>
         </div>
 

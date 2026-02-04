@@ -1,7 +1,5 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Buat Permohonan Baru')
-
 @push('styles')
     <style>
         .card {

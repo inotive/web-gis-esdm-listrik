@@ -1,8 +1,7 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Pengajuan Permohonan Saya')
-
 @push('styles')
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .card-header {
             background: white;
@@ -183,32 +182,46 @@
             stroke: #F8285A;
         }
 
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
+        /* Status Badge - Match Reference */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
         }
 
-        .badge-pending {
-            background: #FEF3C7;
-            color: #92400E;
+        .status-aktif { background: #ECFDF5; color: #059669; }     /* Selesai/Aktif - Green */
+        .status-menunggu { background: #FEF3C7; color: #D97706; }  /* Pending - Orange */
+        .status-proses { background: #E0F2FE; color: #0284C7; }    /* Proses - Blue */
+        .status-expired { background: #FEE2E2; color: #DC2626; }   /* Ditolak/Expired - Red */
+        .status-ditolak { background: #F1F5F9; color: #64748B; }   /* Ditolak - Gray */
+        
+        /* Action Buttons - Match Reference */
+        .btn-ico {
+            width: 24px;
+            height: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            transition: transform 0.2s;
+            padding: 0;
+            margin: 0 4px;
+            font-size: 16px; /* FontAwesome size */
         }
-
-        .badge-proses {
-            background: #DBEAFE;
-            color: #1E40AF;
-        }
-
-        .badge-selesai {
-            background: #D1FAE5;
-            color: #065F46;
-        }
-
-        .badge-ditolak {
-            background: #FEE2E2;
-            color: #991B1B;
+        
+        .btn-ico:hover { transform: scale(1.1); }
+        .btn-ico.view { color: #0077B6; } /* Blue */
+        .btn-ico.edit { color: #f59e0b; } /* Orange */
+        .btn-ico.danger { color: #ef4444; } /* Red */
+        
+        .col-aksi {
+            text-align: left !important;
         }
 
         .table-footer {
@@ -315,68 +328,62 @@
                                 <td class="col-no">{{ $permohonanUsers->firstItem() + $i }}</td>
                                 <td><strong>{{ $permohonanUser->permohonan->nama }}</strong></td>
                                 <td>
-                                    <span class="badge badge-{{ $permohonanUser->status }}">
-                                        @if ($permohonanUser->status === 'pending')
-                                            Pending
-                                        @elseif($permohonanUser->status === 'proses')
-                                            Proses
-                                        @elseif($permohonanUser->status === 'selesai')
-                                            Selesai
-                                        @elseif($permohonanUser->status === 'ditolak')
-                                            Ditolak
-                                        @else
-                                            {{ $permohonanUser->status }}
-                                        @endif
+                                    @php
+                                        $statusClass = 'status-ditolak';
+                                        $statusLabel = $permohonanUser->status;
+                                        
+                                        if ($permohonanUser->status === 'pending') {
+                                            $statusClass = 'status-menunggu';
+                                            $statusLabel = 'Pending';
+                                        } elseif ($permohonanUser->status === 'proses') {
+                                            $statusClass = 'status-proses';
+                                            $statusLabel = 'Proses';
+                                        } elseif ($permohonanUser->status === 'selesai') {
+                                            $statusClass = 'status-aktif';
+                                            $statusLabel = 'Aktif';
+                                        } elseif ($permohonanUser->status === 'ditolak') {
+                                            $statusClass = 'status-expired';
+                                            $statusLabel = 'Ditolak';
+                                        } elseif ($permohonanUser->status === 'dibatalkan') {
+                                            $statusClass = 'status-expired';
+                                            $statusLabel = 'Dibatalkan';
+                                        } else {
+                                             $statusLabel = ucfirst($permohonanUser->status);
+                                        }
+                                    @endphp
+                                    <span class="status-badge {{ $statusClass }}">
+                                        {{ $statusLabel }}
                                     </span>
                                 </td>
                                 <td>{{ $permohonanUser->created_at->translatedFormat('d F Y') }}</td>
                                 <td>{{ $permohonanUser->keterangan ?? '-' }}</td>
                                 <td class="col-aksi">
-                                    <a href="{{ route('admin.pengajuan-permohonan.show', $permohonanUser) }}"
-                                        class="btn-ico detail" title="Detail">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path
-                                                d="M15 12C15 13.6569 13.6569 15 12 15C10.3431 15 9 13.6569 9 12C9 10.3431 10.3431 9 12 9C13.6569 9 15 10.3431 15 12Z"
-                                                stroke="#6366F1" stroke-width="2" stroke-linecap="round"
-                                                stroke-linejoin="round" />
-                                            <path
-                                                d="M2.45801 12C3.73201 7.943 7.52301 5 12 5C16.478 5 20.268 7.943 21.542 12C20.268 16.057 16.478 19 12 19C7.52301 19 3.73201 16.057 2.45801 12Z"
-                                                stroke="#6366F1" stroke-width="2" stroke-linecap="round"
-                                                stroke-linejoin="round" />
-                                        </svg>
-                                    </a>
-
+                                    {{-- Cancel/Delete Button (Available only if pending) --}}
                                     @if ($permohonanUser->status === 'pending')
-                                        <a href="{{ route('admin.pengajuan-permohonan.edit', $permohonanUser) }}"
-                                            class="btn-ico detail" title="Edit">
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                                xmlns="http://www.w3.org/2000/svg">
-                                                <path
-                                                    d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13"
-                                                    stroke="#6366F1" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" />
-                                                <path
-                                                    d="M18.5 2.50001C18.8978 2.10219 19.4374 1.87869 20 1.87869C20.5626 1.87869 21.1022 2.10219 21.5 2.50001C21.8978 2.89784 22.1213 3.4374 22.1213 4.00001C22.1213 4.56262 21.8978 5.10219 21.5 5.50001L12 15L8 16L9 12L18.5 2.50001Z"
-                                                    stroke="#6366F1" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round" />
-                                            </svg>
-                                        </a>
-
                                         <form action="{{ route('admin.pengajuan-permohonan.destroy', $permohonanUser) }}"
                                             method="POST" style="display:inline-block;margin:0;"
                                             class="form-cancel-permohonan"
                                             data-name="{{ $permohonanUser->permohonan->nama }}">
                                             @csrf @method('DELETE')
                                             <button type="button" class="btn-ico danger btn-cancel-permohonan"
-                                                title="Batalkan">
-                                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                                    xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M18 6L6 18M6 6L18 18" stroke="#F8285A" stroke-width="2"
-                                                        stroke-linecap="round" stroke-linejoin="round" />
-                                                </svg>
+                                                title="Batalkan Permohonan">
+                                                <i class="fa-solid fa-xmark"></i>
                                             </button>
                                         </form>
+                                    @endif
+
+                                    {{-- Detail Button (Always available) --}}
+                                    <a href="{{ route('admin.pengajuan-permohonan.show', $permohonanUser) }}"
+                                        class="btn-ico view" title="Detail">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
+
+                                    {{-- Edit Button (Available only if pending) --}}
+                                    @if ($permohonanUser->status === 'pending')
+                                        <a href="{{ route('admin.pengajuan-permohonan.edit', $permohonanUser) }}"
+                                            class="btn-ico edit" title="Edit">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </a>
                                     @endif
                                 </td>
                             </tr>

@@ -15,25 +15,33 @@ class PerizinanImport implements ToModel, WithHeadingRow
     *
     * @return \Illuminate\Database\Eloquent\Model|null
     */
+
+
+    public function headingRow(): int
+    {
+        return 4; // The header row containing "Nama", "Kontak", etc.
+    }
+
     public function model(array $row)
     {
-        // Cari perusahaan berdasarkan nama (case insensitive)
-        $perusahaan = null;
-        if (isset($row['nama_perusahaan'])) {
-            $perusahaan = Perusahaan::where('nama', 'like', '%' . $row['nama_perusahaan'] . '%')->first();
+        // Skip row 5 (which contains column numbers '1', '2', '3'...)
+        // We check if 'nama' is exactly the string '3' (based on the template) or purely numeric
+        if (isset($row['nama']) && $row['nama'] == '3') {
+             return null;
         }
 
-        // Jika perusahaan tidak ditemukan, create baru (optional logic, tapi aman untuk sekarang skip atau create)
-        // Di sini kita create baru jika contact ada, atau biarkan error/skip jika critical.
-        // Untuk kemudahan, jika null, kita create dummy/temp atau biarkan validation fail. 
-        // Tapi "ToModel" akan mencoba insert.
-        // Kita paksa cari atau create.
-        if (!$perusahaan && !empty($row['nama_perusahaan'])) {
+        // Cari perusahaan berdasarkan nama (case insensitive)
+        $perusahaan = null;
+        if (isset($row['nama'])) {
+            $perusahaan = Perusahaan::where('nama', 'like', '%' . $row['nama'] . '%')->first();
+        }
+
+        // Jika perusahaan tidak ditemukan, create baru
+        if (!$perusahaan && !empty($row['nama'])) {
             $perusahaan = Perusahaan::create([
-                'nama' => $row['nama_perusahaan'],
+                'nama' => $row['nama'],
                 'kontak' => $row['kontak'] ?? null,
-                'alamat' => $row['lokasi'] ?? null, // Map lokasi to alamat as best effort
-                // 'kabupaten_kota' => ... // if available in row
+                'alamat' => $row['lokasi'] ?? null,
             ]);
         }
         
@@ -42,22 +50,25 @@ class PerizinanImport implements ToModel, WithHeadingRow
         }
 
         return new Perizinan([
-            'nama'              => $row['nama_pemohon'] ?? $row['nama_perizinan'] ?? $row['nama'] ?? '-',
+            'nama'              => $row['nama'],
             'perusahaan_id'     => $perusahaan->id,
             'kontak'            => $row['kontak'] ?? null,
-            'jenis'             => $row['jenis_permohonan'] ?? $row['jenis_perizinan'] ?? $row['jenis'] ?? 'Izin Usaha',
+            'jenis'             => $row['jenis'] ?? 'IUPTLS',
             'no_pengajuan'      => $row['no_pengajuan'] ?? null,
-            'no_surat_keluar'   => $row['no_surat_keluar'] ?? null,
+            'no_surat_keluar'   => $row['surat_izin'] ?? $row['no_surat_izin'] ?? $row['no_surat_keluar'] ?? null,
             'tanggal'           => $this->transformDate($row['tanggal'] ?? null),
+            'no_surat_izin_terbit'=> $row['no_surat_izin_terbit'] ?? null,
+            'tanggal_terbit'    => $this->transformDate($row['tanggal_terbit'] ?? null),
             'tanggal_akhir'     => $this->transformDate($row['tanggal_akhir'] ?? null),
             'lokasi'            => $row['lokasi'] ?? null,
-            'status_kelistrikan'=> $this->mapStatus($row['status_kelistrikan'] ?? null),
             'titik_koordinat'   => $row['titik_koordinat'] ?? null,
-            'jumlah_kapasitas'  => $row['jumlah_kapasitas'] ?? 0,
-            'total_kapasitas_kva'=> $row['total_kapasitas_kva'] ?? 0,
+            'jumlah'            => $row['jumlah'] ?? 0,
+            'kapasitas'         => $row['kapasitas'] ?? 0,
+            'total_kapasitas_kva'=> $row['total_kapasitas'] ?? 0,
             'jenis_penggunaan'  => $row['jenis_penggunaan'] ?? null,
             'sifat_penggunaan'  => $row['sifat_penggunaan'] ?? null,
             'catatan'           => $row['catatan'] ?? null,
+            'created_by'        => auth()->id(),
         ]);
     }
 
@@ -77,11 +88,5 @@ class PerizinanImport implements ToModel, WithHeadingRow
         }
     }
 
-    private function mapStatus($status)
-    {
-        $status = strtolower($status ?? '');
-        if (str_contains($status, 'non') || str_contains($status, 'kuning')) return 'berlistrik_non_pln';
-        if (str_contains($status, 'tidak') || str_contains($status, 'merah')) return 'tidak_berlistrik';
-        return 'berlistrik_pln'; // Default green
-    }
+
 }

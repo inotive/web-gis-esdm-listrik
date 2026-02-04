@@ -1,7 +1,5 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Manajemen Dokumen')
-
 @push('styles')
     <!-- FilePond CSS -->
     <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />

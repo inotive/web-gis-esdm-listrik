@@ -532,7 +532,7 @@
     <section class="card">
         <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
             <h2 class="card-title" style="margin: 0;">Informasi Permohonan</h2>
-            @if ($isAdmin && $permohonanUser->status !== 'selesai' && $permohonanUser->status !== 'ditolak')
+            @if ($isAdmin && $permohonanUser->status !== 'selesai' && $permohonanUser->status !== 'ditolak' && $permohonanUser->status !== 'dibatalkan')
                 <div style="display: flex; gap: 12px;">
                     <button type="button" class="btn-success" data-open="#modalApprove">
                         <i class="ri-check-line"></i>
@@ -543,6 +543,13 @@
                         Tolak Permohonan
                     </button>
                 </div>
+            @endif
+
+            @if (!$isAdmin && $permohonanUser->status === 'pending')
+                 <button type="button" class="btn-danger" style="background: #64748B;" data-open="#modalCancel">
+                    <i class="ri-prohibited-line"></i>
+                    Batalkan Permohonan
+                </button>
             @endif
         </div>
 
@@ -560,9 +567,9 @@
                 $statusMap = [
                     'pending' => ['text' => 'Menunggu Verifikasi', 'class' => 'status-menunggu'],
                     'proses' => ['text' => 'Sedang Diproses', 'class' => 'status-proses'],
-                    'diproses' => ['text' => 'Sedang Diproses', 'class' => 'status-proses'],
                     'selesai' => ['text' => 'Aktif', 'class' => 'status-aktif'],
                     'ditolak' => ['text' => 'Ditolak', 'class' => 'status-ditolak'],
+                    'dibatalkan' => ['text' => 'Dibatalkan', 'class' => 'status-expired'],
                     'expired' => ['text' => 'Kedaluwarsa', 'class' => 'status-expired'],
                 ];
                 if (isset($permohonanUser->status) && isset($statusMap[$permohonanUser->status])) {
@@ -878,6 +885,42 @@
                         <button type="submit" class="btn-modal-primary" style="background: #EF4444;">
                             <i class="ri-close-line"></i>
                             Tolak Permohonan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
+
+    <!-- Modal Cancel Permohonan -->
+    @if (!$isAdmin && $permohonanUser->status === 'pending')
+        <div class="modal-overlay" id="modalCancel">
+            <div class="modal" style="max-width: 600px;">
+                <div class="modal-header">
+                    <h3>Batalkan Permohonan</h3>
+                    <button type="button" class="btn-close-modal" data-close>
+                        <i class="ri-close-line"></i>
+                    </button>
+                </div>
+                <form action="{{ route('admin.permohonan-user.cancel', [$permohonanId, $permohonanUser->id]) }}"
+                    method="POST" id="formCancel">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="form-label">Alasan Pembatalan</label>
+                            <textarea name="keterangan" class="form-control" rows="5"
+                                placeholder="Masukkan alasan pembatalan (opsional)">{{ old('keterangan') }}</textarea>
+                            <small style="color: #6B7280; font-size: 12px;">Berikan alasan jika diperlukan</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn-modal-cancel" data-close>
+                            <i class="ri-close-line"></i>
+                            Tutup
+                        </button>
+                        <button type="submit" class="btn-modal-primary" style="background: #64748B;">
+                            <i class="ri-prohibited-line"></i>
+                            Batalkan Permohonan
                         </button>
                     </div>
                 </form>

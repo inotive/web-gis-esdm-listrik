@@ -553,7 +553,7 @@ class PermohonanUserController extends Controller
     /**
      * Cancel permohonan (user only - only for their own permohonan)
      */
-    public function cancel($permohonanId, PermohonanUser $permohonanUser)
+    public function cancel(Request $request, $permohonanId, PermohonanUser $permohonanUser)
     {
         // Ensure permohonan_id matches
         if ($permohonanUser->permohonan_id != $permohonanId) {
@@ -571,9 +571,16 @@ class PermohonanUserController extends Controller
                 ->withErrors(['error' => 'Hanya permohonan dengan status Pending yang dapat dibatalkan.']);
         }
 
-        $permohonanUser->delete();
+        $validated = $request->validate([
+            'keterangan' => 'nullable|string',
+        ]);
 
-        return redirect()->route('admin.permohonan.index', ['tab' => 'permohonan'])
+        $permohonanUser->update([
+            'status' => 'dibatalkan',
+            'keterangan' => $validated['keterangan'] ?? $permohonanUser->keterangan,
+        ]);
+
+        return redirect()->route('admin.permohonan-user.show', [$permohonanId, $permohonanUser->id])
             ->with('success', 'Permohonan berhasil dibatalkan.');
     }
 

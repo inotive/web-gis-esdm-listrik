@@ -100,7 +100,6 @@ class PermohonanImport implements ToModel, WithHeadingRow
         return new PermohonanUser([
             'permohonan_id' => $permohonan->id,
             'user_id'       => $user->id,
-            'data_source'   => 'import',
             'status'        => $this->mapStatus($row['status'] ?? 'pending'),
             'keterangan'    => $row['keterangan'] ?? null,
             'jawaban'       => $jawaban, // Simpan jawaban yang sudah dimap
@@ -113,7 +112,7 @@ class PermohonanImport implements ToModel, WithHeadingRow
     {
         $status = strtolower($status ?? '');
         if (str_contains($status, 'selesai') || str_contains($status, 'aktif')) return 'selesai';
-        if (str_contains($status, 'proses')) return 'diproses';
+        if (str_contains($status, 'proses')) return 'proses';
         if (str_contains($status, 'tolak')) return 'ditolak';
         return 'pending';
     }

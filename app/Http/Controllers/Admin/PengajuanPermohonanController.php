@@ -430,7 +430,7 @@ class PengajuanPermohonanController extends Controller
                 ->withErrors(['error' => 'Hanya permohonan dengan status Pending yang dapat dibatalkan.']);
         }
 
-        $pengajuanPermohonan->delete();
+        $pengajuanPermohonan->update(['status' => 'dibatalkan']);
 
         return redirect()->route('admin.pengajuan-permohonan.index')
             ->with('success', 'Permohonan berhasil dibatalkan.');
