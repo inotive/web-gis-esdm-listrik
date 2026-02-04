@@ -632,7 +632,14 @@
                                     <td class="text-end" style="color:#059669;font-weight:700;">{{ number_format($item->total_kapasitas_kva, 2) }} kVA</td>
                                     <td class="col-aksi">
                                         <a href="{{ route('admin.perizinan.show', $item->id) }}" class="btn-ico view" title="Detail"><i class="fa-solid fa-eye"></i></a>
+                                        @php
+                                            $user = auth()->user();
+                                            $isOwner = ($user->perusahaan_id && $user->perusahaan_id == $item->perusahaan_id) || ($item->created_by == $user->id);
+                                            $canEdit = $user->can('perizinan.edit') || $isOwner;
+                                        @endphp
+                                        @if($canEdit)
                                         <a href="{{ route('admin.perizinan.edit', $item->id) }}" class="btn-ico edit" title="Edit"><i class="fa-solid fa-pen-to-square"></i></a>
+                                        @endif
                                         <form action="{{ route('admin.perizinan.destroy', $item->id) }}" method="POST" style="display:inline-block;margin:0;" class="form-delete-perizinan" data-name="{{ $item->nama }}">
                                             @csrf @method('DELETE')
                                             <button type="button" class="btn-ico danger btn-delete-perizinan" title="Hapus">

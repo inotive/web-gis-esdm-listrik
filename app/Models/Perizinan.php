@@ -34,6 +34,7 @@ class Perizinan extends Model
         'sifat_penggunaan',
         'catatan',
         'file_izin',
+        'created_by',
     ];
 
     protected $casts = [

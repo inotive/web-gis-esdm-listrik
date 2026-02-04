@@ -418,10 +418,17 @@
       <i class="ri-arrow-left-line"></i>
       Kembali
     </a>
+    @php
+      $user = auth()->user();
+      $isOwner = ($user->perusahaan_id && $user->perusahaan_id == $perizinan->perusahaan_id) || ($perizinan->created_by == $user->id);
+      $canEdit = $user->can('perizinan.edit') || $isOwner;
+    @endphp
+    @if($canEdit)
     <a href="{{ route('admin.perizinan.edit', $perizinan->id) }}" class="btn btn-primary">
       <i class="ri-edit-line"></i>
       Edit
     </a>
+    @endif
   </div>
 </div>
 
@@ -521,10 +528,12 @@
 <section class="card" style="margin-top: 24px;">
   <div class="section-header">
     <h3 class="section-title" style="margin: 0; border: none; padding: 0;">Dokumen Perizinan</h3>
+    @if($canEdit)
     <button type="button" class="btn-add-document" onclick="openAddDocumentModal()">
       <i class="ri-add-line"></i>
       Tambah Dokumen
     </button>
+    @endif
   </div>
 
   @if($perizinan->documents->count() > 0)
@@ -543,6 +552,7 @@
                   </svg>
                 </a>
               @endif
+              @if($canEdit)
               <form action="{{ route('admin.perizinan.document.delete', [$perizinan->id, $document->id]) }}" method="POST" style="display:inline;" class="form-delete-document" data-name="{{ $document->nama }}">
                 @csrf
                 @method('DELETE')
@@ -555,6 +565,7 @@
                   </svg>
                 </button>
               </form>
+              @endif
             </div>
           </div>
           <div class="document-meta">

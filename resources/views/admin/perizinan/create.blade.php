@@ -298,7 +298,7 @@
       @enderror
     </div>
 
-    <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 32px;">
+    <div style="display: flex; gap: 12px; justify-content: flex-start; margin-top: 32px;">
       <a href="{{ route('admin.permohonan.index', ['tab' => 'perizinan']) }}" class="btn btn-secondary">
         <i class="ri-arrow-go-back-line"></i>
         Kembali

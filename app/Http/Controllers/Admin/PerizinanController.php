@@ -132,6 +132,7 @@ class PerizinanController extends Controller
             unset($validated['nama_perusahaan']);
             $validated['perusahaan_id'] = $perusahaanId;
             $validated['nama_perusahaan'] = $namaPerusahaan;
+            $validated['created_by'] = Auth::id();
 
             $perizinan = Perizinan::create($validated);
 
