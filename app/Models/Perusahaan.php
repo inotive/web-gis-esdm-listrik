@@ -84,4 +84,12 @@ class Perusahaan extends Model
     {
         return $this->hasMany(PembangkitLokal::class, 'perusahaan_id');
     }
+
+    /**
+     * Relationship: Perusahaan memiliki banyak Inspeksi
+     */
+    public function inspeksis(): HasMany
+    {
+        return $this->hasMany(Inspeksi::class, 'perusahaan_id');
+    }
 }

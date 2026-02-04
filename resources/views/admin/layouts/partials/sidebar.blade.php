@@ -51,7 +51,8 @@
         </a>
 
 
-        <a class="menu-item {{ nav_active('admin.permohonan.*', 'admin.perizinan.*') }}" href="{{ route('admin.permohonan.index') }}">
+        <a class="menu-item {{ nav_active('admin.permohonan.*', 'admin.perizinan.*') }}"
+            href="{{ route('admin.permohonan.index') }}">
             <span class="menu-icon"><i class="ri-file-list-3-line" aria-hidden="true"></i></span>
             <span class="menu-label">Permohonan dan Perizinan</span>
         </a>
@@ -119,10 +120,10 @@
             </a> --}}
 
             @if (!in_array($userRole, ['admin', 'superadmin']))
-            <a class="menu-item {{ nav_active('admin.jalan.*') }}" href="{{ route('admin.jalan.index') }}">
-                <span class="menu-icon"><i class="ri-road-map-line" aria-hidden="true"></i></span>
-                <span class="menu-label">Data Jalan &amp; Aksesbilitas</span>
-            </a>
+                <a class="menu-item {{ nav_active('admin.jalan.*') }}" href="{{ route('admin.jalan.index') }}">
+                    <span class="menu-icon"><i class="ri-road-map-line" aria-hidden="true"></i></span>
+                    <span class="menu-label">Data Jalan &amp; Aksesbilitas</span>
+                </a>
             @endif
 
             <a class="menu-item {{ nav_active('admin.rencana-pengembangan.*') }}"
@@ -141,6 +142,10 @@
                 <span class="menu-label">Kategori Permohonan</span>
             </a>
 
+            <a class="menu-item {{ nav_active('admin.inspeksi.*') }}" href="{{ route('admin.inspeksi.index') }}">
+                <span class="menu-icon"><i class="ri-file-search-line" aria-hidden="true"></i></span>
+                <span class="menu-label">Inspeksi</span>
+            </a>
 
             @can('user.view')
                 <a class="menu-item {{ nav_active('admin.hak-akses.user.*', 'admin.hak-akses.user.*', 'admin.hak-akses.permission.*') }}"
