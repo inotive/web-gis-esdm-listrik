@@ -209,6 +209,9 @@ class PermohonanController extends Controller
             'berakhir' => Perizinan::whereDate('tanggal_akhir', '<', $now)->count(),
         ];
 
+        // Fetch distinct types of Perizinan for the filter dropdown
+        $jenisIzinList = Perizinan::select('jenis')->distinct()->pluck('jenis');
+
         $perizinans = $queryPerizinan->orderBy('created_at', 'desc')
             ->paginate($perPage, ['*'], 'page_perizinan')
             ->withQueryString();
@@ -221,6 +224,7 @@ class PermohonanController extends Controller
             'q' => $q,
             'tab' => $tab,
             'statsPerizinan' => $statsPerizinan,
+            'jenisIzinList' => $jenisIzinList,
         ]);
     }
 

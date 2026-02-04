@@ -58,4 +58,26 @@ class Perizinan extends Model
     {
         return $this->hasMany(PerizinanDocument::class, 'perizinan_id');
     }
+
+    /**
+     * Accessor: Hitung status berdasarkan tanggal akhir
+     */
+    public function getCalculatedStatusAttribute(): string
+    {
+        if (!$this->tanggal_akhir) {
+            return 'Sedang Aktif'; // Default if no end date
+        }
+
+        $today = now()->startOfDay();
+        $endDate = $this->tanggal_akhir->startOfDay();
+        $warningDate = $today->copy()->addDays(30);
+
+        if ($endDate->lt($today)) {
+            return 'Berakhir';
+        } elseif ($endDate->lte($warningDate)) {
+            return 'Mau Berakhir';
+        } else {
+            return 'Sedang Aktif';
+        }
+    }
 }

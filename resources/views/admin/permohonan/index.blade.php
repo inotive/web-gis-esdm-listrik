@@ -541,7 +541,7 @@
                         {{-- Search Bar --}}
                         <div class="input-group" style="width: 300px;">
                             <span class="input-group-text"><i class="ri-search-line"></i></span>
-                            <input type="text" name="q" class="form-control" placeholder="Cari Perusahaan, No. Izin..." value="{{ request('q') }}" onchange="this.form.submit()">
+                            <input type="text" name="q" id="globalSearchInput" class="form-control" placeholder="Cari Perusahaan, No. Izin..." value="{{ request('q') }}" onchange="this.form.submit()">
                         </div>
                         
                         {{-- Dropdown Filters --}}
@@ -555,10 +555,12 @@
                             </select>
                             
                             {{-- Filter Semua Jenis Izin --}}
+                            {{-- Filter Semua Jenis Izin --}}
                             <select name="jenis" class="form-select" style="width: auto; min-width: 180px;" onchange="this.form.submit()">
                                 <option value="">Semua Jenis Izin</option>
-                                <option value="IUPTLS" {{ request('jenis') == 'IUPTLS' ? 'selected' : '' }}>IUPTLS</option>
-                                <option value="SKTP" {{ request('jenis') == 'SKTP' ? 'selected' : '' }}>SKTP</option>
+                                @foreach($jenisIzinList as $jenisIzin)
+                                    <option value="{{ $jenisIzin }}" {{ request('jenis') == $jenisIzin ? 'selected' : '' }}>{{ $jenisIzin }}</option>
+                                @endforeach
                             </select>
                         </div>
                         
@@ -616,10 +618,12 @@
                                     <td>{{ $item->no_surat_keluar ?? '-' }}</td>
                                     <td>{{ $item->tanggal ? $item->tanggal->format('d/m/Y') : '-' }}</td>
                                     <td>{{ $item->tanggal_akhir ? $item->tanggal_akhir->format('d/m/Y') : '-' }}</td>
+
                                     <td>
-                                        @if($item->status_izin == 'Berakhir')
+                                        @php $status = $item->calculated_status; @endphp
+                                        @if($status == 'Berakhir')
                                             <span class="status-badge status-expired" style="background:#FEE2E2;color:#DC2626;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;">Berakhir</span>
-                                        @elseif($item->status_izin == 'Mau Berakhir')
+                                        @elseif($status == 'Mau Berakhir')
                                             <span class="status-badge status-menunggu" style="background:#FEF9C3;color:#CA8A04;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;">Mau Berakhir</span>
                                         @else
                                             <span class="status-badge status-aktif" style="background:#DCFCE7;color:#16A34A;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;">Sedang Aktif</span>
@@ -714,6 +718,21 @@
                     debounceTimerPerizinan = setTimeout(() => { filterFormPerizinan.submit(); }, 500);
                 });
             });
+
+            // Live Search for Global Search Input (Perizinan)
+            let debounceTimerGlobalSearch;
+            const globalSearchInput = document.getElementById('globalSearchInput');
+            if (globalSearchInput) {
+                globalSearchInput.addEventListener('input', function() {
+                    clearTimeout(debounceTimerGlobalSearch);
+                    const hiddenInput = filterFormPerizinan.querySelector('input[name="q"][type="hidden"]');
+                    if (hiddenInput) hiddenInput.value = this.value;
+                    
+                    debounceTimerGlobalSearch = setTimeout(() => { 
+                        filterFormPerizinan.submit(); 
+                    }, 500);
+                });
+            }
 
             // Delete Confirmation Permohonan
             document.querySelectorAll('.btn-delete-permohonan').forEach(btn => {
