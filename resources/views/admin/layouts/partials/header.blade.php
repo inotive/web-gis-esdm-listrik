@@ -40,12 +40,12 @@
             $authUser = Auth::user();
             $profileImage = $authUser?->image
                 ? asset('storage/profile/' . $authUser->image)
-                : 'https://i.pravatar.cc/80?img=22';
+                : asset('assets/media/svg/avatars/blank.svg');
         @endphp
 
         {{-- Avatar = Trigger Modal Quick Profile --}}
-        <div class="user-profile-btn" id="userProfileBtn" title="{{ $authUser?->name ?? 'User' }}">
-            <img src="{{ $profileImage }}" alt="user" class="avatar" />
+        <div class="user-avatar" id="userProfileBtn" title="{{ $authUser?->name ?? 'User' }}">
+            <i class="ri-user-line"></i>
         </div>
     </div>
 </header>
@@ -183,27 +183,31 @@
 {{-- ===================== STYLE KHUSUS MODAL ===================== --}}
 <style>
     /* Profile Modal Quick Menu Styles (from welcome.blade.php) */
-    .user-profile-btn {
-        width: 40px;
-        height: 40px;
+    /* Profile Modal Quick Menu Styles (Matched with Landing Page) */
+    .user-avatar {
+        width: 42px;
+        height: 42px;
         border-radius: 50%;
-        overflow: hidden;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.95);
+        color: #0b2a63;
         cursor: pointer;
-        border: 2px solid #10b981;
+        display: grid;
+        place-items: center;
+        font-size: 20px;
         transition: all 0.2s;
-        position: relative;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     }
 
-    .user-profile-btn:hover {
-        transform: scale(1.05);
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    .user-avatar:hover {
+        background: #fff;
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
-    .user-profile-btn img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
+    /* .user-profile-btn removed */
+    /* .user-profile-btn img removed */
 
     .profile-modal-overlay {
         position: fixed;

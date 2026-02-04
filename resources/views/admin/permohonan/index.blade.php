@@ -444,6 +444,16 @@
                     </table>
                 </div>
                 <div class="table-footer">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="summary text-muted" style="font-size: 13px;">Show</span>
+                        <select class="form-select form-select-sm" style="width: auto;" onchange="document.querySelector('#filterFormPermohonan input[name=per_page]').value = this.value; document.getElementById('filterFormPermohonan').submit();">
+                            <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
+                            <option value="15" {{ request('per_page') == 15 ? 'selected' : '' }}>15</option>
+                            <option value="20" {{ request('per_page') == 20 ? 'selected' : '' }}>20</option>
+                            <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                        </select>
+                        <span class="summary text-muted" style="font-size: 13px;">per page</span>
+                    </div>
                     <div class="summary">Menampilkan <strong>{{ $permohonanUsers->firstItem() ?? 0 }}–{{ $permohonanUsers->lastItem() ?? 0 }}</strong> dari <strong>{{ $permohonanUsers->total() }}</strong> data</div>
                     <div>{{ $permohonanUsers->appends(['tab' => 'permohonan'])->links() }}</div>
                 </div>
@@ -641,6 +651,16 @@
                     </table>
                 </div>
                 <div class="table-footer">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="summary text-muted" style="font-size: 13px;">Show</span>
+                        <select class="form-select form-select-sm" style="width: auto;" onchange="document.querySelector('#filterFormPerizinan input[name=per_page]').value = this.value; document.getElementById('filterFormPerizinan').submit();">
+                            <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10</option>
+                            <option value="15" {{ request('per_page') == 15 ? 'selected' : '' }}>15</option>
+                            <option value="20" {{ request('per_page') == 20 ? 'selected' : '' }}>20</option>
+                            <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                        </select>
+                        <span class="summary text-muted" style="font-size: 13px;">per page</span>
+                    </div>
                     <div class="summary">Menampilkan <strong>{{ $perizinans->firstItem() ?? 0 }}–{{ $perizinans->lastItem() ?? 0 }}</strong> dari <strong>{{ $perizinans->total() }}</strong> data</div>
                     <div>{{ $perizinans->appends(array_merge(request()->query(), ['tab' => 'perizinan']))->links() }}</div>
                 </div>

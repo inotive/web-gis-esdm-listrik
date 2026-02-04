@@ -401,14 +401,17 @@ class PermohonanUserController extends Controller
             abort(404);
         }
 
-        // Ensure user can only delete their own permohonan
-        if ($permohonanUser->user_id !== Auth::id()) {
+        // Check access: admin can delete all, user can only delete their own
+        $userRole = Auth::user()->roles()->first()->name ?? null;
+        $isAdmin = in_array($userRole, ['admin', 'superadmin']);
+
+        if (!$isAdmin && $permohonanUser->user_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
 
         $permohonanUser->delete();
 
-        return redirect()->route('admin.permohonan-user.index', $permohonanId)
+        return redirect()->route('admin.permohonan.index', ['tab' => 'permohonan'])
             ->with('success', 'Permohonan berhasil dihapus.');
     }
 
@@ -570,7 +573,7 @@ class PermohonanUserController extends Controller
 
         $permohonanUser->delete();
 
-        return redirect()->route('admin.permohonan-user.index', $permohonanId)
+        return redirect()->route('admin.permohonan.index', ['tab' => 'permohonan'])
             ->with('success', 'Permohonan berhasil dibatalkan.');
     }
 

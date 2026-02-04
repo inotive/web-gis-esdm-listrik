@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PermohonanUser extends Model
 {
-    use HasFactory;
+    use HasFactory, \App\Helpers\UploadFile;
 
     protected $table = 'permohonan_users';
 
@@ -30,6 +30,36 @@ class PermohonanUser extends Model
         'jawaban' => 'array',
         'approved_at' => 'datetime',
     ];
+
+    protected static function booted()
+    {
+        static::deleting(function ($permohonanUser) {
+            // 1. Clean up associated documents
+            foreach ($permohonanUser->documents as $document) {
+                if ($document->dokumen) {
+                    // Delete physical file from permohonan-documents
+                    $permohonanUser->deleteFile($document->dokumen->path, 'permohonan-documents');
+                    // Delete the Dokumen model record
+                    $document->dokumen->delete();
+                }
+                // Delete the relationship record
+                $document->delete();
+            }
+
+            // 2. Clean up files in jawaban array
+            if (is_array($permohonanUser->jawaban)) {
+                foreach ($permohonanUser->jawaban as $value) {
+                    if (is_array($value)) {
+                        foreach ($value as $file) {
+                            if (is_string($file)) $permohonanUser->deleteFile($file, 'permohonan-jawaban');
+                        }
+                    } elseif (is_string($value)) {
+                        $permohonanUser->deleteFile($value, 'permohonan-jawaban');
+                    }
+                }
+            }
+        });
+    }
 
     /**
      * Relasi: PermohonanUser belongs to Permohonan
