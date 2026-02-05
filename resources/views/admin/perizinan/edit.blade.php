@@ -95,6 +95,7 @@
     gap: 20px;
   }
 
+  @media (max-width: 768px) {
     .form-row {
       grid-template-columns: 1fr;
     }
@@ -299,10 +300,10 @@
 
     <div style="display: flex; gap: 12px; justify-content: flex-start; margin-top: 32px;">
       <a href="{{ route('admin.permohonan.index', ['tab' => 'perizinan']) }}" class="btn btn-secondary">
-        <i class="ri-arrow-left-line"></i>
+        <i class="ri-arrow-go-back-line"></i>
         Kembali
       </a>
-      <button type="submit" class="btn btn-primary" style="padding: 8px 16px; height: 60px;">
+      <button type="submit" class="btn btn-primary">
         <i class="ri-save-line"></i>
         Simpan Perubahan
       </button>

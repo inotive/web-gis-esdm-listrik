@@ -78,10 +78,17 @@ class PerizinanImport implements OnEachRow, WithHeadingRow
         // We rely on $rowArray['kapasitas'] primarily, or check column P (16) or R (18) if needed.
         // Assuming 'kapasitas' header exists unique enough or we trust the array:
         $kapasitasRaw = $rowArray['kapasitas'] ?? 0;
-        $totalKapasitasRaw = $rowArray['total_kapasitas'] ?? 0;
+        // Check for 'total_kapasitas_kva' (slug from "Total Kapasitas (kVA)") or fallback to 'total_kapasitas'
+        $totalKapasitasRaw = $rowArray['total_kapasitas_kva'] ?? $rowArray['total_kapasitas'] ?? 0;
 
+        $jumlah = (int) ($rowArray['jumlah'] ?? 0);
         $kapasitas = $this->sanitizeDecimal($kapasitasRaw);
         $totalKapasitas = $this->sanitizeDecimal($totalKapasitasRaw);
+
+        // Fallback calculation: If total is 0 or missing, calculate it from Jumlah * Kapasitas
+        if ($totalKapasitas == 0 && $jumlah > 0 && $kapasitas > 0) {
+            $totalKapasitas = $jumlah * $kapasitas;
+        }
 
         // Update or Create Perizinan
         // Consider what makes a Perizinan unique? No pengajuan or combination?

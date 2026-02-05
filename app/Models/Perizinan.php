@@ -66,7 +66,7 @@ class Perizinan extends Model
     public function getCalculatedStatusAttribute(): string
     {
         if (!$this->tanggal_akhir) {
-            return 'Sedang Aktif'; // Default if no end date
+            return 'Berakhir'; // Default if no end date
         }
 
         $today = now()->startOfDay();

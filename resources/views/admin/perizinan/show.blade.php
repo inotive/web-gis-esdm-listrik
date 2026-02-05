@@ -498,7 +498,7 @@
   </div>
 
   <div class="detail-row">
-    <div class="detail-label">Jenis Penggunaan</div>
+    <div class="detail-label">Jenis Pembangkit</div>
     <div class="detail-value">{{ $perizinan->jenis_penggunaan ?? '-' }}</div>
   </div>
 
