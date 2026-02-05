@@ -1,126 +1,186 @@
 [
-    {
-        "Kodifikasi": "BRU-BIL-1",
-        "link": "https://youtu.be/S_9TW5jJUMQ"
-    },
-    {
-        "Kodifikasi": "PPU-BBL-1",
-        "link": "https://youtu.be/-_5ZlznHmx4"
-    },
-    {
-        "Kodifikasi": "PPU-BBL-2",
-        "link": "https://youtu.be/xdaOXYn9PDg"
-    },
-    {
-        "Kodifikasi": "PPU-BBL-3",
-        "link": "https://youtu.be/4jovcUs2SVg"
-    },
-    {
-        "Kodifikasi": "PPU-BBL-4",
-        "link": "https://youtu.be/SX3N8fSBMZQ"
-    },
-    {
-        "Kodifikasi": "PPU-BSR-1",
-        "link": "https://youtu.be/6a1tVkHLpAo"
-    },
-    {
-        "Kodifikasi": "PPU-KBU-1",
-        "link": "https://youtu.be/2NwtFMVcBk4"
-    },
-    {
-        "Kodifikasi": "PPU-LBK-1",
-        "link": "https://youtu.be/D4ScXlkDxU0"
-    },
-    {
-        "Kodifikasi": "PPU-SSP-1",
-        "link": "https://youtu.be/G24Y0RclaaM"
-    },
-    {
-        "Kodifikasi": "PPU-SSP-2",
-        "link": "https://youtu.be/GrHz12M1UNI"
-    },
-    {
-        "Kodifikasi": "PPU-STK-1",
-        "link": "https://youtu.be/2NwtFMVcBk4"
-    },
-    {
-        "Kodifikasi": "PSR-BTL-1",
-        "link": "https://youtu.be/3yDuKtCKoso"
-    },
-    {
-        "Kodifikasi": "PSR-MBT-1",
-        "link": "https://youtu.be/zr6uXPKL0DU"
-    },
-    {
-        "Kodifikasi": "PSR-MRT-1",
-        "link": "https://youtu.be/6VY9JG8XkS8"
-    },
-    {
-        "Kodifikasi": "BRU-BDK-1",
-        "link": "https://youtu.be/GLCID9C5bTQ"
-    },
-    {
-        "Kodifikasi": "BRU-KRG-1",
-        "link": "https://youtu.be/Erod30oV8e0"
-    },
-    {
-        "Kodifikasi": "BRU-LLI-1",
-        "link": "https://youtu.be/kGIpy93uD8s"
-    },
-    {
-        "Kodifikasi": "BRU-MRB-1",
-        "link": "https://youtu.be/z7HS8juPCS0"
-    },
-    {
-        "Kodifikasi": "BRU-MRP-1",
-        "link": "https://youtu.be/Lqtmh-1-VFU"
-    },
-    {
-        "Kodifikasi": "KBR-AJY-1",
-        "link": "https://youtu.be/vk8J5w8XxuY"
-    },
-    {
-        "Kodifikasi": "KBR-GDR-1",
-        "link": "https://youtu.be/MDD9NoqZa9E"
-    },
-    {
-        "Kodifikasi": "KBR-ILG-1",
-        "link": "https://youtu.be/OCw13Ygr1v0"
-    },
-    {
-        "Kodifikasi": "KBR-ILG-2",
-        "link": "https://youtu.be/DW2PpMO50l0"
-    },
-    {
-        "Kodifikasi": "PSR-LKO-1",
-        "link": "https://youtu.be/I9wWgXZpB1g"
-    },
-    {
-        "Kodifikasi": "PSR-LUA-1",
-        "link": "https://youtu.be/Esn6sDcwEWA"
-    },
-    {
-        "Kodifikasi": "PSR-MKY-1",
-        "link": "https://youtu.be/XGnfKs-I_Nk"
-    },
-    {
-        "Kodifikasi": "PSR-RAT-1",
-        "link": "https://youtu.be/ZQW8jPONT7M"
-    },
-    {
-        "Kodifikasi": "PSR-RWG-1",
-        "link": "https://youtu.be/2YrrqzvRjxc"
-    },
-    {
-        "Kodifikasi": "PSR-TJA-1",
-        "link": "https://youtu.be/JVHPIt94AVE"
-    },
-    {
-        "Kodifikasi": "KTM-BPM-1",
-        "link": "https://youtu.be/qeYsBL0Vg80"
-    },
-    {
-        "Kodifikasi": "KTM-HLI-2",
-        "link": "https://youtu.be/fNTtR_bWzTk"
-    }
+    {"Kodifikasi": "BRU-BIL-1","link": "https://youtu.be/S_9TW5jJUMQ"},
+    {"Kodifikasi": "PPU-BBL-1","link": "https://youtu.be/-_5ZlznHmx4"},
+    {"Kodifikasi": "PPU-BBL-2","link": "https://youtu.be/xdaOXYn9PDg"},
+    {"Kodifikasi": "PPU-BBL-3","link": "https://youtu.be/4jovcUs2SVg"},
+    {"Kodifikasi": "PPU-BBL-4","link": "https://youtu.be/SX3N8fSBMZQ"},
+    {"Kodifikasi": "PPU-BSR-1","link": "https://youtu.be/6a1tVkHLpAo"},
+    {"Kodifikasi": "PPU-KBU-1","link": "https://youtu.be/2NwtFMVcBk4"},
+    {"Kodifikasi": "PPU-LBK-1","link": "https://youtu.be/D4ScXlkDxU0"},
+    {"Kodifikasi": "PPU-SSP-1","link": "https://youtu.be/G24Y0RclaaM"},
+    {"Kodifikasi": "PPU-SSP-2","link": "https://youtu.be/GrHz12M1UNI"},
+    {"Kodifikasi": "PPU-STK-1","link": "https://youtu.be/2NwtFMVcBk4"},
+    {"Kodifikasi": "PSR-BTL-1","link": "https://youtu.be/3yDuKtCKoso"},
+    {"Kodifikasi": "PSR-MBT-1","link": "https://youtu.be/zr6uXPKL0DU"},
+    {"Kodifikasi": "PSR-MRT-1","link": "https://youtu.be/6VY9JG8XkS8"},
+    {"Kodifikasi": "BRU-BDK-1","link": "https://youtu.be/GLCID9C5bTQ"},
+    {"Kodifikasi": "BRU-KRG-1","link": "https://youtu.be/Erod30oV8e0"},
+    {"Kodifikasi": "BRU-LLI-1","link": "https://youtu.be/kGIpy93uD8s"},
+    {"Kodifikasi": "BRU-MRB-1","link": "https://youtu.be/z7HS8juPCS0"},
+    {"Kodifikasi": "BRU-MRP-1","link": "https://youtu.be/Lqtmh-1-VFU"},
+    {"Kodifikasi": "KBR-AJY-1","link": "https://youtu.be/vk8J5w8XxuY"},
+    {"Kodifikasi": "KBR-GDR-1","link": "https://youtu.be/MDD9NoqZa9E"},
+    {"Kodifikasi": "KBR-ILG-1","link": "https://youtu.be/OCw13Ygr1v0"},
+    {"Kodifikasi": "KBR-ILG-2","link": "https://youtu.be/DW2PpMO50l0"},
+    {"Kodifikasi": "PSR-LKO-1","link": "https://youtu.be/I9wWgXZpB1g"},
+    {"Kodifikasi": "PSR-LUA-1","link": "https://youtu.be/Esn6sDcwEWA"},
+    {"Kodifikasi": "PSR-MKY-1","link": "https://youtu.be/XGnfKs-I_Nk"},
+    {"Kodifikasi": "PSR-RAT-1","link": "https://youtu.be/ZQW8jPONT7M"},
+    {"Kodifikasi": "PSR-RWG-1","link": "https://youtu.be/2YrrqzvRjxc"},
+    {"Kodifikasi": "PSR-TJA-1","link": "https://youtu.be/JVHPIt94AVE"},
+    {"Kodifikasi": "KTM-BPM-1","link": "https://youtu.be/qeYsBL0Vg80"},
+    {"Kodifikasi": "KTM-HLI-2","link": "https://youtu.be/fNTtR_bWzTk"},
+    { "Kodifikasi": "BRU-BAL-1", "link": "https://youtu.be/TT8mdWP2rZs" },
+    { "Kodifikasi": "BRU-BIA-1", "link": "https://youtu.be/odmyYBwmenM" },
+    { "Kodifikasi": "BRU-BIA-2", "link": "https://youtu.be/odmyYBwmenM" },
+    { "Kodifikasi": "BRU-LDK-1", "link": "https://youtu.be/odkov4Xb4PE" },
+    { "Kodifikasi": "BRU-LGA-1", "link": "https://youtu.be/n1CkYeZ_tTU" },
+    { "Kodifikasi": "BRU-LGB-1", "link": "https://youtu.be/SME8dkoAx6o" },
+    { "Kodifikasi": "BRU-LGD-1", "link": "https://youtu.be/OxhfVE8u7pM" },
+    { "Kodifikasi": "BRU-LGK-1", "link": "https://youtu.be/sKGECtoLGOM" },
+    { "Kodifikasi": "BRU-LGL-1", "link": "https://youtu.be/SS05HzNV4fc" },
+    { "Kodifikasi": "BRU-LGP-1", "link": "https://youtu.be/inOxE2LSTBI" },
+    { "Kodifikasi": "BRU-LGS-1", "link": "https://youtu.be/ED-YoYkgIpQ" },
+    { "Kodifikasi": "BRU-LGS-2", "link": "https://youtu.be/_mIlCebbCIk" },
+    { "Kodifikasi": "BRU-LLK-1", "link": "https://youtu.be/uqsjUscmDS0" },
+    { "Kodifikasi": "BRU-MPL-1", "link": "https://youtu.be/L69ytYC_LjM" },
+    { "Kodifikasi": "BRU-MUL-1", "link": "https://youtu.be/qS_nPz4CsAA" },
+    { "Kodifikasi": "BRU-PGB-1", "link": "https://youtu.be/dOdTwRF33A4" },
+    { "Kodifikasi": "BRU-PGB-2", "link": "https://youtu.be/h5RQ1h6UcWg" },
+    { "Kodifikasi": "BRU-PNM-1", "link": "https://youtu.be/ga0M0zGqC5I" },
+    { "Kodifikasi": "BRU-PNN-1", "link": "https://youtu.be/x0ACP9zaZuc" },
+    { "Kodifikasi": "BRU-PNS-1", "link": "https://youtu.be/yS3XyCxPI3Y" },
+    { "Kodifikasi": "BRU-TDK-1", "link": "https://youtu.be/EFSYMDI9mg8" },
+    { "Kodifikasi": "BRU-TMR-1", "link": "https://youtu.be/Bsp6fXjPMuQ" },
+    { "Kodifikasi": "BRU-TSG-1", "link": "https://youtu.be/S2s4LcA3_g0" },
+    { "Kodifikasi": "KBR-ABT-1", "link": "https://youtu.be/IFubLH5qEsA" },
+    { "Kodifikasi": "KBR-AJY-2", "link": "https://youtu.be/F0XX-QcJ0qY" },
+    { "Kodifikasi": "KBR-BSQ-1", "link": "https://youtu.be/agDgfkfUL1k" },
+    { "Kodifikasi": "KBR-DPT-1", "link": "https://youtu.be/G0kUS_onNQw" },
+    { "Kodifikasi": "KBR-DRY-1", "link": "https://youtu.be/-vpDhgoQxiQ" },
+    { "Kodifikasi": "KBR-DSQ-1", "link": "https://youtu.be/26Y1B3vel14" },
+    { "Kodifikasi": "KBR-GBU-1", "link": "https://youtu.be/pr6B4DPbZt8" },
+    { "Kodifikasi": "KBR-GBY-1", "link": "https://youtu.be/X7UY-XYk41g" },
+    { "Kodifikasi": "KBR-JDK-1", "link": "https://youtu.be/PqF1MOuRPjg" },
+    { "Kodifikasi": "KBR-JDK-2", "link": "https://youtu.be/Tkyq6AXQGQ0" },
+    { "Kodifikasi": "KBR-JMU-1", "link": "https://youtu.be/-3kB8t1PKTE" },
+    { "Kodifikasi": "KBR-JSK-1", "link": "https://youtu.be/eemkTKmHWVQ" },
+    { "Kodifikasi": "KBR-JSK-2", "link": "https://youtu.be/O7jZpoAuMwM" },
+    { "Kodifikasi": "KBR-JSK-3", "link": "https://youtu.be/D5W55oCSB64" },
+    { "Kodifikasi": "KBR-KDQ-1", "link": "https://youtu.be/eqcFwAwJRH0" },
+    { "Kodifikasi": "KBR-KDQ-2", "link": "https://youtu.be/qx8Z9fV_YgQ" },
+    { "Kodifikasi": "KBR-KIQ-1", "link": "https://youtu.be/NfbPyX9UEIc" },
+    { "Kodifikasi": "KBR-KIQ-2", "link": "https://youtu.be/FLEBjosrR1c" },
+    { "Kodifikasi": "KBR-KLG-1", "link": "https://youtu.be/lSwlS9_suik" },
+    { "Kodifikasi": "KBR-KLN-1", "link": "https://youtu.be/382si7X1ZK8" },
+    { "Kodifikasi": "KBR-KLR-1", "link": "https://youtu.be/Slb3ETO4EcQ" },
+    { "Kodifikasi": "KBR-KLW-1", "link": "https://youtu.be/Y2sM7MtWh2g" },
+    { "Kodifikasi": "KBR-KYY-1", "link": "https://youtu.be/KtiKJWRtlvc" },
+    { "Kodifikasi": "KBR-LBM-1", "link": "https://youtu.be/G89qqkd7-1A" },
+    { "Kodifikasi": "KBR-LDQ-1", "link": "https://youtu.be/Vnym4KffYko" },
+    { "Kodifikasi": "KBR-LLN-1", "link": "https://youtu.be/CZHKbNLUSWY" },
+    { "Kodifikasi": "KBR-LMB-1", "link": "https://youtu.be/S1q8EMpXiB4" },
+    { "Kodifikasi": "KBR-LMI-1", "link": "https://youtu.be/nKR0d1DLYJ0" },
+    { "Kodifikasi": "KBR-LMN-1", "link": "https://youtu.be/v60H-UL_wgA" },
+    { "Kodifikasi": "KBR-LPR-1", "link": "https://youtu.be/0XNdxPS1iR4" },
+    { "Kodifikasi": "KBR-MBI-1", "link": "https://youtu.be/zvj9BKqwCz0" },
+    { "Kodifikasi": "KBR-MBO-1", "link": "https://youtu.be/QxP51ytHkt4" },
+    { "Kodifikasi": "KBR-MBY-1", "link": "https://youtu.be/RcnatmIRLgU" },
+    { "Kodifikasi": "KBR-MDG-1", "link": "https://youtu.be/U1i52hjRP3I" },
+    { "Kodifikasi": "KBR-MJQ-1", "link": "https://youtu.be/Mfshuv6ysvo" },
+    { "Kodifikasi": "KBR-MKQ-1", "link": "https://youtu.be/Q1MlMsO_CGw" },
+    { "Kodifikasi": "KBR-MNG-1", "link": "https://youtu.be/laxMS6-BsUc" },
+    { "Kodifikasi": "KBR-MNQ-1", "link": "https://youtu.be/PKAz6MUdA9k" },
+    { "Kodifikasi": "KBR-MOG-1", "link": "https://youtu.be/8MFC3c1pv7Y" },
+    { "Kodifikasi": "KBR-MPQ-1", "link": "https://youtu.be/RKRtyXOE4P0" },
+    { "Kodifikasi": "KBR-MPQ-2", "link": "https://youtu.be/XRRMjmW0WnE" },
+    { "Kodifikasi": "KBR-MRQ-1", "link": "https://youtu.be/Fnz03wDV29Y" },
+    { "Kodifikasi": "KBR-MTA-1", "link": "https://youtu.be/7dJXe7ZwkYI" },
+    { "Kodifikasi": "KBR-MTG-1", "link": "https://youtu.be/0piFYDZka48" },
+    { "Kodifikasi": "KBR-MTR-1", "link": "https://youtu.be/YHAGSnk19ic" },
+    { "Kodifikasi": "KBR-MTR-2", "link": "https://youtu.be/I2HoU1mCD7Q" },
+    { "Kodifikasi": "KBR-MY-1", "link": "https://youtu.be/bI-9_NyLnKs" },
+    { "Kodifikasi": "KBR-MYA-1", "link": "https://youtu.be/NSzDXox-XT0" },
+    { "Kodifikasi": "KBR-PEN-1", "link": "https://youtu.be/tpgfEaRaKVw" },
+    { "Kodifikasi": "KBR-PNW-1", "link": "https://youtu.be/BBlr-r61HP0" },
+    { "Kodifikasi": "KBR-RES-1", "link": "https://youtu.be/lfyIcwMXHgo" },
+    { "Kodifikasi": "KBR-RKG-1", "link": "https://youtu.be/rfKf-zS1joo" },
+    { "Kodifikasi": "KBR-SKT-1", "link": "https://youtu.be/niqcRzGQLj0" },
+    { "Kodifikasi": "KBR-SKT-2", "link": "https://youtu.be/CC8swmKbD3A" },
+    { "Kodifikasi": "KBR-SMB-1", "link": "https://youtu.be/HBfbgBaKhcI" },
+    { "Kodifikasi": "KBR-STL-1", "link": "https://youtu.be/tBsC0InGd98" },
+    { "Kodifikasi": "KBR-SUA-1", "link": "https://youtu.be/OjPucmPpjpA" },
+    { "Kodifikasi": "KBR-TDH-1", "link": "https://youtu.be/J9NxB_1dkhE" },
+    { "Kodifikasi": "KBR-TDH-2", "link": "https://youtu.be/2zfXKhQds4s" },
+    { "Kodifikasi": "KBR-TDQ-1", "link": "https://youtu.be/XtnnRkxddzc" },
+    { "Kodifikasi": "KBR-TJH-1", "link": "https://youtu.be/FBBhHqY0U8E" },
+    { "Kodifikasi": "KBR-TJJ-1", "link": "https://youtu.be/c4f9koItZGE" },
+    { "Kodifikasi": "KBR-TJP-1", "link": "https://youtu.be/rHRkpNuH0wI" },
+    { "Kodifikasi": "KBR-TJS-1", "link": "https://youtu.be/vEdknx1ZO6w" },
+    { "Kodifikasi": "KBR-TKL-1", "link": "https://youtu.be/4MiLCbE-UsE" },
+    { "Kodifikasi": "KBR-TKQ-1", "link": "https://youtu.be/MigH94uF2Tc" },
+    { "Kodifikasi": "KBR-TKQ-2", "link": "https://youtu.be/ewYZ2pqvzBw" },
+    { "Kodifikasi": "KBR-TND-1", "link": "https://youtu.be/K65DlOZb2Z8" },
+    { "Kodifikasi": "KBR-UHG-1", "link": "https://youtu.be/h6jJLCwO8VI" },
+    { "Kodifikasi": "KTM-BHN-1", "link": "https://youtu.be/EEtUamDc0YI" },
+    { "Kodifikasi": "KTM-HLI-1", "link": "https://youtu.be/4aol87V6XAM" },
+    { "Kodifikasi": "KTM-HLI-2", "link": "https://youtu.be/Jqr4h2CoXKM" },
+    { "Kodifikasi": "KTM-HLI-3", "link": "https://youtu.be/iWawKZ4PQMA" },
+    { "Kodifikasi": "KTM-KRT-1", "link": "https://youtu.be/L-xZJ5HOh64" },
+    { "Kodifikasi": "KTM-KRY-1", "link": "https://youtu.be/ZG5HRnNnqpM" },
+    { "Kodifikasi": "KTM-KRY-2", "link": "https://youtu.be/-AMhTPgP3Y4" },
+    { "Kodifikasi": "KTM-LPB-1", "link": "https://youtu.be/uBM1coU9aeE" },
+    { "Kodifikasi": "KTM-MAI-1", "link": "https://youtu.be/0YOsCsK1cHQ" },
+    { "Kodifikasi": "KTM-MB-1",  "link": "https://youtu.be/1Tdl6_BPnPM" },
+    { "Kodifikasi": "KTM-MDM-1", "link": "https://youtu.be/NPBhOgGT9-A" },
+    { "Kodifikasi": "KTM-MIB-1", "link": "https://youtu.be/Xof6KraKXO8" },
+    { "Kodifikasi": "KTM-MIB-2", "link": "https://youtu.be/lP1-RgDd_hk" },
+    { "Kodifikasi": "KTM-MIB-3", "link": "https://youtu.be/jK71AyeiGGs" },
+    { "Kodifikasi": "KTM-MIB-4", "link": "https://youtu.be/FrrnIRhRJPo" },
+    { "Kodifikasi": "KTM-MIB-5", "link": "https://youtu.be/GGjbtX6mCWg" },
+    { "Kodifikasi": "KTM-MIB-6", "link": "https://youtu.be/Os_LTFMUpZs" },
+    { "Kodifikasi": "KTM-MLP-1", "link": "https://youtu.be/IuLo-8fCp90" },
+    { "Kodifikasi": "KTM-MLY-1", "link": "https://youtu.be/x45PenbTrYI" },
+    { "Kodifikasi": "KTM-MNB-1", "link": "https://youtu.be/mmpgX1ojPa4" },
+    { "Kodifikasi": "KTM-MNB-2", "link": "https://youtu.be/fEea2GiOfN0" },
+    { "Kodifikasi": "KTM-MND-1", "link": "https://youtu.be/rcxEVuamekk" },
+    { "Kodifikasi": "KTM-MPS-1", "link": "https://youtu.be/gvhSMeJ8nOw" },
+    { "Kodifikasi": "KTM-MRH-1", "link": "https://youtu.be/5WMJ9e5-E3Q" },
+    { "Kodifikasi": "KTM-MRK-1", "link": "https://youtu.be/IlknL4TW8ls" },
+    { "Kodifikasi": "KTM-MRK-2", "link": "https://youtu.be/OsM5-3x0Rxg" },
+    { "Kodifikasi": "KTM-MRK-3", "link": "https://youtu.be/zcapUj_Y3F8" },
+    { "Kodifikasi": "KTM-MWI-1", "link": "https://youtu.be/-eTn4FXoBoo" },
+    { "Kodifikasi": "KTM-PLW-1", "link": "https://youtu.be/GDmu857lFX4" },
+    { "Kodifikasi": "KTM-PLW-2", "link": "https://youtu.be/dUmne4SqVz8" },
+    { "Kodifikasi": "KTM-PMG-1", "link": "https://youtu.be/YNEenqmfcoA" },
+    { "Kodifikasi": "KTM-PRD-1", "link": "https://youtu.be/HwlHQ7UnIHw" },
+    { "Kodifikasi": "KTM-PRP-1", "link": "https://youtu.be/SMXhF0Ch3Zo" },
+    { "Kodifikasi": "KTM-PRP-2", "link": "https://youtu.be/HHqFEYMWBJ4" },
+    { "Kodifikasi": "KTM-RPG-1", "link": "https://youtu.be/aKhmK01-rJc" },
+    { "Kodifikasi": "KTM-SDR-1", "link": "https://youtu.be/XMniOKji-Dg" },
+    { "Kodifikasi": "KTM-SDR-2", "link": "https://youtu.be/cSpdn-45fXQ" },
+    { "Kodifikasi": "KTM-SDR-3", "link": "https://youtu.be/puo-M58eKhE" },
+    { "Kodifikasi": "KTM-SKA-1", "link": "https://youtu.be/_Lg7TILEGkE" },
+    { "Kodifikasi": "KTM-SNB-1", "link": "https://youtu.be/ZcCfIPRx8Fs" },
+    { "Kodifikasi": "KTM-SNB-2", "link": "https://youtu.be/yaM4-REFZ5g" },
+    { "Kodifikasi": "KTM-SSD-1", "link": "https://youtu.be/5chUCRwIMP8" },
+    { "Kodifikasi": "KTM-SSL-1", "link": "https://youtu.be/fSTP9fO96No" },
+    { "Kodifikasi": "KTM-SST-1", "link": "https://youtu.be/x-kU1hs-8us" },
+    { "Kodifikasi": "KTM-TDN-1", "link": "https://youtu.be/hYNU9k_JXLw" },
+    { "Kodifikasi": "KTM-TJM-1", "link": "https://youtu.be/8hXUFWSCFlw" },
+    { "Kodifikasi": "KTM-TML-1", "link": "https://youtu.be/afvIG5bA6x8" },
+    { "Kodifikasi": "KTM-TML-2", "link": "https://youtu.be/lhOaXuzegxs" },
+    { "Kodifikasi": "KTM-TPB-1", "link": "https://youtu.be/TBJoIhJh0Eo" },
+    { "Kodifikasi": "KTM-TPL-1", "link": "https://youtu.be/J27sRBRXaVg" },
+    { "Kodifikasi": "KTM-TPM-1", "link": "https://youtu.be/nxCPApZM5_Y" },
+    { "Kodifikasi": "KTM-TTP-1", "link": "https://youtu.be/oZ2EjFOcnZM" },
+    { "Kodifikasi": "PSR-HBU-1", "link": "https://youtu.be/G3c9vABim5A" },
+    { "Kodifikasi": "PSR-KPT-1", "link": "https://youtu.be/dzEhmyfFgGQ" },
+    { "Kodifikasi": "PSR-LDD-1", "link": "https://youtu.be/EVNDHAvdcSI" },
+    { "Kodifikasi": "PSR-KSI-1", "link": "https://youtu.be/WVNzxQmoD8o" },
+    { "Kodifikasi": "PSR-RLB-1", "link": "https://youtu.be/oFItbYFqSCk" },
+    { "Kodifikasi": "PSR-RLY-1", "link": "https://youtu.be/ZixC0EnZYnA" },
+    { "Kodifikasi": "PSR-SLO-1", "link": "https://youtu.be/xRaMUxYZRqA" },
+    { "Kodifikasi": "PPU-RIK-1", "link": "https://youtu.be/vFdoskkiEuA" },
+    { "Kodifikasi": "PPU-RIK-2", "link": "https://youtu.be/vFdoskkiEuA" }
 ]
