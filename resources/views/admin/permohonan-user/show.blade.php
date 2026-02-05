@@ -64,7 +64,10 @@
         .status-menunggu { background: #FEF3C7; color: #D97706; }
         .status-proses { background: #E0F2FE; color: #0284C7; }
         .status-expired { background: #FEE2E2; color: #DC2626; }
-        .status-ditolak { background: #F1F5F9; color: #64748B; }
+        .status-ditolak { background: #FEE2E2; color: #DC2626; }
+        /* Custom Colors */
+        .status-dibatalkan { background: #F3F4F6 !important; color: #FEF3C7 !important; }
+        .status-kedaluwarsa { background: #FEF3C7 !important; color: #B45309 !important; }
 
         .question-item {
             background: #FCFCFD;
@@ -569,8 +572,8 @@
                     'proses' => ['text' => 'Sedang Diproses', 'class' => 'status-proses'],
                     'selesai' => ['text' => 'Aktif', 'class' => 'status-aktif'],
                     'ditolak' => ['text' => 'Ditolak', 'class' => 'status-ditolak'],
-                    'dibatalkan' => ['text' => 'Dibatalkan', 'class' => 'status-expired'],
-                    'expired' => ['text' => 'Kedaluwarsa', 'class' => 'status-expired'],
+                    'dibatalkan' => ['text' => 'Dibatalkan', 'class' => 'status-dibatalkan'],
+                    'expired' => ['text' => 'Kedaluwarsa', 'class' => 'status-kedaluwarsa'],
                 ];
                 if (isset($permohonanUser->status) && isset($statusMap[$permohonanUser->status])) {
                     $statusText = $statusMap[$permohonanUser->status]['text'];
@@ -600,7 +603,7 @@
 
         @if ($permohonanUser->keterangan)
             <div class="info-row">
-                <div class="info-label">Keterangan</div>
+                <div class="info-label">Keterangan Admin</div>
                 <div class="info-value">{{ $permohonanUser->keterangan }}</div>
             </div>
         @endif

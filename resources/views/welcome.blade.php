@@ -432,16 +432,7 @@
         </div>
         
         <div class="profile-modal-body">
-            <a href="javascript:void(0)" class="profile-menu-item" data-bs-toggle="modal" data-bs-target="#modalProfile" onclick="closeProfileModalFunc()">
-                <div class="profile-menu-icon">
-                    <i class="fas fa-user-circle"></i>
-                </div>
-                <div class="profile-menu-text">
-                    <h4>Profil Saya</h4>
-                    <p>Lihat dan edit profil Anda</p>
-                </div>
-                
-            </a>
+
 
             
 

@@ -140,7 +140,7 @@
         .status-menunggu { background: #FEF3C7; color: #D97706; }
         .status-proses { background: #E0F2FE; color: #0284C7; }
         .status-expired { background: #FEE2E2; color: #DC2626; }
-        .status-ditolak { background: #F1F5F9; color: #64748B; }
+        .status-ditolak { background: #FEE2E2; color: #DC2626; }
 
         .btn-secondary {
             display: inline-flex;

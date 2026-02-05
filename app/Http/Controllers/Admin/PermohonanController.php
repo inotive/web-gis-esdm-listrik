@@ -210,7 +210,11 @@ class PermohonanController extends Controller
         ];
 
         // Fetch distinct types of Perizinan for the filter dropdown
-        $jenisIzinList = Perizinan::select('jenis')->distinct()->pluck('jenis');
+        $existingJenis = Perizinan::select('jenis')->distinct()->pluck('jenis')->toArray();
+        $jenisIzinList = collect(array_merge(Perizinan::DEFAULT_JENIS_PERIZINAN, $existingJenis))
+            ->unique()
+            ->sort()
+            ->values();
 
         $perizinans = $queryPerizinan->orderBy('created_at', 'desc')
             ->paginate($perPage, ['*'], 'page_perizinan')

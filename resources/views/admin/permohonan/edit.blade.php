@@ -183,10 +183,10 @@
     </div>
 
     <div class="form-group">
-      <label class="label">Keterangan</label>
-      <textarea name="keterangan" class="input" rows="3" placeholder="Masukkan keterangan">{{ old('keterangan', $permohonan->keterangan) }}</textarea>
+      <label class="label">Keterangan Admin</label>
+      <textarea name="keterangan" class="input" rows="3" placeholder="Masukkan keterangan admin">{{ old('keterangan', $permohonan->keterangan) }}</textarea>
     </div>
-
+  
     <hr style="margin: 24px 0; border: none; border-top: 1px solid #E5E7EB;">
 
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">

@@ -67,7 +67,11 @@ class PerizinanController extends Controller
     public function create()
     {
         $perusahaans = Perusahaan::orderBy('nama', 'asc')->get(['id', 'nama']);
-        $jenisPerizinan = Perizinan::distinct()->whereNotNull('jenis')->orderBy('jenis', 'asc')->pluck('jenis');
+        $existingJenis = Perizinan::distinct()->whereNotNull('jenis')->pluck('jenis')->toArray();
+        $jenisPerizinan = collect(array_merge(Perizinan::DEFAULT_JENIS_PERIZINAN, $existingJenis))
+            ->unique()
+            ->sort()
+            ->values();
 
         return view('admin.perizinan.create', [
             'title' => 'Tambah Perizinan',
@@ -183,7 +187,11 @@ class PerizinanController extends Controller
     public function edit(Perizinan $perizinan)
     {
         $perusahaans = Perusahaan::orderBy('nama', 'asc')->get(['id', 'nama']);
-        $jenisPerizinan = Perizinan::distinct()->whereNotNull('jenis')->orderBy('jenis', 'asc')->pluck('jenis');
+        $existingJenis = Perizinan::distinct()->whereNotNull('jenis')->pluck('jenis')->toArray();
+        $jenisPerizinan = collect(array_merge(Perizinan::DEFAULT_JENIS_PERIZINAN, $existingJenis))
+            ->unique()
+            ->sort()
+            ->values();
 
         return view('admin.perizinan.edit', [
             'title' => 'Edit Perizinan',

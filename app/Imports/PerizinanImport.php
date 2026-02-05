@@ -77,43 +77,63 @@ class PerizinanImport implements OnEachRow, WithHeadingRow
         // Often keys are slugs: 'kapasitas_mw', 'kapasitas', etc.
         // We rely on $rowArray['kapasitas'] primarily, or check column P (16) or R (18) if needed.
         // Assuming 'kapasitas' header exists unique enough or we trust the array:
-        $kapasitasRaw = $rowArray['kapasitas'] ?? 0;
-        // Check for 'total_kapasitas_kva' (slug from "Total Kapasitas (kVA)") or fallback to 'total_kapasitas'
-        $totalKapasitasRaw = $rowArray['total_kapasitas_kva'] ?? $rowArray['total_kapasitas'] ?? 0;
+        // Helper to safely get calculated value
+        $getSafeValue = function($col, $row) use ($worksheet) {
+            $cell = $worksheet->getCell($col . $row);
+            try {
+                return $cell->getCalculatedValue();
+            } catch (\Exception $e) {
+                // Fallback to old calculated value if formula fails (e.g. missing table reference)
+                return $cell->getOldCalculatedValue();
+            }
+        };
 
-        $jumlah = (int) ($rowArray['jumlah'] ?? 0);
+        $jumlahRaw = $getSafeValue('N', $rowIndex);
+        $kapasitasRaw = $getSafeValue('O', $rowIndex);
+        $totalKapasitasRaw = $getSafeValue('P', $rowIndex);
+
+        $jumlah = (int) $jumlahRaw;
         $kapasitas = $this->sanitizeDecimal($kapasitasRaw);
         $totalKapasitas = $this->sanitizeDecimal($totalKapasitasRaw);
 
-        // Fallback calculation: If total is 0 or missing, calculate it from Jumlah * Kapasitas
-        if ($totalKapasitas == 0 && $jumlah > 0 && $kapasitas > 0) {
-            $totalKapasitas = $jumlah * $kapasitas;
-        }
+
 
         // Update or Create Perizinan
         // Consider what makes a Perizinan unique? No pengajuan or combination?
         // For import, we might just append or update if ID exists (but we don't have ID).
         // Let's create new for now as per previous logic (it was returning new Perizinan).
         
+        // Explicitly fetch columns based on user feedback and template
+        $tanggalTerbitRaw = $worksheet->getCell('J' . $rowIndex)->getValue(); // Column 10: Tanggal Terbit
+        $tanggalAkhirRaw = $getSafeValue('K', $rowIndex);  // Column 11: Tanggal Akhir
+        $catatanRaw = $worksheet->getCell('S' . $rowIndex)->getValue();       // Column 19: Catatan
+        $noSuratIzinTerbitRaw = $worksheet->getCell('I' . $rowIndex)->getValue(); // Column 9: No Surat Izin Terbit
+        $noSuratKeluarRaw = $worksheet->getCell('G' . $rowIndex)->getValue();     // Column 7: No Surat Keluar (Rekomtek/Pertek)
+
+        // DEBUG DATE LOGGING
+        // Check what we are actually getting
+        $debugMsg = "Row {$rowIndex} | J (Terbit): " . json_encode($tanggalTerbitRaw) . " | K (Akhir): " . json_encode($tanggalAkhirRaw) . "\n";
+        file_put_contents(storage_path('logs/debug_dates.log'), $debugMsg, FILE_APPEND);
+
         Perizinan::create([
             'nama'              => $rowArray['nama'],
             'perusahaan_id'     => $perusahaan->id,
             'kontak'            => $rowArray['kontak'] ?? null,
-            'jenis'             => $jenisIzin ?: 'IUPTLS', // Use the explicitly fetched Column 5
+            'jenis'             => $jenisIzin ?: 'IUPTLS',
             'no_pengajuan'      => $rowArray['no_pengajuan'] ?? null,
-            'no_surat_keluar'   => $rowArray['surat_izin'] ?? $rowArray['no_surat_izin'] ?? $rowArray['no_surat_keluar'] ?? null,
+            'no_surat_keluar'   => $noSuratKeluarRaw,
             'tanggal'           => $this->transformDate($rowArray['tanggal'] ?? null),
-            'no_surat_izin_terbit'=> $rowArray['no_surat_izin_terbit'] ?? null,
-            'tanggal_terbit'    => $this->transformDate($rowArray['tanggal_terbit'] ?? null),
-            'tanggal_akhir'     => $this->transformDate($rowArray['tanggal_akhir'] ?? null),
+            'no_surat_izin_terbit'=> $noSuratIzinTerbitRaw,
+            'tanggal_terbit'    => $this->transformDate($tanggalTerbitRaw), 
+            'tanggal_akhir'     => $this->transformDate($tanggalAkhirRaw),
             'lokasi'            => $rowArray['lokasi'] ?? null,
             'titik_koordinat'   => $rowArray['titik_koordinat'] ?? null,
             'jumlah'            => $rowArray['jumlah'] ?? 0,
             'kapasitas'         => $kapasitas,
             'total_kapasitas_kva'=> $totalKapasitas,
-            'jenis_penggunaan'  => $jenisPembangkit, // Use the explicitly fetched Column 17
+            'jenis_penggunaan'  => $jenisPembangkit,
             'sifat_penggunaan'  => $rowArray['sifat_penggunaan'] ?? null,
-            'catatan'           => $rowArray['catatan'] ?? null,
+            'catatan'           => $catatanRaw, 
             'created_by'        => auth()->id(),
         ]);
     }
@@ -127,7 +147,15 @@ class PerizinanImport implements OnEachRow, WithHeadingRow
             if (is_numeric($value)) {
                 return Date::excelToDateTimeObject($value);
             }
-            // Otherwise parse as string
+            
+            // Handle Indonesian Month Names (e.g. 28 Oktober 2022)
+            $value = str_ireplace(
+                ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
+                ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                $value
+            );
+
+            // Parse as string
             return Carbon::parse($value);
         } catch (\Exception $e) {
             return null;

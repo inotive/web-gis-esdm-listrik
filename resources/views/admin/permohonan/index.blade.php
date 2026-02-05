@@ -146,7 +146,10 @@
         .status-menunggu { background: #FEF3C7; color: #D97706; }
         .status-proses { background: #E0F2FE; color: #0284C7; }
         .status-expired { background: #FEE2E2; color: #DC2626; }
-        .status-ditolak { background: #F1F5F9; color: #64748B; }
+        .status-ditolak { background: #FEE2E2; color: #DC2626; }
+        /* Custom Colors */
+        .status-dibatalkan { background: #F3F4F6 !important; color: #FEF3C7 !important; }
+        .status-kedaluwarsa { background: #FEF3C7 !important; color: #B45309 !important; }
         
         /* Action Buttons - Sesuai Figma & Perusahaan */
         .btn-ico {
@@ -622,8 +625,8 @@
                                     <td>
                                         <span class="status-badge" style="background:#DCFCE7;color:#16A34A;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;">{{ $item->jenis }}</span>
                                     </td>
-                                    <td>{{ $item->no_surat_keluar ?? '-' }}</td>
-                                    <td>{{ $item->tanggal ? $item->tanggal->format('d/m/Y') : '-' }}</td>
+                                    <td>{{ $item->no_surat_izin_terbit ?? $item->no_surat_keluar ?? '-' }}</td>
+                                    <td>{{ $item->tanggal_terbit ? $item->tanggal_terbit->format('d/m/Y') : '-' }}</td>
                                     <td>{{ $item->tanggal_akhir ? $item->tanggal_akhir->format('d/m/Y') : '-' }}</td>
 
                                     <td>

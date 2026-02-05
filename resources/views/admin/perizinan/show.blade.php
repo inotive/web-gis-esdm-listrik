@@ -435,14 +435,11 @@
 <section class="card">
   <h3 class="section-title">Informasi Umum</h3>
 
-  <div class="detail-row">
-    <div class="detail-label">Nama</div>
-    <div class="detail-value">{{ $perizinan->nama ?? '-' }}</div>
-  </div>
+
 
   <div class="detail-row">
-    <div class="detail-label">Perusahaan</div>
-    <div class="detail-value">{{ $perizinan->perusahaan->nama ?? '-' }}</div>
+    <div class="detail-label">Nama Perusahaan</div>
+    <div class="detail-value">{{ $perizinan->perusahaan->nama ?? $perizinan->nama_perusahaan ?? $perizinan->nama ?? '-' }}</div>
   </div>
 
   <div class="detail-row">

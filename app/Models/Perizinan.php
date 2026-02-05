@@ -13,6 +13,15 @@ class Perizinan extends Model
 
     protected $table = 'perizinans';
 
+    const DEFAULT_JENIS_PERIZINAN = [
+        'IUPTLS',
+        'IUJPTL',
+        'SKTP',
+        'SKT-TL',
+        'STP-TL',
+        'IO'
+    ];
+
     protected $fillable = [
         'perusahaan_id',
         'nama_perusahaan',
@@ -22,6 +31,7 @@ class Perizinan extends Model
         'no_surat_keluar',
         'no_surat_izin_terbit',
         'tanggal',
+        'tanggal_terbit',
         'tanggal_akhir',
         'status_izin',
         'lokasi',
@@ -39,6 +49,7 @@ class Perizinan extends Model
 
     protected $casts = [
         'tanggal' => 'date',
+        'tanggal_terbit' => 'date',
         'tanggal_akhir' => 'date',
         'kapasitas' => 'decimal:2',
         'total_kapasitas_kva' => 'decimal:2',
