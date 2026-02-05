@@ -77,7 +77,7 @@ class PerizinanTemplateExport implements FromCollection, WithHeadings, WithStyle
                 'Kontak',
                 'Jenis',
                 'No. Pengajuan',
-                "Surat Izin",          // Mendukung wrap text
+                "No. Surat Keluar \n (Rekomtek/Pertek)",          // Mendukung wrap text
                 'Tanggal',
                 'No. Surat Izin Terbit',
                 'Tanggal Terbit',
