@@ -26,6 +26,16 @@ class PermohonanController extends Controller
     public function index(Request $request)
 
     {
+        // TAB PERSISTENCE LOGIC
+        // If query has 'tab', save it to session.
+        // If query missing 'tab', try to restore from session (redirect).
+        if ($request->has('tab')) {
+            session(['last_permohonan_tab' => $request->tab]);
+        } elseif (session()->has('last_permohonan_tab')) {
+            // Merge existing query params with the restored tab to keep filters/search
+            return redirect()->route('admin.permohonan.index', array_merge($request->query(), ['tab' => session('last_permohonan_tab')]));
+        }
+
         $perPage = (int) $request->get('per_page', 10);
         $q = $request->get('q');
         $tab = $request->get('tab', 'permohonan');

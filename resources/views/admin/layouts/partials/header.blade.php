@@ -722,11 +722,12 @@
         right: -5px;
         background-color: #ef4444;
         color: white;
-        border-radius: 50%;
+        border-radius: 99px; /* Pill shape */
         font-size: 10px;
         font-weight: bold;
         min-width: 18px;
         height: 18px;
+        padding: 0 4px; /* Breathing room */
         display: flex;
         align-items: center;
         justify-content: center;

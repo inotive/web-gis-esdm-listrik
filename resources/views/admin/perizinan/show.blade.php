@@ -468,6 +468,21 @@
   </div>
 
   <div class="detail-row">
+    <div class="detail-label">No. Surat Izin Terbit</div>
+    <div class="detail-value">{{ $perizinan->no_surat_izin_terbit ?? '-' }}</div>
+  </div>
+
+  <div class="detail-row">
+    <div class="detail-label">Tanggal Terbit</div>
+    <div class="detail-value">{{ $perizinan->tanggal_terbit ? $perizinan->tanggal_terbit->translatedFormat('d F Y') : '-' }}</div>
+  </div>
+
+  <div class="detail-row">
+    <div class="detail-label">Tanggal Berakhir</div>
+    <div class="detail-value">{{ $perizinan->tanggal_akhir ? $perizinan->tanggal_akhir->translatedFormat('d F Y') : '-' }}</div>
+  </div>
+
+  <div class="detail-row">
     <div class="detail-label">Lokasi</div>
     <div class="detail-value">{{ $perizinan->lokasi ?? '-' }}</div>
   </div>

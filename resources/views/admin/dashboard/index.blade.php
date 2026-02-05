@@ -705,14 +705,14 @@
                                     <td>{{ $perusahaan['jenis_usaha'] ?? '-' }}</td>
                                     <td>{{ $perusahaan['kabupaten_kota'] ?? '-' }}</td>
                                     <td class="text-center">
-                                        <span class="badge badge-blue">{{ $perusahaan['total_gardu'] }}</span>
+                                        <span class="stats-badge badge-blue">{{ $perusahaan['total_gardu'] }}</span>
                                     </td>
                                     <td class="text-center">
                                         <span
-                                            class="badge badge-green">{{ number_format($perusahaan['total_jaringan_km'], 2) }}</span>
+                                            class="stats-badge badge-green">{{ number_format($perusahaan['total_jaringan_km'], 2) }}</span>
                                     </td>
                                     <td class="text-center">
-                                        <span class="badge badge-orange">{{ $perusahaan['total_pembangkit'] }}</span>
+                                        <span class="stats-badge badge-orange">{{ $perusahaan['total_pembangkit'] }}</span>
                                     </td>
                                     <td class="text-center">
                                         <strong style="color: #1F2937;">{{ $perusahaan['total_infrastruktur'] }}</strong>
@@ -769,7 +769,7 @@
             text-align: center;
         }
 
-        .badge {
+        .stats-badge {
             display: inline-block;
             padding: 4px 10px;
             border-radius: 12px;
