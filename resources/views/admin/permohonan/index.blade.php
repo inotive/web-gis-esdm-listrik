@@ -592,19 +592,7 @@
                                 <th>Tanggal Terbit</th>
                                 <th>Tanggal Akhir</th>
                                 <th>Status</th>
-                                <th class="text-end">Kapasitas</th>
                                 <th class="col-aksi">Aksi</th>
-                            </tr>
-                            <tr class="filter-row">
-                                <th class="col-no"></th>
-                                <th><input type="text" class="filter-input-perizinan filter-backend" name="filter_perizinan_nama" value="{{ request('filter_perizinan_nama') }}" placeholder="Filter nama..."></th>
-                                <th><input type="text" class="filter-input-perizinan filter-backend" name="filter_perizinan_jenis" value="{{ request('filter_perizinan_jenis') }}" placeholder="Filter jenis..."></th>
-                                <th><input type="text" class="filter-input-perizinan filter-backend" name="filter_perizinan_no_izin" value="{{ request('filter_perizinan_no_izin') }}" placeholder="Filter no izin..."></th>
-                                <th><input type="date" class="filter-input-perizinan filter-backend" name="filter_perizinan_tgl_terbit" value="{{ request('filter_perizinan_tgl_terbit') }}" placeholder="MM/DD/YYYY"></th>
-                                <th><input type="date" class="filter-input-perizinan filter-backend" name="filter_perizinan_tgl_akhir" value="{{ request('filter_perizinan_tgl_akhir') }}" placeholder="MM/DD/YYYY"></th>
-                                <th><input type="text" class="filter-input-perizinan filter-backend" name="filter_perizinan_status" value="{{ request('filter_perizinan_status') }}" placeholder="Filter status..."></th>
-                                <th><input type="text" class="filter-input-perizinan filter-backend" name="filter_perizinan_kapasitas" value="{{ request('filter_perizinan_kapasitas') }}" placeholder="Filter kapasitas..."></th>
-                                <th class="col-aksi"></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -632,7 +620,6 @@
                                             <span class="status-badge status-aktif" style="background:#DCFCE7;color:#16A34A;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;">Sedang Aktif</span>
                                         @endif
                                     </td>
-                                    <td class="text-end" style="color:#059669;font-weight:700;">{{ number_format($item->total_kapasitas_kva, 2) }} kVA</td>
                                     <td class="col-aksi">
                                         <a href="{{ route('admin.perizinan.show', $item->id) }}" class="btn-ico view" title="Detail"><i class="fa-solid fa-eye"></i></a>
                                         @php

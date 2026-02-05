@@ -480,28 +480,16 @@
     <div class="detail-value">{{ $perizinan->titik_koordinat ?? '-' }}</div>
   </div>
 
+
+
   <div class="detail-row">
-    <div class="detail-label">Status Kelistrikan</div>
-    <div class="detail-value">
-    @if($perizinan->status_kelistrikan)
-      @if($perizinan->status_kelistrikan == 'berlistrik_pln')
-        <span style="display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-transform: uppercase; background: #D1FAE5; color: #065F46;">Berlistrik PLN</span>
-      @elseif($perizinan->status_kelistrikan == 'berlistrik_non_pln')
-        <span style="display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-transform: uppercase; background: #FEF3C7; color: #92400E;">Berlistrik Non-PLN</span>
-      @elseif($perizinan->status_kelistrikan == 'tidak_berlistrik')
-        <span style="display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-transform: uppercase; background: #FEE2E2; color: #991B1B;">Tidak Berlistrik</span>
-      @else
-        <span style="color: #9CA3AF; font-style: italic;">{{ $perizinan->status_kelistrikan }} (format tidak dikenal)</span>
-      @endif
-    @else
-      <span style="color: #9CA3AF; font-style: italic;">Belum diisi</span>
-    @endif
-    </div>
+    <div class="detail-label">Jumlah Unit</div>
+    <div class="detail-value">{{ $perizinan->jumlah ?? '-' }}</div>
   </div>
 
   <div class="detail-row">
-    <div class="detail-label">Jumlah Kapasitas</div>
-    <div class="detail-value">{{ $perizinan->jumlah_kapasitas ?? '-' }}</div>
+    <div class="detail-label">Kapasitas</div>
+    <div class="detail-value">{{ $perizinan->kapasitas ? number_format($perizinan->kapasitas, 2) : '-' }}</div>
   </div>
 
   <div class="detail-row">
