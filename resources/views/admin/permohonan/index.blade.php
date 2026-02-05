@@ -139,6 +139,7 @@
             border-radius: 20px;
             font-size: 11px;
             font-weight: 600;
+            white-space: nowrap;
         }
 
         .status-aktif { background: #ECFDF5; color: #059669; }
@@ -229,23 +230,29 @@
         }
 
         .summary-card {
-            background: white;
+            background: #ffffff;
             border-radius: 12px;
-            padding: 16px;
+            padding: 16px 20px;
             border: 1px solid #E5E7EB;
-            display: flex;
-            flex-direction: column;
+            display: grid;                      
+            grid-template-columns: auto 1fr;    
+            grid-template-rows: auto auto;     
+            column-gap: 12px;
+            row-gap: 2px;
+            align-items: center;
+            min-height: 72px;
         }
 
         .summary-card-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
-            margin-bottom: 12px;
+            font-size: 18px;
+            grid-column: 1;
+            grid-row: 1 / span 2;
         }
 
         /* Card Variations */
@@ -262,13 +269,22 @@
             color: #111827;
             margin-bottom: 4px;
             line-height: 1;
+            display: block;
+            order: 2;   
+            width: 100%;
+            grid-column: 2;
+            grid-row: 2;  
         }
 
         .summary-card-label {
-            font-size: 11px;
+            font-size: 12px;      
             font-weight: 500;
             color: #6B7280;
-            line-height: 1.2;
+            line-height: 1.3;
+            order: 1;   
+            width: 100%; 
+            grid-column: 2;
+            grid-row: 1;
         }
 
         @media (max-width: 1200px) {
