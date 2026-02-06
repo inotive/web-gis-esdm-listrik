@@ -82,7 +82,7 @@ class Perizinan extends Model
 
         $today = now()->startOfDay();
         $endDate = $this->tanggal_akhir->startOfDay();
-        $warningDate = $today->copy()->addDays(30);
+        $warningDate = $today->copy()->addDays(90);
 
         if ($endDate->lt($today)) {
             return 'Berakhir';

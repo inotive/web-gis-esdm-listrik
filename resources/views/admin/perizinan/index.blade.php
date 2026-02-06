@@ -59,18 +59,6 @@
                                 <span class="text-muted">-</span>
                             @endif
                         </td>
-                        <td class="px-4 py-3">{{ $item->jenis }}</td>
-                        <td class="px-4 py-3">
-                            @if($item->status_kelistrikan == 'berlistrik_pln')
-                                <span class="badge bg-success bg-opacity-10 text-success px-2 py-1 rounded-pill">Berlistrik PLN</span>
-                            @elseif($item->status_kelistrikan == 'berlistrik_non_pln')
-                                <span class="badge bg-warning bg-opacity-10 text-warning px-2 py-1 rounded-pill">Non PLN</span>
-                            @elseif($item->status_kelistrikan == 'tidak_berlistrik')
-                                <span class="badge bg-danger bg-opacity-10 text-danger px-2 py-1 rounded-pill">Tidak Berlistrik</span>
-                            @else
-                                <span class="text-muted">-</span>
-                            @endif
-                        </td>
                          <td class="px-4 py-3">
                             <div style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                 {{ $item->lokasi ?? '-' }}

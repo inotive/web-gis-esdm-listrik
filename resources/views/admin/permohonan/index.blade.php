@@ -605,8 +605,8 @@
                         <thead>
                             <tr>
                                 <th class="col-no">No</th>
-                                <th>Nama Pemohon</th>
-                                <th>Jenis</th>
+                                <th>Nama Perusahaan</th>
+                                <th>Jenis Izin</th>
                                 <th>No. Surat Izin</th>
                                 <th>Tanggal Terbit</th>
                                 <th>Tanggal Akhir</th>
