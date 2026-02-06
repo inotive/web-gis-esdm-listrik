@@ -66,7 +66,7 @@
         .status-expired { background: #FEE2E2; color: #DC2626; }
         .status-ditolak { background: #FEE2E2; color: #DC2626; }
         /* Custom Colors */
-        .status-dibatalkan { background: #F3F4F6 !important; color: #FEF3C7 !important; }
+        .status-dibatalkan { background: #cdced1ff !important; color: #494848ff !important; }
         .status-kedaluwarsa { background: #FEF3C7 !important; color: #B45309 !important; }
 
         .question-item {
@@ -710,7 +710,7 @@
                     @endif
                 </div>
             </div>
-            </div>
+
         @endforeach
         @else
             @if($permohonanUser->jawaban)
