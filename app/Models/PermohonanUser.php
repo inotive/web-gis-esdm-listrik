@@ -24,12 +24,33 @@ class PermohonanUser extends Model
         'approved_by',
         'approved_at',
         'approval_notes',
+        'nama_pemohon_import',
+        'jenis_permohonan_import',
+        'nama_perusahaan_import',
     ];
 
     protected $casts = [
         'jawaban' => 'array',
         'approved_at' => 'datetime',
     ];
+
+    // Accessor for Applicant Name (User Name or Imported Name)
+    public function getApplicantNameAttribute()
+    {
+        return $this->user ? $this->user->name : $this->nama_pemohon_import;
+    }
+
+    // Accessor for Permohonan Type Name (Category Name or Imported Name)
+    public function getTypeNameAttribute()
+    {
+        return $this->permohonan ? $this->permohonan->nama : $this->jenis_permohonan_import;
+    }
+
+    // Accessor for Company Name (Perusahaan Name or Imported Name)
+    public function getCompanyNameAttribute()
+    {
+        return $this->perusahaan ? $this->perusahaan->nama : $this->nama_perusahaan_import;
+    }
 
     protected static function booted()
     {

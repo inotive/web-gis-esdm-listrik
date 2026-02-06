@@ -38,16 +38,11 @@
                             </a>
                         </div>
                         <ul class="mb-0 pl-3">
-                            <li>Pastikan format file sesuai dengan template yang disediakan.</li>
-                            <li>Kolom wajib: <b>nama_pemohon</b>, <b>jenis_permohonan</b>.</li>
-                            <li>Kolom <b>status_kelistrikan</b> harap diisi: 
-                                <ul>
-                                    <li><b>Berlistrik PLN</b></li>
-                                    <li><b>Berlistrik NON-PLN</b></li>
-                                    <li><b>Tidak Berlistrik</b></li>
-                                </ul>
-                            </li>
-                            <li>Jika perusahaan tidak ditemukan, sistem akan mencoba membuat perusahaan baru.</li>
+                            <li>Pastikan format file sesuai dengan template yang disediakan (9 Kolom).</li>
+                            <li>Kolom wajib: <b>nama_perusahaan</b>, <b>nama_pemohon</b>, dan <b>jenis_permohonan</b>.</li>
+                            <li>Lokasi (Kota, Kecamatan, Kelurahan) akan disimpan secara terpisah dalam data permohonan.</li>
+                            <li>Kolom <b>Bulan</b> dan <b>Tahun</b> digabungkan sebagai informasi periode.</li>
+                            <li>Jika perusahaan atau pemohon belum ada, nama akan disimpan sebagai teks (tidak membuat data master baru).</li>
                         </ul>
                     </div>
 

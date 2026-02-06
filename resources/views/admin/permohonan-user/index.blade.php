@@ -552,7 +552,7 @@
                         @forelse ($permohonanUsers as $i => $permohonanUser)
                             <tr>
                                 <td class="col-no">{{ $permohonanUsers->firstItem() + $i }}</td>
-                                <td><strong>{{ $permohonanUser->permohonan->nama }}</strong></td>
+                                <td><strong>{{ $permohonanUser->type_name }}</strong></td>
                                 <td>
                                     @php
                                         $statusClass = 'status-aktif';
@@ -604,7 +604,7 @@
                                             {{-- Pending: bisa progress atau reject --}}
                                             <button type="button" class="btn-ico progress btn-progress-permohonan-user"
                                                 data-id="{{ $permohonanUser->id }}"
-                                                data-name="{{ $permohonanUser->permohonan->nama }}" title="Proses">
+                                                data-name="{{ $permohonanUser->type_name }}" title="Proses">
                                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                                     xmlns="http://www.w3.org/2000/svg">
                                                     <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#3B82F6" stroke-width="2"
@@ -617,7 +617,7 @@
                                             </button>
                                             <button type="button" class="btn-ico danger btn-reject-permohonan-user"
                                                 data-id="{{ $permohonanUser->id }}"
-                                                data-name="{{ $permohonanUser->permohonan->nama }}" title="Tolak">
+                                                data-name="{{ $permohonanUser->type_name }}" title="Tolak">
                                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                                     xmlns="http://www.w3.org/2000/svg">
                                                     <path d="M18 6L6 18M6 6L18 18" stroke="#F8285A" stroke-width="2"
@@ -628,7 +628,7 @@
                                             {{-- Proses: bisa approve atau reject --}}
                                             <button type="button" class="btn-ico approve btn-approve-permohonan-user"
                                                 data-id="{{ $permohonanUser->id }}"
-                                                data-name="{{ $permohonanUser->permohonan->nama }}" title="Setujui">
+                                                data-name="{{ $permohonanUser->type_name }}" title="Setujui">
                                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                                     xmlns="http://www.w3.org/2000/svg">
                                                     <path d="M20 6L9 17L4 12" stroke="#10B981" stroke-width="2"
@@ -637,7 +637,7 @@
                                             </button>
                                             <button type="button" class="btn-ico danger btn-reject-permohonan-user"
                                                 data-id="{{ $permohonanUser->id }}"
-                                                data-name="{{ $permohonanUser->permohonan->nama }}" title="Tolak">
+                                                data-name="{{ $permohonanUser->type_name }}" title="Tolak">
                                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                                                     xmlns="http://www.w3.org/2000/svg">
                                                     <path d="M18 6L6 18M6 6L18 18" stroke="#F8285A" stroke-width="2"
@@ -668,7 +668,7 @@
                                                 action="{{ route('admin.permohonan-user.cancel', [$permohonanId, $permohonanUser]) }}"
                                                 method="POST" style="display:inline-block;margin:0;"
                                                 class="form-cancel-permohonan-user"
-                                                data-name="{{ $permohonanUser->permohonan->nama }}">
+                                                data-name="{{ $permohonanUser->type_name }}">
                                                 @csrf @method('POST')
                                                 <button type="button" class="btn-ico danger btn-cancel-permohonan-user"
                                                     title="Batalkan">

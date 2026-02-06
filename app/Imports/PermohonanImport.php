@@ -5,6 +5,7 @@ namespace App\Imports;
 use App\Models\PermohonanUser;
 use App\Models\Permohonan;
 use App\Models\User;
+use App\Models\Perusahaan;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Illuminate\Support\Str;
@@ -18,102 +19,134 @@ class PermohonanImport implements ToModel, WithHeadingRow
     */
     public function model(array $row)
     {
-        // 1. Cari User berdasarkan Nama Pemohon
+        // Headers are typically slugified by Excel import (e.g. 'Nama Perusahaan' -> 'nama_perusahaan')
+        // Expected keys: nama_perusahaan, nama_pemohon, jenis_permohonan, bulan, tahun, kotakabupaten, kecamatan, kelurahandesa, keterangan
+
+        // 1. Find Perusahaan (Do NOT Create)
+        $perusahaan = null;
+        $namaPerusahaanImport = null;
+
+        if (!empty($row['nama_perusahaan'])) {
+            $perusahaan = Perusahaan::where('nama', trim($row['nama_perusahaan']))->first();
+            
+            if (!$perusahaan) {
+                // FALLBACK: Perusahaan not found, save name as text
+                $namaPerusahaanImport = trim($row['nama_perusahaan']);
+            }
+        }
+
+        // 2. Find User (Pemohon)
         $user = null;
-        if (isset($row['nama_pemohon'])) {
+        $namaPemohonImport = null;
+
+        if (!empty($row['nama_pemohon'])) {
             $user = User::where('name', 'like', '%' . $row['nama_pemohon'] . '%')->first();
+            
+            if (!$user) {
+                // FALLBACK: User not found, save name as text
+                $namaPemohonImport = $row['nama_pemohon'];
+            } else {
+                // Connect to existing user
+                // Only update linkage if user is linked to specific Perusahaan ID
+                if (!$user->perusahaan_id && $perusahaan) {
+                    $user->update(['perusahaan_id' => $perusahaan->id, 'company_name' => $perusahaan->nama]);
+                }
+            }
         }
 
-        // Jika user tidak ditemukan, create dummy user (atau skip, tergantung kebutuhan)
-        // Disini kita create user simple jika email ada, atau skip.
-        // Asumsi: jika nama pemohon ada tapi user tidak ada, kita skip atau return null 
-        // untuk kehati-hatian, tapi user minta "import", biasanya ingin datanya masuk.
-        // Kita coba cari user pertama jika null, atau create user baru.
-        if (!$user && !empty($row['nama_pemohon'])) {
-             // Create dummy user for import
-             $user = User::create([
-                 'name' => $row['nama_pemohon'],
-                 'username' => Str::slug($row['nama_pemohon']) . rand(100, 999), // Generate username
-                 'email' => Str::slug($row['nama_pemohon']) . '_' . rand(100,999) . '@import.com',
-                 'password' => bcrypt('password'), // default password
-                 'role' => 'user' // Asumsi ada field role atau menggunakan spatie
-             ]);
-        }
-        
-        if (!$user) return null;
-
-        // 2. Cari Jenis Permohonan
+        // 3. Find Permohonan Type
         $permohonan = null;
-        if (isset($row['jenis_permohonan'])) {
-            $permohonan = Permohonan::where('nama', 'like', '%' . $row['jenis_permohonan'] . '%')->first();
+        $jenisPermohonanImport = null;
+
+        if (!empty($row['jenis_permohonan'])) {
+            $permohonan = Permohonan::where('nama', trim($row['jenis_permohonan']))->first();
+            
+            if (!$permohonan) {
+                // FALLBACK: Type not found, save name as text
+                $jenisPermohonanImport = $row['jenis_permohonan'];
+            }
         }
 
-        // Jika jenis permohonan tidak ditemukan, cari default atau create baru
-        if (!$permohonan && !empty($row['jenis_permohonan'])) {
-            $permohonan = Permohonan::create([
-                'nama' => $row['jenis_permohonan'],
-                'jenis_permohonan' => 'Imported', // Default type
-                'keterangan' => 'Otomatis dibuat dari import'
-            ]);
-        } elseif (!$permohonan) {
-             // Fallback terakhir jika row['jenis_permohonan'] kosong
-             $permohonan = Permohonan::first(); 
+        // Need at least a Permohonan Type or an Imported Type Name
+        if (!$permohonan && !$jenisPermohonanImport) {
+             return null; 
         }
 
-        if (!$permohonan) return null;
-
-        // 3. Map Columns to Questions (Auto-create questions if needed)
-        // Daftar kolom yang ingin dijadikan "Pertanyaan" / Field dinamis
+        // 4. Map Columns to Questions (Dynamic Fields)
+        // Note: Map 'keterangan' to 'Keterangan Permohonan' so it appears as Applicant Data.
         $columnsToMap = [
-            'status_kelistrikan' => 'Status Kelistrikan',
-            'titik_koordinat' => 'Titik Koordinat',
-            'jumlah_kapasitas' => 'Jumlah Kapasitas',
-            'total_kapasitas_kva' => 'Total Kapasitas (kVA)',
-            'jenis_penggunaan' => 'Jenis Penggunaan',
-            'sifat_penggunaan' => 'Sifat Penggunaan',
-            'catatan' => 'Catatan',
-            'lokasi' => 'Lokasi'
+            'kotakabupaten' => 'Kota/Kabupaten',
+            'kecamatan'     => 'Kecamatan',
+            'kelurahandesa' => 'Kelurahan/Desa',
+            'keterangan'    => 'Keterangan Permohonan',
         ];
 
         $jawaban = [];
+        
+        if ($permohonan) {
+            // Standard behavior: Link to Questions
+            foreach ($columnsToMap as $colKey => $questionText) {
+                if (isset($row[$colKey])) {
+                    $question = \App\Models\PermohonanQuestion::firstOrCreate(
+                        [
+                            'permohonan_id' => $permohonan->id,
+                            'pertanyaan' => $questionText
+                        ],
+                        [
+                            'urutan' => 99,
+                            'tipe' => 'text',
+                            'wajib' => false
+                        ]
+                    );
+                    $jawaban[$question->id] = $row[$colKey];
+                }
+            }
+        } else {
+            // Fallback: Store directly with keys since no Question model exists
+            foreach ($columnsToMap as $colKey => $questionText) {
+                if (isset($row[$colKey])) {
+                    $jawaban[$questionText] = $row[$colKey];
+                }
+            }
+        }
 
-        foreach ($columnsToMap as $colKey => $questionText) {
-            if (isset($row[$colKey])) {
-                // Find or create question for this Permohonan
-                $question = \App\Models\PermohonanQuestion::firstOrCreate(
+        // 5. Construct Periode Question
+        $bulan = $row['bulan'] ?? '-';
+        $tahun = $row['tahun'] ?? '-';
+        if ($bulan !== '-' || $tahun !== '-') {
+            $periodeVal = trim("$bulan $tahun");
+            
+            if ($permohonan) {
+                $qPeriode = \App\Models\PermohonanQuestion::firstOrCreate(
                     [
                         'permohonan_id' => $permohonan->id,
-                        'pertanyaan' => $questionText
+                        'pertanyaan' => 'Periode'
                     ],
                     [
-                        'urutan' => 99, // Urutan default di akhir
+                        'urutan' => 98,
                         'tipe' => 'text',
                         'wajib' => false
                     ]
                 );
-
-                // Map answer to question ID
-                $jawaban[$question->id] = $row[$colKey];
+                $jawaban[$qPeriode->id] = $periodeVal;
+            } else {
+                $jawaban['Periode'] = $periodeVal;
             }
         }
 
+        // 6. Create PermohonanUser (The Application Record)
         return new PermohonanUser([
-            'permohonan_id' => $permohonan->id,
-            'user_id'       => $user->id,
-            'status'        => $this->mapStatus($row['status'] ?? 'pending'),
-            'keterangan'    => $row['keterangan'] ?? null,
-            'jawaban'       => $jawaban, // Simpan jawaban yang sudah dimap
+            'permohonan_id' => $permohonan ? $permohonan->id : null,
+            'user_id'       => $user ? $user->id : null,
+            'perusahaan_id' => $perusahaan ? $perusahaan->id : null,
+            'nama_pemohon_import'     => $namaPemohonImport,
+            'jenis_permohonan_import' => $jenisPermohonanImport,
+            'nama_perusahaan_import'  => $namaPerusahaanImport,
+            'status'        => 'pending',
+            'keterangan'    => null, 
+            'jawaban'       => $jawaban,
             'created_at'    => now(),
             'updated_at'    => now(),
         ]);
-    }
-
-    private function mapStatus($status)
-    {
-        $status = strtolower($status ?? '');
-        if (str_contains($status, 'selesai') || str_contains($status, 'aktif')) return 'selesai';
-        if (str_contains($status, 'proses')) return 'proses';
-        if (str_contains($status, 'tolak')) return 'ditolak';
-        return 'pending';
     }
 }

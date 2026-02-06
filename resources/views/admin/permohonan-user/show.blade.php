@@ -66,7 +66,7 @@
         .status-expired { background: #FEE2E2; color: #DC2626; }
         .status-ditolak { background: #FEE2E2; color: #DC2626; }
         /* Custom Colors */
-        .status-dibatalkan { background: #F3F4F6 !important; color: #FEF3C7 !important; }
+        .status-dibatalkan { background: #cdced1ff !important; color: #494848ff !important; }
         .status-kedaluwarsa { background: #FEF3C7 !important; color: #B45309 !important; }
 
         .question-item {
@@ -521,7 +521,7 @@
             <div class="page-title">
                 Detail Permohonan
                 <span style="font-size: 14px; font-weight: normal; color: #64748B;"> -
-                    {{ $permohonanUser->permohonan->nama }}</span>
+                    {{ $permohonanUser->type_name }}</span>
             </div>
         </div>
         <div class="page-actions">
@@ -537,14 +537,24 @@
             <h2 class="card-title" style="margin: 0;">Informasi Permohonan</h2>
             @if ($isAdmin && $permohonanUser->status !== 'selesai' && $permohonanUser->status !== 'ditolak' && $permohonanUser->status !== 'dibatalkan')
                 <div style="display: flex; gap: 12px;">
-                    <button type="button" class="btn-success" data-open="#modalApprove">
-                        <i class="ri-check-line"></i>
-                        Setujui Permohonan
-                    </button>
                     <button type="button" class="btn-danger" data-open="#modalReject">
                         <i class="ri-close-line"></i>
                         Tolak Permohonan
                     </button>
+
+                    @if ($permohonanUser->status === 'pending')
+                        {{-- Button Proses Permohonan --}}
+                        <button type="button" class="btn-primary" style="background: #0ea5e9;" data-open="#modalProgress">
+                            <i class="ri-loader-4-line"></i>
+                            Proses Permohonan
+                        </button>
+                    @elseif ($permohonanUser->status === 'proses')
+                        {{-- Button Setujui Permohonan --}}
+                        <button type="button" class="btn-success" data-open="#modalApprove">
+                            <i class="ri-check-line"></i>
+                            Setujui Permohonan
+                        </button>
+                    @endif
                 </div>
             @endif
 
@@ -558,7 +568,12 @@
 
         <div class="info-row">
             <div class="info-label">Nama Permohonan</div>
-            <div class="info-value"><strong>{{ $permohonanUser->permohonan->nama }}</strong></div>
+            <div class="info-value"><strong>{{ $permohonanUser->type_name }}</strong></div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">Nama Perusahaan</div>
+            <div class="info-value">{{ $permohonanUser->company_name ?? '-' }}</div>
         </div>
 
         <div class="info-row">
@@ -593,7 +608,7 @@
 
         <div class="info-row">
             <div class="info-label">Pengaju</div>
-            <div class="info-value">{{ $permohonanUser->user->name }}</div>
+            <div class="info-value">{{ $permohonanUser->applicant_name }}</div>
         </div>
 
         <div class="info-row">
@@ -614,7 +629,8 @@
     <section class="card">
         <h2 class="section-title">Detail Pengajuan</h2>
 
-        @foreach ($permohonanUser->permohonan->questions as $index => $question)
+        @if($permohonanUser->permohonan)
+            @foreach ($permohonanUser->permohonan->questions as $index => $question)
             @php
                 $questionId = $question->id;
                 $answer = $jawaban[$questionId] ?? null;
@@ -704,7 +720,26 @@
                     @endif
                 </div>
             </div>
+
         @endforeach
+        @else
+            @if($permohonanUser->jawaban)
+                @foreach ($permohonanUser->jawaban as $key => $value)
+                    <div class="question-item">
+                        <div class="question-number">
+                            {{ $loop->iteration }}. {{ $key }}
+                        </div>
+                        <div class="answer-value">
+                            {{ is_array($value) ? implode(', ', $value) : $value }}
+                        </div>
+                    </div>
+                @endforeach
+            @else
+                <div class="empty-state">
+                    <p>Tidak ada data jawaban.</p>
+                </div>
+            @endif
+        @endif
     </section>
 
     @if ($permohonanUser->documents && $permohonanUser->documents->count() > 0)
@@ -791,7 +826,7 @@
     @endif
 
     <!-- Modal Approve Permohonan -->
-    @if ($isAdmin && $permohonanUser->status !== 'selesai')
+    @if ($isAdmin && $permohonanUser->status === 'proses')
         <div class="modal-overlay" id="modalApprove">
             <div class="modal" style="max-width: 700px;">
                 <div class="modal-header">
@@ -851,6 +886,37 @@
                         <button type="submit" class="btn-modal-primary" style="background: #10B981;">
                             <i class="ri-check-line"></i>
                             Setujui Permohonan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
+
+    <!-- Modal Process Permohonan (NEW) -->
+    @if ($isAdmin && $permohonanUser->status === 'pending')
+        <div class="modal-overlay" id="modalProgress">
+            <div class="modal" style="max-width: 500px;">
+                <div class="modal-header">
+                    <h3>Konfirmasi Proses</h3>
+                    <button type="button" class="btn-close-modal" data-close>
+                        <i class="ri-close-line"></i>
+                    </button>
+                </div>
+                <form action="{{ route('admin.permohonan-user.progress', [$permohonanId, $permohonanUser->id]) }}"
+                    method="POST" id="formProgress">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="text-center" style="padding: 20px 0;">
+                            <p style="font-size: 16px; margin-bottom: 0;">Apakah anda yakin ingin memproses permohonan ini?</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="justify-content: center; gap: 12px;">
+                        <button type="button" class="btn-modal-cancel" data-close>
+                            Tidak
+                        </button>
+                        <button type="submit" class="btn-modal-primary" style="background: #0ea5e9;">
+                            Yakin
                         </button>
                     </div>
                 </form>
@@ -1073,6 +1139,11 @@
 
             if (formAddDocument) {
                 handleFormSubmit(formAddDocument);
+            }
+
+            const formProgress = document.getElementById('formProgress');
+            if (formProgress) {
+                handleFormSubmit(formProgress);
             }
 
             // Modal functionality

@@ -168,27 +168,33 @@ class PermohonanController extends Controller
         if ($filterPerizinanStatus) {
             // Map status filter to status_izin calculation logic
             if (stripos($filterPerizinanStatus, 'aktif') !== false && stripos($filterPerizinanStatus, 'berakhir') === false) {
-                // "Sedang Aktif" - tanggal_akhir > now
-                $queryPerizinan->whereDate('tanggal_akhir', '>', now());
+                // "Sedang Aktif" - tanggal_akhir > 90 days
+                $queryPerizinan->whereDate('tanggal_akhir', '>', now()->copy()->addDays(90));
             } elseif (stripos($filterPerizinanStatus, 'mau') !== false || stripos($filterPerizinanStatus, 'akan') !== false) {
-                // "Mau Berakhir" - tanggal_akhir between now and 30 days
+                // "Mau Berakhir" - tanggal_akhir between now and 90 days
                 $queryPerizinan->whereDate('tanggal_akhir', '>', now())
-                              ->whereDate('tanggal_akhir', '<=', now()->copy()->addDays(30));
+                              ->whereDate('tanggal_akhir', '<=', now()->copy()->addDays(90));
             } elseif (stripos($filterPerizinanStatus, 'berakhir') !== false) {
-                // "Berakhir" - tanggal_akhir < now
-                $queryPerizinan->whereDate('tanggal_akhir', '<', now());
+                // "Berakhir" - tanggal_akhir < now OR tanggal_akhir IS NULL
+                $queryPerizinan->where(function ($q) {
+                    $q->whereDate('tanggal_akhir', '<', now())
+                        ->orWhereNull('tanggal_akhir');
+                });
             }
         }
         
         // Global dropdown filter Status (from toolbar)
         if ($status && $status !== '') {
             if ($status === 'Sedang Aktif') {
-                $queryPerizinan->whereDate('tanggal_akhir', '>', now());
+                $queryPerizinan->whereDate('tanggal_akhir', '>', now()->copy()->addDays(90));
             } elseif ($status === 'Mau Berakhir') {
                 $queryPerizinan->whereDate('tanggal_akhir', '>', now())
-                              ->whereDate('tanggal_akhir', '<=', now()->copy()->addDays(30));
+                              ->whereDate('tanggal_akhir', '<=', now()->copy()->addDays(90));
             } elseif ($status === 'Berakhir') {
-                $queryPerizinan->whereDate('tanggal_akhir', '<', now());
+                $queryPerizinan->where(function ($q) {
+                    $q->whereDate('tanggal_akhir', '<', now())
+                        ->orWhereNull('tanggal_akhir');
+                });
             }
         }
         
@@ -212,11 +218,14 @@ class PermohonanController extends Controller
                 $q->where('jenis', 'like', '%SKTP%') // Prioritize SKTP check if separated
                   ->orWhere('jenis', 'like', '%Rekomtek%');
             })->count(),
-            'sedang_aktif' => Perizinan::whereDate('tanggal_akhir', '>', $now)->count(),
+            'sedang_aktif' => Perizinan::whereDate('tanggal_akhir', '>', $now->copy()->addDays(90))->count(),
             'mau_berakhir' => Perizinan::whereDate('tanggal_akhir', '>', $now)
-                                       ->whereDate('tanggal_akhir', '<=', $now->copy()->addDays(30))
+                                       ->whereDate('tanggal_akhir', '<=', $now->copy()->addDays(90))
                                        ->count(),
-            'berakhir' => Perizinan::whereDate('tanggal_akhir', '<', $now)->count(),
+            'berakhir' => Perizinan::where(function ($q) use ($now) {
+                $q->whereDate('tanggal_akhir', '<', $now)
+                    ->orWhereNull('tanggal_akhir');
+            })->count(),
         ];
 
         // Fetch distinct types of Perizinan for the filter dropdown

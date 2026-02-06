@@ -155,18 +155,19 @@
         </div>
 
         <form method="POST"
-            action="{{ route('admin.permohonan-user.update', [$permohonanUser->permohonan_id, $permohonanUser]) }}"
+            action="{{ route('admin.permohonan-user.update', [$permohonanUser->permohonan_id ?? 0, $permohonanUser]) }}"
             id="permohonanForm">
             @csrf
             @method('PUT')
 
             <div class="form-group">
                 <label class="label">Jenis Permohonan</label>
-                <input type="text" class="input" value="{{ $permohonanUser->permohonan->nama }}" readonly
+                <input type="text" class="input" value="{{ $permohonanUser->type_name }}" readonly
                     style="background: #F3F4F6;">
             </div>
 
             <div id="questionsContainer">
+                @if($permohonanUser->permohonan)
                 @foreach ($permohonanUser->permohonan->questions as $index => $question)
                     <div class="question-item">
                         <div class="question-number">
@@ -272,6 +273,25 @@
                         @enderror
                     </div>
                 @endforeach
+                @else
+                    {{-- Fallback for imported data without Type --}}
+                    @if($permohonanUser->jawaban)
+                        @foreach ($permohonanUser->jawaban as $key => $value)
+                            <div class="question-item">
+                                <div class="question-number">
+                                    {{ $loop->iteration }}. {{ $key }}
+                                </div>
+                                @php
+                                    $val = is_array($value) ? implode(', ', $value) : $value;
+                                @endphp
+                                <input type="text" name="jawaban[{{ $key }}]" class="input" value="{{ $val }}" />
+                                <small style="color: #64748B;">*Input manual (Tipe data tidak diketahui)</small>
+                            </div>
+                        @endforeach
+                    @else
+                         <p style="color: #64748B; font-style: italic;">Tidak ada data jawaban untuk diedit.</p>
+                    @endif
+                @endif
             </div>
 
             <div class="form-group">
