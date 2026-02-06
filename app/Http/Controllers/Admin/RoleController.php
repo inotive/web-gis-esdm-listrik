@@ -161,13 +161,52 @@ class RoleController extends Controller
     {
         abort_unless(auth()->user()->can('role.permission'), 403, 'Anda tidak memiliki akses untuk mengelola permission.');
 
-        $permissions = Permission::orderBy('group')->orderBy('display_name')->get()->groupBy('group');
+        $permissions = Permission::orderBy('group')->orderBy('display_name')->get();
+
+        // Custom Logic: Separate Permohonan and Perizinan based on name prefix
+        $permissions->transform(function ($permission) {
+            if (str_starts_with($permission->name, 'permohonan.')) {
+                $permission->group = 'Permohonan';
+            } elseif (str_starts_with($permission->name, 'perizinan.')) {
+                $permission->group = 'Perizinan';
+            } elseif ($permission->group === 'Manajemen User') {
+                $permission->group = 'Manajemen Pengguna';
+            }
+            return $permission;
+        });
+
+        // Group by the modified group name
+        $groupedPermissions = $permissions->groupBy('group');
+
+        // Custom Sorting Order
+        $customOrder = [
+            'Dashboard',
+            'Data Desa',
+            'Data Perusahaan',
+            'Dokumen',
+            'Kategori Permohonan',
+            'Manajemen Pengguna',
+            'Master Data',
+            'Data Inspeksi',
+            'Permohonan',
+            'Perizinan',
+            'Rekap Data',
+            'Rencana Pengembangan',
+            'Role & Permission'
+        ];
+
+        // Sort groups according to custom order
+        $sortedPermissions = $groupedPermissions->sortBy(function ($items, $key) use ($customOrder) {
+            $index = array_search($key, $customOrder);
+            return $index === false ? 999 : $index; // Put unknown groups at the end
+        });
+
         $rolePermissions = $role->permissions->pluck('id')->toArray();
 
         return view('admin.role.permissions', [
             'title' => 'Kelola Permission - ' . $role->name,
             'role' => $role,
-            'permissions' => $permissions,
+            'permissions' => $sortedPermissions,
             'rolePermissions' => $rolePermissions,
         ]);
     }

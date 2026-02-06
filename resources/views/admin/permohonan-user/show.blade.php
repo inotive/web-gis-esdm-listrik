@@ -535,25 +535,31 @@
     <section class="card">
         <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
             <h2 class="card-title" style="margin: 0;">Informasi Permohonan</h2>
-            @if ($isAdmin && $permohonanUser->status !== 'selesai' && $permohonanUser->status !== 'ditolak' && $permohonanUser->status !== 'dibatalkan')
+            @if ($permohonanUser->status !== 'selesai' && $permohonanUser->status !== 'ditolak' && $permohonanUser->status !== 'dibatalkan')
                 <div style="display: flex; gap: 12px;">
-                    <button type="button" class="btn-danger" data-open="#modalReject">
-                        <i class="ri-close-line"></i>
-                        Tolak Permohonan
-                    </button>
+                    @can('permohonan.approve')
+                        <button type="button" class="btn-danger" data-open="#modalReject">
+                            <i class="ri-close-line"></i>
+                            Tolak Permohonan
+                        </button>
+                    @endcan
 
                     @if ($permohonanUser->status === 'pending')
-                        {{-- Button Proses Permohonan --}}
-                        <button type="button" class="btn-primary" style="background: #0ea5e9;" data-open="#modalProgress">
-                            <i class="ri-loader-4-line"></i>
-                            Proses Permohonan
-                        </button>
+                        @can('permohonan.process')
+                            {{-- Button Proses Permohonan --}}
+                            <button type="button" class="btn-primary" style="background: #0ea5e9;" data-open="#modalProgress">
+                                <i class="ri-loader-4-line"></i>
+                                Proses Permohonan
+                            </button>
+                        @endcan
                     @elseif ($permohonanUser->status === 'proses')
-                        {{-- Button Setujui Permohonan --}}
-                        <button type="button" class="btn-success" data-open="#modalApprove">
-                            <i class="ri-check-line"></i>
-                            Setujui Permohonan
-                        </button>
+                        @can('permohonan.approve')
+                            {{-- Button Setujui Permohonan --}}
+                            <button type="button" class="btn-success" data-open="#modalApprove">
+                                <i class="ri-check-line"></i>
+                                Setujui Permohonan
+                            </button>
+                        @endcan
                     @endif
                 </div>
             @endif

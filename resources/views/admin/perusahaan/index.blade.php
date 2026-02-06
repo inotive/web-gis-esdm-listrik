@@ -607,10 +607,12 @@
             @include('admin.perusahaan.create') {{-- modal create --}}
             @include('admin.perusahaan.edit_modal') {{-- modal edit --}}
 
+            @can('perusahaan.create')
             <button class="btn btn-primary btn-add">
                 <i class="ri-add-line"></i>
                 Tambah Data Perusahaan
             </button>
+            @endcan
         </div>
     </div>
 
@@ -745,6 +747,7 @@
                                         title="Detail">
                                         <i class="fa-solid fa-eye"></i>
                                     </a>
+                                    @can('perusahaan.edit')
                                     <button type="button" class="btn-ico edit btn-edit-perusahaan"
                                         data-id="{{ $perusahaan->id }}" data-nama="{{ $perusahaan->nama }}"
                                         data-nama-pimpinan="{{ $perusahaan->nama_pimpinan ?? '' }}"
@@ -756,6 +759,8 @@
                                         data-village-id="{{ $perusahaan->village_id ?? '' }}" title="Edit">
                                         <i class="fa-solid fa-pen-to-square"></i>
                                     </button>
+                                    @endcan
+                                    @can('perusahaan.delete')
                                     <form action="{{ route('admin.perusahaan.destroy', $perusahaan) }}" method="POST"
                                         style="display:inline-block;margin:0;" class="form-delete-perusahaan"
                                         data-name="{{ $perusahaan->nama }}">
@@ -765,6 +770,7 @@
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
                                     </form>
+                                    @endcan
                                 </td>
                             </tr>
                         @empty

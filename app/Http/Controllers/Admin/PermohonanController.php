@@ -23,6 +23,21 @@ class PermohonanController extends Controller
     /**
      * Display a listing of the resource.
      */
+    public function __construct()
+    {
+        $this->middleware('can:permohonan.view')->only(['index', 'show']);
+        // Note: permohonan.create was removed, role checks usually handle create logic for users
+        // But for admin side management if any:
+        $this->middleware('can:permohonan.edit')->only(['edit', 'update']);
+        $this->middleware('can:permohonan.delete')->only(['destroy']);
+        
+        // Import requires create/edit or specific permission? defaulting to edit/create usually
+        // Let's protect import with 'view' for now or 'create' if existed? 
+        // With permohonan.create gone, we might use permohonan.edit or just role check.
+        // Assuming 'permohonan.edit' is appropriate for import as it modifies data.
+        $this->middleware('can:permohonan.edit')->only(['import', 'importProcess', 'downloadTemplate']);
+    }
+
     public function index(Request $request)
 
     {

@@ -127,6 +127,7 @@
                 <td><strong>{{ $user->username }}</strong></td>
                 <td>{{ $user->created_at->format('d M Y H:i') }}</td>
                 <td class="col-aksi">
+                  @can('pengguna.approve')
                   <form action="{{ route('admin.hak-akses.user.approve', $user) }}" method="POST" style="display:inline-block;margin:0;">
                     @csrf
                     <button type="submit" class="btn-ico" style="color:#10b981;" title="Approve">
@@ -140,6 +141,7 @@
                     onclick="rejectUser(this, '{{ $user->name }}')">
                     <i class="fa-solid fa-times-circle"></i>
                   </button>
+                  @endcan
                 </td>
               </tr>
             @endforeach

@@ -135,8 +135,8 @@ Route::group(['middleware' => ['auth', 'verified', 'verified_user'], 'as' => 'ad
         // User Management
         Route::middleware('can:user.view')->group(function () {
             Route::resource('user', UserController::class)->except('show');
-            Route::post('user/{user}/approve', [UserController::class, 'approve'])->name('user.approve');
-            Route::post('user/{user}/reject', [UserController::class, 'reject'])->name('user.reject');
+            Route::post('user/{user}/approve', [UserController::class, 'approve'])->middleware('can:pengguna.approve')->name('user.approve');
+            Route::post('user/{user}/reject', [UserController::class, 'reject'])->middleware('can:pengguna.approve')->name('user.reject');
         });
     });
     // Data Wilayah

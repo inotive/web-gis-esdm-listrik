@@ -14,6 +14,8 @@ class RencanaPengembanganController extends Controller
 {
     public function index(Request $request)
     {
+        abort_unless(\Illuminate\Support\Facades\Auth::user()->can('rencana_pengembangan.view'), 403, 'Unauthorized');
+        
         $query = RencanaPengembanganBantuan::with(['regency', 'district', 'village']);
 
         // Top filter bar filters
@@ -135,6 +137,8 @@ class RencanaPengembanganController extends Controller
 
     public function updateField(Request $request, $id)
     {
+        abort_unless(\Illuminate\Support\Facades\Auth::user()->can('rencana_pengembangan.edit'), 403, 'Unauthorized');
+
         $item = RencanaPengembanganBantuan::findOrFail($id);
 
         $field = $request->input('field');
@@ -178,6 +182,8 @@ class RencanaPengembanganController extends Controller
 
     public function store(Request $request)
     {
+        abort_unless(\Illuminate\Support\Facades\Auth::user()->can('rencana_pengembangan.create'), 403, 'Unauthorized');
+
         $validated = $request->validate([
             'regency_id' => 'required|exists:reg_regencies,id',
             'district_id' => 'required|exists:reg_districts,id',
@@ -193,6 +199,8 @@ class RencanaPengembanganController extends Controller
 
     public function destroy($id)
     {
+        abort_unless(\Illuminate\Support\Facades\Auth::user()->can('rencana_pengembangan.delete'), 403, 'Unauthorized');
+
         $item = RencanaPengembanganBantuan::findOrFail($id);
         $item->delete();
 

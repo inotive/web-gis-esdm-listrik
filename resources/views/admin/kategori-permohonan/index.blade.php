@@ -375,10 +375,12 @@
         </div>
         <div class="page-actions">
 
+            @can('kategori_permohonan.create')
             <a href="{{ route('admin.kategori-permohonan.create') }}" class="btn btn-primary">
                 <i class="ri-add-line"></i>
                 Tambah Kategori Permohonan
             </a>
+            @endcan
         </div>
     </div>
 
@@ -429,10 +431,13 @@
                                         title="Detail">
                                         <i class="fa-solid fa-eye"></i>
                                     </a>
+                                    @can('kategori_permohonan.edit')
                                     <a href="{{ route('admin.kategori-permohonan.edit', $permohonan) }}"
                                         class="btn-ico edit" title="Edit">
                                         <i class="fa-solid fa-pen-to-square"></i>
                                     </a>
+                                    @endcan
+                                    @can('kategori_permohonan.delete')
                                     <form action="{{ route('admin.kategori-permohonan.destroy', $permohonan) }}"
                                         method="POST" style="display:inline-block;margin:0;" class="form-delete-permohonan"
                                         data-name="{{ $permohonan->nama }}">
@@ -441,6 +446,7 @@
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
                                     </form>
+                                    @endcan
                                 </td>
                             </tr>
                         @empty

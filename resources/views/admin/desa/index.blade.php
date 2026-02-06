@@ -632,10 +632,12 @@
             @include('admin.desa.create') {{-- modal create --}}
             @include('admin.desa.edit_modal') {{-- modal edit --}}
 
+            @can('desa.create')
             <button class="btn btn-primary btn-add">
                 <i class="ri-add-line"></i>
                 Tambah Data Desa
             </button>
+            @endcan
         </div>
     </div>
 
@@ -748,6 +750,7 @@
                                     @endif
                                 </td>
                                 <td class="col-aksi">
+                                    @can('desa.edit')
                                     <button type="button" class="btn-ico edit btn-edit-desa" data-id="{{ $desa->id }}"
                                         data-name="{{ $desa->name }}"
                                         data-regency-id="{{ $desa->district->regency_id ?? '' }}"
@@ -755,6 +758,8 @@
                                         title="Edit">
                                         <i class="fa-solid fa-pen-to-square"></i>
                                     </button>
+                                    @endcan
+                                    @can('desa.delete')
                                     <form action="{{ route('admin.desa.destroy', $desa) }}" method="POST"
                                         style="display:inline-block;margin:0;" class="form-delete-desa"
                                         data-name="{{ $desa->name }}">
@@ -763,6 +768,7 @@
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
                                     </form>
+                                    @endcan
                                 </td>
                             </tr>
                         @empty
