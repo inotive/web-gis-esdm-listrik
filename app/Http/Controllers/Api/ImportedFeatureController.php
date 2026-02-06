@@ -155,6 +155,11 @@ class ImportedFeatureController extends Controller
                     }
                 }
 
+                // Add video link from joined column
+                if ($item->video_link_joined) {
+                    $properties['video_360_link'] = $item->video_link_joined;
+                }
+
 
 
                 // Skip if geometry is invalid
