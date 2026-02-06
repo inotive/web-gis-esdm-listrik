@@ -521,7 +521,7 @@
             <div class="page-title">
                 Detail Permohonan
                 <span style="font-size: 14px; font-weight: normal; color: #64748B;"> -
-                    {{ $permohonanUser->permohonan->nama }}</span>
+                    {{ $permohonanUser->type_name }}</span>
             </div>
         </div>
         <div class="page-actions">
@@ -558,7 +558,12 @@
 
         <div class="info-row">
             <div class="info-label">Nama Permohonan</div>
-            <div class="info-value"><strong>{{ $permohonanUser->permohonan->nama }}</strong></div>
+            <div class="info-value"><strong>{{ $permohonanUser->type_name }}</strong></div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">Nama Perusahaan</div>
+            <div class="info-value">{{ $permohonanUser->company_name ?? '-' }}</div>
         </div>
 
         <div class="info-row">
@@ -593,7 +598,7 @@
 
         <div class="info-row">
             <div class="info-label">Pengaju</div>
-            <div class="info-value">{{ $permohonanUser->user->name }}</div>
+            <div class="info-value">{{ $permohonanUser->applicant_name }}</div>
         </div>
 
         <div class="info-row">
@@ -614,7 +619,8 @@
     <section class="card">
         <h2 class="section-title">Detail Pengajuan</h2>
 
-        @foreach ($permohonanUser->permohonan->questions as $index => $question)
+        @if($permohonanUser->permohonan)
+            @foreach ($permohonanUser->permohonan->questions as $index => $question)
             @php
                 $questionId = $question->id;
                 $answer = $jawaban[$questionId] ?? null;
@@ -704,7 +710,26 @@
                     @endif
                 </div>
             </div>
+            </div>
         @endforeach
+        @else
+            @if($permohonanUser->jawaban)
+                @foreach ($permohonanUser->jawaban as $key => $value)
+                    <div class="question-item">
+                        <div class="question-number">
+                            {{ $loop->iteration }}. {{ $key }}
+                        </div>
+                        <div class="answer-value">
+                            {{ is_array($value) ? implode(', ', $value) : $value }}
+                        </div>
+                    </div>
+                @endforeach
+            @else
+                <div class="empty-state">
+                    <p>Tidak ada data jawaban.</p>
+                </div>
+            @endif
+        @endif
     </section>
 
     @if ($permohonanUser->documents && $permohonanUser->documents->count() > 0)
