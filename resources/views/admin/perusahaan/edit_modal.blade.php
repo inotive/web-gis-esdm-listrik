@@ -58,7 +58,9 @@
                     <label class="label">Kabupaten/Kota (Pilih)</label>
                     <div class="control">
                         <select name="regency_id" id="edit_regency_id" class="input" data-control="select2"
-                            data-placeholder="Pilih Kabupaten/Kota"></select>
+                            data-placeholder="Pilih Kabupaten/Kota">
+                            <option value="">Pilih Kabupaten/Kota</option>
+                        </select>
                     </div>
                 </div>
 
@@ -67,7 +69,9 @@
                     <label class="label">Kecamatan</label>
                     <div class="control">
                         <select name="district_id" id="edit_district_id" class="input" data-control="select2"
-                            data-placeholder="Pilih Kecamatan"></select>
+                            data-placeholder="Pilih Kecamatan">
+                            <option value="">Pilih Kecamatan</option>
+                        </select>
                     </div>
                 </div>
 
@@ -76,7 +80,9 @@
                     <label class="label">Desa/Kelurahan</label>
                     <div class="control">
                         <select name="village_id" id="edit_village_id" class="input" data-control="select2"
-                            data-placeholder="Pilih Desa/Kelurahan"></select>
+                            data-placeholder="Pilih Desa/Kelurahan">
+                            <option value="">Pilih Desa/Kelurahan</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -437,8 +443,8 @@
             if (selRegEdit && selDisEdit) {
                 const regChangeHandler = async function() {
                     const rid = this.value;
-                    selDisEdit.innerHTML = '';
-                    selVilEdit.innerHTML = '';
+                    selDisEdit.innerHTML = '<option value="">Pilih Kecamatan</option>';
+                    selVilEdit.innerHTML = '<option value="">Pilih Desa/Kelurahan</option>';
 
                     // Destroy Select2
                     if (jQuery && jQuery.fn.select2) {
@@ -476,7 +482,7 @@
             if (selDisEdit && selVilEdit) {
                 const disChangeHandler = async function() {
                     const did = this.value;
-                    selVilEdit.innerHTML = '';
+                    selVilEdit.innerHTML = '<option value="">Pilih Desa/Kelurahan</option>';
 
                     // Destroy Select2
                     if (jQuery && jQuery.fn.select2) {
@@ -544,23 +550,39 @@
                     const resReg = await fetch(
                         '{{ route('admin.perusahaan.options.regencies') }}');
                     const regencies = await resReg.json();
+
+                    selReg.innerHTML = '<option value="">Pilih Kabupaten/Kota</option>';
+
+                    // Fallback logic: if regencyId is missing, try to find by name from kabupatenKota
+                    let activeRegencyId = regencyId;
+                    if (!activeRegencyId && kabupatenKota) {
+                        const found = regencies.find(r => r.name.toLowerCase().includes(
+                            kabupatenKota
+                            .toLowerCase()) || kabupatenKota.toLowerCase().includes(r
+                            .name
+                            .toLowerCase()));
+                        if (found) activeRegencyId = found.id;
+                    }
+
                     regencies.forEach(r => {
                         const opt = document.createElement('option');
                         opt.value = r.id;
                         opt.textContent = r.name;
-                        opt.selected = r.id === regencyId;
+                        opt.selected = r.id === activeRegencyId;
                         selReg.appendChild(opt);
                     });
 
                     // Initialize Select2 for regency
                     initSelect2Edit(selReg, 'Pilih Kabupaten/Kota');
-                    if (regencyId && jQuery && jQuery.fn.select2) {
-                        jQuery(selReg).val(regencyId).trigger('change');
+                    if (activeRegencyId && jQuery && jQuery.fn.select2) {
+                        jQuery(selReg).val(activeRegencyId).trigger('change');
                     }
 
-                    // Load districts for selected regency
                     const selDis = document.getElementById('edit_district_id');
-                    selDis.innerHTML = '';
+                    selDis.innerHTML = '<option value="">Pilih Kecamatan</option>';
+
+                    const selVil = document.getElementById('edit_village_id');
+                    selVil.innerHTML = '<option value="">Pilih Desa/Kelurahan</option>';
 
                     // Destroy Select2 if initialized
                     if (jQuery && jQuery.fn.select2 && jQuery(selDis).hasClass(
@@ -568,10 +590,10 @@
                         jQuery(selDis).select2('destroy');
                     }
 
-                    if (regencyId) {
+                    if (activeRegencyId) {
                         const resDis = await fetch(
                             '{{ route('admin.perusahaan.options.districts') }}?regency_id=' +
-                            encodeURIComponent(regencyId));
+                            encodeURIComponent(activeRegencyId));
                         const districts = await resDis.json();
                         districts.forEach(d => {
                             const opt = document.createElement('option');

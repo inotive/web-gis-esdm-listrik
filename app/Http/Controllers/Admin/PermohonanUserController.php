@@ -492,6 +492,9 @@ class PermohonanUserController extends Controller
 
             DB::commit();
 
+            // Dispatch Notification Job
+            \App\Jobs\ProcessPermohonanStatusNotification::dispatch($permohonanUser->id);
+
             return redirect()->route('admin.permohonan-user.show', [$permohonanId, $permohonanUser->id])
                 ->with('success', 'Permohonan berhasil disetujui.');
         } catch (\Exception $e) {
@@ -526,6 +529,9 @@ class PermohonanUserController extends Controller
             'status' => 'ditolak',
             'keterangan' => $validated['keterangan'],
         ]);
+
+        // Dispatch Notification Job
+        \App\Jobs\ProcessPermohonanStatusNotification::dispatch($permohonanUser->id);
 
         return redirect()->route('admin.permohonan-user.show', [$permohonanId, $permohonanUser->id])
             ->with('success', 'Permohonan berhasil ditolak.');
