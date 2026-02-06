@@ -272,6 +272,7 @@ class DokumenController extends Controller
             'tipe' => 'folder',
             'parent_id' => $request->parent_id ?: null,
             'user_id' => auth()->id(),
+            'sumber' => 'manual',
         ]);
 
         $redirectUrl = route('admin.dokumen.index');
