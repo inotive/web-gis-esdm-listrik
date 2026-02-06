@@ -155,7 +155,7 @@
         </div>
 
         <form method="POST"
-            action="{{ route('admin.permohonan-user.update', [$permohonanUser->permohonan_id, $permohonanUser]) }}"
+            action="{{ route('admin.permohonan-user.update', [$permohonanUser->permohonan_id ?? 0, $permohonanUser]) }}"
             id="permohonanForm">
             @csrf
             @method('PUT')
@@ -272,7 +272,6 @@
                             <div class="error-message">{{ $message }}</div>
                         @enderror
                     </div>
-                @endforeach
                 @endforeach
                 @else
                     {{-- Fallback for imported data without Type --}}

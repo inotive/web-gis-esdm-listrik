@@ -537,14 +537,24 @@
             <h2 class="card-title" style="margin: 0;">Informasi Permohonan</h2>
             @if ($isAdmin && $permohonanUser->status !== 'selesai' && $permohonanUser->status !== 'ditolak' && $permohonanUser->status !== 'dibatalkan')
                 <div style="display: flex; gap: 12px;">
-                    <button type="button" class="btn-success" data-open="#modalApprove">
-                        <i class="ri-check-line"></i>
-                        Setujui Permohonan
-                    </button>
                     <button type="button" class="btn-danger" data-open="#modalReject">
                         <i class="ri-close-line"></i>
                         Tolak Permohonan
                     </button>
+
+                    @if ($permohonanUser->status === 'pending')
+                        {{-- Button Proses Permohonan --}}
+                        <button type="button" class="btn-primary" style="background: #0ea5e9;" data-open="#modalProgress">
+                            <i class="ri-loader-4-line"></i>
+                            Proses Permohonan
+                        </button>
+                    @elseif ($permohonanUser->status === 'proses')
+                        {{-- Button Setujui Permohonan --}}
+                        <button type="button" class="btn-success" data-open="#modalApprove">
+                            <i class="ri-check-line"></i>
+                            Setujui Permohonan
+                        </button>
+                    @endif
                 </div>
             @endif
 
@@ -816,7 +826,7 @@
     @endif
 
     <!-- Modal Approve Permohonan -->
-    @if ($isAdmin && $permohonanUser->status !== 'selesai')
+    @if ($isAdmin && $permohonanUser->status === 'proses')
         <div class="modal-overlay" id="modalApprove">
             <div class="modal" style="max-width: 700px;">
                 <div class="modal-header">
@@ -876,6 +886,37 @@
                         <button type="submit" class="btn-modal-primary" style="background: #10B981;">
                             <i class="ri-check-line"></i>
                             Setujui Permohonan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
+
+    <!-- Modal Process Permohonan (NEW) -->
+    @if ($isAdmin && $permohonanUser->status === 'pending')
+        <div class="modal-overlay" id="modalProgress">
+            <div class="modal" style="max-width: 500px;">
+                <div class="modal-header">
+                    <h3>Konfirmasi Proses</h3>
+                    <button type="button" class="btn-close-modal" data-close>
+                        <i class="ri-close-line"></i>
+                    </button>
+                </div>
+                <form action="{{ route('admin.permohonan-user.progress', [$permohonanId, $permohonanUser->id]) }}"
+                    method="POST" id="formProgress">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="text-center" style="padding: 20px 0;">
+                            <p style="font-size: 16px; margin-bottom: 0;">Apakah anda yakin ingin memproses permohonan ini?</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="justify-content: center; gap: 12px;">
+                        <button type="button" class="btn-modal-cancel" data-close>
+                            Tidak
+                        </button>
+                        <button type="submit" class="btn-modal-primary" style="background: #0ea5e9;">
+                            Yakin
                         </button>
                     </div>
                 </form>
@@ -1098,6 +1139,11 @@
 
             if (formAddDocument) {
                 handleFormSubmit(formAddDocument);
+            }
+
+            const formProgress = document.getElementById('formProgress');
+            if (formProgress) {
+                handleFormSubmit(formProgress);
             }
 
             // Modal functionality
