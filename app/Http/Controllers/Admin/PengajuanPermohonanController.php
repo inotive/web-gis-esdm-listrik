@@ -521,7 +521,7 @@ class PengajuanPermohonanController extends Controller
             ],
             [
                 'user_id' => 2,
-                'sumber' => 'permohonan',
+                'sumber' => 'sistem',
             ]
         );
     }
@@ -553,7 +553,7 @@ class PengajuanPermohonanController extends Controller
                 'mime_type' => $mimeType,
                 'size' => $size,
                 'user_id' => 2,
-                'sumber' => 'permohonan',
+                'sumber' => 'sistem',
             ]
         );
     }

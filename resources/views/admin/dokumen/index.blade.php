@@ -496,6 +496,31 @@
             background: var(--accent-2);
             cursor: pointer;
         }
+
+        .badge-sumber {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-left: 6px;
+            vertical-align: middle;
+            line-height: 1;
+        }
+
+        .badge-sumber.permohonan {
+            background: rgba(34, 197, 94, 0.1);
+            color: #16A34A;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .badge-sumber.sistem {
+            background: rgba(100, 116, 139, 0.1);
+            color: #475569;
+            border: 1px solid rgba(100, 116, 139, 0.2);
+        }
     </style>
 @endpush
 
@@ -598,7 +623,13 @@
                                 @endif
                             </div>
 
-                            <div class="dokumen-name">{{ $dokumen->nama }}</div>
+                            <div class="dokumen-name">
+                                {{ $dokumen->nama }}
+                                @if ($dokumen->tipe == 'file' && $dokumen->sumber)
+                                    <span class="badge-sumber {{ strtolower($dokumen->sumber) }}"
+                                        title="Sumber: {{ $dokumen->sumber }}">{{ $dokumen->sumber }}</span>
+                                @endif
+                            </div>
                             <div class="dokumen-meta">
                                 @if ($dokumen->isFile())
                                     {{ $dokumen->formatted_size }}
@@ -631,7 +662,13 @@
                             </div>
 
                             <div class="dokumen-list-info">
-                                <div class="dokumen-list-name">{{ $dokumen->nama }}</div>
+                                <div class="dokumen-list-name">
+                                    {{ $dokumen->nama }}
+                                    @if ($dokumen->tipe == 'file' && $dokumen->sumber)
+                                        <span class="badge-sumber {{ strtolower($dokumen->sumber) }}"
+                                            title="Sumber: {{ $dokumen->sumber }}">{{ $dokumen->sumber }}</span>
+                                    @endif
+                                </div>
                                 <div class="dokumen-list-meta">
                                     @if ($dokumen->isFile())
                                         <span>{{ $dokumen->formatted_size }}</span>
