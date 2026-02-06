@@ -342,6 +342,7 @@ class DokumenController extends Controller
                 'mime_type' => $file->getMimeType(),
                 'size' => $file->getSize(),
                 'user_id' => auth()->id(),
+                'sumber' => 'Manual',
             ]);
 
             $uploadedCount++;
