@@ -429,12 +429,12 @@
                                 @endphp
                                 <tr>
                                     <td class="col-no">{{ $permohonanUsers->firstItem() + $i }}</td>
-                                    <td><strong>{{ $item->user->name ?? '-' }}</strong></td>
-                                    <td>{{ $item->permohonan->nama ?? '-' }}</td>
+                                    <td><strong>{{ $item->applicant_name }}</strong></td>
+                                    <td>{{ $item->type_name }}</td>
                                     <td><span class="status-badge {{ $statusClass }}">{{ $statusText }}</span></td>
                                     <td class="date-text">{{ $item->created_at ? $item->created_at->format('d/m/Y') : '-' }}</td>
                                     <td class="col-aksi">
-                                        <a href="{{ route('admin.permohonan-user.show', [$item->permohonan_id, $item->id]) }}"
+                                        <a href="{{ route('admin.permohonan-user.show', [$item->permohonan_id ?? 0, $item->id]) }}"
                                             class="btn-ico view" title="Lihat Detail"><i class="fa-solid fa-eye"></i></a>
                                         @php 
                                             $isAdmin = in_array(optional(auth()->user()->roles()->first())->name, ['admin', 'superadmin']);
@@ -442,11 +442,11 @@
                                             $isRestricted = in_array($submitterRole, ['desa', 'perusahaan']);
                                         @endphp
                                         @if($isAdmin && !$isRestricted)
-                                            <a href="{{ route('admin.permohonan-user.edit', [$item->permohonan_id, $item->id]) }}"
+                                            <a href="{{ route('admin.permohonan-user.edit', [$item->permohonan_id ?? 0, $item->id]) }}"
                                                 class="btn-ico edit" title="Edit"><i class="fa-solid fa-pen-to-square"></i></a>
-                                            <form action="{{ route('admin.permohonan-user.destroy', [$item->permohonan_id, $item->id]) }}"
+                                            <form action="{{ route('admin.permohonan-user.destroy', [$item->permohonan_id ?? 0, $item->id]) }}"
                                                 method="POST" style="display:inline-block;margin:0;" class="form-delete-permohonan"
-                                                data-name="{{ $item->user->name ?? 'permohonan ini' }}">
+                                                data-name="{{ $item->applicant_name }}">
                                                 @csrf @method('DELETE')
                                                 <button type="button" class="btn-ico danger btn-delete-permohonan" title="Hapus">
                                                     <i class="fa-solid fa-trash"></i>

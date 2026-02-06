@@ -181,8 +181,8 @@ class PermohonanUserController extends Controller
      */
     public function show($permohonanId, PermohonanUser $permohonanUser)
     {
-        // Ensure permohonan_id matches
-        if ($permohonanUser->permohonan_id != $permohonanId) {
+        // Ensure permohonan_id matches (allow 0 for null)
+        if (($permohonanUser->permohonan_id ?? 0) != $permohonanId) {
             abort(404);
         }
 
@@ -209,7 +209,9 @@ class PermohonanUserController extends Controller
             'user'
         ]);
 
-        $permohonanUser->permohonan->questions = $permohonanUser->permohonan->questions->sortBy('urutan')->values();
+        if ($permohonanUser->permohonan) {
+            $permohonanUser->permohonan->questions = $permohonanUser->permohonan->questions->sortBy('urutan')->values();
+        }
 
         $jawaban = $permohonanUser->jawaban ?? [];
 
@@ -226,8 +228,8 @@ class PermohonanUserController extends Controller
      */
     public function edit($permohonanId, PermohonanUser $permohonanUser)
     {
-        // Ensure permohonan_id matches
-        if ($permohonanUser->permohonan_id != $permohonanId) {
+        // Ensure permohonan_id matches (allow 0 for null)
+        if (($permohonanUser->permohonan_id ?? 0) != $permohonanId) {
             abort(404);
         }
 
@@ -249,7 +251,9 @@ class PermohonanUserController extends Controller
             $query->orderBy('id');
         }]);
 
-        $permohonanUser->permohonan->questions = $permohonanUser->permohonan->questions->sortBy('urutan')->values();
+        if ($permohonanUser->permohonan) {
+            $permohonanUser->permohonan->questions = $permohonanUser->permohonan->questions->sortBy('urutan')->values();
+        }
 
         $jawaban = $permohonanUser->jawaban ?? [];
 
@@ -274,8 +278,8 @@ class PermohonanUserController extends Controller
      */
     public function update(Request $request, $permohonanId, PermohonanUser $permohonanUser)
     {
-        // Ensure permohonan_id matches
-        if ($permohonanUser->permohonan_id != $permohonanId) {
+        // Ensure permohonan_id matches (allow 0 for null)
+        if (($permohonanUser->permohonan_id ?? 0) != $permohonanId) {
             abort(404);
         }
 
@@ -301,18 +305,24 @@ class PermohonanUserController extends Controller
 
         // Get permohonan to validate questions
         $permohonan = $permohonanUser->permohonan;
-        $permohonan->load('questions.options');
+        
+        if ($permohonan) {
+            $permohonan->load('questions.options');
 
-        // Validate required questions
-        $requiredQuestions = $permohonan->questions->where('wajib', true);
-        $jawaban = $validated['jawaban'] ?? [];
+            // Validate required questions
+            $requiredQuestions = $permohonan->questions->where('wajib', true);
+            $jawaban = $validated['jawaban'] ?? [];
 
-        foreach ($requiredQuestions as $question) {
-            if (!isset($jawaban[$question->id]) || empty($jawaban[$question->id])) {
-                return back()
-                    ->withInput()
-                    ->withErrors(['jawaban.' . $question->id => 'Pertanyaan "' . $question->pertanyaan . '" wajib diisi.']);
+            foreach ($requiredQuestions as $question) {
+                if (!isset($jawaban[$question->id]) || empty($jawaban[$question->id])) {
+                    return back()
+                        ->withInput()
+                        ->withErrors(['jawaban.' . $question->id => 'Pertanyaan "' . $question->pertanyaan . '" wajib diisi.']);
+                }
             }
+        } else {
+            // If no permohonan type, just accept the jawaban as is
+            $jawaban = $validated['jawaban'] ?? [];
         }
 
         // Process checkbox answers (convert array values to integers)
@@ -396,8 +406,8 @@ class PermohonanUserController extends Controller
      */
     public function destroy($permohonanId, PermohonanUser $permohonanUser)
     {
-        // Ensure permohonan_id matches
-        if ($permohonanUser->permohonan_id != $permohonanId) {
+        // Ensure permohonan_id matches (allow 0 for null)
+        if (($permohonanUser->permohonan_id ?? 0) != $permohonanId) {
             abort(404);
         }
 
@@ -420,8 +430,8 @@ class PermohonanUserController extends Controller
      */
     public function approve(Request $request, $permohonanId, PermohonanUser $permohonanUser)
     {
-        // Ensure permohonan_id matches
-        if ($permohonanUser->permohonan_id != $permohonanId) {
+        // Ensure permohonan_id matches (allow 0 for null)
+        if (($permohonanUser->permohonan_id ?? 0) != $permohonanId) {
             abort(404);
         }
 
@@ -497,8 +507,8 @@ class PermohonanUserController extends Controller
      */
     public function reject(Request $request, $permohonanId, PermohonanUser $permohonanUser)
     {
-        // Ensure permohonan_id matches
-        if ($permohonanUser->permohonan_id != $permohonanId) {
+        // Ensure permohonan_id matches (allow 0 for null)
+        if (($permohonanUser->permohonan_id ?? 0) != $permohonanId) {
             abort(404);
         }
 
@@ -526,8 +536,8 @@ class PermohonanUserController extends Controller
      */
     public function progress(Request $request, $permohonanId, PermohonanUser $permohonanUser)
     {
-        // Ensure permohonan_id matches
-        if ($permohonanUser->permohonan_id != $permohonanId) {
+        // Ensure permohonan_id matches (allow 0 for null)
+        if (($permohonanUser->permohonan_id ?? 0) != $permohonanId) {
             abort(404);
         }
 
@@ -555,8 +565,8 @@ class PermohonanUserController extends Controller
      */
     public function cancel(Request $request, $permohonanId, PermohonanUser $permohonanUser)
     {
-        // Ensure permohonan_id matches
-        if ($permohonanUser->permohonan_id != $permohonanId) {
+        // Ensure permohonan_id matches (allow 0 for null)
+        if (($permohonanUser->permohonan_id ?? 0) != $permohonanId) {
             abort(404);
         }
 
@@ -589,8 +599,8 @@ class PermohonanUserController extends Controller
      */
     public function addDocument(Request $request, $permohonanId, PermohonanUser $permohonanUser)
     {
-        // Ensure permohonan_id matches
-        if ($permohonanUser->permohonan_id != $permohonanId) {
+        // Ensure permohonan_id matches (allow 0 for null)
+        if (($permohonanUser->permohonan_id ?? 0) != $permohonanId) {
             abort(404);
         }
 
@@ -659,8 +669,8 @@ class PermohonanUserController extends Controller
      */
     public function deleteDocument($permohonanId, PermohonanUser $permohonanUser, PermohonanUserDocument $document)
     {
-        // Ensure permohonan_id matches
-        if ($permohonanUser->permohonan_id != $permohonanId) {
+        // Ensure permohonan_id matches (allow 0 for null)
+        if (($permohonanUser->permohonan_id ?? 0) != $permohonanId) {
             abort(404);
         }
 

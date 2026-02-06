@@ -6,12 +6,12 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
-use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 use Illuminate\Support\Collection;
-use Maatwebsite\Excel\Concerns\WithStrictNullComparison;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class PermohonanTemplateExport implements FromCollection, WithHeadings, WithEvents, WithStrictNullComparison, ShouldAutoSize
+class PermohonanTemplateExport implements FromCollection, WithHeadings, WithEvents, ShouldAutoSize
 {
     /**
     * @return \Illuminate\Support\Collection
@@ -20,21 +20,15 @@ class PermohonanTemplateExport implements FromCollection, WithHeadings, WithEven
     {
         return new Collection([
             [
-                'nama_perusahaan' => 'PT. Contoh Perusahaan',
-                'nama_pemohon' => 'Budi Santoso',
-                'jenis_permohonan' => 'Baru',
-                'kontak' => '081234567890',
-                'no_pengajuan' => 'REG/2026/001',
-                'no_surat_keluar' => 'SK/2026/001',
-                'tanggal' => '2026-01-26',
-                'lokasi' => 'Jl. Merdeka No. 1, Jakarta',
-                'status_kelistrikan' => 'Berlistrik PLN',
-                'titik_koordinat' => '-6.2088,106.8456',
-                'jumlah_kapasitas' => 10,
-                'total_kapasitas_kva' => 1000,
-                'jenis_penggunaan' => 'Industri',
-                'sifat_penggunaan' => 'Tetap',
-                'catatan' => 'Catatan tambahan jika ada',
+                'PT. Contoh Perusahaan',            // nama_perusahaan
+                'Budi Santoso',                     // nama_pemohon
+                'Permohonan IUPTLS',                // jenis_permohonan
+                'Januari',                          // Bulan
+                '2026',                             // Tahun
+                'Kota Samarinda',                   // Kota/Kabupaten
+                'Samarinda Ulu',                    // Kecamatan
+                'Air Putih',                        // Kelurahan/Desa
+                'Catatan jika ada',                 // Keterangan
             ]
         ]);
     }
@@ -42,21 +36,15 @@ class PermohonanTemplateExport implements FromCollection, WithHeadings, WithEven
     public function headings(): array
     {
         return [
-            'nama_perusahaan',
-            'nama_pemohon',
-            'jenis_permohonan',
-            'kontak',
-            'no_pengajuan',
-            'no_surat_keluar',
-            'tanggal',
-            'lokasi',
-            'status_kelistrikan',
-            'titik_koordinat',
-            'jumlah_kapasitas',
-            'total_kapasitas_kva',
-            'jenis_penggunaan',
-            'sifat_penggunaan',
-            'catatan',
+            'Nama Perusahaan',
+            'Nama Pemohon',
+            'Jenis Permohonan',
+            'Bulan',
+            'Tahun',
+            'Kota/Kabupaten',
+            'Kecamatan',
+            'Kelurahan/Desa',
+            'Keterangan',
         ];
     }
 
@@ -64,23 +52,21 @@ class PermohonanTemplateExport implements FromCollection, WithHeadings, WithEven
     {
         return [
             AfterSheet::class => function(AfterSheet $event) {
-                // Dropdown validation for status_kelistrikan (Column I)
-                $validation = $event->sheet->getCell('I2')->getDataValidation();
-                $validation->setType(DataValidation::TYPE_LIST);
-                $validation->setErrorStyle(DataValidation::STYLE_INFORMATION);
-                $validation->setAllowBlank(false);
-                $validation->setShowInputMessage(true);
-                $validation->setShowErrorMessage(true);
-                $validation->setShowDropDown(true);
-                $validation->setErrorTitle('Input Error');
-                $validation->setError('Value is not declared in the list.');
-                $validation->setPromptTitle('Pick from list');
-                $validation->setPrompt('Please pick a value from the drop-down list.');
-                $validation->setFormula1('"Berlistrik PLN,Berlistrik NON-PLN,Tidak Berlistrik"');
+                $sheet = $event->sheet->getDelegate();
+                $lastCol = 'I'; // 9 Kolom (A - I)
 
-                for ($i = 3; $i <= 1000; $i++) {
-                   $event->sheet->getCell("I$i")->setDataValidation(clone $validation);
-                }
+                // 1. STYLING HEADER (Baris 1)
+                $sheet->getStyle('A1:' . $lastCol . '1')->getFont()->setBold(true);
+                
+                // Alignment Center Header
+                $sheet->getStyle('A1:' . $lastCol . '1')
+                      ->getAlignment()
+                      ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+                      ->setVertical(Alignment::VERTICAL_CENTER);
+
+                // 2. BORDER (Garis Tabel)
+                $lastRow = $sheet->getHighestRow();
+                $sheet->getStyle('A1:' . $lastCol . $lastRow)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
             },
         ];
     }
