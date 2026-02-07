@@ -60,14 +60,41 @@
             font-weight: 600;
         }
 
-        .status-aktif { background: #ECFDF5; color: #059669; }
-        .status-menunggu { background: #FEF3C7; color: #D97706; }
-        .status-proses { background: #E0F2FE; color: #0284C7; }
-        .status-expired { background: #FEE2E2; color: #DC2626; }
-        .status-ditolak { background: #FEE2E2; color: #DC2626; }
+        .status-aktif {
+            background: #ECFDF5;
+            color: #059669;
+        }
+
+        .status-menunggu {
+            background: #FEF3C7;
+            color: #D97706;
+        }
+
+        .status-proses {
+            background: #E0F2FE;
+            color: #0284C7;
+        }
+
+        .status-expired {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+
+        .status-ditolak {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+
         /* Custom Colors */
-        .status-dibatalkan { background: #cdced1ff !important; color: #494848ff !important; }
-        .status-kedaluwarsa { background: #FEF3C7 !important; color: #B45309 !important; }
+        .status-dibatalkan {
+            background: #cdced1ff !important;
+            color: #494848ff !important;
+        }
+
+        .status-kedaluwarsa {
+            background: #FEF3C7 !important;
+            color: #B45309 !important;
+        }
 
         .question-item {
             background: #FCFCFD;
@@ -535,7 +562,10 @@
     <section class="card">
         <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
             <h2 class="card-title" style="margin: 0;">Informasi Permohonan</h2>
-            @if ($permohonanUser->status !== 'selesai' && $permohonanUser->status !== 'ditolak' && $permohonanUser->status !== 'dibatalkan')
+            @if (
+                $permohonanUser->status !== 'selesai' &&
+                    $permohonanUser->status !== 'ditolak' &&
+                    $permohonanUser->status !== 'dibatalkan')
                 <div style="display: flex; gap: 12px;">
                     @can('permohonan.approve')
                         <button type="button" class="btn-danger" data-open="#modalReject">
@@ -565,7 +595,7 @@
             @endif
 
             @if (!$isAdmin && $permohonanUser->status === 'pending')
-                 <button type="button" class="btn-danger" style="background: #64748B;" data-open="#modalCancel">
+                <button type="button" class="btn-danger" style="background: #64748B;" data-open="#modalCancel">
                     <i class="ri-prohibited-line"></i>
                     Batalkan Permohonan
                 </button>
@@ -579,38 +609,38 @@
 
         <div class="info-row">
             <div class="info-label">Nama Perusahaan</div>
-            <div class="info-value">{{ $permohonanUser->company_name ?? '-' }}</div>
+            <div class="info-value">{{ $permohonanUser->user->company_name ?? '-' }}</div>
         </div>
 
         <div class="info-row">
             <div class="info-label">Status</div>
             <div class="info-value">
-            @php
-                $statusClass = 'status-aktif';
-                $statusText = ucfirst($permohonanUser->status ?? 'Belum diisi');
-                $statusMap = [
-                    'pending' => ['text' => 'Menunggu Verifikasi', 'class' => 'status-menunggu'],
-                    'proses' => ['text' => 'Sedang Diproses', 'class' => 'status-proses'],
-                    'selesai' => ['text' => 'Aktif', 'class' => 'status-aktif'],
-                    'ditolak' => ['text' => 'Ditolak', 'class' => 'status-ditolak'],
-                    'dibatalkan' => ['text' => 'Dibatalkan', 'class' => 'status-dibatalkan'],
-                    'expired' => ['text' => 'Kedaluwarsa', 'class' => 'status-kedaluwarsa'],
-                ];
-                if (isset($permohonanUser->status) && isset($statusMap[$permohonanUser->status])) {
-                    $statusText = $statusMap[$permohonanUser->status]['text'];
-                    $statusClass = $statusMap[$permohonanUser->status]['class'];
-                }
-            @endphp
-            
-            @if($permohonanUser->status)
-                <span class="status-badge {{ $statusClass }}">
-                    {{ $statusText }}
-                </span>
-            @else
-                <span style="color: #9CA3AF; font-style: italic;">Belum diisi</span>
-            @endif
+                @php
+                    $statusClass = 'status-aktif';
+                    $statusText = ucfirst($permohonanUser->status ?? 'Belum diisi');
+                    $statusMap = [
+                        'pending' => ['text' => 'Menunggu Verifikasi', 'class' => 'status-menunggu'],
+                        'proses' => ['text' => 'Sedang Diproses', 'class' => 'status-proses'],
+                        'selesai' => ['text' => 'Aktif', 'class' => 'status-aktif'],
+                        'ditolak' => ['text' => 'Ditolak', 'class' => 'status-ditolak'],
+                        'dibatalkan' => ['text' => 'Dibatalkan', 'class' => 'status-dibatalkan'],
+                        'expired' => ['text' => 'Kedaluwarsa', 'class' => 'status-kedaluwarsa'],
+                    ];
+                    if (isset($permohonanUser->status) && isset($statusMap[$permohonanUser->status])) {
+                        $statusText = $statusMap[$permohonanUser->status]['text'];
+                        $statusClass = $statusMap[$permohonanUser->status]['class'];
+                    }
+                @endphp
+
+                @if ($permohonanUser->status)
+                    <span class="status-badge {{ $statusClass }}">
+                        {{ $statusText }}
+                    </span>
+                @else
+                    <span style="color: #9CA3AF; font-style: italic;">Belum diisi</span>
+                @endif
+            </div>
         </div>
-    </div>
 
         <div class="info-row">
             <div class="info-label">Pengaju</div>
@@ -629,107 +659,109 @@
             </div>
         @endif
 
- 
+
     </section>
 
     <section class="card">
         <h2 class="section-title">Detail Pengajuan</h2>
 
-        @if($permohonanUser->permohonan)
+        @if ($permohonanUser->permohonan)
             @foreach ($permohonanUser->permohonan->questions as $index => $question)
-            @php
-                $questionId = $question->id;
-                $answer = $jawaban[$questionId] ?? null;
-            @endphp
+                @php
+                    $questionId = $question->id;
+                    $answer = $jawaban[$questionId] ?? null;
+                @endphp
 
-            <div class="question-item">
-                <div class="question-number">
-                    {{ $index + 1 }}. {{ $question->pertanyaan }}
-                    @if ($question->wajib)
-                        <span style="color:#ef4444">*</span>
-                    @endif
-                </div>
+                <div class="question-item">
+                    <div class="question-number">
+                        {{ $index + 1 }}. {{ $question->pertanyaan }}
+                        @if ($question->wajib)
+                            <span style="color:#ef4444">*</span>
+                        @endif
+                    </div>
 
-                <div class="answer-value">
-                    @if ($answer === null || $answer === '')
-                        <span style="color: #94A3B8; font-style: italic;">Tidak diisi</span>
-                    @else
-                        @switch($question->tipe)
-                            @case('text')
-                            @case('textarea')
+                    <div class="answer-value">
+                        @if ($answer === null || $answer === '')
+                            <span style="color: #94A3B8; font-style: italic;">Tidak diisi</span>
+                        @else
+                            @switch($question->tipe)
+                                @case('text')
+                                @case('textarea')
 
-                            @case('number')
-                            @case('date')
-                                {{ $answer }}
-                            @break
+                                @case('number')
+                                @case('date')
+                                    {{ $answer }}
+                                @break
 
-                            @case('radio')
-                                @php
-                                    $option = $question->options->firstWhere('id', $answer);
-                                @endphp
-                                {{ $option ? $option->opsi : $answer }}
-                            @break
-
-                            @case('checkbox')
-                                @php
-                                    $answerArray = is_array($answer) ? $answer : [$answer];
-                                    $selectedOptions = $question->options->whereIn('id', $answerArray);
-                                @endphp
-                                @if ($selectedOptions->count() > 0)
-                                    <ul>
-                                        @foreach ($selectedOptions as $option)
-                                            <li>{{ $option->opsi }}</li>
-                                        @endforeach
-                                    </ul>
-                                @else
-                                    {{ implode(', ', $answerArray) }}
-                                @endif
-                            @break
-
-                            @case('file')
-                                @if ($answer)
+                                @case('radio')
                                     @php
-                                        // Assumption: Answer contains filename
-                                        $fileUrl = asset('storage/permohonan-jawaban/' . $answer);
-                                        $ext = pathinfo($answer, PATHINFO_EXTENSION);
+                                        $option = $question->options->firstWhere('id', $answer);
                                     @endphp
-                                    <button type="button" class="btn-primary" style="padding: 6px 12px; font-size: 13px;"
-                                        onclick="showFilePreview('{{ $fileUrl }}', '{{ $ext }}')">
-                                        <i class="ri-eye-line"></i> Lihat File
-                                    </button>
-                                @endif
-                            @break
+                                    {{ $option ? $option->opsi : $answer }}
+                                @break
 
-                            @case('file_multiple')
-                                @if ($answer)
+                                @case('checkbox')
                                     @php
-                                        $files = is_array($answer) ? $answer : json_decode($answer, true) ?? [$answer];
+                                        $answerArray = is_array($answer) ? $answer : [$answer];
+                                        $selectedOptions = $question->options->whereIn('id', $answerArray);
                                     @endphp
-                                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                                        @foreach ($files as $file)
-                                            @php
-                                                $fileUrl = asset('storage/permohonan-jawaban/' . $file);
-                                                $ext = pathinfo($file, PATHINFO_EXTENSION);
-                                            @endphp
-                                            <button type="button" class="btn-primary" style="padding: 6px 12px; font-size: 13px;"
-                                                onclick="showFilePreview('{{ $fileUrl }}', '{{ $ext }}')">
-                                                <i class="ri-eye-line"></i> Lihat File {{ $loop->iteration }}
-                                            </button>
-                                        @endforeach
-                                    </div>
-                                @endif
-                            @break
+                                    @if ($selectedOptions->count() > 0)
+                                        <ul>
+                                            @foreach ($selectedOptions as $option)
+                                                <li>{{ $option->opsi }}</li>
+                                            @endforeach
+                                        </ul>
+                                    @else
+                                        {{ implode(', ', $answerArray) }}
+                                    @endif
+                                @break
 
-                            @default
-                                {{ is_array($answer) ? implode(', ', $answer) : $answer }}
-                        @endswitch
-                    @endif
+                                @case('file')
+                                    @if ($answer)
+                                        @php
+                                            // Assumption: Answer contains filename
+                                            $fileUrl = asset('storage/permohonan-jawaban/' . $answer);
+                                            $ext = pathinfo($answer, PATHINFO_EXTENSION);
+                                        @endphp
+                                        <button type="button" class="btn-primary" style="padding: 6px 12px; font-size: 13px;"
+                                            onclick="showFilePreview('{{ $fileUrl }}', '{{ $ext }}')">
+                                            <i class="ri-eye-line"></i> Lihat File
+                                        </button>
+                                    @endif
+                                @break
+
+                                @case('file_multiple')
+                                    @if ($answer)
+                                        @php
+                                            $files = is_array($answer)
+                                                ? $answer
+                                                : json_decode($answer, true) ?? [$answer];
+                                        @endphp
+                                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                            @foreach ($files as $file)
+                                                @php
+                                                    $fileUrl = asset('storage/permohonan-jawaban/' . $file);
+                                                    $ext = pathinfo($file, PATHINFO_EXTENSION);
+                                                @endphp
+                                                <button type="button" class="btn-primary"
+                                                    style="padding: 6px 12px; font-size: 13px;"
+                                                    onclick="showFilePreview('{{ $fileUrl }}', '{{ $ext }}')">
+                                                    <i class="ri-eye-line"></i> Lihat File {{ $loop->iteration }}
+                                                </button>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                @break
+
+                                @default
+                                    {{ is_array($answer) ? implode(', ', $answer) : $answer }}
+                            @endswitch
+                        @endif
+                    </div>
                 </div>
-            </div>
-
-        @endforeach
+            @endforeach
         @else
-            @if($permohonanUser->jawaban)
+            @if ($permohonanUser->jawaban)
                 @foreach ($permohonanUser->jawaban as $key => $value)
                     <div class="question-item">
                         <div class="question-number">
@@ -914,7 +946,8 @@
                     @csrf
                     <div class="modal-body">
                         <div class="text-center" style="padding: 20px 0;">
-                            <p style="font-size: 16px; margin-bottom: 0;">Apakah anda yakin ingin memproses permohonan ini?</p>
+                            <p style="font-size: 16px; margin-bottom: 0;">Apakah anda yakin ingin memproses permohonan ini?
+                            </p>
                         </div>
                     </div>
                     <div class="modal-footer" style="justify-content: center; gap: 12px;">
@@ -983,8 +1016,7 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label class="form-label">Alasan Pembatalan</label>
-                            <textarea name="keterangan" class="form-control" rows="5"
-                                placeholder="Masukkan alasan pembatalan (opsional)">{{ old('keterangan') }}</textarea>
+                            <textarea name="keterangan" class="form-control" rows="5" placeholder="Masukkan alasan pembatalan (opsional)">{{ old('keterangan') }}</textarea>
                             <small style="color: #6B7280; font-size: 12px;">Berikan alasan jika diperlukan</small>
                         </div>
                     </div>
