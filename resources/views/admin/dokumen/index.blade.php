@@ -532,12 +532,12 @@
         </div>
         <div class="page-actions">
             @can('dokumen.create')
-            <button type="button" class="btn btn-secondary" onclick="openCreateFolderModal()">
-                <i class="ri-folder-add-line"></i> Buat Folder
-            </button>
-            <button type="button" class="btn btn-primary" onclick="openUploadModal()">
-                <i class="ri-upload-cloud-2-line"></i> Upload File
-            </button>
+                <button type="button" class="btn btn-secondary" onclick="openCreateFolderModal()">
+                    <i class="ri-folder-add-line"></i> Buat Folder
+                </button>
+                <button type="button" class="btn btn-primary" onclick="openUploadModal()">
+                    <i class="ri-upload-cloud-2-line"></i> Upload File
+                </button>
             @endcan
         </div>
     </div>
@@ -682,7 +682,7 @@
                                         <span style="color: #3B82F6; font-weight: 500;"><i class="ri-folder-line"></i>
                                             {{ $dokumen->parent->nama }}</span>
                                     @endif
-                                    <span>Oleh: {{ $dokumen->user->name ?? 'System' }}</span>
+                                    {{-- <span>Oleh: {{ $dokumen->user->name ?? 'System' }}</span> --}}
                                     <span>{{ $dokumen->created_at->format('d M Y H:i') }}</span>
                                 </div>
                             </div>

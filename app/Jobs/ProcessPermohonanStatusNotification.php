@@ -46,8 +46,17 @@ class ProcessPermohonanStatusNotification implements ShouldQueue
             return;
         }
 
-        $statusLabel = $permohonanUser->status === 'selesai' ? 'Disetujui' : 'Ditolak';
-        $type = $permohonanUser->status === 'selesai' ? 'success' : 'danger';
+        $statusLabel = match ($permohonanUser->status) {
+            'selesai' => 'Disetujui',
+            'proses' => 'Sedang Diproses',
+            default => 'Ditolak',
+        };
+
+        $type = match ($permohonanUser->status) {
+            'selesai' => 'success',
+            'proses' => 'warning',
+            default => 'danger',
+        };
 
         try {
             // 1. Create Database Notification

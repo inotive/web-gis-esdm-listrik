@@ -31,7 +31,11 @@ class PermohonanStatusNotification extends Mailable implements ShouldQueue
      */
     public function envelope(): Envelope
     {
-        $subject = $this->status === 'selesai' ? 'Permohonan Disetujui' : 'Permohonan Ditolak';
+        $subject = match ($this->status) {
+            'selesai' => 'Permohonan Disetujui',
+            'proses' => 'Permohonan Sedang Diproses',
+            default => 'Permohonan Ditolak',
+        };
         return new Envelope(
             subject: $subject,
         );

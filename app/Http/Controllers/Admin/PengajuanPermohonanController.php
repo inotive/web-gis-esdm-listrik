@@ -489,7 +489,7 @@ class PengajuanPermohonanController extends Controller
             $tahun = $this->getOrCreateFolder(date('Y'), $kategori->id);
 
             // 6. Bulan
-            $bulan = $this->getOrCreateFolder(date('m'), $tahun->id);
+            $bulan = $this->getOrCreateFolder(date('F'), $tahun->id);
 
             // 7. Kabupaten
             $kabupatenName = $user->village?->regency?->name ?? 'Lainnya';
