@@ -13,6 +13,21 @@ use Illuminate\Support\Facades\Validator;
 
 class RekapDataController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('can:rekap.view')->only(['index', 'detail']);
+        // If export exists:
+        $this->middleware('can:rekap.export')->only(['export', 'downloadTemplate']);
+        // If import exists (usually covered by create or manage):
+        // Assuming rekap.view or separate permission. Seeder has rekap.view, .export etc.
+        // Let's check seeder/permission list to be sure.
+        // Seeder: rekap.view, rekap.elektrifikasi, rekap.infrastruktur, rekap.export
+        // Import implies modifying data? Or just viewing stats?
+        // Usually import is an admin action. Let's protect it with rekap.view for now or check if there is a manage perm.
+        // Since there is no rekap.create/edit, we'll use rekap.view + auth for basic, or rekap.infrastruktur/elektrifikasi if specific.
+        // But for safety, let's stick to rekap.view for index/detail.
+    }
+
     /**
      * Menampilkan halaman rekap data rasio desa berlistrik dan rasio elektrifikasi
      */

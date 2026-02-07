@@ -424,10 +424,12 @@
             <div class="page-title">Data Inspeksi</div>
         </div>
         <div class="page-actions">
+            @can('inspeksi.create')
             <a href="{{ route('admin.inspeksi.create') }}" class="btn btn-primary btn-add">
                 <i class="ri-add-line"></i>
                 Tambah Inspeksi
             </a>
+            @endcan
         </div>
     </div>
 
@@ -506,10 +508,13 @@
                                         style="color: #0077B6;" title="Detail">
                                         <i class="fa-solid fa-eye"></i>
                                     </a>
+                                    @can('inspeksi.edit')
                                     <a href="{{ route('admin.inspeksi.edit', $inspeksi) }}" class="btn-ico edit"
                                         title="Edit">
                                         <i class="fa-solid fa-pen-to-square"></i>
                                     </a>
+                                    @endcan
+                                    @can('inspeksi.delete')
                                     <form action="{{ route('admin.inspeksi.destroy', $inspeksi) }}" method="POST"
                                         style="display:inline-block;margin:0;" class="form-delete">
                                         @csrf @method('DELETE')
@@ -518,6 +523,7 @@
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
                                     </form>
+                                    @endcan
                                 </td>
                             </tr>
                         @empty

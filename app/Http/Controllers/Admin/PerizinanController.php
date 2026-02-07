@@ -18,6 +18,15 @@ use App\Exports\PerizinanTemplateExport;
 class PerizinanController extends Controller
 {
     use UploadFile;
+
+    public function __construct()
+    {
+        $this->middleware('can:perizinan.view')->only(['index', 'show', 'mapData', 'getMapData']);
+        $this->middleware('can:perizinan.create')->only(['create', 'store', 'import', 'importProcess', 'downloadTemplate']);
+        $this->middleware('can:perizinan.edit')->only(['edit', 'update', 'addDocument', 'deleteDocument']);
+        $this->middleware('can:perizinan.delete')->only(['destroy']);
+    }
+
     /**
      * Display a listing of the resource.
      */

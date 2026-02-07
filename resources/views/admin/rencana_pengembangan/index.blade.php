@@ -297,7 +297,9 @@
         </div>
         <div class="page-actions">
             <div class="date-pill"><i class="ri-calendar-line"></i><span>{{ now()->translatedFormat('F Y') }}</span></div>
+            @can('rencana_pengembangan.create')
             <button class="btn btn-primary" onclick="openAddModal()"><i class="ri-add-line"></i> Tambah Data</button>
+            @endcan
         </div>
     </div>
 
@@ -508,7 +510,7 @@
                             <!-- Aksesibilitas -->
                             <td>
                                 <select class="editable-select" data-field="aksesibilitas"
-                                    data-id="{{ $item->id }}">
+                                    data-id="{{ $item->id }}" @disabled(auth()->user()->cannot('rencana_pengembangan.edit'))>
                                     <option value="">Pilih...</option>
                                     @foreach ($aksesibilitasOptions as $text => $score)
                                         <option value="{{ $text }}"
@@ -526,7 +528,7 @@
                             <!-- Radius Jaringan -->
                             <td>
                                 <select class="editable-select" data-field="radius_jaringan"
-                                    data-id="{{ $item->id }}">
+                                    data-id="{{ $item->id }}" @disabled(auth()->user()->cannot('rencana_pengembangan.edit'))>
                                     <option value="">Pilih...</option>
                                     @foreach ($radiusOptions as $text => $score)
                                         <option value="{{ $text }}"
@@ -544,7 +546,7 @@
                             <!-- Arah Kebijakan -->
                             <td>
                                 <select class="editable-select" data-field="arah_kebijakan"
-                                    data-id="{{ $item->id }}">
+                                    data-id="{{ $item->id }}" @disabled(auth()->user()->cannot('rencana_pengembangan.edit'))>
                                     <option value="">Pilih...</option>
                                     @foreach ($kebijakanOptions as $text => $score)
                                         <option value="{{ $text }}"
@@ -562,7 +564,7 @@
                             <!-- Potensi Kegiatan -->
                             <td>
                                 <select class="editable-select" data-field="potensi_kegiatan"
-                                    data-id="{{ $item->id }}">
+                                    data-id="{{ $item->id }}" @disabled(auth()->user()->cannot('rencana_pengembangan.edit'))>
                                     <option value="">Pilih...</option>
                                     @foreach ($potensiOptions as $text => $score)
                                         <option value="{{ $text }}"
@@ -580,7 +582,7 @@
                             <!-- Jumlah Pelanggan -->
                             <td>
                                 <select class="editable-select" data-field="jumlah_pelanggan"
-                                    data-id="{{ $item->id }}">
+                                    data-id="{{ $item->id }}" @disabled(auth()->user()->cannot('rencana_pengembangan.edit'))>
                                     <option value="">Pilih...</option>
                                     @foreach ($pelangganOptions as $text => $score)
                                         <option value="{{ $text }}"
@@ -610,6 +612,7 @@
 
                             <!-- Actions -->
                             <td>
+                                @can('rencana_pengembangan.delete')
                                 <form action="{{ route('admin.rencana-pengembangan.destroy', $item->id) }}"
                                     method="POST" style="display: inline;">
                                     @csrf
@@ -619,6 +622,7 @@
                                         <i class="ri-delete-bin-line"></i>
                                     </button>
                                 </form>
+                                @endcan
                             </td>
                         </tr>
                     @empty

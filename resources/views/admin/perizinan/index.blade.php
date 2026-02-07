@@ -9,12 +9,14 @@
     <div class="page-title" style="font-size: 24px; font-weight: 700; color: #111827;">Perizinan</div>
   </div>
   <div class="page-actions">
+        @can('perizinan.create')
         <a href="{{ route('admin.perizinan.import') }}" class="btn btn-primary" style="background:var(--accent-1, #059669); border-color:var(--accent-1, #059669); margin-right:8px;">
             <i class="ri-file-excel-2-line"></i> Import Data
         </a>
         <a href="{{ route('admin.perizinan.create') }}" class="btn btn-primary" style="background: var(--accent-2, #2563EB); border-color: var(--accent-2, #2563EB);">
             <i class="ri-add-line"></i> Tambah Data
         </a>
+        @endcan
   </div>
 </div>
 
@@ -69,9 +71,12 @@
                                 <a href="{{ route('admin.perizinan.show', $item->id) }}" class="btn btn-sm btn-info text-white" title="Detail">
                                     <i class="ri-eye-line"></i>
                                 </a>
+                                @can('perizinan.edit')
                                 <a href="{{ route('admin.perizinan.edit', $item->id) }}" class="btn btn-sm btn-warning text-white" title="Edit">
                                     <i class="ri-pencil-line"></i>
                                 </a>
+                                @endcan
+                                @can('perizinan.delete')
                                 <form action="{{ route('admin.perizinan.destroy', $item->id) }}" method="POST" class="form-delete-perizinan" data-name="{{ $item->nama }}">
                                     @csrf
                                     @method('DELETE')
@@ -79,6 +84,7 @@
                                         <i class="ri-delete-bin-line"></i>
                                     </button>
                                 </form>
+                                @endcan
                             </div>
                         </td>
                     </tr>

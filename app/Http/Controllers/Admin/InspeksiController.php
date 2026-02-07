@@ -23,6 +23,9 @@ class InspeksiController extends Controller
         $perusahaanId = $request->get('perusahaan_id');
         $tanggalDari = $request->get('tanggal_dari');
         $tanggalSampai = $request->get('tanggal_sampai');
+        
+        // Authorization
+        abort_unless(Auth::user()->can('inspeksi.view'), 403, 'Unauthorized');
 
         $query = Inspeksi::with(['perusahaan', 'pengguna']);
 
@@ -70,6 +73,8 @@ class InspeksiController extends Controller
      */
     public function create()
     {
+        abort_unless(Auth::user()->can('inspeksi.create'), 403, 'Unauthorized');
+
         $perusahaans = Perusahaan::orderBy('nama')->get(['id', 'nama']);
 
         return view('admin.inspeksi.create', [
@@ -83,6 +88,8 @@ class InspeksiController extends Controller
      */
     public function store(Request $request)
     {
+        abort_unless(Auth::user()->can('inspeksi.create'), 403, 'Unauthorized');
+
         $data = $this->validatedData($request);
 
         // Set ditambahkan_oleh to current user
@@ -103,6 +110,8 @@ class InspeksiController extends Controller
      */
     public function show(Inspeksi $inspeksi)
     {
+        abort_unless(Auth::user()->can('inspeksi.view'), 403, 'Unauthorized');
+
         $inspeksi->load(['perusahaan', 'pengguna']);
 
         return view('admin.inspeksi.show', [
@@ -116,6 +125,8 @@ class InspeksiController extends Controller
      */
     public function edit(Inspeksi $inspeksi)
     {
+        abort_unless(Auth::user()->can('inspeksi.edit'), 403, 'Unauthorized');
+
         $inspeksi->load(['perusahaan', 'pengguna']);
         $perusahaans = Perusahaan::orderBy('nama')->get(['id', 'nama']);
 
@@ -131,6 +142,8 @@ class InspeksiController extends Controller
      */
     public function update(Request $request, Inspeksi $inspeksi)
     {
+        abort_unless(Auth::user()->can('inspeksi.edit'), 403, 'Unauthorized');
+
         $data = $this->validatedData($request);
 
         // Handle lampiran file upload
@@ -152,6 +165,8 @@ class InspeksiController extends Controller
      */
     public function destroy(Inspeksi $inspeksi)
     {
+        abort_unless(Auth::user()->can('inspeksi.delete'), 403, 'Unauthorized');
+
         // Delete associated file (lampiran)
         if ($inspeksi->lampiran && Storage::disk('public')->exists($inspeksi->lampiran)) {
             Storage::disk('public')->delete($inspeksi->lampiran);

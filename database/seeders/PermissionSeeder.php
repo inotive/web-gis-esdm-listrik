@@ -32,16 +32,13 @@ class PermissionSeeder extends Seeder
 
                 // User Management
                 ['name' => 'user.view', 'group' => 'Manajemen User', 'display_name' => 'Lihat Daftar User'],
-                ['name' => 'user.create', 'group' => 'Manajemen User', 'display_name' => 'Tambah User'],
-                ['name' => 'user.edit', 'group' => 'Manajemen User', 'display_name' => 'Edit User'],
-                ['name' => 'user.delete', 'group' => 'Manajemen User', 'display_name' => 'Hapus User'],
+                ['name' => 'user.view', 'group' => 'Manajemen User', 'display_name' => 'Lihat Daftar User'],
 
                 // Data Desa
                 ['name' => 'desa.view', 'group' => 'Data Desa', 'display_name' => 'Lihat Data Desa'],
                 ['name' => 'desa.create', 'group' => 'Data Desa', 'display_name' => 'Tambah Data Desa'],
                 ['name' => 'desa.edit', 'group' => 'Data Desa', 'display_name' => 'Edit Data Desa'],
                 ['name' => 'desa.delete', 'group' => 'Data Desa', 'display_name' => 'Hapus Data Desa'],
-                ['name' => 'desa.export', 'group' => 'Data Desa', 'display_name' => 'Export Data Desa'],
 
                 // Data Perusahaan
                 ['name' => 'perusahaan.view', 'group' => 'Data Perusahaan', 'display_name' => 'Lihat Data Perusahaan'],
@@ -76,9 +73,8 @@ class PermissionSeeder extends Seeder
                 ['name' => 'perizinan.create', 'group' => 'Perizinan', 'display_name' => 'Tambah Perizinan'],
                 ['name' => 'perizinan.edit', 'group' => 'Perizinan', 'display_name' => 'Edit Perizinan'],
                 ['name' => 'perizinan.delete', 'group' => 'Perizinan', 'display_name' => 'Hapus Perizinan'],
-                ['name' => 'perizinan.approve', 'group' => 'Perizinan', 'display_name' => 'Approve Perizinan'],
                 ['name' => 'permohonan.view', 'group' => 'Perizinan', 'display_name' => 'Lihat Data Permohonan'],
-                ['name' => 'permohonan.create', 'group' => 'Perizinan', 'display_name' => 'Tambah Permohonan'],
+                ['name' => 'permohonan.approve', 'group' => 'Perizinan', 'display_name' => 'Approve Permohonan'],
                 ['name' => 'permohonan.edit', 'group' => 'Perizinan', 'display_name' => 'Edit Permohonan'],
                 ['name' => 'permohonan.delete', 'group' => 'Perizinan', 'display_name' => 'Hapus Permohonan'],
                 ['name' => 'permohonan.process', 'group' => 'Perizinan', 'display_name' => 'Proses Permohonan'],
@@ -88,7 +84,6 @@ class PermissionSeeder extends Seeder
                 ['name' => 'dokumen.create', 'group' => 'Dokumen', 'display_name' => 'Upload Dokumen'],
                 ['name' => 'dokumen.edit', 'group' => 'Dokumen', 'display_name' => 'Edit Dokumen'],
                 ['name' => 'dokumen.delete', 'group' => 'Dokumen', 'display_name' => 'Hapus Dokumen'],
-                ['name' => 'dokumen.download', 'group' => 'Dokumen', 'display_name' => 'Download Dokumen'],
 
                 // Kategori Permohonan
                 ['name' => 'kategori_permohonan.view', 'group' => 'Kategori Permohonan', 'display_name' => 'Lihat Kategori Permohonan'],
@@ -97,11 +92,10 @@ class PermissionSeeder extends Seeder
                 ['name' => 'kategori_permohonan.delete', 'group' => 'Kategori Permohonan', 'display_name' => 'Hapus Kategori'],
 
                 // Manajemen Pengguna (Perusahaan)
-                ['name' => 'pengguna.view', 'group' => 'Manajemen Pengguna', 'display_name' => 'Lihat Pengguna Perusahaan'],
                 ['name' => 'pengguna.create', 'group' => 'Manajemen Pengguna', 'display_name' => 'Tambah Pengguna'],
                 ['name' => 'pengguna.edit', 'group' => 'Manajemen Pengguna', 'display_name' => 'Edit Pengguna'],
                 ['name' => 'pengguna.delete', 'group' => 'Manajemen Pengguna', 'display_name' => 'Hapus Pengguna'],
-                ['name' => 'pengguna.reset_password', 'group' => 'Manajemen Pengguna', 'display_name' => 'Reset Password Pengguna'],
+                ['name' => 'pengguna.approve', 'group' => 'Manajemen Pengguna', 'display_name' => 'Approve Pengguna'],
 
                 // Rekap Data
                 ['name' => 'rekap.view', 'group' => 'Rekap Data', 'display_name' => 'Lihat Rekap Data'],
@@ -115,6 +109,18 @@ class PermissionSeeder extends Seeder
                 ['name' => 'unit_kerja.manage', 'group' => 'Master Data', 'display_name' => 'Kelola Unit Kerja'],
                 ['name' => 'jabatan.manage', 'group' => 'Master Data', 'display_name' => 'Kelola Jabatan'],
                 ['name' => 'wilayah.manage', 'group' => 'Master Data', 'display_name' => 'Kelola Data Wilayah'],
+
+                // Data Inspeksi
+                ['name' => 'inspeksi.view', 'group' => 'Data Inspeksi', 'display_name' => 'Lihat Data Inspeksi'],
+                ['name' => 'inspeksi.create', 'group' => 'Data Inspeksi', 'display_name' => 'Tambahkan Data Inspeksi'],
+                ['name' => 'inspeksi.edit', 'group' => 'Data Inspeksi', 'display_name' => 'Edit Data Inspeksi'],
+                ['name' => 'inspeksi.delete', 'group' => 'Data Inspeksi', 'display_name' => 'Hapus Data Inspeksi'],
+
+                // Rencana Pengembangan Bantuan
+                ['name' => 'rencana_pengembangan.view', 'group' => 'Rencana Pengembangan', 'display_name' => 'Lihat Data Rencana Pengembangan'],
+                ['name' => 'rencana_pengembangan.create', 'group' => 'Rencana Pengembangan', 'display_name' => 'Tambah Data Rencana Pengembangan'],
+                ['name' => 'rencana_pengembangan.edit', 'group' => 'Rencana Pengembangan', 'display_name' => 'Edit Data Rencana Pengembangan'],
+                ['name' => 'rencana_pengembangan.delete', 'group' => 'Rencana Pengembangan', 'display_name' => 'Hapus Data Rencana Pengembangan'],
             ];
 
             DB::beginTransaction();
@@ -171,7 +177,6 @@ class PermissionSeeder extends Seeder
             // Viewer - Read only permissions
             $viewerPermissions = Permission::where('name', 'like', '%.view')
                 ->orWhere('name', 'like', '%.show')
-                ->orWhere('name', 'like', '%.download')
                 ->orWhere('name', 'dashboard.view')
                 ->get();
             $viewer->syncPermissions($viewerPermissions);
@@ -183,7 +188,8 @@ class PermissionSeeder extends Seeder
                     ->orWhere('name', 'like', '%.show')
                     ->orWhere('name', 'like', '%.create')
                     ->orWhere('name', 'like', '%.edit')
-                    ->orWhere('name', 'like', '%.download')
+                    ->orWhere('name', 'permohonan.process')
+                    ->orWhere('name', 'permohonan.approve')
                     ->orWhere('name', 'dashboard.view');
             })
                 ->where('group', '!=', 'Role & Permission')
@@ -198,10 +204,8 @@ class PermissionSeeder extends Seeder
 
             $frontendPermissions = Permission::where(function ($q) {
                 $q->where('name', 'permohonan.view')
-                    ->orWhere('name', 'permohonan.create')
                     ->orWhere('name', 'permohonan.edit')
-                    ->orWhere('name', 'dokumen.view')
-                    ->orWhere('name', 'dokumen.download');
+                    ->orWhere('name', 'dokumen.view');
             })->get();
 
             $desa->syncPermissions($frontendPermissions);

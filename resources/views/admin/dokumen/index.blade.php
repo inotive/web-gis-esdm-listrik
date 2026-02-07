@@ -531,12 +531,14 @@
             <div class="page-title">Manajemen Dokumen</div>
         </div>
         <div class="page-actions">
+            @can('dokumen.create')
             <button type="button" class="btn btn-secondary" onclick="openCreateFolderModal()">
                 <i class="ri-folder-add-line"></i> Buat Folder
             </button>
             <button type="button" class="btn btn-primary" onclick="openUploadModal()">
                 <i class="ri-upload-cloud-2-line"></i> Upload File
             </button>
+            @endcan
         </div>
     </div>
 

@@ -11,6 +11,14 @@ use Illuminate\Support\Facades\DB;
 
 class KategoriPermohonanController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('can:kategori_permohonan.view')->only(['index', 'show']);
+        $this->middleware('can:kategori_permohonan.create')->only(['create', 'store']);
+        $this->middleware('can:kategori_permohonan.edit')->only(['edit', 'update']);
+        $this->middleware('can:kategori_permohonan.delete')->only(['destroy']);
+    }
+
     /**
      * Display a listing of the resource.
      */

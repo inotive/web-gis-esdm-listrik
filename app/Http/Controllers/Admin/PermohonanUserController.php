@@ -435,9 +435,8 @@ class PermohonanUserController extends Controller
             abort(404);
         }
 
-        // Only admin/superadmin can approve
-        $userRole = Auth::user()->roles()->first()->name ?? null;
-        if (!in_array($userRole, ['admin', 'superadmin'])) {
+        // Check permission
+        if (!Auth::user()->can('permohonan.approve')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -515,9 +514,8 @@ class PermohonanUserController extends Controller
             abort(404);
         }
 
-        // Only admin/superadmin can reject
-        $userRole = Auth::user()->roles()->first()->name ?? null;
-        if (!in_array($userRole, ['admin', 'superadmin'])) {
+        // Check permission
+        if (!Auth::user()->can('permohonan.approve')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -547,9 +545,9 @@ class PermohonanUserController extends Controller
             abort(404);
         }
 
-        // Only admin/superadmin can update to proses
-        $userRole = Auth::user()->roles()->first()->name ?? null;
-        if (!in_array($userRole, ['admin', 'superadmin'])) {
+        // Check permission (using existing permohonan.process or permohonan.approve?)
+        // Since this moves status to 'proses', let's use 'permohonan.process' which exists.
+        if (!Auth::user()->can('permohonan.process')) {
             abort(403, 'Unauthorized action.');
         }
 

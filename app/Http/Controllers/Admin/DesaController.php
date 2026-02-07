@@ -12,6 +12,14 @@ use Illuminate\Validation\ValidationException;
 
 class DesaController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('can:desa.view')->only(['index']);
+        $this->middleware('can:desa.create')->only(['create', 'store']);
+        $this->middleware('can:desa.edit')->only(['edit', 'update']);
+        $this->middleware('can:desa.delete')->only(['destroy']);
+    }
+
     // INDEX
     public function index(Request $request)
     {
