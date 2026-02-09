@@ -187,8 +187,8 @@ class PermohonanController extends Controller
                 $queryPerizinan->whereDate('tanggal_akhir', '>', now()->copy()->addDays(90));
             } elseif (stripos($filterPerizinanStatus, 'mau') !== false || stripos($filterPerizinanStatus, 'akan') !== false) {
                 // "Mau Berakhir" - tanggal_akhir between now and 90 days
-                $queryPerizinan->whereDate('tanggal_akhir', '>', now())
-                              ->whereDate('tanggal_akhir', '<=', now()->copy()->addDays(90));
+                $queryPerizinan->whereDate('tanggal_akhir', '>=', now())
+                               ->whereDate('tanggal_akhir', '<=', now()->copy()->addDays(90));
             } elseif (stripos($filterPerizinanStatus, 'berakhir') !== false) {
                 // "Berakhir" - tanggal_akhir < now OR tanggal_akhir IS NULL
                 $queryPerizinan->where(function ($q) {
@@ -203,8 +203,8 @@ class PermohonanController extends Controller
             if ($status === 'Sedang Aktif') {
                 $queryPerizinan->whereDate('tanggal_akhir', '>', now()->copy()->addDays(90));
             } elseif ($status === 'Mau Berakhir') {
-                $queryPerizinan->whereDate('tanggal_akhir', '>', now())
-                              ->whereDate('tanggal_akhir', '<=', now()->copy()->addDays(90));
+                $queryPerizinan->whereDate('tanggal_akhir', '>=', now())
+                               ->whereDate('tanggal_akhir', '<=', now()->copy()->addDays(90));
             } elseif ($status === 'Berakhir') {
                 $queryPerizinan->where(function ($q) {
                     $q->whereDate('tanggal_akhir', '<', now())
@@ -234,7 +234,7 @@ class PermohonanController extends Controller
                   ->orWhere('jenis', 'like', '%Rekomtek%');
             })->count(),
             'sedang_aktif' => Perizinan::whereDate('tanggal_akhir', '>', $now->copy()->addDays(90))->count(),
-            'mau_berakhir' => Perizinan::whereDate('tanggal_akhir', '>', $now)
+            'mau_berakhir' => Perizinan::whereDate('tanggal_akhir', '>=', $now)
                                        ->whereDate('tanggal_akhir', '<=', $now->copy()->addDays(90))
                                        ->count(),
             'berakhir' => Perizinan::where(function ($q) use ($now) {
