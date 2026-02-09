@@ -9,6 +9,7 @@ use App\Models\PermohonanUserDocument;
 use App\Models\PermohonanQuestion;
 use App\Models\Dokumen;
 use App\Helpers\UploadFile;
+use App\Jobs\ProcessPermohonanStatusNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -305,7 +306,7 @@ class PermohonanUserController extends Controller
 
         // Get permohonan to validate questions
         $permohonan = $permohonanUser->permohonan;
-        
+
         if ($permohonan) {
             $permohonan->load('questions.options');
 
@@ -435,9 +436,8 @@ class PermohonanUserController extends Controller
             abort(404);
         }
 
-        // Only admin/superadmin can approve
-        $userRole = Auth::user()->roles()->first()->name ?? null;
-        if (!in_array($userRole, ['admin', 'superadmin'])) {
+        // Check permission
+        if (!Auth::user()->can('permohonan.approve')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -492,6 +492,9 @@ class PermohonanUserController extends Controller
 
             DB::commit();
 
+            // Dispatch Notification Job
+            \App\Jobs\ProcessPermohonanStatusNotification::dispatch($permohonanUser->id);
+
             return redirect()->route('admin.permohonan-user.show', [$permohonanId, $permohonanUser->id])
                 ->with('success', 'Permohonan berhasil disetujui.');
         } catch (\Exception $e) {
@@ -512,9 +515,8 @@ class PermohonanUserController extends Controller
             abort(404);
         }
 
-        // Only admin/superadmin can reject
-        $userRole = Auth::user()->roles()->first()->name ?? null;
-        if (!in_array($userRole, ['admin', 'superadmin'])) {
+        // Check permission
+        if (!Auth::user()->can('permohonan.approve')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -526,6 +528,9 @@ class PermohonanUserController extends Controller
             'status' => 'ditolak',
             'keterangan' => $validated['keterangan'],
         ]);
+
+        // Dispatch Notification Job
+        ProcessPermohonanStatusNotification::dispatch($permohonanUser->id);
 
         return redirect()->route('admin.permohonan-user.show', [$permohonanId, $permohonanUser->id])
             ->with('success', 'Permohonan berhasil ditolak.');
@@ -541,9 +546,9 @@ class PermohonanUserController extends Controller
             abort(404);
         }
 
-        // Only admin/superadmin can update to proses
-        $userRole = Auth::user()->roles()->first()->name ?? null;
-        if (!in_array($userRole, ['admin', 'superadmin'])) {
+        // Check permission (using existing permohonan.process or permohonan.approve?)
+        // Since this moves status to 'proses', let's use 'permohonan.process' which exists.
+        if (!Auth::user()->can('permohonan.process')) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -556,7 +561,10 @@ class PermohonanUserController extends Controller
             'keterangan' => $validated['keterangan'] ?? $permohonanUser->keterangan,
         ]);
 
-        return redirect()->route('admin.permohonan-user.index', $permohonanId)
+
+        ProcessPermohonanStatusNotification::dispatch($permohonanUser->id);
+
+        return redirect()->route('admin.permohonan-user.show', [$permohonanId, $permohonanUser->id])
             ->with('success', 'Status permohonan berhasil diupdate menjadi Proses.');
     }
 

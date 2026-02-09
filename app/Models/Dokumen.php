@@ -21,6 +21,7 @@ class Dokumen extends Model
         'mime_type',
         'size',
         'user_id',
+        'sumber',
     ];
 
     protected $casts = [

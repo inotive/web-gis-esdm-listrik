@@ -201,13 +201,13 @@ class PengajuanPermohonanController extends Controller
 
                 if ($hasFile) {
                     //upload file
+                    $storedFiles = [];
                     foreach ($value as $item) {
-                        $files = $item;
-                        if ($files->isValid()) {
-                            $storedFiles[] = $this->storeFile($files, 'permohonan-jawaban');
+                        if ($item->isValid()) {
+                            $storedFiles[] = $this->storeFile($item, 'permohonan-jawaban');
                         }
-                        $jawaban[$key] = $storedFiles;
                     }
+                    $jawaban[$key] = $storedFiles;
                 }
 
                 // $jawaban[$key] = array_map('intval', $value);
@@ -259,6 +259,9 @@ class PengajuanPermohonanController extends Controller
             ]);
 
             DB::commit();
+
+            // Sync to Dokumen model
+            $this->syncToDokumen($permohonanUser);
 
             // Dispatch Notification Job
             \App\Jobs\ProcessNewPermohonanNotification::dispatch($permohonanUser->id);
@@ -434,5 +437,124 @@ class PengajuanPermohonanController extends Controller
 
         return redirect()->route('admin.pengajuan-permohonan.index')
             ->with('success', 'Permohonan berhasil dibatalkan.');
+    }
+
+    /**
+     * Synchronize uploaded permohonan files to Dokumen model
+     */
+    private function syncToDokumen($permohonanUser)
+    {
+        try {
+            $user = Auth::user()->load('village.regency');
+            $permohonan = $permohonanUser->permohonan;
+            $permohonan->load('questions');
+
+            // Collect file names from jawaban
+            $fileNames = [];
+            $jawaban = $permohonanUser->jawaban ?? [];
+
+            foreach ($permohonan->questions as $question) {
+                if (in_array($question->tipe, ['file', 'multiple_file'])) {
+                    $value = $jawaban[$question->id] ?? null;
+                    if ($value) {
+                        if (is_array($value)) {
+                            $fileNames = array_merge($fileNames, $value);
+                        } else {
+                            $fileNames[] = $value;
+                        }
+                    }
+                }
+            }
+
+            if (empty($fileNames)) {
+                return;
+            }
+
+            // Hierarchy setup
+            // Dokumen > Perizinan Ketenagalistrikkan > Data Permohonan > [Kategori] > Tahun > Bulan > Kabupaten > [Perusahaan/Desa]
+
+            // 1. Root: Dokumen
+            $root = $this->getOrCreateFolder('Dokumen');
+
+            // 2. Perizinan Ketenagalistrikkan
+            $perizinan = $this->getOrCreateFolder('Perizinan Ketenagalistrikkan', $root->id);
+
+            // 3. Data Permohonan
+            $dataPermohonan = $this->getOrCreateFolder('Data Permohonan', $perizinan->id);
+
+            // 4. [Kategori]
+            $kategori = $this->getOrCreateFolder($permohonan->nama, $dataPermohonan->id);
+
+            // 5. Tahun
+            $tahun = $this->getOrCreateFolder(date('Y'), $kategori->id);
+
+            // 6. Bulan
+            $bulan = $this->getOrCreateFolder(date('F'), $tahun->id);
+
+            // 7. Kabupaten
+            $kabupatenName = $user->village?->regency?->name ?? 'Lainnya';
+            $kabupaten = $this->getOrCreateFolder($kabupatenName, $bulan->id);
+
+            // 8. [Nama Perusahaan/Desa]
+            $perusahaanOrDesaName = $user->company_name ?: $user->name;
+            $parentFolder = $this->getOrCreateFolder($perusahaanOrDesaName, $kabupaten->id, $user->id);
+
+            foreach ($fileNames as $fileName) {
+                $this->createDokumenFile($fileName, $parentFolder->id, $user->id);
+            }
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+            \Log::error('Sync to Dokumen error: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get or create a folder in Dokumen model
+     */
+    private function getOrCreateFolder($name, $parentId = null, $userId = null)
+    {
+        return Dokumen::firstOrCreate(
+            [
+                'nama' => $name,
+                'parent_id' => $parentId,
+                'tipe' => 'folder',
+            ],
+            [
+                'user_id' => 2,
+                'sumber' => 'sistem',
+            ]
+        );
+    }
+
+    /**
+     * Create a file record in Dokumen model
+     */
+    private function createDokumenFile($fileName, $parentId, $userId)
+    {
+        $path = 'permohonan-jawaban/' . $fileName;
+        $fullPath = storage_path('app/public/' . $path);
+
+        if (!file_exists($fullPath)) {
+            \Log::warning('Sync to Dokumen: File not found on disk', ['path' => $fullPath]);
+            return;
+        }
+
+        $mimeType = mime_content_type($fullPath);
+        $size = filesize($fullPath);
+
+        Dokumen::updateOrCreate(
+            [
+                'parent_id' => $parentId,
+                'nama' => $fileName,
+                'tipe' => 'file',
+            ],
+            [
+                'path' => $path,
+                'mime_type' => $mimeType,
+                'size' => $size,
+                'user_id' => 2,
+                'sumber' => 'sistem',
+            ]
+        );
     }
 }

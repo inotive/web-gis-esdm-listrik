@@ -149,6 +149,8 @@
 
                 // Admin Status from Blade
                 const isAdmin = {{ auth()->check() && auth()->user()->hasRole('admin') ? 'true' : 'false' }};
+                const isSuperAdmin =
+                    {{ auth()->check() && auth()->user()->hasRole('superadmin') ? 'true' : 'false' }};
 
                 const view = new MapView({
                     container: "viewDiv",
@@ -665,7 +667,7 @@
                                 console.log(sub.label ==
                                     'Status Desa Berlistrik Dengan Bantuan');
                                 // Filter Restricted Layers for Non-Admin
-                                if (!isAdmin) {
+                                if (!isAdmin && !isSuperAdmin) {
                                     if (sub.label ==
                                         'Status Desa Berlistrik Dengan Bantuan' ||
                                         sub.label == 'Rencana Bantuan Lokasi Pemukiman'

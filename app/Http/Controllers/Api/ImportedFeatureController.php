@@ -14,57 +14,46 @@ class ImportedFeatureController extends Controller
      */
     public function getStructure()
     {
-        $categories = ImportedJsonFeature::select('kategori')->distinct()->pluck('kategori');
+        // Fetch all unique combinations with regency check in one go
+        $rows = ImportedJsonFeature::select(
+            'kategori',
+            'sub_kategori',
+            'sub_subkategori',
+            \Illuminate\Support\Facades\DB::raw('MAX(CASE WHEN regency_id IS NOT NULL THEN 1 ELSE 0 END) as has_regency')
+        )
+            ->groupBy('kategori', 'sub_kategori', 'sub_subkategori')
+            ->get();
 
-        $structure = [];
+        $structureMap = [];
 
-        foreach ($categories as $kategori) {
-            // Fetch unique combinations of sub_kategori and sub_subkategori
-            $rows = ImportedJsonFeature::where('kategori', $kategori)
-                ->select('sub_kategori', 'sub_subkategori')
-                ->distinct()
-                ->get();
+        foreach ($rows as $row) {
+            $kategori = $row->kategori;
+            $sub = $row->sub_kategori;
+            $subsub = $row->sub_subkategori;
 
-            $subs = [];
-            foreach ($rows as $row) {
-                // Construct the full "slug" which acts as the path
-                // Logic: sub_kategori + '/' + sub_subkategori (if exists)
-                $path = $row->sub_kategori;
-                if ($row->sub_subkategori) {
-                    $path .= '/' . $row->sub_subkategori;
-                }
-
-                // Check has_regency (optimization: simplified check)
-                // We assume if regency_id is set on ANY matching row, it's true.
-                // But rows are distinct (sub, subsub).
-                // Let's check existence just to be safe or skip it if performant enough.
-                // Re-querying per row might be slow.
-                // Alternatively, just return generic true/false or fetch regency_id presence in initial query?
-                // Let's stick to simple exists() check for now.
-
-                $hasRegency = ImportedJsonFeature::where('kategori', $kategori)
-                    ->where('sub_kategori', $row->sub_kategori)
-                    ->where('sub_subkategori', $row->sub_subkategori)
-                    ->whereNotNull('regency_id')
-                    ->exists();
-
-                $displayLabel = $row->sub_subkategori ? $row->sub_subkategori : $row->sub_kategori;
-
-                $subs[] = [
-                    'slug' => $path, // This path is sent to FE and returned in getData
-                    'label' => Str::title(str_replace('-', ' ', $displayLabel ?? 'Umum')), // Label is leaf name
-                    'has_regency' => $hasRegency
+            if (!isset($structureMap[$kategori])) {
+                $structureMap[$kategori] = [
+                    'slug' => $kategori,
+                    'label' => Str::title(str_replace('-', ' ', $kategori)),
+                    'sub_categories' => []
                 ];
             }
 
-            $structure[] = [
-                'slug' => $kategori,
-                'label' => Str::title(str_replace('-', ' ', $kategori)),
-                'sub_categories' => $subs
+            $path = $sub;
+            if ($subsub) {
+                $path .= '/' . $subsub;
+            }
+
+            $displayLabel = $subsub ? $subsub : $sub;
+
+            $structureMap[$kategori]['sub_categories'][] = [
+                'slug' => $path,
+                'label' => Str::title(str_replace('-', ' ', $displayLabel ?? 'Umum')),
+                'has_regency' => (bool)$row->has_regency
             ];
         }
 
-        return response()->json($structure);
+        return response()->json(array_values($structureMap));
     }
 
     /**
@@ -155,6 +144,11 @@ class ImportedFeatureController extends Controller
                     }
                 }
 
+                // Add video link from joined column
+                if ($item->video_link_joined) {
+                    $properties['video_360_link'] = $item->video_link_joined;
+                }
+
 
 
                 // Skip if geometry is invalid
@@ -177,7 +171,7 @@ class ImportedFeatureController extends Controller
 
         return response($jsonContent, 200, [
             'Content-Type' => 'application/json',
-            'Cache-Control' => 'no-cache, no-store, must-revalidate'
+            'Cache-Control' => 'public, max-age=3600'
         ]);
     }
 }

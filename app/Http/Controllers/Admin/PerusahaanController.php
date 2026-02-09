@@ -17,6 +17,18 @@ use Illuminate\Validation\ValidationException;
 
 class PerusahaanController extends Controller
 {
+    public function __construct()
+    {
+        // View permissions
+        $this->middleware('can:perusahaan.view')->only(['index']);
+        $this->middleware('can:perusahaan.show')->only(['show']); // Detail has separate permission if needed, but often mapped to view/show
+
+        // CUD permissions
+        $this->middleware('can:perusahaan.create')->only(['create', 'store']);
+        $this->middleware('can:perusahaan.edit')->only(['edit', 'update']);
+        $this->middleware('can:perusahaan.delete')->only(['destroy']);
+    }
+
     // INDEX
     public function index(Request $request)
     {

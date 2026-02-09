@@ -335,9 +335,11 @@
     <!-- TAB 1: PERMOHONAN -->
     <div id="tab-permohonan" class="tab-content {{ ($tab == 'permohonan' || !$tab) ? 'active' : '' }}">
         <div class="mb-2 text-end">
+             @can('permohonan.create')
              <a href="{{ route('admin.permohonan.import') }}" class="btn btn-secondary me-2">
                 <i class="ri-file-excel-2-line"></i> Import
             </a>
+            @endcan
             {{-- Tombol Buat Permohonan di-hide karena sekarang menggunakan fitur import saja --}}
             {{-- <a href="{{ route('admin.permohonan.create') }}" class="btn btn-primary">
                 <i class="ri-add-line"></i> Buat Permohonan
@@ -442,8 +444,11 @@
                                             $isRestricted = in_array($submitterRole, ['desa', 'perusahaan']);
                                         @endphp
                                         @if($isAdmin && !$isRestricted)
+                                            @can('permohonan.edit')
                                             <a href="{{ route('admin.permohonan-user.edit', [$item->permohonan_id ?? 0, $item->id]) }}"
                                                 class="btn-ico edit" title="Edit"><i class="fa-solid fa-pen-to-square"></i></a>
+                                            @endcan
+                                            @can('permohonan.delete')
                                             <form action="{{ route('admin.permohonan-user.destroy', [$item->permohonan_id ?? 0, $item->id]) }}"
                                                 method="POST" style="display:inline-block;margin:0;" class="form-delete-permohonan"
                                                 data-name="{{ $item->applicant_name }}">
@@ -452,6 +457,7 @@
                                                     <i class="fa-solid fa-trash"></i>
                                                 </button>
                                             </form>
+                                            @endcan
                                         @endif
                                     </td>
                                 </tr>
@@ -535,12 +541,14 @@
         </div>
 
         <div class="mb-2 text-end">
+            @can('perizinan.create')
             <a href="{{ route('admin.perizinan.import') }}" class="btn btn-secondary me-2">
                 <i class="ri-file-excel-2-line"></i> Import
             </a>
             <a href="{{ route('admin.perizinan.create') }}" class="btn btn-primary">
                 <i class="ri-add-line"></i> Tambah Perizinan
             </a>
+            @endcan
         </div>
 
         <section class="card">
@@ -651,7 +659,12 @@
                                         @endif
                                         <form action="{{ route('admin.perizinan.destroy', $item->id) }}" method="POST" style="display:inline-block;margin:0;" class="form-delete-perizinan" data-name="{{ $item->nama }}">
                                             @csrf @method('DELETE')
-                                            <button type="button" class="btn-ico danger btn-delete-perizinan" title="Hapus">
+                                            
+                                            <!-- Logic button delete dikasih check permission juga -->
+                                            <!-- Tapi karena form ini ada di dalam blok $canEdit, kita asumsikan yang bisa edit bisa hapus atau kita tambah check -->
+                                            <!-- Namun logic delete perizinan sebaiknya dipisah -->
+
+                                            <button type="button" class="btn-ico danger btn-delete-perizinan" title="Hapus" @disabled(auth()->user()->cannot('perizinan.delete'))>
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
                                         </form>
