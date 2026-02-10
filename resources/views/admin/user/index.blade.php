@@ -203,8 +203,12 @@
                   @endif
                 </td>
                 <td class="col-aksi">
+                  @can('pengguna.edit')
                   <a href="#" class="btn-ico edit" title="Edit" data-open="#modalEditUser_{{ $value->id }}"><i class="fa-solid fa-pen-to-square"></i></a>
+                  @endcan
+                  @can('pengguna.delete')
                   <button data-route="{{ route('admin.hak-akses.user.destroy', $value->id) }}" class="btn-ico delete" title="Hapus" onclick="destroyItem(this)"><i class="fa-solid fa-trash"></i></button>
+                  @endcan
                 </td>
               </tr>
             @endforeach

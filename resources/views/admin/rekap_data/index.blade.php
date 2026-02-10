@@ -452,6 +452,7 @@
                 @endforeach
             </select>
             <div class="action-buttons">
+                @can('rekap.export')
                 <a href="{{ route('admin.rekap-data.template') }}" class="btn-export print" style="background: #6366f1; text-decoration: none;">
                     <i class="ri-download-line"></i> Download Template
                 </a>
@@ -461,6 +462,7 @@
                 <button class="btn-export excel"><i class="ri-file-excel-2-line"></i> Export Excel</button>
                 <button class="btn-export pdf"><i class="ri-file-pdf-2-line"></i> Export PDF</button>
                 <button class="btn-export print" onclick="window.print()"><i class="ri-printer-line"></i> Cetak</button>
+                @endcan
             </div>
         </div>
 
@@ -619,9 +621,11 @@
                     Perizinan</span>
             </div>
             <div class="action-buttons">
+                @can('rekap.export')
                 <button class="btn-export excel"><i class="ri-file-excel-2-line"></i> Export Excel</button>
                 <button class="btn-export pdf"><i class="ri-file-pdf-2-line"></i> Export PDF</button>
                 <button class="btn-export print" onclick="window.print()"><i class="ri-printer-line"></i> Cetak</button>
+                @endcan
             </div>
         </div>
 

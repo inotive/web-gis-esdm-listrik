@@ -17,7 +17,7 @@ class RekapDataController extends Controller
     {
         $this->middleware('can:rekap.view')->only(['index', 'detail']);
         // If export exists:
-        $this->middleware('can:rekap.export')->only(['export', 'downloadTemplate']);
+        $this->middleware('can:rekap.export')->only(['export', 'downloadTemplate', 'import']);
         // If import exists (usually covered by create or manage):
         // Assuming rekap.view or separate permission. Seeder has rekap.view, .export etc.
         // Let's check seeder/permission list to be sure.

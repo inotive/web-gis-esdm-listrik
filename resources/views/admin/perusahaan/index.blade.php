@@ -743,10 +743,12 @@
                                     @endif
                                 </td>
                                 <td class="col-aksi">
+                                    @can('perusahaan.show')
                                     <a href="{{ route('admin.perusahaan.show', $perusahaan) }}" class="btn-ico detail"
                                         title="Detail">
                                         <i class="fa-solid fa-eye"></i>
                                     </a>
+                                    @endcan
                                     @can('perusahaan.edit')
                                     <button type="button" class="btn-ico edit btn-edit-perusahaan"
                                         data-id="{{ $perusahaan->id }}" data-nama="{{ $perusahaan->nama }}"

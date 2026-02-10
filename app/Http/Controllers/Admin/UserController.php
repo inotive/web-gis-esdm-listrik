@@ -13,6 +13,15 @@ use Illuminate\Support\Facades\Validator;
 class UserController extends Controller
 {
     use UploadFile;
+    
+    public function __construct()
+    {
+        $this->middleware('can:user.view')->only(['index']);
+        $this->middleware('can:pengguna.create')->only(['create', 'store']);
+        $this->middleware('can:pengguna.edit')->only(['edit', 'update']);
+        $this->middleware('can:pengguna.delete')->only(['destroy']);
+        $this->middleware('can:pengguna.approve')->only(['approve', 'reject']);
+    }
 
     public function index()
     {
@@ -101,6 +110,14 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
+        // Proteksi: Hanya superadmin yang boleh edit user superadmin lain
+        if ($user->hasRole('superadmin') && !auth()->user()->hasRole('superadmin')) {
+            $notifikasi = [
+                'pesan' => 'Anda tidak memiliki akses untuk mengedit akun Super Admin!',
+                'alert' => "error"
+            ];
+            return redirect()->back()->with($notifikasi);
+        }
         $validator = Validator::make($request->all(), [
             'email'    => 'required|email|unique:users,email,' . $user->id,
             'username' => 'required|alpha_dash|unique:users,username,' . $user->id,
@@ -151,6 +168,16 @@ class UserController extends Controller
         $data['image'] = $imageProfile;
 
         $user->fill($data)->update();
+        
+        // Proteksi: Hanya superadmin yang bisa assign role superadmin
+        if (in_array('superadmin', $request->role ?? []) && !auth()->user()->hasRole('superadmin')) {
+             $notifikasi = [
+                'pesan' => 'Anda tidak memiliki akses untuk menjadikan user sebagai Super Admin!',
+                'alert' => "error"
+            ];
+            return redirect()->back()->with($notifikasi);
+        }
+        
         $user->syncRoles($request->role);
 
         $notifikasi = [
@@ -161,6 +188,15 @@ class UserController extends Controller
     }
 
     public function destroy(User $user){
+        // Proteksi: Jangan hapus user Super Admin
+        if ($user->hasRole('superadmin')) {
+            $notifikasi = [
+                'pesan' => 'Akun Super Admin tidak dapat dihapus!',
+                'alert' => "error"
+            ];
+            return redirect()->back()->with($notifikasi);
+        }
+
         if ($user->image) {
             Storage::disk('public')->delete('profile/' . $user->image);
         }
