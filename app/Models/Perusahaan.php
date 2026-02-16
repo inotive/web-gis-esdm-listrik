@@ -19,12 +19,22 @@ class Perusahaan extends Model
         'kabupaten_kota',
     ];
 
+
+
     /**
      * Relationship: Perusahaan memiliki banyak PembangkitListrik
      */
     public function pembangkitListriks(): HasMany
     {
         return $this->hasMany(PembangkitListrik::class, 'perusahaan_id');
+    }
+
+    /**
+     * Relationship: Perusahaan memiliki banyak User
+     */
+    public function users(): HasMany
+    {
+        return $this->hasMany(User::class, 'perusahaan_id');
     }
 
     /**

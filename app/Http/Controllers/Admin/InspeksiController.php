@@ -10,6 +10,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use App\Jobs\ProcessNewInspeksiNotification;
+use App\Jobs\ProcessInspeksiFeedbackNotification;
+use App\Jobs\ProcessInspeksiStatusNotification;
 
 class InspeksiController extends Controller
 {
@@ -105,7 +108,10 @@ class InspeksiController extends Controller
             $data['lampiran'] = $request->file('lampiran')->store('inspeksi/lampiran', 'public');
         }
 
-        Inspeksi::create($data);
+        $inspeksi = Inspeksi::create($data);
+
+        // Dispatch notification job
+        ProcessNewInspeksiNotification::dispatch($inspeksi->id);
 
         return redirect()->route('admin.inspeksi.index')->with('success', 'Data inspeksi berhasil ditambahkan.');
     }
@@ -160,7 +166,13 @@ class InspeksiController extends Controller
             $data['lampiran'] = $request->file('lampiran')->store('inspeksi/lampiran', 'public');
         }
 
+        $oldStatus = $inspeksi->status;
         $inspeksi->update($data);
+        $newStatus = $inspeksi->status;
+
+        if ($oldStatus !== $newStatus) {
+            ProcessInspeksiStatusNotification::dispatch($inspeksi->id, $oldStatus, $newStatus);
+        }
 
         return redirect()->route('admin.inspeksi.index')->with('success', 'Data inspeksi berhasil diperbarui.');
     }
@@ -213,6 +225,9 @@ class InspeksiController extends Controller
             'file_upload' => $filePath,
         ]);
 
+        // Dispatch notification job
+        ProcessInspeksiFeedbackNotification::dispatch($inspeksi->id);
+
         return back()->with('success', 'Feedback berhasil dikirim.');
     }
 
@@ -228,6 +243,7 @@ class InspeksiController extends Controller
             'berita_acara' => ['nullable', 'string'],
             'lampiran' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png,doc,docx', 'max:5120'], // 5MB max
             'catatan' => ['nullable', 'string'],
+            'status' => ['sometimes', 'string', 'max:50'],
         ], [], [
             'tanggal' => 'Tanggal',
             'referensi_izin' => 'Referensi Izin',
