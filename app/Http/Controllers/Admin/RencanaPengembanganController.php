@@ -15,7 +15,7 @@ class RencanaPengembanganController extends Controller
     public function index(Request $request)
     {
         abort_unless(\Illuminate\Support\Facades\Auth::user()->can('rencana_pengembangan.view'), 403, 'Unauthorized');
-        
+
         $query = RencanaPengembanganBantuan::with(['regency', 'district', 'village']);
 
         // Top filter bar filters
@@ -97,7 +97,7 @@ class RencanaPengembanganController extends Controller
         // Get filter options
         $regencies = RegRegency::orderBy('name')->get(['id', 'name']);
         $districts = RegDistrict::orderBy('name')->get(['id', 'name']);
-        $prioritasOptions = ['Prioritas 1 PLTS', 'Prioritas 1 SUTM'];
+        $prioritasOptions = ['Prioritas 1 PLTS', 'Prioritas 1 SUTM', 'Prioritas 2 PLTS', 'Prioritas 2 SUTM', 'Prioritas 3 PLTS', 'Prioritas 3 SUTM'];
 
         // Get unique values from database for filters (maintain score order 5 to 1)
         $uniqueAksesibilitas = collect(array_keys(RencanaPengembanganBantuan::getAksesibilitasOptions()));

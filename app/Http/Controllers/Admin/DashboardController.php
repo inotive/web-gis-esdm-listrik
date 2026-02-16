@@ -137,8 +137,8 @@ class DashboardController extends Controller
                     'total_jaringan_km' => $perusahaan->infrastrukturJaringans->sum('panjang_jaringan'),
                     'total_pembangkit' => $perusahaan->pembangkitLokals->count(),
                     'total_infrastruktur' => $perusahaan->gardus->count() +
-                                            $perusahaan->infrastrukturJaringans->count() +
-                                            $perusahaan->pembangkitLokals->count(),
+                        $perusahaan->infrastrukturJaringans->count() +
+                        $perusahaan->pembangkitLokals->count(),
                 ];
             })
             ->sortByDesc('total_infrastruktur')
@@ -202,11 +202,11 @@ class DashboardController extends Controller
         // ==========================================
         // TOP 10 PRIORITAS (Rencana Pengembangan Bantuan)
         // ==========================================
-        // $topPrioritas = RencanaPengembanganBantuan::with(['regency', 'district', 'village'])
-        //     ->orderBy('total_skor', 'desc')
-        //     ->take(10)
-        //     ->get();
-        $topPrioritas = collect([]);
+        $topPrioritas = RencanaPengembanganBantuan::with(['regency', 'district', 'village'])
+            ->orderBy('total_skor', 'desc')
+            ->take(10)
+            ->get();
+        // $topPrioritas = collect([]);
 
         return view('admin.dashboard.index', [
             'title' => 'Dashboard Admin',

@@ -359,12 +359,14 @@
             <div class="summary-label">Menunggu Approval</div>
         </div>
         <div class="summary-card" style="border-left: 4px solid #10B981;">
-            <div class="summary-icon" style="background: #D1FAE5; color: #10B981;"><i class="ri-checkbox-circle-line"></i></div>
+            <div class="summary-icon" style="background: #D1FAE5; color: #10B981;"><i class="ri-checkbox-circle-line"></i>
+            </div>
             <div class="summary-value">{{ number_format($permohonanApproved) }}</div>
             <div class="summary-label">Disetujui</div>
         </div>
         <div class="summary-card" style="border-left: 4px solid #EF4444;">
-            <div class="summary-icon" style="background: #FEE2E2; color: #EF4444;"><i class="ri-close-circle-line"></i></div>
+            <div class="summary-icon" style="background: #FEE2E2; color: #EF4444;"><i class="ri-close-circle-line"></i>
+            </div>
             <div class="summary-value">{{ number_format($permohonanRejected) }}</div>
             <div class="summary-label">Ditolak</div>
         </div>
@@ -712,7 +714,8 @@
                                             class="stats-badge badge-green">{{ number_format($perusahaan['total_jaringan_km'], 2) }}</span>
                                     </td>
                                     <td class="text-center">
-                                        <span class="stats-badge badge-orange">{{ $perusahaan['total_pembangkit'] }}</span>
+                                        <span
+                                            class="stats-badge badge-orange">{{ $perusahaan['total_pembangkit'] }}</span>
                                     </td>
                                     <td class="text-center">
                                         <strong style="color: #1F2937;">{{ $perusahaan['total_infrastruktur'] }}</strong>
@@ -923,8 +926,8 @@
                             Total Skor</th>
                         <th style="padding: 14px 16px; text-align: center; font-weight: 600; white-space: nowrap;">
                             Prioritas</th>
-                        <th style="padding: 14px 16px; text-align: center; font-weight: 600; white-space: nowrap;">
-                            Aksi</th>
+                        {{-- <th style="padding: 14px 16px; text-align: center; font-weight: 600; white-space: nowrap;">
+                            Aksi</th> --}}
                     </tr>
                 </thead>
                 <tbody>
@@ -977,12 +980,12 @@
                                     {{ $item->prioritas ?? '-' }}
                                 </span>
                             </td>
-                            <td style="padding: 14px 16px; text-align: center; white-space: nowrap;">
+                            {{-- <td style="padding: 14px 16px; text-align: center; white-space: nowrap;">
                                 <a href="{{ route('admin.rencana-pengembangan.index') }}"
                                     style="display: inline-block; padding: 6px 12px; background: #7B1FA2; color: white; border-radius: 6px; font-weight: 600; font-size: 12px; text-decoration: none;">
                                     Lihat Detail
                                 </a>
-                            </td>
+                            </td> --}}
                         </tr>
                     @empty
                         <tr>
