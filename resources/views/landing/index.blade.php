@@ -724,7 +724,6 @@
 
                                 // Smart Renderer Assignment
                                 layer.watch("visible", (visible) => {
-                                    console.log(cat);
                                     if (visible) {
                                         layer.load().then(() => {
                                             const type = layer
@@ -748,6 +747,10 @@
                                                 if (sub.label ===
                                                     'Rencana Bantuan Lokasi Pemukiman'
                                                 ) {
+                                                    layer
+                                                        .legendEnabled =
+                                                        true;
+
                                                     layer.renderer = {
                                                         type: "unique-value",
                                                         field: "color",
@@ -786,14 +789,18 @@
                                                     };
                                                 } else {
                                                     // For other point layers, use SimpleRenderer with the category color
+                                                    layer
+                                                        .legendEnabled =
+                                                        false;
+
                                                     layer.renderer = {
                                                         type: "simple",
                                                         label: sub
                                                             .slug
                                                             .split(
                                                                 "/"
-                                                                )[
-                                                            0],
+                                                            )[
+                                                                0],
                                                         symbol: {
                                                             type: "picture-marker",
                                                             url: defaultSvgUrl,
@@ -804,6 +811,9 @@
                                                 }
                                             } else if (type ===
                                                 "polyline") {
+                                                layer
+                                                    .legendEnabled =
+                                                    false;
                                                 layer.renderer = {
                                                     type: "simple",
                                                     symbol: {
@@ -815,6 +825,9 @@
                                                 };
                                             } else if (type ===
                                                 "polygon") {
+                                                layer
+                                                    .legendEnabled =
+                                                    false;
                                                 // Fix color alpha for polygon fill
                                                 const fillColor = [...
                                                     color
