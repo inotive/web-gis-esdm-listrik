@@ -724,6 +724,7 @@
 
                                 // Smart Renderer Assignment
                                 layer.watch("visible", (visible) => {
+                                    console.log(cat);
                                     if (visible) {
                                         layer.load().then(() => {
                                             const type = layer
@@ -788,7 +789,11 @@
                                                     layer.renderer = {
                                                         type: "simple",
                                                         label: sub
-                                                            .label,
+                                                            .slug
+                                                            .split(
+                                                                "/"
+                                                                )[
+                                                            0],
                                                         symbol: {
                                                             type: "picture-marker",
                                                             url: defaultSvgUrl,
