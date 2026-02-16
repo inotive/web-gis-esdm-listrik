@@ -752,8 +752,10 @@
                                                         width: "32px",
                                                         height: "32px"
                                                     },
+                                                    defaultLabel: "Lainnya",
                                                     uniqueValueInfos: [{
                                                             value: "yellow",
+                                                            label: "SUTM",
                                                             symbol: {
                                                                 type: "picture-marker",
                                                                 url: createLocationPinSvg(
@@ -765,6 +767,7 @@
                                                         },
                                                         {
                                                             value: "red",
+                                                            label: "PLTS",
                                                             symbol: {
                                                                 type: "picture-marker",
                                                                 url: createLocationPinSvg(
@@ -1280,6 +1283,7 @@
                     expandIconClass: "esri-icon-layer-list",
                     expandTooltip: "Legenda"
                 });
+                console.log(legendExpand);
                 view.ui.add(legendExpand, "bottom-right");
 
 
