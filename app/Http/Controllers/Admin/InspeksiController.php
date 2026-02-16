@@ -105,7 +105,9 @@ class InspeksiController extends Controller
 
         // Handle lampiran file upload
         if ($request->hasFile('lampiran')) {
-            $data['lampiran'] = $request->file('lampiran')->store('inspeksi/lampiran', 'public');
+            $file = $request->file('lampiran');
+            $filename = $file->getClientOriginalName();
+            $data['lampiran'] = $file->storeAs('inspeksi/lampiran', $filename, 'public');
         }
 
         $inspeksi = Inspeksi::create($data);
@@ -163,10 +165,14 @@ class InspeksiController extends Controller
             if ($inspeksi->lampiran && Storage::disk('public')->exists($inspeksi->lampiran)) {
                 Storage::disk('public')->delete($inspeksi->lampiran);
             }
-            $data['lampiran'] = $request->file('lampiran')->store('inspeksi/lampiran', 'public');
+            $file = $request->file('lampiran');
+            $filename = $file->getClientOriginalName();
+            $data['lampiran'] = $file->storeAs('inspeksi/lampiran', $filename, 'public');
         }
 
         $oldStatus = $inspeksi->status;
+
+        dd($data);
         $inspeksi->update($data);
         $newStatus = $inspeksi->status;
 
@@ -214,7 +220,9 @@ class InspeksiController extends Controller
 
         $filePath = null;
         if ($request->hasFile('file_upload')) {
-            $filePath = $request->file('file_upload')->store('inspeksi/feedback', 'public');
+            $file = $request->file('file_upload');
+            $filename = $file->getClientOriginalName();
+            $filePath = $file->storeAs('inspeksi/feedback', $filename, 'public');
         }
 
         $inspeksi->feedback()->create([
