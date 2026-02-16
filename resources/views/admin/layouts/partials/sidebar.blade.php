@@ -79,6 +79,10 @@
                 <span class="menu-icon"><i class="ri-file-add-line" aria-hidden="true"></i></span>
                 <span class="menu-label">Pengajuan Permohonan</span>
             </a>
+            <a class="menu-item {{ nav_active('admin.inspeksi.*') }}" href="{{ route('admin.inspeksi.index') }}">
+                <span class="menu-icon"><i class="ri-file-search-line" aria-hidden="true"></i></span>
+                <span class="menu-label">Inspeksi</span>
+            </a>
         @endif
 
 

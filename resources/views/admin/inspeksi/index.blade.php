@@ -425,10 +425,10 @@
         </div>
         <div class="page-actions">
             @can('inspeksi.create')
-            <a href="{{ route('admin.inspeksi.create') }}" class="btn btn-primary btn-add">
-                <i class="ri-add-line"></i>
-                Tambah Inspeksi
-            </a>
+                <a href="{{ route('admin.inspeksi.create') }}" class="btn btn-primary btn-add">
+                    <i class="ri-add-line"></i>
+                    Tambah Inspeksi
+                </a>
             @endcan
         </div>
     </div>
@@ -509,20 +509,24 @@
                                         <i class="fa-solid fa-eye"></i>
                                     </a>
                                     @can('inspeksi.edit')
-                                    <a href="{{ route('admin.inspeksi.edit', $inspeksi) }}" class="btn-ico edit"
-                                        title="Edit">
-                                        <i class="fa-solid fa-pen-to-square"></i>
-                                    </a>
+                                        @if (!auth()->user()->hasRole('perusahaan'))
+                                            <a href="{{ route('admin.inspeksi.edit', $inspeksi) }}" class="btn-ico edit"
+                                                title="Edit">
+                                                <i class="fa-solid fa-pen-to-square"></i>
+                                            </a>
+                                        @endif
                                     @endcan
                                     @can('inspeksi.delete')
-                                    <form action="{{ route('admin.inspeksi.destroy', $inspeksi) }}" method="POST"
-                                        style="display:inline-block;margin:0;" class="form-delete">
-                                        @csrf @method('DELETE')
-                                        <button type="button" class="btn-ico danger btn-delete" title="Hapus"
-                                            data-id="{{ $inspeksi->id }}" data-nama="{{ $inspeksi->referensi_izin }}">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                    </form>
+                                        @if (!auth()->user()->hasRole('perusahaan'))
+                                            <form action="{{ route('admin.inspeksi.destroy', $inspeksi) }}" method="POST"
+                                                style="display:inline-block;margin:0;" class="form-delete">
+                                                @csrf @method('DELETE')
+                                                <button type="button" class="btn-ico danger btn-delete" title="Hapus"
+                                                    data-id="{{ $inspeksi->id }}" data-nama="{{ $inspeksi->referensi_izin }}">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        @endif
                                     @endcan
                                 </td>
                             </tr>

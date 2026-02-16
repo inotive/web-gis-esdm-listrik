@@ -23,9 +23,9 @@ class InspeksiController extends Controller
         $perusahaanId = $request->get('perusahaan_id');
         $tanggalDari = $request->get('tanggal_dari');
         $tanggalSampai = $request->get('tanggal_sampai');
-        
+
         // Authorization
-        abort_unless(Auth::user()->can('inspeksi.view'), 403, 'Unauthorized');
+        // abort_unless(Auth::user()->can('inspeksi.view'), 403, 'Unauthorized');
 
         $query = Inspeksi::with(['perusahaan', 'pengguna']);
 
@@ -43,6 +43,11 @@ class InspeksiController extends Controller
         // Filter by perusahaan
         if ($perusahaanId) {
             $query->where('perusahaan_id', $perusahaanId);
+        }
+
+        // Filter for logged-in company user
+        if (Auth::user()->hasRole('perusahaan') && Auth::user()->perusahaan_id) {
+            $query->where('perusahaan_id', Auth::user()->perusahaan_id);
         }
 
         // Filter by date range
@@ -110,9 +115,9 @@ class InspeksiController extends Controller
      */
     public function show(Inspeksi $inspeksi)
     {
-        abort_unless(Auth::user()->can('inspeksi.view'), 403, 'Unauthorized');
+        // abort_unless(Auth::user()->can('inspeksi.view'), 403, 'Unauthorized');
 
-        $inspeksi->load(['perusahaan', 'pengguna']);
+        $inspeksi->load(['perusahaan', 'pengguna', 'feedback']);
 
         return view('admin.inspeksi.show', [
             'title' => 'Detail Inspeksi',
@@ -175,6 +180,40 @@ class InspeksiController extends Controller
         $inspeksi->delete();
 
         return redirect()->route('admin.inspeksi.index')->with('success', 'Data inspeksi berhasil dihapus.');
+    }
+
+    /**
+     * Store feedback for inspection
+     */
+    public function storeFeedback(Request $request, Inspeksi $inspeksi)
+    {
+        $request->validate([
+            'nama' => ['required', 'string', 'max:255'],
+            'posisi' => ['required', 'string', 'max:255'],
+            'kontak' => ['required', 'string', 'max:255'],
+            'catatan' => ['required', 'string'],
+            'file_upload' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png,doc,docx', 'max:5120'],
+        ]);
+
+        // Authorization check
+        if (Auth::user()->hasRole('perusahaan') && Auth::user()->perusahaan_id !== $inspeksi->perusahaan_id) {
+            abort(403);
+        }
+
+        $filePath = null;
+        if ($request->hasFile('file_upload')) {
+            $filePath = $request->file('file_upload')->store('inspeksi/feedback', 'public');
+        }
+
+        $inspeksi->feedback()->create([
+            'nama' => $request->nama,
+            'posisi' => $request->posisi,
+            'kontak' => $request->kontak,
+            'catatan' => $request->catatan,
+            'file_upload' => $filePath,
+        ]);
+
+        return back()->with('success', 'Feedback berhasil dikirim.');
     }
 
     /**

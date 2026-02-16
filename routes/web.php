@@ -305,6 +305,7 @@ Route::group(['middleware' => ['auth', 'verified', 'verified_user'], 'as' => 'ad
         Route::get('/{inspeksi}/edit', [InspeksiController::class, 'edit'])->name('edit');
         Route::put('/{inspeksi}', [InspeksiController::class, 'update'])->name('update');
         Route::delete('/{inspeksi}', [InspeksiController::class, 'destroy'])->name('destroy');
+        Route::post('/{inspeksi}/feedback', [InspeksiController::class, 'storeFeedback'])->name('feedback.store');
     });
 
     // Permohonan User (Old - for admin to manage)

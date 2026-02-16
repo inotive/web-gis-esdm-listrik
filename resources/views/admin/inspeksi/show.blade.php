@@ -292,10 +292,20 @@
                 <i class="ri-arrow-left-line"></i>
                 Kembali
             </a>
-            {{-- <a href="{{ route('admin.inspeksi.edit', $inspeksi) }}" class="btn-edit">
-                <i class="ri-edit-line"></i>
-                Edit Inspeksi
-            </a> --}}
+
+            @if (auth()->user()->hasRole('perusahaan'))
+                @if ($inspeksi->feedback)
+                    <button class="btn-edit" style="background:#10B981; cursor:default; border:none; color:white;">
+                        <i class="ri-check-line"></i>
+                        Feedback Terkirim
+                    </button>
+                @else
+                    <button type="button" class="btn-edit" data-bs-toggle="modal" data-bs-target="#modalFeedback">
+                        <i class="ri-message-2-line"></i>
+                        Berikan Feedback
+                    </button>
+                @endif
+            @endif
         </div>
     </div>
 
@@ -428,5 +438,136 @@
                 </div>
             @endif
         </div>
+
+        {{-- Feedback Perusahaan --}}
+        @if ($inspeksi->feedback)
+            <div class="content-card">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="ri-message-2-line"></i>
+                    </div>
+                    <h3 class="section-title">Feedback Perusahaan</h3>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label"><i class="ri-user-line"></i> Nama</div>
+                        <div class="info-value">{{ $inspeksi->feedback->nama }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label"><i class="ri-briefcase-line"></i> Posisi</div>
+                        <div class="info-value">{{ $inspeksi->feedback->posisi }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label"><i class="ri-phone-line"></i> Kontak</div>
+                        <div class="info-value">{{ $inspeksi->feedback->kontak }}</div>
+                    </div>
+                </div>
+
+                <div class="content-block mt-3">
+                    <div class="info-label mb-2"><i class="ri-sticky-note-line"></i> Catatan</div>
+                    {{ $inspeksi->feedback->catatan }}
+                </div>
+
+                @if ($inspeksi->feedback->file_upload)
+                    <div class="file-section mt-3">
+                        <div class="file-icon"><i class="ri-file-text-line"></i></div>
+                        <div class="file-info">
+                            <div class="file-label">Lampiran Feedback</div>
+                            <div class="file-name">Dokumen Pendukung</div>
+                        </div>
+                        <a href="{{ Storage::url($inspeksi->feedback->file_upload) }}" target="_blank"
+                            class="file-download">
+                            <i class="ri-download-2-line"></i> Download
+                        </a>
+                    </div>
+                @endif
+            </div>
+        @endif
+
+        {{-- Modal Feedback --}}
+        @if (auth()->user()->hasRole('perusahaan') && !$inspeksi->feedback)
+            <div class="modal fade" id="modalFeedback" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <form action="{{ route('admin.inspeksi.feedback.store', $inspeksi) }}" method="POST"
+                            enctype="multipart/form-data" id="formFeedback">
+                            @csrf
+                            <div class="modal-header">
+                                <h5 class="modal-title">Berikan Feedback</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Nama <span class="text-danger">*</span></label>
+                                        <input type="text" name="nama" class="form-control" required
+                                            value="{{ auth()->user()->name }}">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Posisi <span class="text-danger">*</span></label>
+                                        <input type="text" name="posisi" class="form-control" required>
+                                    </div>
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label">Kontak (HP/Email) <span
+                                                class="text-danger">*</span></label>
+                                        <input type="text" name="kontak" class="form-control" required
+                                            value="{{ auth()->user()->email }}">
+                                    </div>
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label">Catatan <span class="text-danger">*</span></label>
+                                        <textarea name="catatan" rows="4" class="form-control" required></textarea>
+                                    </div>
+                                    <div class="col-md-12 mb-3">
+                                        <label class="form-label">File Pendukung (Opsional)</label>
+                                        <input type="file" name="file_upload" class="form-control"
+                                            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                                        <small class="text-muted">Max: 5MB</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-primary">Kirim Feedback</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            $('#formFeedback').on('submit', function(e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Kirim Feedback?',
+                    text: "Pastikan data yang Anda masukkan sudah benar.",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Kirim',
+                    cancelButtonText: 'Batal',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.submit();
+                    }
+                });
+            });
+
+            @if (session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: '{{ session('success') }}',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            @endif
+        });
+    </script>
+@endpush
