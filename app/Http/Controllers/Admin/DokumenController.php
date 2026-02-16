@@ -64,11 +64,11 @@ class DokumenController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('can:dokumen.view')->only(['index', 'show']); 
+        $this->middleware('can:dokumen.view')->only(['index', 'show']);
         // Note: download logic is checked in method if needed, but generally view implies access
-        // Removal of dokumen.download means we rely on view or open access? 
+        // Removal of dokumen.download means we rely on view or open access?
         // User asked to remove permission check for download, so we DON'T add it here.
-        
+
         $this->middleware('can:dokumen.create')->only(['create', 'store', 'storeFolder', 'storeFiles']);
         $this->middleware('can:dokumen.edit')->only(['edit', 'update']);
         $this->middleware('can:dokumen.delete')->only(['destroy']);
@@ -347,7 +347,7 @@ class DokumenController extends Controller
             $filePath = 'dokumen/' . $fileName;
 
             Dokumen::create([
-                'nama' => $file->getClientOriginalName(),
+                'nama' => $fileName,
                 'tipe' => 'file',
                 'parent_id' => $parentId,
                 'path' => $filePath, // Simpan path lengkap
