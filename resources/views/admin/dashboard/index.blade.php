@@ -1004,6 +1004,7 @@
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const greenColor = '#17C653';
@@ -1190,6 +1191,7 @@
 
                 new Chart(desaCtx, {
                     type: 'bar',
+                    plugins: [ChartDataLabels],
                     data: {
                         labels: elektrifikasiData.map(d => d.name),
                         datasets: [{
@@ -1222,6 +1224,18 @@
                                         return context.dataset.label + ': ' + context.parsed.y +
                                             ' desa';
                                     }
+                                }
+                            },
+                            datalabels: {
+                                anchor: 'end',
+                                align: 'top',
+                                color: '#64748B',
+                                font: {
+                                    weight: 'bold',
+                                    size: 10
+                                },
+                                formatter: function(value, context) {
+                                    return value > 0 ? value + ' desa' : '';
                                 }
                             }
                         },
