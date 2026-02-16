@@ -46,9 +46,16 @@ class ImportedFeatureController extends Controller
 
             $displayLabel = $subsub ? $subsub : $sub;
 
+            $label = Str::title(str_replace('-', ' ', $displayLabel ?? 'Umum'));
+
+            // Rename specific label as requested
+            if ($label === 'Kondisi Titik Pemukiman Non Listrik Pln') {
+                $label = 'Kondisi Titik Pemukiman Belum Berlistrik PLN 2025';
+            }
+
             $structureMap[$kategori]['sub_categories'][] = [
                 'slug' => $path,
-                'label' => Str::title(str_replace('-', ' ', $displayLabel ?? 'Umum')),
+                'label' => $label,
                 'has_regency' => (bool)$row->has_regency
             ];
         }

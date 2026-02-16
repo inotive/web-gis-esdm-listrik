@@ -215,6 +215,7 @@
                         layerTitle = attrs.H_Survei;
                     }
 
+
                     const buildRow = (label, value) =>
                         `<div class="dm-row"><div class="dm-key">${label}</div><div class="dm-val">${value}</div></div>`;
                     let rows = '';
@@ -258,7 +259,7 @@
                         Object.entries(attrs)
                             .filter(([k]) => k !== 'link_dokumen')
                             .forEach(([k, v]) => {
-                                otherRows.push(buildRow(k, escapeHtml(v)));
+                                otherRows.push(buildRow(k.replace(/_/g, ' '), escapeHtml(v)));
                             });
 
                         rows = [...linkRows, ...otherRows].join('');
@@ -662,10 +663,11 @@
                         // Convert structure to layerCategories format and create layers
                         structure.forEach((cat) => {
                             const catLayers = [];
+                            if (cat.slug == "kondisi-titik-pemukiman-non-listrik-pln") {
+                                cat.label = "Kondisi Titik Pemukiman Belum Berlistrik PLN 2025";
+                            }
 
                             cat.sub_categories.forEach((sub) => {
-                                console.log(sub.label ==
-                                    'Status Desa Berlistrik Dengan Bantuan');
                                 // Filter Restricted Layers for Non-Admin
                                 if (!isAdmin && !isSuperAdmin) {
                                     if (sub.label ==
@@ -675,7 +677,6 @@
                                         return;
                                     }
                                 }
-
                                 // Define dynamic layer
                                 const layerUrl =
                                     `{{ url('/api/features/data') }}?kategori=${encodeURIComponent(cat.slug)}&sub_kategori=${encodeURIComponent(sub.slug)}`;
@@ -1283,7 +1284,6 @@
                     expandIconClass: "esri-icon-layer-list",
                     expandTooltip: "Legenda"
                 });
-                console.log(legendExpand);
                 view.ui.add(legendExpand, "bottom-right");
 
 
@@ -1308,7 +1308,8 @@
 
                 // Feature Count Widget
                 const featureCountWidget = document.createElement('div');
-                featureCountWidget.className = 'feature-count-widget esri-component esri-widget';
+                featureCountWidget.className =
+                    'feature-count-widget esri-component esri-widget';
                 featureCountWidget.innerHTML = `
                    <div class="fc-icon">📊</div>
                    <div class="fc-content">
@@ -1355,7 +1356,8 @@
                 // Distance measurement button
                 const measureBtn = document.createElement('div');
                 measureBtn.className = 'measure-btn';
-                measureBtn.innerHTML =
+                measureBtn
+                    .innerHTML =
                     '📏 Ukur Jarak';
                 measureBtn.title = 'Klik untuk mengukur jarak dan menghitung biaya';
 
@@ -1571,10 +1573,10 @@
                     const videoUrl = linkElement.getAttribute('data-video-url');
                     const videoTitle = linkElement.getAttribute('data-video-title');
 
-                    console.log('Video 360 Link Clicked:', {
-                        videoUrl,
-                        videoTitle
-                    });
+                    // console.log('Video 360 Link Clicked:', {
+                    //     videoUrl,
+                    //     videoTitle
+                    // });
 
                     if (videoUrl) {
                         openVideo360Modal(videoUrl, videoTitle);
