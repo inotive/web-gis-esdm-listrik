@@ -743,43 +743,60 @@
                                                     createLocationPinSvg(
                                                         color);
 
-                                                // Create UniqueValueRenderer to handle per-feature colors
-                                                layer.renderer = {
-                                                    type: "unique-value",
-                                                    field: "color",
-                                                    defaultSymbol: {
-                                                        type: "picture-marker",
-                                                        url: defaultSvgUrl,
-                                                        width: "32px",
-                                                        height: "32px"
-                                                    },
-                                                    defaultLabel: "Lainnya",
-                                                    uniqueValueInfos: [{
-                                                            value: "yellow",
-                                                            label: "SUTM",
-                                                            symbol: {
-                                                                type: "picture-marker",
-                                                                url: createLocationPinSvg(
-                                                                    "yellow"
-                                                                ),
-                                                                width: "32px",
-                                                                height: "32px"
-                                                            }
+                                                // Create UniqueValueRenderer only for specific layer that needs it
+                                                if (sub.label ===
+                                                    'Rencana Bantuan Lokasi Pemukiman'
+                                                ) {
+                                                    layer.renderer = {
+                                                        type: "unique-value",
+                                                        field: "color",
+                                                        defaultSymbol: {
+                                                            type: "picture-marker",
+                                                            url: defaultSvgUrl,
+                                                            width: "32px",
+                                                            height: "32px"
                                                         },
-                                                        {
-                                                            value: "red",
-                                                            label: "PLTS",
-                                                            symbol: {
-                                                                type: "picture-marker",
-                                                                url: createLocationPinSvg(
-                                                                    "red"
-                                                                ),
-                                                                width: "32px",
-                                                                height: "32px"
+                                                        defaultLabel: "Lainnya",
+                                                        uniqueValueInfos: [{
+                                                                value: "yellow",
+                                                                label: "SUTM",
+                                                                symbol: {
+                                                                    type: "picture-marker",
+                                                                    url: createLocationPinSvg(
+                                                                        "yellow"
+                                                                    ),
+                                                                    width: "32px",
+                                                                    height: "32px"
+                                                                }
+                                                            },
+                                                            {
+                                                                value: "red",
+                                                                label: "PLTS",
+                                                                symbol: {
+                                                                    type: "picture-marker",
+                                                                    url: createLocationPinSvg(
+                                                                        "red"
+                                                                    ),
+                                                                    width: "32px",
+                                                                    height: "32px"
+                                                                }
                                                             }
+                                                        ]
+                                                    };
+                                                } else {
+                                                    // For other point layers, use SimpleRenderer with the category color
+                                                    layer.renderer = {
+                                                        type: "simple",
+                                                        label: sub
+                                                            .label,
+                                                        symbol: {
+                                                            type: "picture-marker",
+                                                            url: defaultSvgUrl,
+                                                            width: "32px",
+                                                            height: "32px"
                                                         }
-                                                    ]
-                                                };
+                                                    };
+                                                }
                                             } else if (type ===
                                                 "polyline") {
                                                 layer.renderer = {

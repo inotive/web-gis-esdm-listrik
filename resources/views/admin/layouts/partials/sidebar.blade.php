@@ -48,28 +48,28 @@
         </a>
 
         @can('dokumen.view')
-        <a class="menu-item {{ nav_active('admin.dokumen.*') }}" href="{{ route('admin.dokumen.index') }}">
-            <span class="menu-icon"><i class="ri-file-text-line" aria-hidden="true"></i></span>
-            <span class="menu-label">Dokumen</span>
-        </a>
+            <a class="menu-item {{ nav_active('admin.dokumen.*') }}" href="{{ route('admin.dokumen.index') }}">
+                <span class="menu-icon"><i class="ri-file-text-line" aria-hidden="true"></i></span>
+                <span class="menu-label">Dokumen</span>
+            </a>
         @endcan
 
 
         @if (!in_array($userRole, ['desa', 'perusahaan']))
             @can(['permohonan.view', 'perizinan.view'])
-            <a class="menu-item {{ nav_active('admin.permohonan.*', 'admin.perizinan.*') }}"
-                href="{{ route('admin.permohonan.index') }}">
-                <span class="menu-icon"><i class="ri-file-list-3-line" aria-hidden="true"></i></span>
-                <span class="menu-label">Permohonan dan Perizinan</span>
-            </a>
+                <a class="menu-item {{ nav_active('admin.permohonan.*', 'admin.perizinan.*') }}"
+                    href="{{ route('admin.permohonan.index') }}">
+                    <span class="menu-icon"><i class="ri-file-list-3-line" aria-hidden="true"></i></span>
+                    <span class="menu-label">Permohonan dan Perizinan</span>
+                </a>
             @endcan
         @endif
 
         @can('rekap.view')
-        <a class="menu-item {{ nav_active('admin.rekap-data.*') }}" href="{{ route('admin.rekap-data.index') }}">
-            <span class="menu-icon"><i class="ri-file-text-line" aria-hidden="true"></i></span>
-            <span class="menu-label">Rekap Data</span>
-        </a>
+            <a class="menu-item {{ nav_active('admin.rekap-data.*') }}" href="{{ route('admin.rekap-data.index') }}">
+                <span class="menu-icon"><i class="ri-file-text-line" aria-hidden="true"></i></span>
+                <span class="menu-label">Rekap Data</span>
+            </a>
         @endcan
 
         @if (in_array($userRole ?? null, ['desa', 'perusahaan']))
@@ -109,17 +109,17 @@
         </a> -->
 
             @can('desa.view')
-            <a class="menu-item {{ nav_active('admin.desa.*') }}" href="{{ route('admin.desa.index') }}">
-                <span class="menu-icon"><i class="ri-home-3-line" aria-hidden="true"></i></span>
-                <span class="menu-label">Data Desa</span>
-            </a>
+                <a class="menu-item {{ nav_active('admin.desa.*') }}" href="{{ route('admin.desa.index') }}">
+                    <span class="menu-icon"><i class="ri-home-3-line" aria-hidden="true"></i></span>
+                    <span class="menu-label">Data Desa</span>
+                </a>
             @endcan
 
             @can('perusahaan.view')
-            <a class="menu-item {{ nav_active('admin.perusahaan.*') }}" href="{{ route('admin.perusahaan.index') }}">
-                <span class="menu-icon"><i class="ri-building-line" aria-hidden="true"></i></span>
-                <span class="menu-label">Data Perusahaan</span>
-            </a>
+                <a class="menu-item {{ nav_active('admin.perusahaan.*') }}" href="{{ route('admin.perusahaan.index') }}">
+                    <span class="menu-icon"><i class="ri-building-line" aria-hidden="true"></i></span>
+                    <span class="menu-label">Data Perusahaan</span>
+                </a>
             @endcan
 
             <!-- <a class="menu-item {{ nav_active('admin.pelanggan.*') }}" href="{{ route('admin.pelanggan.index') }}">
@@ -135,19 +135,19 @@
 
             @if (!in_array($userRole, ['admin', 'superadmin']))
                 @can('jalan.view')
-                <a class="menu-item {{ nav_active('admin.jalan.*') }}" href="{{ route('admin.jalan.index') }}">
-                    <span class="menu-icon"><i class="ri-road-map-line" aria-hidden="true"></i></span>
-                    <span class="menu-label">Data Jalan &amp; Aksesbilitas</span>
-                </a>
+                    <a class="menu-item {{ nav_active('admin.jalan.*') }}" href="{{ route('admin.jalan.index') }}">
+                        <span class="menu-icon"><i class="ri-road-map-line" aria-hidden="true"></i></span>
+                        <span class="menu-label">Data Jalan &amp; Aksesbilitas</span>
+                    </a>
                 @endcan
             @endif
 
             @can('rencana_pengembangan.view')
-            <a class="menu-item {{ nav_active('admin.rencana-pengembangan.*') }}"
-                href="{{ route('admin.rencana-pengembangan.index') }}">
-                <span class="menu-icon"><i class="ri-lightbulb-flash-line" aria-hidden="true"></i></span>
-                <span class="menu-label">Rencana Pengembangan Bantuan</span>
-            </a>
+                <a class="menu-item {{ nav_active('admin.rencana-pengembangan.*') }}"
+                    href="{{ route('admin.rencana-pengembangan.index') }}">
+                    <span class="menu-icon"><i class="ri-lightbulb-flash-line" aria-hidden="true"></i></span>
+                    <span class="menu-label">Rencana Pengembangan Bantuan</span>
+                </a>
             @endcan
 
             <!-- <a class="menu-item {{ nav_active('admin.skoring.*') }}" href="{{ route('admin.skoring.index') }}">
@@ -155,18 +155,18 @@
             <span class="menu-label">Variabel Skoring &amp; Bobot</span>
         </a> -->
             @can('kategori_permohonan.view')
-            <a class="menu-item {{ nav_active('admin.kategori-permohonan.*') }}"
-                href="{{ route('admin.kategori-permohonan.index') }}">
-                <span class="menu-icon"><i class="ri-file-list-3-line" aria-hidden="true"></i></span>
-                <span class="menu-label">Kategori Permohonan</span>
-            </a>
+                <a class="menu-item {{ nav_active('admin.kategori-permohonan.*') }}"
+                    href="{{ route('admin.kategori-permohonan.index') }}">
+                    <span class="menu-icon"><i class="ri-file-list-3-line" aria-hidden="true"></i></span>
+                    <span class="menu-label">Kategori Permohonan</span>
+                </a>
             @endcan
 
             @can('inspeksi.view')
-            <a class="menu-item {{ nav_active('admin.inspeksi.*') }}" href="{{ route('admin.inspeksi.index') }}">
-                <span class="menu-icon"><i class="ri-file-search-line" aria-hidden="true"></i></span>
-                <span class="menu-label">Inspeksi</span>
-            </a>
+                <a class="menu-item {{ nav_active('admin.inspeksi.*') }}" href="{{ route('admin.inspeksi.index') }}">
+                    <span class="menu-icon"><i class="ri-file-search-line" aria-hidden="true"></i></span>
+                    <span class="menu-label">Inspeksi</span>
+                </a>
             @endcan
 
             @can('user.view')
