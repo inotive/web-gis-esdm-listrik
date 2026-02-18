@@ -164,18 +164,31 @@ class PerusahaanController extends Controller
             'permohonanUsers.documents.dokumen',
         ]);
 
-        // Ambil data perizinan dari PerizinanListrik berdasarkan nama_pemohon yang cocok dengan nama perusahaan
-        $perizinanListriks = PerizinanListrik::where('nama_pemohon', 'LIKE', '%' . $perusahaan->nama . '%')
-            ->orWhere('nama_pemohon', $perusahaan->nama)
-            ->orderBy('tanggal_terbit', 'desc')
-            ->get();
+        // Ambil data perizinan dari PerizinanListrik berdasarkan nama_pemohon
+        $perizinanListriks = PerizinanListrik::where(function($query) use ($perusahaan) {
+            // Selalu cari yang match persis
+            $query->where('nama_pemohon', $perusahaan->nama);
 
-        $perizinanData = $perizinanListriks->map(function ($perizinan) {
+            // Hanya gunakan LIKE jika nama perusahaan cukup panjang (mencegah match "A" ke semua data)
+            if (strlen($perusahaan->nama) >= 4) {
+                $query->orWhere('nama_pemohon', 'LIKE', '%' . $perusahaan->nama . '%');
+            }
+        })
+        ->orderBy('tanggal_terbit', 'desc')
+        ->get();
+
+        // Convert to base collection to avoid Eloquent's collection strictness on merge
+        $perizinanData = $perizinanListriks->toBase()->map(function ($perizinan) {
             // Hitung status berdasarkan tanggal_akhir
             $status = 'Berakhir';
             if ($perizinan->tanggal_akhir) {
                 $today = now();
                 $tanggalAkhir = $perizinan->tanggal_akhir;
+                // Pastikan format date carbon
+                if (!($tanggalAkhir instanceof \Carbon\Carbon)) {
+                    $tanggalAkhir = \Carbon\Carbon::parse($tanggalAkhir);
+                }
+                
                 if ($tanggalAkhir > $today->copy()->addDays(30)) {
                     $status = 'Aktif';
                 } elseif ($tanggalAkhir >= $today && $tanggalAkhir <= $today->copy()->addDays(30)) {
@@ -196,8 +209,49 @@ class PerusahaanController extends Controller
                 'sifat_penggunaan' => $perizinan->sifat_penggunaan,
                 'catatan' => $perizinan->catatan,
                 'status' => $status,
+                'source' => 'old' // Flag untuk debug jika perlu
             ];
-        })->toArray();
+        });
+
+        // Ambil data dari tabel Perizinan (Data Baru)
+        $newPerizinans = $perusahaan->perizinans;
+        $newPerizinanData = $newPerizinans->map(function ($perizinan) use ($perusahaan) {
+             $status = 'Berakhir';
+            if ($perizinan->tanggal_akhir) {
+                $today = now();
+                $tanggalAkhir = $perizinan->tanggal_akhir;
+                 if (!($tanggalAkhir instanceof \Carbon\Carbon)) {
+                    $tanggalAkhir = \Carbon\Carbon::parse($tanggalAkhir);
+                }
+
+                if ($tanggalAkhir > $today->copy()->addDays(30)) {
+                    $status = 'Aktif';
+                } elseif ($tanggalAkhir >= $today && $tanggalAkhir <= $today->copy()->addDays(30)) {
+                    $status = 'Mau Berakhir';
+                }
+            }
+
+            return [
+                'id' => $perizinan->id,
+                'no_izin' => $perizinan->no_surat_izin_terbit ?? $perizinan->no_pengajuan ?? '-',
+                'nama' => $perusahaan->nama, // Pemohon adalah perusahaan ini
+                'jenis_izin' => $perizinan->jenis ?? '-',
+                // Asumsi field di tabel perizinans adalah 'tanggal' atau 'tanggal_terbit' (cek controller store method)
+                // Controller store pakai 'tanggal'.
+                'tanggal_terbit' => $perizinan->tanggal ?? $perizinan->created_at, 
+                'tanggal_akhir' => $perizinan->tanggal_akhir,
+                'lokasi' => $perizinan->lokasi,
+                'kapasitas' => $perizinan->kapasitas,
+                'total_kapasitas' => $perizinan->total_kapasitas_kva, // Field di perizinan
+                'sifat_penggunaan' => $perizinan->sifat_penggunaan,
+                'catatan' => $perizinan->catatan,
+                'status' => $status,
+                'source' => 'new'
+            ];
+        });
+
+        // Merge dan Sort
+        $perizinanData = $perizinanData->merge($newPerizinanData)->sortByDesc('tanggal_terbit')->values()->toArray();
 
         // Ambil data permohonan dari relasi permohonanUsers (pivot)
         $permohonanData = $perusahaan->permohonanUsers->map(function ($permohonanUser) {
