@@ -503,21 +503,21 @@
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Nama <span class="text-danger">*</span></label>
                                         <input type="text" name="nama" class="form-control" required
-                                            value="{{ auth()->user()->name }}">
+                                            placeholder="Masukkan Nama Responden">
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Posisi <span class="text-danger">*</span></label>
-                                        <input type="text" name="posisi" class="form-control" required>
+                                        <input type="text" name="posisi" class="form-control" required placeholder="Masukkan Posisi Responden">
                                     </div>
                                     <div class="col-md-12 mb-3">
                                         <label class="form-label">Kontak (HP/Email) <span
                                                 class="text-danger">*</span></label>
                                         <input type="text" name="kontak" class="form-control" required
-                                            value="{{ auth()->user()->email }}">
+                                            placeholder="Masukkan Kontak Responden">
                                     </div>
                                     <div class="col-md-12 mb-3">
                                         <label class="form-label">Catatan <span class="text-danger">*</span></label>
-                                        <textarea name="catatan" rows="4" class="form-control" required></textarea>
+                                        <textarea name="catatan" rows="4" class="form-control" required placeholder="Masukkan Catatan Feedback"></textarea>
                                     </div>
                                     <div class="col-md-12 mb-3">
                                         <label class="form-label">File Pendukung (Opsional)</label>
