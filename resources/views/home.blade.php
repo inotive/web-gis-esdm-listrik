@@ -945,15 +945,15 @@
 
                 <div class="hero-stats">
                     <div class="stat-item">
-                        <span class="stat-value">{{ number_format($countJaringan ?? 0) }}</span>
-                        <span class="stat-label">Data Infrastruktur Jaringan</span>
+                        <span class="stat-value">10</span>
+                        <span class="stat-label">Data Infrastruktur Jaringan Kabupaten/Kota</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-value">{{ number_format($countGardu ?? 0) }}</span>
+                        <span class="stat-value">10</span>
                         <span class="stat-label">Data Gardu</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-value">{{ number_format($countPembangkit ?? 0) }}</span>
+                        <span class="stat-value">6</span>
                         <span class="stat-label">Pembangkit Lokal</span>
                     </div>
                 </div>

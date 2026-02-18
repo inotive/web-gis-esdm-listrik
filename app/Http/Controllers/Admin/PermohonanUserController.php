@@ -9,6 +9,7 @@ use App\Models\PermohonanUserDocument;
 use App\Models\PermohonanQuestion;
 use App\Models\Dokumen;
 use App\Helpers\UploadFile;
+use App\Jobs\ProcessPermohonanStatusNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -305,7 +306,7 @@ class PermohonanUserController extends Controller
 
         // Get permohonan to validate questions
         $permohonan = $permohonanUser->permohonan;
-        
+
         if ($permohonan) {
             $permohonan->load('questions.options');
 
@@ -529,7 +530,7 @@ class PermohonanUserController extends Controller
         ]);
 
         // Dispatch Notification Job
-        \App\Jobs\ProcessPermohonanStatusNotification::dispatch($permohonanUser->id);
+        ProcessPermohonanStatusNotification::dispatch($permohonanUser->id);
 
         return redirect()->route('admin.permohonan-user.show', [$permohonanId, $permohonanUser->id])
             ->with('success', 'Permohonan berhasil ditolak.');
@@ -559,6 +560,9 @@ class PermohonanUserController extends Controller
             'status' => 'proses',
             'keterangan' => $validated['keterangan'] ?? $permohonanUser->keterangan,
         ]);
+
+
+        ProcessPermohonanStatusNotification::dispatch($permohonanUser->id);
 
         return redirect()->route('admin.permohonan-user.show', [$permohonanId, $permohonanUser->id])
             ->with('success', 'Status permohonan berhasil diupdate menjadi Proses.');

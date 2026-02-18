@@ -40,4 +40,11 @@ class Inspeksi extends Model
     {
         return $this->belongsTo(Perusahaan::class, 'perusahaan_id');
     }
+    /**
+     * Relationship: Inspeksi has one Feedback
+     */
+    public function feedback()
+    {
+        return $this->hasOne(InspeksiFeedback::class, 'inspeksi_id');
+    }
 }

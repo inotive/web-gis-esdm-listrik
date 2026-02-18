@@ -149,6 +149,8 @@
 
                 // Admin Status from Blade
                 const isAdmin = {{ auth()->check() && auth()->user()->hasRole('admin') ? 'true' : 'false' }};
+                const isSuperAdmin =
+                    {{ auth()->check() && auth()->user()->hasRole('superadmin') ? 'true' : 'false' }};
 
                 const view = new MapView({
                     container: "viewDiv",
@@ -213,6 +215,7 @@
                         layerTitle = attrs.H_Survei;
                     }
 
+
                     const buildRow = (label, value) =>
                         `<div class="dm-row"><div class="dm-key">${label}</div><div class="dm-val">${value}</div></div>`;
                     let rows = '';
@@ -256,7 +259,7 @@
                         Object.entries(attrs)
                             .filter(([k]) => k !== 'link_dokumen')
                             .forEach(([k, v]) => {
-                                otherRows.push(buildRow(k, escapeHtml(v)));
+                                otherRows.push(buildRow(k.replace(/_/g, ' '), escapeHtml(v)));
                             });
 
                         rows = [...linkRows, ...otherRows].join('');
@@ -660,12 +663,13 @@
                         // Convert structure to layerCategories format and create layers
                         structure.forEach((cat) => {
                             const catLayers = [];
+                            if (cat.slug == "kondisi-titik-pemukiman-non-listrik-pln") {
+                                cat.label = "Kondisi Titik Pemukiman Belum Berlistrik PLN 2025";
+                            }
 
                             cat.sub_categories.forEach((sub) => {
-                                console.log(sub.label ==
-                                    'Status Desa Berlistrik Dengan Bantuan');
                                 // Filter Restricted Layers for Non-Admin
-                                if (!isAdmin) {
+                                if (!isAdmin && !isSuperAdmin) {
                                     if (sub.label ==
                                         'Status Desa Berlistrik Dengan Bantuan' ||
                                         sub.label == 'Rencana Bantuan Lokasi Pemukiman'
@@ -673,7 +677,6 @@
                                         return;
                                     }
                                 }
-
                                 // Define dynamic layer
                                 const layerUrl =
                                     `{{ url('/api/features/data') }}?kategori=${encodeURIComponent(cat.slug)}&sub_kategori=${encodeURIComponent(sub.slug)}`;
@@ -740,42 +743,77 @@
                                                     createLocationPinSvg(
                                                         color);
 
-                                                // Create UniqueValueRenderer to handle per-feature colors
-                                                layer.renderer = {
-                                                    type: "unique-value",
-                                                    field: "color",
-                                                    defaultSymbol: {
-                                                        type: "picture-marker",
-                                                        url: defaultSvgUrl,
-                                                        width: "32px",
-                                                        height: "32px"
-                                                    },
-                                                    uniqueValueInfos: [{
-                                                            value: "yellow",
-                                                            symbol: {
-                                                                type: "picture-marker",
-                                                                url: createLocationPinSvg(
-                                                                    "yellow"
-                                                                ),
-                                                                width: "32px",
-                                                                height: "32px"
-                                                            }
+                                                // Create UniqueValueRenderer only for specific layer that needs it
+                                                if (sub.label ===
+                                                    'Rencana Bantuan Lokasi Pemukiman'
+                                                ) {
+                                                    layer
+                                                        .legendEnabled =
+                                                        true;
+
+                                                    layer.renderer = {
+                                                        type: "unique-value",
+                                                        field: "color",
+                                                        defaultSymbol: {
+                                                            type: "picture-marker",
+                                                            url: defaultSvgUrl,
+                                                            width: "32px",
+                                                            height: "32px"
                                                         },
-                                                        {
-                                                            value: "red",
-                                                            symbol: {
-                                                                type: "picture-marker",
-                                                                url: createLocationPinSvg(
-                                                                    "red"
-                                                                ),
-                                                                width: "32px",
-                                                                height: "32px"
+                                                        defaultLabel: "Lainnya",
+                                                        uniqueValueInfos: [{
+                                                                value: "yellow",
+                                                                label: "SUTM",
+                                                                symbol: {
+                                                                    type: "picture-marker",
+                                                                    url: createLocationPinSvg(
+                                                                        "yellow"
+                                                                    ),
+                                                                    width: "32px",
+                                                                    height: "32px"
+                                                                }
+                                                            },
+                                                            {
+                                                                value: "red",
+                                                                label: "PLTS",
+                                                                symbol: {
+                                                                    type: "picture-marker",
+                                                                    url: createLocationPinSvg(
+                                                                        "red"
+                                                                    ),
+                                                                    width: "32px",
+                                                                    height: "32px"
+                                                                }
                                                             }
+                                                        ]
+                                                    };
+                                                } else {
+                                                    // For other point layers, use SimpleRenderer with the category color
+                                                    layer
+                                                        .legendEnabled =
+                                                        false;
+
+                                                    layer.renderer = {
+                                                        type: "simple",
+                                                        label: sub
+                                                            .slug
+                                                            .split(
+                                                                "/"
+                                                            )[
+                                                                0],
+                                                        symbol: {
+                                                            type: "picture-marker",
+                                                            url: defaultSvgUrl,
+                                                            width: "32px",
+                                                            height: "32px"
                                                         }
-                                                    ]
-                                                };
+                                                    };
+                                                }
                                             } else if (type ===
                                                 "polyline") {
+                                                layer
+                                                    .legendEnabled =
+                                                    false;
                                                 layer.renderer = {
                                                     type: "simple",
                                                     symbol: {
@@ -787,6 +825,9 @@
                                                 };
                                             } else if (type ===
                                                 "polygon") {
+                                                layer
+                                                    .legendEnabled =
+                                                    false;
                                                 // Fix color alpha for polygon fill
                                                 const fillColor = [...
                                                     color
@@ -1302,7 +1343,8 @@
 
                 // Feature Count Widget
                 const featureCountWidget = document.createElement('div');
-                featureCountWidget.className = 'feature-count-widget esri-component esri-widget';
+                featureCountWidget.className =
+                    'feature-count-widget esri-component esri-widget';
                 featureCountWidget.innerHTML = `
                    <div class="fc-icon">📊</div>
                    <div class="fc-content">
@@ -1349,7 +1391,8 @@
                 // Distance measurement button
                 const measureBtn = document.createElement('div');
                 measureBtn.className = 'measure-btn';
-                measureBtn.innerHTML =
+                measureBtn
+                    .innerHTML =
                     '📏 Ukur Jarak';
                 measureBtn.title = 'Klik untuk mengukur jarak dan menghitung biaya';
 
@@ -1565,10 +1608,10 @@
                     const videoUrl = linkElement.getAttribute('data-video-url');
                     const videoTitle = linkElement.getAttribute('data-video-title');
 
-                    console.log('Video 360 Link Clicked:', {
-                        videoUrl,
-                        videoTitle
-                    });
+                    // console.log('Video 360 Link Clicked:', {
+                    //     videoUrl,
+                    //     videoTitle
+                    // });
 
                     if (videoUrl) {
                         openVideo360Modal(videoUrl, videoTitle);
