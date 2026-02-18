@@ -114,6 +114,8 @@
               <th class="col-name">Nama Pengguna</th>
               <th class="col-email">Email</th>
               <th>Username</th>
+              <th>Hak Akses</th>
+              <th>Lampiran</th>
               <th>Tanggal Daftar</th>
               <th class="col-aksi">Aksi</th>
             </tr>
@@ -125,6 +127,24 @@
                 <td class="col-name"><strong>{{ $user->name }}</strong></td>
                 <td class="col-email">{{ $user->email }}</td>
                 <td><strong>{{ $user->username }}</strong></td>
+                <td>
+                  @if($user->identity_type)
+                    <span class="btn-ghost" style="border-radius:999px;padding:4px 10px;border-color:#D7E3FF;color:#2563eb;background:#F5F9FF">
+                      <i class="fas fa-shield-alt me-1"></i>{{ ucfirst($user->identity_type) }}
+                    </span>
+                  @else
+                    <span class="text-muted">-</span>
+                  @endif
+                </td>
+                <td>
+                  @if($user->document_verification_path)
+                    <a href="{{ asset('storage/' . $user->document_verification_path) }}" target="_blank" class="btn btn-sm btn-light-primary px-3 py-1" style="font-size: 12px;">
+                      <i class="ri-file-pdf-line me-1"></i> Lihat
+                    </a>
+                  @else
+                    <span class="text-muted text-sm">Tidak ada</span>
+                  @endif
+                </td>
                 <td>{{ $user->created_at->format('d M Y H:i') }}</td>
                 <td class="col-aksi">
                   @can('pengguna.approve')

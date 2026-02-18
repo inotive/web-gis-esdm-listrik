@@ -38,6 +38,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'verified_by',
         'perusahaan_id',
         'company_name',
+        'document_verification_path',
     ];
 
     /**
