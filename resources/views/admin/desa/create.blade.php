@@ -43,8 +43,9 @@
                     <div class="control">
                         <select name="status_berlistrik" id="cStatusBerlistrik" class="input" required>
                             <option value="">Pilih Status Listrik</option>
-                            <option value="Belum Terlayani Listrik">Belum Terlayani Listrik</option>
                             <option value="Terlayani Listrik">Terlayani Listrik</option>
+                            <option value="Desa Berlistrik NonPLN">Desa Berlistrik NonPLN</option>
+                            <option value="Belum Terlayani Listrik">Belum Terlayani Listrik</option>
                         </select>
                     </div>
                 </div>

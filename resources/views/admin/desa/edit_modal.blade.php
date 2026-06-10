@@ -45,6 +45,7 @@
                         <select name="status_berlistrik" id="edit_status_berlistrik" class="input">
                             <option value="">-- Pilih Status --</option>
                             <option value="Terlayani Listrik">Terlayani Listrik</option>
+                            <option value="Desa Berlistrik NonPLN">Desa Berlistrik NonPLN</option>
                             <option value="Belum Terlayani Listrik">Belum Terlayani Listrik</option>
                         </select>
                     </div>

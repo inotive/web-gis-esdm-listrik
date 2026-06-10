@@ -10,6 +10,9 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
+use App\Exports\RekapElektrifikasiExport;
+use App\Exports\RekapInfrastrukturExport;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class RekapDataController extends Controller
 {
@@ -251,6 +254,160 @@ class RekapDataController extends Controller
             'XX'
         ];
         return $romanNumerals[$number - 1] ?? (string) $number;
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $tab = $request->get('tab', 'elektrifikasi');
+        $tahun = $request->get('tahun', date('Y'));
+
+        if ($tab === 'infrastruktur') {
+            $infrastrukturData = PerizinanListrik::selectRaw('
+                    kabupaten_kota,
+                    COUNT(*) as jumlah_perizinan,
+                    SUM(CASE WHEN jenis_usaha LIKE "%IUPTL%" OR jenis LIKE "%IUPTL%" THEN 1 ELSE 0 END) as jumlah_iuptls,
+                    SUM(CASE WHEN jenis_usaha LIKE "%SKTP%" OR jenis LIKE "%SKTP%" OR jenis LIKE "%Rekomtek%" THEN 1 ELSE 0 END) as rekomtek_sktp,
+                    SUM(COALESCE(total_kapasitas, 0)) as jumlah_kapasitas
+                ')
+                ->groupBy('kabupaten_kota')
+                ->orderBy('kabupaten_kota')
+                ->get()
+                ->map(function ($item, $index) {
+                    return [
+                        'no' => $this->getRomanNumeral($index + 1),
+                        'kabupaten_kota' => $item->kabupaten_kota,
+                        'jumlah_perizinan' => $item->jumlah_perizinan,
+                        'jumlah_iuptls' => $item->jumlah_iuptls,
+                        'rekomtek_sktp' => $item->rekomtek_sktp,
+                        'jumlah_kapasitas' => $item->jumlah_kapasitas,
+                    ];
+                })
+                ->toArray();
+
+            $totalInfra = [
+                'jumlah_perizinan' => collect($infrastrukturData)->sum('jumlah_perizinan'),
+                'jumlah_iuptls' => collect($infrastrukturData)->sum('jumlah_iuptls'),
+                'rekomtek_sktp' => collect($infrastrukturData)->sum('rekomtek_sktp'),
+                'jumlah_kapasitas' => collect($infrastrukturData)->sum('jumlah_kapasitas'),
+            ];
+
+            return Excel::download(new RekapInfrastrukturExport($infrastrukturData, $totalInfra), 'rekap_infrastruktur.xlsx');
+        }
+
+        // Default: elektrifikasi
+        $rekapData = RekapElektrifikasi::where('tahun', $tahun)
+            ->orderByRaw("FIELD(no_urut, 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X')")
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'no' => $item->no_urut,
+                    'kabupaten_kota' => $item->kabupaten_kota,
+                    'jumlah_desa' => $item->jumlah_desa,
+                    'jumlah_kk' => $item->jumlah_kk,
+                    'jumlah_penduduk' => $item->jumlah_penduduk,
+                    'desa_berlistrik_pln' => $item->desa_berlistrik_pln,
+                    'desa_berlistrik_non_pln' => $item->desa_berlistrik_non_pln,
+                    'desa_berlistrik_jumlah' => $item->desa_berlistrik_jumlah,
+                    'desa_belum_berlistrik' => $item->desa_belum_berlistrik,
+                    'kk_berlistrik_pln' => $item->kk_berlistrik_pln,
+                    'kk_berlistrik_non_pln' => $item->kk_berlistrik_non_pln,
+                    'kk_berlistrik_jumlah' => $item->kk_berlistrik_jumlah,
+                    'rasio_desa_berlistrik' => $item->rasio_desa_berlistrik,
+                    'jumlah_kk_belum_berlistrik' => $item->jumlah_kk_belum_berlistrik,
+                    'rasio_elektrifikasi' => $item->rasio_elektrifikasi,
+                ];
+            })
+            ->toArray();
+
+        if (empty($rekapData)) {
+            $rekapData = $this->getDefaultRekapData();
+        }
+
+        $total = RekapElektrifikasi::getTotalByYear($tahun);
+        if (!$total) {
+            $total = $this->calculateTotal($rekapData);
+        }
+
+        return Excel::download(new RekapElektrifikasiExport($rekapData, $total, $tahun), 'rekap_elektrifikasi_' . $tahun . '.xlsx');
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $tab = $request->get('tab', 'elektrifikasi');
+        $tahun = $request->get('tahun', date('Y'));
+
+        if ($tab === 'infrastruktur') {
+            $infrastrukturData = PerizinanListrik::selectRaw('
+                    kabupaten_kota,
+                    COUNT(*) as jumlah_perizinan,
+                    SUM(CASE WHEN jenis_usaha LIKE "%IUPTL%" OR jenis LIKE "%IUPTL%" THEN 1 ELSE 0 END) as jumlah_iuptls,
+                    SUM(CASE WHEN jenis_usaha LIKE "%SKTP%" OR jenis LIKE "%SKTP%" OR jenis LIKE "%Rekomtek%" THEN 1 ELSE 0 END) as rekomtek_sktp,
+                    SUM(COALESCE(total_kapasitas, 0)) as jumlah_kapasitas
+                ')
+                ->groupBy('kabupaten_kota')
+                ->orderBy('kabupaten_kota')
+                ->get()
+                ->map(function ($item, $index) {
+                    return [
+                        'no' => $this->getRomanNumeral($index + 1),
+                        'kabupaten_kota' => $item->kabupaten_kota,
+                        'jumlah_perizinan' => $item->jumlah_perizinan,
+                        'jumlah_iuptls' => $item->jumlah_iuptls,
+                        'rekomtek_sktp' => $item->rekomtek_sktp,
+                        'jumlah_kapasitas' => $item->jumlah_kapasitas,
+                    ];
+                })
+                ->toArray();
+
+            $totalInfra = [
+                'jumlah_perizinan' => collect($infrastrukturData)->sum('jumlah_perizinan'),
+                'jumlah_iuptls' => collect($infrastrukturData)->sum('jumlah_iuptls'),
+                'rekomtek_sktp' => collect($infrastrukturData)->sum('rekomtek_sktp'),
+                'jumlah_kapasitas' => collect($infrastrukturData)->sum('jumlah_kapasitas'),
+            ];
+
+            $isPdf = true;
+            $pdf = Pdf::loadView('admin.rekap_data.exports.infrastruktur', compact('infrastrukturData', 'totalInfra', 'isPdf'))->setPaper('a4', 'landscape');
+            return $pdf->download('rekap_infrastruktur.pdf');
+        }
+
+        // Default: elektrifikasi
+        $rekapData = RekapElektrifikasi::where('tahun', $tahun)
+            ->orderByRaw("FIELD(no_urut, 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X')")
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'no' => $item->no_urut,
+                    'kabupaten_kota' => $item->kabupaten_kota,
+                    'jumlah_desa' => $item->jumlah_desa,
+                    'jumlah_kk' => $item->jumlah_kk,
+                    'jumlah_penduduk' => $item->jumlah_penduduk,
+                    'desa_berlistrik_pln' => $item->desa_berlistrik_pln,
+                    'desa_berlistrik_non_pln' => $item->desa_berlistrik_non_pln,
+                    'desa_berlistrik_jumlah' => $item->desa_berlistrik_jumlah,
+                    'desa_belum_berlistrik' => $item->desa_belum_berlistrik,
+                    'kk_berlistrik_pln' => $item->kk_berlistrik_pln,
+                    'kk_berlistrik_non_pln' => $item->kk_berlistrik_non_pln,
+                    'kk_berlistrik_jumlah' => $item->kk_berlistrik_jumlah,
+                    'rasio_desa_berlistrik' => $item->rasio_desa_berlistrik,
+                    'jumlah_kk_belum_berlistrik' => $item->jumlah_kk_belum_berlistrik,
+                    'rasio_elektrifikasi' => $item->rasio_elektrifikasi,
+                ];
+            })
+            ->toArray();
+
+        if (empty($rekapData)) {
+            $rekapData = $this->getDefaultRekapData();
+        }
+
+        $total = RekapElektrifikasi::getTotalByYear($tahun);
+        if (!$total) {
+            $total = $this->calculateTotal($rekapData);
+        }
+
+        $isPdf = true;
+        $pdf = Pdf::loadView('admin.rekap_data.exports.elektrifikasi', compact('rekapData', 'total', 'tahun', 'isPdf'))->setPaper('a4', 'landscape');
+        return $pdf->download('rekap_elektrifikasi_' . $tahun . '.pdf');
     }
     /**
      * Download template import Excel

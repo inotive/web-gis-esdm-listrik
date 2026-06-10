@@ -105,9 +105,12 @@ class DesaController extends Controller
                         $matches = false;
                         if ($statusToolbar === 'Belum Terlayani Listrik') {
                             $matches = str_contains($s, 'BELUM') || str_contains($s, 'TIDAK');
+                        } elseif ($statusToolbar === 'Desa Berlistrik NonPLN') {
+                            $matches = str_contains($s, 'NONPLN') || str_contains($s, 'NON PLN') || str_contains($s, 'NON-PLN');
                         } elseif ($statusToolbar === 'Terlayani Listrik') {
                             $isDanger = str_contains($s, 'BELUM') || str_contains($s, 'TIDAK');
-                            if (!$isDanger) {
+                            $isNonPln = str_contains($s, 'NONPLN') || str_contains($s, 'NON PLN') || str_contains($s, 'NON-PLN');
+                            if (!$isDanger && !$isNonPln) {
                                 $matches = str_contains($s, 'TERLAYANI') || str_contains($s, 'BERLISTRIK');
                             }
                         }
@@ -128,11 +131,14 @@ class DesaController extends Controller
                 }
                 
                 // Second condition: match by local column status_berlistrik
-                // Use orWhere with a nested where to properly group the conditions
                 $q->orWhere(function ($subQ) use ($statusToolbar) {
                     if ($statusToolbar === 'Belum Terlayani Listrik') {
                         $subQ->where('status_berlistrik', 'like', '%Belum%')
                             ->orWhere('status_berlistrik', 'like', '%Tidak%');
+                    } elseif ($statusToolbar === 'Desa Berlistrik NonPLN') {
+                        $subQ->where('status_berlistrik', 'like', '%NonPLN%')
+                            ->orWhere('status_berlistrik', 'like', '%Non PLN%')
+                            ->orWhere('status_berlistrik', 'like', '%Non-PLN%');
                     } elseif ($statusToolbar === 'Terlayani Listrik') {
                         $subQ->where('status_berlistrik', 'like', '%Terlayani%')
                             ->orWhere('status_berlistrik', 'like', '%Berlistrik%');

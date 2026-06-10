@@ -374,6 +374,14 @@
         }
 
         @media print {
+            @page {
+                size: landscape;
+                margin: 1cm;
+            }
+
+            body {
+                background: white;
+            }
 
             .action-bar,
             .page-head,
@@ -382,6 +390,35 @@
             .tab-navigation,
             .summary-cards {
                 display: none !important;
+            }
+
+            .table-container, .table-wrapper {
+                overflow: visible !important;
+                border: none !important;
+                box-shadow: none !important;
+            }
+
+            .table-rekap {
+                font-size: 9px !important;
+                width: 100% !important;
+            }
+
+            .table-rekap thead th {
+                font-size: 9px !important;
+                padding: 4px 2px !important;
+            }
+            
+            .table-rekap thead th.sub-header {
+                font-size: 8px !important;
+            }
+
+            .table-rekap tbody td, .table-rekap tfoot td {
+                padding: 4px 2px !important;
+            }
+
+            /* Adjust width specifically for printing */
+            .col-kabkota {
+                white-space: normal !important;
             }
         }
     </style>
@@ -459,8 +496,8 @@
                 <button class="btn-export excel" onclick="openImportModal()">
                     <i class="ri-upload-line"></i> Import Data
                 </button>
-                <button class="btn-export excel"><i class="ri-file-excel-2-line"></i> Export Excel</button>
-                <button class="btn-export pdf"><i class="ri-file-pdf-2-line"></i> Export PDF</button>
+                <a href="{{ route('admin.rekap-data.export-excel', ['tab' => 'elektrifikasi', 'tahun' => $tahun]) }}" class="btn-export excel" style="text-decoration: none;"><i class="ri-file-excel-2-line"></i> Export Excel</a>
+                <a href="{{ route('admin.rekap-data.export-pdf', ['tab' => 'elektrifikasi', 'tahun' => $tahun]) }}" class="btn-export pdf" style="text-decoration: none;"><i class="ri-file-pdf-2-line"></i> Export PDF</a>
                 <button class="btn-export print" onclick="window.print()"><i class="ri-printer-line"></i> Cetak</button>
                 @endcan
             </div>
@@ -622,8 +659,8 @@
             </div>
             <div class="action-buttons">
                 @can('rekap.export')
-                <button class="btn-export excel"><i class="ri-file-excel-2-line"></i> Export Excel</button>
-                <button class="btn-export pdf"><i class="ri-file-pdf-2-line"></i> Export PDF</button>
+                <a href="{{ route('admin.rekap-data.export-excel', ['tab' => 'infrastruktur', 'tahun' => $tahun]) }}" class="btn-export excel" style="text-decoration: none;"><i class="ri-file-excel-2-line"></i> Export Excel</a>
+                <a href="{{ route('admin.rekap-data.export-pdf', ['tab' => 'infrastruktur', 'tahun' => $tahun]) }}" class="btn-export pdf" style="text-decoration: none;"><i class="ri-file-pdf-2-line"></i> Export PDF</a>
                 <button class="btn-export print" onclick="window.print()"><i class="ri-printer-line"></i> Cetak</button>
                 @endcan
             </div>

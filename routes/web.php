@@ -351,6 +351,8 @@ Route::group(['middleware' => ['auth', 'verified', 'verified_user'], 'as' => 'ad
     Route::group(['as' => 'rekap-data.', 'prefix' => 'rekap-data'], function () {
         Route::get('/template', [RekapDataController::class, 'downloadTemplate'])->name('template');
         Route::post('/import', [RekapDataController::class, 'import'])->name('import');
+        Route::get('/export-excel', [RekapDataController::class, 'exportExcel'])->name('export-excel');
+        Route::get('/export-pdf', [RekapDataController::class, 'exportPdf'])->name('export-pdf');
         Route::get('/', [RekapDataController::class, 'index'])->name('index');
         Route::get('/detail/{kabupaten}', [RekapDataController::class, 'detail'])->name('detail');
     });

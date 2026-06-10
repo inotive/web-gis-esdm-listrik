@@ -685,8 +685,8 @@
                     <select class="form-select" name="status" id="filterStatus">
                         <option value="">Semua Status</option>
                         <option value="Terlayani Listrik" @selected(request('status') == 'Terlayani Listrik')>Terlayani Listrik</option>
-                        <option value="Belum Terlayani Listrik" @selected(request('status') == 'Belum Terlayani Listrik')>Belum Terlayani Listrik
-                        </option>
+                        <option value="Desa Berlistrik NonPLN" @selected(request('status') == 'Desa Berlistrik NonPLN')>Desa Berlistrik NonPLN</option>
+                        <option value="Belum Terlayani Listrik" @selected(request('status') == 'Belum Terlayani Listrik')>Belum Terlayani Listrik</option>
                     </select>
                 </div>
 
@@ -740,6 +740,8 @@
                                     @if ($status)
                                         @if (str_contains($statusUpper, 'BELUM') || str_contains($statusUpper, 'TIDAK'))
                                             <span class="badge-status badge-status-danger">{{ $status }}</span>
+                                        @elseif(str_contains($statusUpper, 'NONPLN') || str_contains($statusUpper, 'NON PLN') || str_contains($statusUpper, 'NON-PLN'))
+                                            <span class="badge-status badge-status-warning">{{ $status }}</span>
                                         @elseif(str_contains($statusUpper, 'TERLAYANI') || str_contains($statusUpper, 'BERLISTRIK'))
                                             <span class="badge-status badge-status-success">{{ $status }}</span>
                                         @else
