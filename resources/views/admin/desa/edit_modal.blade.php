@@ -523,10 +523,18 @@
                     // Set name
                     document.getElementById('edit_name').value = name;
 
-                    // Set status
+                    // Set status - normalize the value to match option values
                     const statusSelect = document.getElementById('edit_status_berlistrik');
                     if (statusSelect) {
-                        statusSelect.value = status || '';
+                        const normalizeStatus = (s) => {
+                            const u = (s || '').toUpperCase();
+                            if (u.includes('BELUM') || u.includes('TIDAK')) return 'Belum Terlayani Listrik';
+                            if (u.includes('NONPLN') || u.includes('NON PLN') || u.includes('NON-PLN')) return 'Desa Berlistrik NonPLN';
+                            if (u.includes('TERLAYANI') || u.includes('BERLISTRIK')) return 'Terlayani Listrik';
+                            return s;
+                        };
+                        const normalizedStatus = normalizeStatus(status);
+                        statusSelect.value = normalizedStatus || '';
                     }
 
                     // Load regencies
