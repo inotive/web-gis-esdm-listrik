@@ -302,9 +302,9 @@
         </div>
         <div class="page-actions">
             <div class="date-pill"><i class="ri-calendar-line"></i><span>{{ now()->translatedFormat('F Y') }}</span></div>
-            @can('rencana_pengembangan.create')
+            {{-- @can('rencana_pengembangan.create')
             <button class="btn btn-primary" onclick="openAddModal()"><i class="ri-add-line"></i> Tambah Data</button>
-            @endcan
+            @endcan --}}
         </div>
     </div>
 
