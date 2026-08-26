@@ -80,26 +80,36 @@ class DashboardController extends Controller
             ];
         }
 
-        // Hitung total statistik elektrifikasi dari database
+        // Hitung total statistik desa berlistrik langsung dari tabel RegVillage (local database)
+        $totalDesa = RegVillage::count();
+        
+        $totalDesaBerlistrikPln = RegVillage::where(function($q) {
+            $q->where('status_berlistrik', 'like', '%PLN%')
+              ->orWhere('status_berlistrik', 'like', '%Terlayani%');
+        })->where('status_berlistrik', 'not like', '%Non%')
+          ->where('status_berlistrik', 'not like', '%Belum%')
+          ->count();
+
+        $totalDesaBerlistrikNonPln = RegVillage::where('status_berlistrik', 'like', '%Non%')->count();
+        
+        $totalDesaBelum = RegVillage::where(function($q) {
+            $q->where('status_berlistrik', 'like', '%Belum%')
+              ->orWhere('status_berlistrik', 'like', '%Tidak%');
+        })->count();
+
+        $totalDesaBerlistrik = $totalDesaBerlistrikPln + $totalDesaBerlistrikNonPln;
+        $totalDesaRekap = $totalDesa;
+
+        // Hitung total statistik KK dari database (RekapElektrifikasi)
         $totalStats = RekapElektrifikasi::getTotalByYear($latestYear);
         if ($totalStats) {
-            $totalDesaBerlistrik = $totalStats['desa_berlistrik_jumlah'];
-            $totalDesaBerlistrikPln = $totalStats['desa_berlistrik_pln'];
-            $totalDesaBerlistrikNonPln = $totalStats['desa_berlistrik_non_pln'];
-            $totalDesaBelum = $totalStats['desa_belum_berlistrik'];
             $totalKK = $totalStats['jumlah_kk'];
             $totalKKBerlistrik = $totalStats['kk_berlistrik_jumlah'];
             $rasioElektrifikasi = $totalStats['rasio_elektrifikasi'];
-            $totalDesaRekap = $totalStats['jumlah_desa'];
         } else {
-            $totalDesaBerlistrik = collect($elektrifikasiData)->sum('desa_berlistrik');
-            $totalDesaBerlistrikPln = collect($elektrifikasiData)->sum('desa_berlistrik_pln');
-            $totalDesaBerlistrikNonPln = collect($elektrifikasiData)->sum('desa_berlistrik_non_pln');
-            $totalDesaBelum = collect($elektrifikasiData)->sum('desa_belum');
             $totalKK = collect($elektrifikasiData)->sum('total_kk');
             $totalKKBerlistrik = collect($elektrifikasiData)->sum('kk_berlistrik');
             $rasioElektrifikasi = $totalKK > 0 ? round(($totalKKBerlistrik / $totalKK) * 100, 2) : 0;
-            $totalDesaRekap = $totalDesaBerlistrik + $totalDesaBelum;
         }
 
         // ==========================================

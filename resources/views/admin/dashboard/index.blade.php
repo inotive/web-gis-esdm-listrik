@@ -410,7 +410,7 @@
                     <!-- Card PLN -->
                     <div class="status-card status-card-pln">
                         <div class="status-number">{{ number_format($totalDesaBerlistrikPln) }}</div>
-                        <div class="status-label">Berlistrik PLN</div>
+                        <div class="status-label">Terlayani Listrik PLN</div>
                         <div class="status-percentage">
                             {{ $totalDesa > 0 ? number_format(($totalDesaBerlistrikPln / $totalDesa) * 100, 1) : 0 }}%
                         </div>
@@ -419,7 +419,7 @@
                     <!-- Card Non-PLN -->
                     <div class="status-card status-card-non-pln">
                         <div class="status-number">{{ number_format($totalDesaBerlistrikNonPln) }}</div>
-                        <div class="status-label">Berlistrik Non-PLN</div>
+                        <div class="status-label">Berlistrik Non PLN</div>
                         <div class="status-percentage">
                             {{ $totalDesa > 0 ? number_format(($totalDesaBerlistrikNonPln / $totalDesa) * 100, 1) : 0 }}%
                         </div>
@@ -428,7 +428,7 @@
                     <!-- Card Tidak Berlistrik -->
                     <div class="status-card status-card-belum">
                         <div class="status-number">{{ number_format($totalDesaBelum) }}</div>
-                        <div class="status-label">Tidak Berlistrik</div>
+                        <div class="status-label">Belum terlayani listrik</div>
                         <div class="status-percentage">
                             {{ $totalDesa > 0 ? number_format(($totalDesaBelum / $totalDesa) * 100, 1) : 0 }}%
                         </div>
@@ -841,19 +841,16 @@
     <!-- Chart: Desa Per Kabupaten (3 Kategori) -->
     <div class="dash-card">
         <div class="dash-card-header">
-            <div class="dash-card-title">Jumlah Desa Per Kabupaten/Kota (PLN, Non-PLN, Tidak Berlistrik)</div>
+            <div class="dash-card-title">Jumlah Desa Per Kabupaten/Kota (PLN, Non-PLN, Belum terlayani listrik)</div>
         </div>
         <div class="dash-card-body">
             <div class="chart-container">
                 <canvas id="desaChart"></canvas>
             </div>
             <div class="chart-legend">
-                <span class="legend-item"><span class="legend-dot" style="background: #22c55e;"></span> Berlistrik
-                    PLN</span>
-                <span class="legend-item"><span class="legend-dot" style="background: #f59e0b;"></span> Berlistrik
-                    Non-PLN</span>
-                <span class="legend-item"><span class="legend-dot" style="background: #ef4444;"></span> Tidak
-                    Berlistrik</span>
+                <span class="legend-item"><span class="legend-dot" style="background: #22c55e;"></span> Terlayani Listrik PLN</span>
+                <span class="legend-item"><span class="legend-dot" style="background: #f59e0b;"></span> Berlistrik Non PLN</span>
+                <span class="legend-item"><span class="legend-dot" style="background: #ef4444;"></span> Belum terlayani listrik</span>
             </div>
         </div>
     </div>
@@ -1195,17 +1192,17 @@
                     data: {
                         labels: elektrifikasiData.map(d => d.name),
                         datasets: [{
-                            label: 'Berlistrik PLN',
+                            label: 'Terlayani Listrik PLN',
                             data: elektrifikasiData.map(d => d.desa_berlistrik_pln ?? 0),
                             backgroundColor: plnColor,
                             borderRadius: 4
                         }, {
-                            label: 'Berlistrik Non-PLN',
+                            label: 'Berlistrik Non PLN',
                             data: elektrifikasiData.map(d => d.desa_berlistrik_non_pln ?? 0),
                             backgroundColor: nonPlnColor,
                             borderRadius: 4
                         }, {
-                            label: 'Tidak Berlistrik',
+                            label: 'Belum terlayani listrik',
                             data: elektrifikasiData.map(d => d.desa_belum ?? 0),
                             backgroundColor: tidakBerlistrikColor,
                             borderRadius: 4
@@ -1272,7 +1269,7 @@
                 new Chart(pieCtx, {
                     type: 'doughnut',
                     data: {
-                        labels: ['Berlistrik PLN', 'Berlistrik Non-PLN', 'Tidak Berlistrik'],
+                        labels: ['Terlayani Listrik PLN', 'Berlistrik Non PLN', 'Belum terlayani listrik'],
                         datasets: [{
                             data: [
                                 {{ $totalDesaBerlistrikPln }},

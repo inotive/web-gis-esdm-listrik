@@ -732,7 +732,7 @@
                                         // Priority 1: From ImportedJsonFeature map
                                         // Priority 2: From local table (status_berlistrik)
                                         // dd($desa->status_berlistrik);
-                                        $statusProps = $statusMap[$desa->name] ?? null;
+                                        $statusProps = $statusMap[$desa->id] ?? null;
                                         $status = $statusProps['StatusDesa'] ?? ($desa->status_berlistrik ?? '');
                                         $statusUpper = strtoupper($status);
                                     @endphp

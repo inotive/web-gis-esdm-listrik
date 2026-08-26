@@ -94,83 +94,85 @@ class DesaController extends Controller
         // Toolbar Filter: Status Listrik
         $statusToolbar = $request->get('status');
         if ($statusToolbar) {
-            // Optimize: use chunk to process records in batches and prevent memory exhaustion
-            $matchingNames = [];
-            \App\Models\ImportedJsonFeature::where('sub_kategori', 'Status Desa Berlistrik')
-                ->select('id', 'properties')
-                ->chunk(200, function ($features) use ($statusToolbar, &$matchingNames) {
-                    foreach ($features as $feature) {
-                        $s = strtoupper($feature->properties['StatusDesa'] ?? '');
-                        
-                        $matches = false;
-                        if ($statusToolbar === 'Belum terlayani listrik') {
-                            $matches = str_contains($s, 'BELUM') || str_contains($s, 'TIDAK');
-                        } elseif ($statusToolbar === 'Berlistrik Non PLN') {
-                            $matches = str_contains($s, 'NONPLN') || str_contains($s, 'NON PLN') || str_contains($s, 'NON-PLN');
-                        } elseif ($statusToolbar === 'Terlayani Listrik PLN') {
-                            $isDanger = str_contains($s, 'BELUM') || str_contains($s, 'TIDAK');
-                            $isNonPln = str_contains($s, 'NONPLN') || str_contains($s, 'NON PLN') || str_contains($s, 'NON-PLN');
-                            if (!$isDanger && !$isNonPln) {
-                                $matches = str_contains($s, 'TERLAYANI') || str_contains($s, 'BERLISTRIK');
-                            }
-                        }
-                        
-                        if ($matches) {
-                            $props = $feature->properties;
-                            if (!empty($props['Nama_Desa'])) $matchingNames[] = $props['Nama_Desa'];
-                            if (!empty($props['Desa'])) $matchingNames[] = $props['Desa'];
-                        }
-                    }
-                });
-
-            // Get all unique village names that have feature data in database
-            $allFeatures = \App\Models\ImportedJsonFeature::where('sub_kategori', 'Status Desa Berlistrik')
+            // Load all unique features into memory for Status Desa Berlistrik
+            $features = \App\Models\ImportedJsonFeature::where('sub_kategori', 'Status Desa Berlistrik')
                 ->select('properties')
                 ->get();
             
-            $allFeatureNames = [];
-            foreach ($allFeatures as $feature) {
-                $props = $feature->properties;
-                if (!empty($props['Nama_Desa'])) $allFeatureNames[] = $props['Nama_Desa'];
-                if (!empty($props['Desa'])) $allFeatureNames[] = $props['Desa'];
+            // Map features by village name
+            $featuresMap = [];
+            foreach ($features as $f) {
+                $props = $f->properties;
+                $name = trim($props['Desa'] ?? ($props['Nama_Desa'] ?? ''));
+                $kec = strtoupper(trim($props['Kecamatan'] ?? ''));
+                $kab = strtoupper(trim($props['Kabupaten'] ?? ''));
+                if ($name) {
+                    $featuresMap[$name][] = [
+                        'status' => $props['StatusDesa'] ?? null,
+                        'kecamatan' => $kec,
+                        'kabupaten' => $kab
+                    ];
+                }
             }
-            $allFeatureNames = array_unique($allFeatureNames);
 
-            // Filter by (Found in JSON Feature) OR (Found in Local Column if not in JSON)
-            $query->where(function ($q) use ($matchingNames, $allFeatureNames, $statusToolbar) {
-                // Condition 1: If the village has a feature, its name must match the matching JSON features
-                $q->where(function ($sub) use ($matchingNames, $allFeatureNames) {
-                    $sub->whereIn('name', $allFeatureNames);
-                    if (!empty($matchingNames)) {
-                        $sub->whereIn('name', array_unique($matchingNames));
-                    } else {
-                        $sub->whereRaw('1 = 0');
-                    }
-                });
+            // Load all villages to evaluate status in memory
+            $allVillages = \App\Models\RegVillage::with('district.regency')->get();
+            $matchingIds = [];
 
-                // Condition 2: If the village does NOT have a feature, check the local status_berlistrik
-                $q->orWhere(function ($sub) use ($allFeatureNames, $statusToolbar) {
-                    if (!empty($allFeatureNames)) {
-                        $sub->whereNotIn('name', $allFeatureNames);
-                    }
+            foreach ($allVillages as $v) {
+                $status = null;
+                $vName = trim($v->name);
+                if (isset($featuresMap[$vName])) {
+                    $kec = strtoupper(trim($v->district->name ?? ''));
+                    $kab = strtoupper(trim($v->district->regency->name ?? ''));
                     
-                    $sub->where(function ($localQ) use ($statusToolbar) {
-                        if ($statusToolbar === 'Belum terlayani listrik') {
-                            $localQ->where('status_berlistrik', 'like', '%Belum%')
-                                ->orWhere('status_berlistrik', 'like', '%Tidak%');
-                        } elseif ($statusToolbar === 'Berlistrik Non PLN') {
-                            $localQ->where('status_berlistrik', 'like', '%NonPLN%')
-                                ->orWhere('status_berlistrik', 'like', '%Non PLN%')
-                                ->orWhere('status_berlistrik', 'like', '%Non-PLN%');
-                        } elseif ($statusToolbar === 'Terlayani Listrik PLN') {
-                            $localQ->where('status_berlistrik', 'like', '%Terlayani%')
-                                ->orWhere('status_berlistrik', 'like', '%Berlistrik%');
-                        } else {
-                            $localQ->where('status_berlistrik', $statusToolbar);
+                    foreach ($featuresMap[$vName] as $fInfo) {
+                        $match = true;
+                        if ($fInfo['kecamatan'] && $kec) {
+                            if (!str_contains($kec, $fInfo['kecamatan']) && !str_contains($fInfo['kecamatan'], $kec)) {
+                                $match = false;
+                            }
                         }
-                    });
-                });
-            });
+                        if ($match && $fInfo['kabupaten'] && $kab) {
+                            $cleanV = trim(str_replace(['KAB.', 'KABUPATEN', 'KOTA'], '', $kab));
+                            $cleanF = trim(str_replace(['KAB.', 'KABUPATEN', 'KOTA'], '', $fInfo['kabupaten']));
+                            if (!str_contains($cleanV, $cleanF) && !str_contains($cleanF, $cleanV)) {
+                                $match = false;
+                            }
+                        }
+                        if ($match) {
+                            $status = $fInfo['status'];
+                            break;
+                        }
+                    }
+                }
+
+                if (!$status) {
+                    $status = $v->status_berlistrik;
+                }
+
+                // Match with target status
+                $s = strtoupper(trim($status ?? ''));
+                $matches = false;
+
+                if ($statusToolbar === 'Belum terlayani listrik') {
+                    $matches = str_contains($s, 'BELUM') || str_contains($s, 'TIDAK');
+                } elseif ($statusToolbar === 'Berlistrik Non PLN') {
+                    $matches = str_contains($s, 'NONPLN') || str_contains($s, 'NON PLN') || str_contains($s, 'NON-PLN');
+                } elseif ($statusToolbar === 'Terlayani Listrik PLN') {
+                    $isDanger = str_contains($s, 'BELUM') || str_contains($s, 'TIDAK');
+                    $isNonPln = str_contains($s, 'NONPLN') || str_contains($s, 'NON PLN') || str_contains($s, 'NON-PLN');
+                    if (!$isDanger && !$isNonPln) {
+                        $matches = str_contains($s, 'TERLAYANI') || str_contains($s, 'BERLISTRIK');
+                    }
+                }
+
+                if ($matches) {
+                    $matchingIds[] = $v->id;
+                }
+            }
+
+            $query->whereIn('id', $matchingIds);
         }
 
         $desas = $query->orderBy('created_at', 'desc')
@@ -184,38 +186,59 @@ class DesaController extends Controller
             : collect([]);
 
         // Fetch status berlistrik data from ImportedJsonFeature
-        $desaNames = $desas->pluck('name')->toArray();
+        $desaIdsMap = [];
+        foreach ($desas as $desa) {
+            $trimmedName = trim($desa->name);
+            $desaIdsMap[$trimmedName][] = [
+                'id' => $desa->id,
+                'district' => strtoupper(trim($desa->district->name ?? '')),
+                'regency' => strtoupper(trim($desa->district->regency->name ?? ''))
+            ];
+        }
+        $desaNames = array_keys($desaIdsMap);
 
         // Fetch features matching the names for the specific category
-        // Note: Using whereJsonContains or similar might be slow or not supported on all DBs for array values in JSON.
-        // Since we have a pagination of 10-100, we can fetch by iterating OR just fetch all for this page.
-        // A simple LIKE query or whereIn on a virtual column would be ideal, but for portability/simplicity with small batch:
-        // Optimize: use chunk to process records in batches and prevent memory exhaustion
-        $statusFeatures = collect([]);
+        $statusFeatures = [];
         if (!empty($desaNames)) {
             \App\Models\ImportedJsonFeature::where('sub_kategori', 'Status Desa Berlistrik')
                 ->select('id', 'properties')
-                ->chunk(200, function ($features) use ($desaNames, &$statusFeatures) {
+                ->chunk(200, function ($features) use ($desaIdsMap, &$statusFeatures) {
                     foreach ($features as $feature) {
                         // Determine matching key from properties
                         $props = $feature->properties;
                         $name = $props['Desa'] ?? ($props['Nama_Desa'] ?? null);
+                        $nameTrimmed = $name ? trim($name) : null;
 
-                        if ($name && in_array($name, $desaNames)) {
-                            // Use name as key to prevent duplicates
-                            $statusFeatures[$name] = $feature;
+                        if ($nameTrimmed && isset($desaIdsMap[$nameTrimmed])) {
+                            // Find the correct village ID by comparing district/regency
+                            $featureKec = strtoupper(trim($props['Kecamatan'] ?? ''));
+                            $featureKab = strtoupper(trim($props['Kabupaten'] ?? ''));
+                            
+                            foreach ($desaIdsMap[$nameTrimmed] as $vInfo) {
+                                $match = true;
+                                if ($featureKec && $vInfo['district']) {
+                                    if (!str_contains($vInfo['district'], $featureKec) && !str_contains($featureKec, $vInfo['district'])) {
+                                        $match = false;
+                                    }
+                                }
+                                if ($match && $featureKab && $vInfo['regency']) {
+                                    $cleanVReg = trim(str_replace(['KAB.', 'KABUPATEN', 'KOTA'], '', $vInfo['regency']));
+                                    $cleanFKab = trim(str_replace(['KAB.', 'KABUPATEN', 'KOTA'], '', $featureKab));
+                                    if (!str_contains($cleanVReg, $cleanFKab) && !str_contains($cleanFKab, $cleanVReg)) {
+                                        $match = false;
+                                    }
+                                }
+                                if ($match) {
+                                    $statusFeatures[$vInfo['id']] = $props;
+                                }
+                            }
                         }
                     }
                 });
-            
-            // Convert to collection for consistency
-            $statusFeatures = collect($statusFeatures);
         }
 
-        // Pass map of [desa_name => feature]
-        $statusMap = $statusFeatures->map(function ($feature) {
-            return $feature->properties;
-        });
+        // Pass map of [desa_id => properties]
+        $statusMap = collect($statusFeatures);
 
         return view('admin.desa.index', [
             'title'     => "Manajemen Data Desa",
