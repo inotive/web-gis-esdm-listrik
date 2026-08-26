@@ -53,17 +53,121 @@
         </aside>
     </div>
 
-    <!-- Modal Video 360 -->
+    <!-- Modal Video 360 (YouTube IFrame API) -->
     <div id="video360Modal" class="video360-modal" style="display: none;">
         <div class="video360-modal-overlay" onclick="closeVideo360Modal()"></div>
         <div class="video360-modal-content">
             <div class="video360-modal-header">
-                <h3 id="video360ModalTitle">Video 360</h3>
+                <div class="video360-header-left">
+                    <span class="video360-badge">🎥 360°</span>
+                    <h3 id="video360ModalTitle">Video 360</h3>
+                </div>
                 <button class="video360-modal-close" onclick="closeVideo360Modal()">&times;</button>
             </div>
             <div class="video360-modal-body">
-                <iframe id="video360Iframe" src="" frameborder="0" allowfullscreen
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; xr-spatial-tracking"></iframe>
+                <!-- YouTube IFrame API Player Container -->
+                <div id="ytPlayerContainer">
+                    <div id="ytPlayer"></div>
+                    <!-- Overlay transparan: menangkap drag event agar iframe tidak pause -->
+                    <div id="ytDragOverlay" class="yt-drag-overlay"></div>
+                    <!-- Mask: sembunyikan info bar YouTube di bagian bawah -->
+                    <div class="yt-bar-mask"></div>
+                </div>
+
+                <!-- 360° D-Pad Control Panel -->
+                <div id="spherical360Controls" class="spherical-controls" style="display:none;">
+
+                    <!-- Drag hint overlay (shown briefly on open) -->
+                    <div id="dragHint" class="drag-hint">✋ Seret video untuk melihat sekeliling</div>
+
+                    <div class="sph-panel">
+
+                        <!-- D-Pad kiri: navigasi yaw/pitch -->
+                        <div class="sph-dpad-wrap">
+                            <div class="sph-dpad-label">Arah Pandang</div>
+                            <div class="sph-dpad">
+                                <!-- Baris atas -->
+                                <div></div>
+                                <button class="sph-dpad-btn sph-up"
+                                    id="dpadUp"
+                                    onmousedown="startHold('pitch', 8)" onmouseup="stopHold()" onmouseleave="stopHold()"
+                                    ontouchstart="startHold('pitch', 8)" ontouchend="stopHold()">
+                                    ▲
+                                </button>
+                                <div></div>
+                                <!-- Baris tengah -->
+                                <button class="sph-dpad-btn sph-left"
+                                    onmousedown="startHold('yaw', 8)" onmouseup="stopHold()" onmouseleave="stopHold()"
+                                    ontouchstart="startHold('yaw', 8)" ontouchend="stopHold()">
+                                    ◀
+                                </button>
+                                <div class="sph-dpad-center">360°</div>
+                                <button class="sph-dpad-btn sph-right"
+                                    onmousedown="startHold('yaw', -8)" onmouseup="stopHold()" onmouseleave="stopHold()"
+                                    ontouchstart="startHold('yaw', -8)" ontouchend="stopHold()">
+                                    ▶
+                                </button>
+                                <!-- Baris bawah -->
+                                <div></div>
+                                <button class="sph-dpad-btn sph-down"
+                                    onmousedown="startHold('pitch', -8)" onmouseup="stopHold()" onmouseleave="stopHold()"
+                                    ontouchstart="startHold('pitch', -8)" ontouchend="stopHold()">
+                                    ▼
+                                </button>
+                                <div></div>
+                            </div>
+                        </div>
+
+                        <!-- Tengah: FOV Zoom -->
+                        <div class="sph-zoom-wrap">
+                            <div class="sph-dpad-label">Zoom (FOV)</div>
+                            <div class="sph-zoom">
+                                <button class="sph-zoom-btn"
+                                    onmousedown="startHold('fov', -5)" onmouseup="stopHold()" onmouseleave="stopHold()"
+                                    ontouchstart="startHold('fov', -5)" ontouchend="stopHold()">
+                                    🔍+
+                                </button>
+                                <div class="sph-zoom-val" id="sphFovDisplay">100°</div>
+                                <button class="sph-zoom-btn"
+                                    onmousedown="startHold('fov', 5)" onmouseup="stopHold()" onmouseleave="stopHold()"
+                                    ontouchstart="startHold('fov', 5)" ontouchend="stopHold()">
+                                    🔍-
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Kanan: Roll + Reset -->
+                        <div class="sph-side-wrap">
+                            <div class="sph-dpad-label">Putar / Roll</div>
+                            <div class="sph-roll">
+                                <button class="sph-roll-btn"
+                                    onmousedown="startHold('roll', -8)" onmouseup="stopHold()" onmouseleave="stopHold()"
+                                    ontouchstart="startHold('roll', -8)" ontouchend="stopHold()">
+                                    ↺
+                                </button>
+                                <div class="sph-zoom-val" id="sphRollDisplay">0°</div>
+                                <button class="sph-roll-btn"
+                                    onmousedown="startHold('roll', 8)" onmouseup="stopHold()" onmouseleave="stopHold()"
+                                    ontouchstart="startHold('roll', 8)" ontouchend="stopHold()">
+                                    ↻
+                                </button>
+                            </div>
+                            <button class="sph-reset-btn" onclick="resetSphericalProperties()">⟳ Reset</button>
+                        </div>
+
+                    </div><!-- .sph-panel -->
+
+                    <!-- Readout bar -->
+                    <div id="sphReadout" class="spherical-readout">
+                        <span id="sphReadoutText">Yaw: 0°  |  Pitch: 0°  |  Roll: 0°  |  FOV: 100°</span>
+                    </div>
+
+                    <!-- Hidden inputs still used by JS state -->
+                    <input type="hidden" id="sphYaw"   value="0">
+                    <input type="hidden" id="sphPitch" value="0">
+                    <input type="hidden" id="sphRoll"  value="0">
+                    <input type="hidden" id="sphFov"   value="100">
+                </div>
             </div>
         </div>
     </div>
@@ -1542,45 +1646,326 @@
 
             });
 
-            // Fungsi untuk membuka modal video 360
-            window.openVideo360Modal = function(url, title) {
-                const modal = document.getElementById('video360Modal');
-                const iframe = document.getElementById('video360Iframe');
-                const modalTitle = document.getElementById('video360ModalTitle');
+            // ============================================================
+            // YouTube IFrame API – Video 360° dengan getSphericalProperties
+            // ============================================================
+            let ytPlayer = null;          // Instance YouTube player
+            let sphericalPollInterval = null; // Interval baca posisi otomatis
 
-                // Konversi Google Drive URL ke embedded format
-                let embedUrl = url;
-                if (url.includes('drive.google.com/file/d/')) {
-                    const fileId = url.match(/\/d\/([^/]+)/)[1];
-                    embedUrl = `https://drive.google.com/file/d/${fileId}/preview`;
-                } else if (url.includes('youtube.com/watch') || url.includes('youtu.be/')) {
-                    // Konversi YouTube URL ke embed format
-                    let videoId = '';
-                    if (url.includes('youtu.be/')) {
-                        videoId = url.split('youtu.be/')[1].split('?')[0];
-                    } else if (url.includes('youtube.com/watch')) {
-                        const urlParams = new URLSearchParams(new URL(url).search);
-                        videoId = urlParams.get('v');
-                    }
-                    if (videoId) {
-                        embedUrl = `https://www.youtube.com/embed/${videoId}`;
-                    }
+            // Helper: ekstrak YouTube Video ID dari berbagai format URL
+            const extractYouTubeId = (url) => {
+                if (!url) return null;
+                // youtu.be/ID
+                let m = url.match(/youtu\.be\/([^?&]+)/);
+                if (m) return m[1];
+                // youtube.com/watch?v=ID
+                m = url.match(/[?&]v=([^?&]+)/);
+                if (m) return m[1];
+                // youtube.com/embed/ID
+                m = url.match(/embed\/([^?&]+)/);
+                if (m) return m[1];
+                return null;
+            };
+
+            // Helper: apakah URL adalah YouTube?
+            const isYouTubeUrl = (url) => !!extractYouTubeId(url);
+
+            // Helper: apakah URL adalah Google Drive?
+            const isDriveUrl = (url) => url && url.includes('drive.google.com/file/d/');
+
+            // Callback global dipanggil YouTube IFrame API saat siap
+            window.onYouTubeIframeAPIReady = function() {
+                console.log('[YT IFrame API] Siap');
+                // Jika ada pending video, buka sekarang
+                if (window._pendingVideo360) {
+                    const { url, title } = window._pendingVideo360;
+                    window._pendingVideo360 = null;
+                    openVideo360Modal(url, title);
                 }
+            };
 
-                iframe.src = embedUrl;
+            // Inject YouTube IFrame API script (sekali saja)
+            const loadYouTubeAPI = () => {
+                if (document.getElementById('yt-iframe-api-script')) return;
+                const tag = document.createElement('script');
+                tag.id = 'yt-iframe-api-script';
+                tag.src = 'https://www.youtube.com/iframe_api';
+                document.head.appendChild(tag);
+            };
+            loadYouTubeAPI();
+
+            // Hancurkan player yang ada
+            const destroyYTPlayer = () => {
+                if (sphericalPollInterval) {
+                    clearInterval(sphericalPollInterval);
+                    sphericalPollInterval = null;
+                }
+                if (ytPlayer) {
+                    try { ytPlayer.destroy(); } catch(e) {}
+                    ytPlayer = null;
+                }
+                // Bersihkan container
+                const container = document.getElementById('ytPlayerContainer');
+                if (container) {
+                    container.innerHTML = '<div id="ytPlayer"></div>';
+                }
+            };
+
+            // ─── State spherical (internal, non-UI) ───
+            let _sphState = { yaw: 0, pitch: 0, roll: 0, fov: 100 };
+            let _holdTimer  = null;   // setInterval untuk hold D-Pad
+            let _holdDelay  = null;   // setTimeout sebelum hold aktif
+
+            // Clamp helper
+            const clampSph = (field, val) => {
+                const limits = { yaw:[-180,180], pitch:[-90,90], roll:[-180,180], fov:[30,120] };
+                const [mn, mx] = limits[field] || [-180, 180];
+                return Math.max(mn, Math.min(mx, val));
+            };
+
+            // Update semua tampilan readout + display values
+            const updateSphUI = () => {
+                const { yaw, pitch, roll, fov } = _sphState;
+                // hidden inputs (untuk kompatibilitas kode lama)
+                document.getElementById('sphYaw').value   = Math.round(yaw);
+                document.getElementById('sphPitch').value = Math.round(pitch);
+                document.getElementById('sphRoll').value  = Math.round(roll);
+                document.getElementById('sphFov').value   = Math.round(fov);
+                // display pills
+                const fovD  = document.getElementById('sphFovDisplay');
+                const rollD = document.getElementById('sphRollDisplay');
+                if (fovD)  fovD.textContent  = Math.round(fov)  + '°';
+                if (rollD) rollD.textContent = Math.round(roll) + '°';
+                // readout bar
+                const text = document.getElementById('sphReadoutText');
+                if (text) text.textContent =
+                    `Yaw: ${yaw.toFixed(1)}°  |  Pitch: ${pitch.toFixed(1)}°  |  Roll: ${roll.toFixed(1)}°  |  FOV: ${fov.toFixed(1)}°`;
+            };
+
+            // Terapkan state ke YouTube player
+            const applySphState = () => {
+                if (!ytPlayer || typeof ytPlayer.setSphericalProperties !== 'function') return;
+                ytPlayer.setSphericalProperties({ ..._sphState });
+                updateSphUI();
+            };
+
+            // Ubah satu field lalu apply
+            window.adjustSpherical = function(field, delta) {
+                _sphState[field] = clampSph(field, (_sphState[field] || 0) + delta);
+                applySphState();
+            };
+
+            // Hold-to-repeat: tahan tombol untuk terus bergerak
+            window.startHold = function(field, delta) {
+                adjustSpherical(field, delta);              // langsung sekali
+                _holdDelay = setTimeout(() => {             // setelah 300ms mulai repeat
+                    _holdTimer = setInterval(() => {
+                        adjustSpherical(field, delta);
+                    }, 80);
+                }, 300);
+            };
+            window.stopHold = function() {
+                clearTimeout(_holdDelay);
+                clearInterval(_holdTimer);
+                _holdDelay = _holdTimer = null;
+            };
+
+            // Baca dari YouTube player → perbarui state & UI
+            window.readSphericalProperties = function() {
+                if (!ytPlayer || typeof ytPlayer.getSphericalProperties !== 'function') return;
+                const props = ytPlayer.getSphericalProperties();
+                if (!props || Object.keys(props).length === 0) return;
+                _sphState.yaw   = parseFloat(props.yaw   ?? 0);
+                _sphState.pitch = parseFloat(props.pitch ?? 0);
+                _sphState.roll  = parseFloat(props.roll  ?? 0);
+                _sphState.fov   = parseFloat(props.fov   ?? 100);
+                updateSphUI();
+            };
+
+            // Legacy: applySphericalInput (tetap ada agar tidak error)
+            window.applySphericalInput = function() { applySphState(); };
+            window.syncSphericalRange  = function() { applySphState(); };
+
+            // Reset ke awal
+            const resetSphericalControls = () => {
+                _sphState = { yaw: 0, pitch: 0, roll: 0, fov: 100 };
+                updateSphUI();
+                // Sembunyikan hint jika masih tampil
+                const hint = document.getElementById('dragHint');
+                if (hint) hint.style.opacity = '0';
+            };
+
+            window.resetSphericalProperties = function() {
+                if (!ytPlayer || typeof ytPlayer.setSphericalProperties !== 'function') return;
+                _sphState = { yaw: 0, pitch: 0, roll: 0, fov: 100 };
+                applySphState();
+            };
+
+            // ─── DRAG-TO-PAN dengan overlay transparan ───
+            // Overlay menutupi iframe sehingga mouse event tidak masuk ke YouTube player
+            // dan video tidak pause saat drag.
+            const setupDragPan = () => {
+                const overlay = document.getElementById('ytDragOverlay');
+                if (!overlay) return;
+
+                let dragging  = false;
+                let moved     = false;
+                let startX = 0, startY = 0;
+                let lastX  = 0, lastY  = 0;
+                const sensitivity  = 0.3;  // derajat per pixel
+                const moveThreshold = 6;   // pixel minimum agar dianggap drag
+
+                const onStart = (x, y) => {
+                    dragging = true;
+                    moved    = false;
+                    startX   = lastX = x;
+                    startY   = lastY = y;
+                    overlay.classList.add('dragging');
+                };
+
+                const onMove = (x, y) => {
+                    if (!dragging) return;
+                    const dx = x - lastX;
+                    const dy = y - lastY;
+                    lastX = x; lastY = y;
+
+                    const totalDx = x - startX;
+                    const totalDy = y - startY;
+                    if (Math.sqrt(totalDx*totalDx + totalDy*totalDy) > moveThreshold) {
+                        moved = true;
+                    }
+
+                    if (moved) {
+                        _sphState.yaw   = clampSph('yaw',   _sphState.yaw   + dx * sensitivity);
+                        _sphState.pitch = clampSph('pitch', _sphState.pitch - dy * sensitivity);
+                        applySphState();
+                    }
+                };
+
+                const onEnd = () => {
+                    if (dragging && !moved) {
+                        // Klik biasa (bukan drag) → toggle play/pause
+                        if (ytPlayer && typeof ytPlayer.getPlayerState === 'function') {
+                            const state = ytPlayer.getPlayerState();
+                            if (state === 1 /* PLAYING */) {
+                                ytPlayer.pauseVideo();
+                            } else {
+                                ytPlayer.playVideo();
+                            }
+                        }
+                    }
+                    dragging = false;
+                    overlay.classList.remove('dragging');
+                };
+
+                // Mouse — overlay langsung tangkap, prevent default agar iframe tidak kena
+                overlay.addEventListener('mousedown', e => { e.preventDefault(); onStart(e.clientX, e.clientY); });
+                window.addEventListener ('mousemove', e => onMove(e.clientX, e.clientY));
+                window.addEventListener ('mouseup',   () => onEnd());
+
+                // Touch
+                overlay.addEventListener('touchstart', e => {
+                    const t = e.touches[0];
+                    onStart(t.clientX, t.clientY);
+                }, { passive: true });
+                overlay.addEventListener('touchmove', e => {
+                    const t = e.touches[0];
+                    onMove(t.clientX, t.clientY);
+                }, { passive: true });
+                overlay.addEventListener('touchend', () => onEnd());
+            };
+
+            // Buka modal Video 360
+            window.openVideo360Modal = function(url, title) {
+                if (!url) return;
+
+                const modal      = document.getElementById('video360Modal');
+                const modalTitle = document.getElementById('video360ModalTitle');
+                const controls   = document.getElementById('spherical360Controls');
+
                 modalTitle.textContent = title || 'Video 360';
                 modal.style.display = 'flex';
                 document.body.style.overflow = 'hidden';
+                resetSphericalControls();
+
+                destroyYTPlayer();
+
+                if (isYouTubeUrl(url)) {
+                    // === YouTube IFrame API ===
+                    const videoId = extractYouTubeId(url);
+
+                    // Pastikan API sudah siap
+                    if (typeof YT === 'undefined' || typeof YT.Player === 'undefined') {
+                        // API belum load, simpan pending
+                        window._pendingVideo360 = { url, title };
+                        loadYouTubeAPI();
+                        return;
+                    }
+
+                    ytPlayer = new YT.Player('ytPlayer', {
+                        height: '100%',
+                        width:  '100%',
+                        videoId: videoId,
+                        playerVars: {
+                            autoplay:       1,
+                            controls:       1,
+                            rel:            0,
+                            modestbranding: 1,
+                            enablejsapi:    1
+                        },
+                        events: {
+                            onReady: function(event) {
+                                event.target.playVideo();
+                                controls.style.display = 'flex';
+                                setupDragPan();
+
+                                // Tampilkan drag hint 3 detik
+                                const hint = document.getElementById('dragHint');
+                                if (hint) {
+                                    hint.style.opacity = '1';
+                                    setTimeout(() => { hint.style.opacity = '0'; }, 3000);
+                                }
+
+                                // Poll getSphericalProperties setiap 500ms untuk update UI real-time
+                                sphericalPollInterval = setInterval(() => {
+                                    readSphericalProperties();
+                                }, 500);
+                            },
+                            onError: function(event) {
+                                console.warn('[YT Player] Error kode:', event.data);
+                            }
+                        }
+                    });
+
+                } else if (isDriveUrl(url)) {
+                    // === Google Drive fallback (iframe biasa) ===
+                    controls.style.display = 'none';
+                    const fileId  = url.match(/\/d\/([^/]+)/)[1];
+                    const embedUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+                    const container = document.getElementById('ytPlayerContainer');
+                    container.innerHTML = `<iframe src="${embedUrl}" frameborder="0" allowfullscreen
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; xr-spatial-tracking"
+                        style="width:100%;height:100%;border:none;"></iframe>`;
+
+                } else {
+                    // === URL lain (iframe biasa) ===
+                    controls.style.display = 'none';
+                    const container = document.getElementById('ytPlayerContainer');
+                    container.innerHTML = `<iframe src="${url}" frameborder="0" allowfullscreen
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; xr-spatial-tracking"
+                        style="width:100%;height:100%;border:none;"></iframe>`;
+                }
             };
 
-            // Fungsi untuk menutup modal video 360
+            // Tutup modal Video 360
             window.closeVideo360Modal = function() {
-                const modal = document.getElementById('video360Modal');
-                const iframe = document.getElementById('video360Iframe');
+                const modal    = document.getElementById('video360Modal');
+                const controls = document.getElementById('spherical360Controls');
 
                 modal.style.display = 'none';
-                iframe.src = '';
                 document.body.style.overflow = 'auto';
+                controls.style.display = 'none';
+                destroyYTPlayer();
             };
 
             // Tutup modal dengan tombol ESC
@@ -1595,29 +1980,16 @@
 
             // Event delegation untuk link video 360 di dalam popup
             document.addEventListener('click', function(e) {
-                // Check if clicked element or its parent is a video360-link
                 let target = e.target;
                 if (target.classList.contains('video360-link') || target.closest('.video360-link')) {
                     e.preventDefault();
                     e.stopPropagation();
-
-                    // Get the actual link element
-                    const linkElement = target.classList.contains('video360-link') ? target : target.closest(
-                        '.video360-link');
-
-                    const videoUrl = linkElement.getAttribute('data-video-url');
-                    const videoTitle = linkElement.getAttribute('data-video-title');
-
-                    // console.log('Video 360 Link Clicked:', {
-                    //     videoUrl,
-                    //     videoTitle
-                    // });
-
-                    if (videoUrl) {
-                        openVideo360Modal(videoUrl, videoTitle);
-                    }
+                    const linkElement = target.classList.contains('video360-link') ? target : target.closest('.video360-link');
+                    const videoUrl    = linkElement.getAttribute('data-video-url');
+                    const videoTitle  = linkElement.getAttribute('data-video-title');
+                    if (videoUrl) openVideo360Modal(videoUrl, videoTitle);
                 }
-            }, true); // Use capture phase to catch events earlier
+            }, true);
         })();
     </script>
 
@@ -2245,15 +2617,272 @@
 
         .video360-modal-body {
             flex: 1;
-            padding: 0;
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
             background: #0f172a;
         }
 
-        .video360-modal-body iframe {
-            width: 100%;
-            height: 100%;
+        /* YouTube player container mengisi sisa ruang */
+        #ytPlayerContainer {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        #ytPlayerContainer iframe,
+        #ytPlayerContainer #ytPlayer {
+            position: absolute;
+            inset: 0;
+            width: 100% !important;
+            height: 100% !important;
             border: none;
+        }
+
+        /* Tutup info bar YouTube (share, suggested, logo) di bagian bawah player */
+        .yt-bar-mask {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;       /* cukup untuk menutupi info bar YouTube */
+            background: #0f172a;
+            z-index: 10;        /* di atas overlay (z:3) dan iframe */
+            pointer-events: auto; /* blokir klik ke info bar */
+        }
+
+        /* Header badge 360° */
+        .video360-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .video360-badge {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+
+        /* ═══ 360° D-Pad Control Panel ═══ */
+        .spherical-controls {
+            background: rgba(10, 18, 36, 0.98);
+            border-top: 1px solid rgba(148, 163, 184, 0.12);
+            padding: 10px 16px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+        }
+
+        /* Drag hint toast */
+        .drag-hint {
+            position: absolute;
+            top: -46px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15,23,42,0.92);
+            border: 1px solid rgba(99,179,255,0.3);
+            color: #93c5fd;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 7px 16px;
+            border-radius: 20px;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 10;
+        }
+
+        /* Drag overlay: menutupi iframe, menangkap mouse/touch untuk drag-to-pan */
+        .yt-drag-overlay {
+            position: absolute;
+            inset: 0;
+            bottom: 0;  /* biarkan mask bar yang menutupi bagian bawah */
+            z-index: 3;
+            cursor: grab;
+            background: transparent;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .yt-drag-overlay.dragging {
+            cursor: grabbing;
+        }
+
+        /* Main panel row */
+        .sph-panel {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            gap: 12px;
+        }
+
+        /* Section labels */
+        .sph-dpad-label {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: #64748b;
+            text-align: center;
+            margin-bottom: 6px;
+        }
+
+        /* ── D-Pad ── */
+        .sph-dpad-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sph-dpad {
+            display: grid;
+            grid-template-columns: 44px 44px 44px;
+            grid-template-rows: 44px 44px 44px;
+            gap: 3px;
+        }
+
+        .sph-dpad-btn {
+            background: rgba(30, 58, 138, 0.5);
+            border: 1.5px solid rgba(59, 130, 246, 0.4);
+            color: #93c5fd;
+            border-radius: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            transition: background 0.12s, transform 0.08s;
+            -webkit-user-select: none;
+        }
+
+        .sph-dpad-btn:hover {
+            background: rgba(59, 130, 246, 0.35);
+        }
+
+        .sph-dpad-btn:active {
+            background: rgba(59, 130, 246, 0.6);
+            transform: scale(0.9);
+        }
+
+        .sph-dpad-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-weight: 800;
+            color: #475569;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── Zoom FOV ── */
+        .sph-zoom-wrap, .sph-side-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sph-zoom {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .sph-zoom-btn {
+            background: rgba(30, 58, 138, 0.4);
+            border: 1.5px solid rgba(59, 130, 246, 0.35);
+            color: #93c5fd;
+            border-radius: 10px;
+            width: 52px;
+            height: 36px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.12s, transform 0.08s;
+            user-select: none;
+        }
+
+        .sph-zoom-btn:hover  { background: rgba(59,130,246,0.3); }
+        .sph-zoom-btn:active { transform: scale(0.9); }
+
+        .sph-zoom-val {
+            font-size: 13px;
+            font-weight: 700;
+            color: #e2e8f0;
+            font-family: monospace;
+            background: rgba(30,41,59,0.7);
+            border-radius: 6px;
+            padding: 3px 8px;
+            min-width: 44px;
+            text-align: center;
+        }
+
+        /* ── Roll ── */
+        .sph-roll {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .sph-roll-btn {
+            background: rgba(76, 29, 149, 0.4);
+            border: 1.5px solid rgba(139,92,246,0.4);
+            color: #c4b5fd;
+            border-radius: 10px;
+            width: 52px;
+            height: 36px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.12s, transform 0.08s;
+            user-select: none;
+        }
+
+        .sph-roll-btn:hover  { background: rgba(139,92,246,0.3); }
+        .sph-roll-btn:active { transform: scale(0.9); }
+
+        .sph-reset-btn {
+            margin-top: 8px;
+            background: rgba(239,68,68,0.12);
+            border: 1px solid rgba(239,68,68,0.3);
+            color: #fca5a5;
+            border-radius: 8px;
+            padding: 5px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.12s;
+        }
+
+        .sph-reset-btn:hover { background: rgba(239,68,68,0.25); }
+
+        /* ── Readout bar ── */
+        .spherical-readout {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(148,163,184,0.12);
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 10.5px;
+            color: #64748b;
+            font-family: monospace;
+            letter-spacing: 0.3px;
+            text-align: center;
         }
 
 
