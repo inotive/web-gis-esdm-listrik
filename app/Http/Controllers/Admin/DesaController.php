@@ -103,11 +103,11 @@ class DesaController extends Controller
                         $s = strtoupper($feature->properties['StatusDesa'] ?? '');
                         
                         $matches = false;
-                        if ($statusToolbar === 'Belum Terlayani Listrik') {
+                        if ($statusToolbar === 'Belum terlayani listrik') {
                             $matches = str_contains($s, 'BELUM') || str_contains($s, 'TIDAK');
-                        } elseif ($statusToolbar === 'Desa Berlistrik NonPLN') {
+                        } elseif ($statusToolbar === 'Berlistrik Non PLN') {
                             $matches = str_contains($s, 'NONPLN') || str_contains($s, 'NON PLN') || str_contains($s, 'NON-PLN');
-                        } elseif ($statusToolbar === 'Terlayani Listrik') {
+                        } elseif ($statusToolbar === 'Terlayani Listrik PLN') {
                             $isDanger = str_contains($s, 'BELUM') || str_contains($s, 'TIDAK');
                             $isNonPln = str_contains($s, 'NONPLN') || str_contains($s, 'NON PLN') || str_contains($s, 'NON-PLN');
                             if (!$isDanger && !$isNonPln) {
@@ -123,28 +123,52 @@ class DesaController extends Controller
                     }
                 });
 
-            // Filter by (Found in JSON Feature) OR (Found in Local Column)
-            $query->where(function ($q) use ($matchingNames, $statusToolbar) {
-                // First condition: match by names from JSON features
-                if (!empty($matchingNames)) {
-                    $q->whereIn('name', array_unique($matchingNames));
-                }
-                
-                // Second condition: match by local column status_berlistrik
-                $q->orWhere(function ($subQ) use ($statusToolbar) {
-                    if ($statusToolbar === 'Belum Terlayani Listrik') {
-                        $subQ->where('status_berlistrik', 'like', '%Belum%')
-                            ->orWhere('status_berlistrik', 'like', '%Tidak%');
-                    } elseif ($statusToolbar === 'Desa Berlistrik NonPLN') {
-                        $subQ->where('status_berlistrik', 'like', '%NonPLN%')
-                            ->orWhere('status_berlistrik', 'like', '%Non PLN%')
-                            ->orWhere('status_berlistrik', 'like', '%Non-PLN%');
-                    } elseif ($statusToolbar === 'Terlayani Listrik') {
-                        $subQ->where('status_berlistrik', 'like', '%Terlayani%')
-                            ->orWhere('status_berlistrik', 'like', '%Berlistrik%');
+            // Get all unique village names that have feature data in database
+            $allFeatures = \App\Models\ImportedJsonFeature::where('sub_kategori', 'Status Desa Berlistrik')
+                ->select('properties')
+                ->get();
+            
+            $allFeatureNames = [];
+            foreach ($allFeatures as $feature) {
+                $props = $feature->properties;
+                if (!empty($props['Nama_Desa'])) $allFeatureNames[] = $props['Nama_Desa'];
+                if (!empty($props['Desa'])) $allFeatureNames[] = $props['Desa'];
+            }
+            $allFeatureNames = array_unique($allFeatureNames);
+
+            // Filter by (Found in JSON Feature) OR (Found in Local Column if not in JSON)
+            $query->where(function ($q) use ($matchingNames, $allFeatureNames, $statusToolbar) {
+                // Condition 1: If the village has a feature, its name must match the matching JSON features
+                $q->where(function ($sub) use ($matchingNames, $allFeatureNames) {
+                    $sub->whereIn('name', $allFeatureNames);
+                    if (!empty($matchingNames)) {
+                        $sub->whereIn('name', array_unique($matchingNames));
                     } else {
-                        $subQ->where('status_berlistrik', $statusToolbar);
+                        $sub->whereRaw('1 = 0');
                     }
+                });
+
+                // Condition 2: If the village does NOT have a feature, check the local status_berlistrik
+                $q->orWhere(function ($sub) use ($allFeatureNames, $statusToolbar) {
+                    if (!empty($allFeatureNames)) {
+                        $sub->whereNotIn('name', $allFeatureNames);
+                    }
+                    
+                    $sub->where(function ($localQ) use ($statusToolbar) {
+                        if ($statusToolbar === 'Belum terlayani listrik') {
+                            $localQ->where('status_berlistrik', 'like', '%Belum%')
+                                ->orWhere('status_berlistrik', 'like', '%Tidak%');
+                        } elseif ($statusToolbar === 'Berlistrik Non PLN') {
+                            $localQ->where('status_berlistrik', 'like', '%NonPLN%')
+                                ->orWhere('status_berlistrik', 'like', '%Non PLN%')
+                                ->orWhere('status_berlistrik', 'like', '%Non-PLN%');
+                        } elseif ($statusToolbar === 'Terlayani Listrik PLN') {
+                            $localQ->where('status_berlistrik', 'like', '%Terlayani%')
+                                ->orWhere('status_berlistrik', 'like', '%Berlistrik%');
+                        } else {
+                            $localQ->where('status_berlistrik', $statusToolbar);
+                        }
+                    });
                 });
             });
         }
@@ -166,8 +190,6 @@ class DesaController extends Controller
         // Note: Using whereJsonContains or similar might be slow or not supported on all DBs for array values in JSON.
         // Since we have a pagination of 10-100, we can fetch by iterating OR just fetch all for this page.
         // A simple LIKE query or whereIn on a virtual column would be ideal, but for portability/simplicity with small batch:
-        // We will fetch based on the assumption we can filter by 'propertis->desa'.
-
         // Optimize: use chunk to process records in batches and prevent memory exhaustion
         $statusFeatures = collect([]);
         if (!empty($desaNames)) {
@@ -177,7 +199,7 @@ class DesaController extends Controller
                     foreach ($features as $feature) {
                         // Determine matching key from properties
                         $props = $feature->properties;
-                        $name = $props['Desa'] ?? null;
+                        $name = $props['Desa'] ?? ($props['Nama_Desa'] ?? null);
 
                         if ($name && in_array($name, $desaNames)) {
                             // Use name as key to prevent duplicates

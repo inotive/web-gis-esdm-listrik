@@ -684,9 +684,9 @@
                 <div class="input-group w-filter has-select">
                     <select class="form-select" name="status" id="filterStatus">
                         <option value="">Semua Status</option>
-                        <option value="Terlayani Listrik" @selected(request('status') == 'Terlayani Listrik')>Terlayani Listrik</option>
-                        <option value="Desa Berlistrik NonPLN" @selected(request('status') == 'Desa Berlistrik NonPLN')>Desa Berlistrik NonPLN</option>
-                        <option value="Belum Terlayani Listrik" @selected(request('status') == 'Belum Terlayani Listrik')>Belum Terlayani Listrik</option>
+                        <option value="Terlayani Listrik PLN" @selected(request('status') == 'Terlayani Listrik PLN')>Terlayani Listrik PLN</option>
+                        <option value="Berlistrik Non PLN" @selected(request('status') == 'Berlistrik Non PLN')>Berlistrik Non PLN</option>
+                        <option value="Belum terlayani listrik" @selected(request('status') == 'Belum terlayani listrik')>Belum terlayani listrik</option>
                     </select>
                 </div>
 

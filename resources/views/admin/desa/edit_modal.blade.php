@@ -44,9 +44,9 @@
                     <div class="control">
                         <select name="status_berlistrik" id="edit_status_berlistrik" class="input">
                             <option value="">-- Pilih Status --</option>
-                            <option value="Terlayani Listrik">Terlayani Listrik</option>
-                            <option value="Desa Berlistrik NonPLN">Desa Berlistrik NonPLN</option>
-                            <option value="Belum Terlayani Listrik">Belum Terlayani Listrik</option>
+                            <option value="Terlayani Listrik PLN">Terlayani Listrik PLN</option>
+                            <option value="Berlistrik Non PLN">Berlistrik Non PLN</option>
+                            <option value="Belum terlayani listrik">Belum terlayani listrik</option>
                         </select>
                     </div>
                 </div>
@@ -528,9 +528,9 @@
                     if (statusSelect) {
                         const normalizeStatus = (s) => {
                             const u = (s || '').toUpperCase();
-                            if (u.includes('BELUM') || u.includes('TIDAK')) return 'Belum Terlayani Listrik';
-                            if (u.includes('NONPLN') || u.includes('NON PLN') || u.includes('NON-PLN')) return 'Desa Berlistrik NonPLN';
-                            if (u.includes('TERLAYANI') || u.includes('BERLISTRIK')) return 'Terlayani Listrik';
+                            if (u.includes('BELUM') || u.includes('TIDAK')) return 'Belum terlayani listrik';
+                            if (u.includes('NONPLN') || u.includes('NON PLN') || u.includes('NON-PLN')) return 'Berlistrik Non PLN';
+                            if (u.includes('TERLAYANI') || u.includes('BERLISTRIK')) return 'Terlayani Listrik PLN';
                             return s;
                         };
                         const normalizedStatus = normalizeStatus(status);
