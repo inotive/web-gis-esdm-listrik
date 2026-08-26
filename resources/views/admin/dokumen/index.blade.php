@@ -578,11 +578,11 @@
                     <option value="size_asc" {{ $sortBy == 'size_asc' ? 'selected' : '' }}>Ukuran Terkecil</option>
                 </select>
                 <div class="view-toggle">
-                    <button type="button" class="view-toggle-btn active" id="btnGridView" onclick="switchView('grid')"
+                    <button type="button" class="view-toggle-btn" id="btnGridView" onclick="switchView('grid')"
                         title="Grid View">
                         <i class="ri-grid-line"></i>
                     </button>
-                    <button type="button" class="view-toggle-btn" id="btnListView" onclick="switchView('list')"
+                    <button type="button" class="view-toggle-btn active" id="btnListView" onclick="switchView('list')"
                         title="List View">
                         <i class="ri-list-check"></i>
                     </button>
@@ -593,7 +593,7 @@
         <!-- Content wrapper for AJAX updates -->
         <div id="dokumenContent">
             <!-- Grid View -->
-            <div class="dokumen-grid {{ $dokumens->count() > 0 ? '' : 'hidden' }}" id="gridView">
+            <div class="dokumen-grid hidden {{ $dokumens->count() > 0 ? '' : 'hidden' }}" id="gridView">
                 @if ($dokumens->count() > 0)
                     @foreach ($dokumens as $dokumen)
                         <div class="dokumen-item {{ $dokumen->isFolder() ? 'folder' : '' }}"
@@ -650,7 +650,7 @@
             </div>
 
             <!-- List View -->
-            <div class="dokumen-list {{ $dokumens->count() > 0 ? '' : 'hidden' }}" id="listView">
+            <div class="dokumen-list active {{ $dokumens->count() > 0 ? '' : 'hidden' }}" id="listView">
                 @if ($dokumens->count() > 0)
                     @foreach ($dokumens as $dokumen)
                         <div class="dokumen-list-item {{ $dokumen->isFolder() ? 'folder' : '' }}"
@@ -1164,7 +1164,7 @@
         }
 
         // View management
-        let currentView = localStorage.getItem('dokumenView') || 'grid';
+        let currentView = localStorage.getItem('dokumenView') || 'list';
 
         function switchView(view) {
             currentView = view;
