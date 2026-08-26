@@ -32,7 +32,14 @@ class RencanaPengembanganController extends Controller
         }
 
         if ($request->filled('prioritas')) {
-            $query->where('prioritas', $request->prioritas);
+            $prioritas = $request->prioritas;
+            if ($prioritas == 1) {
+                $query->whereBetween('total_skor', [19, 25]);
+            } elseif ($prioritas == 2) {
+                $query->whereBetween('total_skor', [15, 18]);
+            } elseif ($prioritas == 3) {
+                $query->whereBetween('total_skor', [5, 14]);
+            }
         }
 
         // Table row filters
@@ -75,7 +82,18 @@ class RencanaPengembanganController extends Controller
         }
 
         if ($request->filled('filter_prioritas')) {
-            $query->where('prioritas', $request->filter_prioritas);
+            $prioritas = $request->filter_prioritas;
+            if ($prioritas == 1) {
+                $query->whereBetween('total_skor', [19, 25]);
+            } elseif ($prioritas == 2) {
+                $query->whereBetween('total_skor', [15, 18]);
+            } elseif ($prioritas == 3) {
+                $query->whereBetween('total_skor', [5, 14]);
+            }
+        }
+
+        if ($request->filled('filter_rencana_sumber_listrik')) {
+            $query->where('rencana_sumber_listrik', $request->filter_rencana_sumber_listrik);
         }
 
         // Search
@@ -97,7 +115,8 @@ class RencanaPengembanganController extends Controller
         // Get filter options
         $regencies = RegRegency::orderBy('name')->get(['id', 'name']);
         $districts = RegDistrict::orderBy('name')->get(['id', 'name']);
-        $prioritasOptions = ['Prioritas 1 PLTS', 'Prioritas 1 SUTM', 'Prioritas 2 PLTS', 'Prioritas 2 SUTM', 'Prioritas 3 PLTS', 'Prioritas 3 SUTM'];
+        $prioritasOptions = [1, 2, 3];
+        $sumberListrikOptions = ['SUTM', 'PLTS'];
 
         // Get unique values from database for filters (maintain score order 5 to 1)
         $uniqueAksesibilitas = collect(array_keys(RencanaPengembanganBantuan::getAksesibilitasOptions()));
@@ -127,6 +146,7 @@ class RencanaPengembanganController extends Controller
             'kebijakanOptions',
             'potensiOptions',
             'pelangganOptions',
+            'sumberListrikOptions',
             'uniqueAksesibilitas',
             'uniqueRadiusJaringan',
             'uniqueArahKebijakan',
@@ -177,6 +197,8 @@ class RencanaPengembanganController extends Controller
             'skor_arah_kebijakan' => $item->skor_arah_kebijakan,
             'skor_potensi_kegiatan' => $item->skor_potensi_kegiatan,
             'skor_jumlah_pelanggan' => $item->skor_jumlah_pelanggan,
+            'rencana_sumber_listrik' => $item->rencana_sumber_listrik,
+            'prioritas' => $item->prioritas,
         ]);
     }
 

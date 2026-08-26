@@ -17,7 +17,7 @@ class RencanaPengembanganBantuanSeeder extends Seeder
         ini_set('memory_limit', '512M');
         set_time_limit(0);
 
-        $filePath = base_path('Rencana Pengembangan Bantuan Ketenagalistrikan.xlsx');
+        $filePath = public_path('assets/Prioritas Rencana Bantuan Pembangunan Ketenagalistrikan(AutoRecovered).xlsx');
 
         if (!file_exists($filePath)) {
             $this->command->error("File tidak ditemukan: {$filePath}");
@@ -35,7 +35,7 @@ class RencanaPengembanganBantuanSeeder extends Seeder
             $rows = $worksheet->toArray();
 
             // Hapus data lama
-            DB::table('rencana_pengembangan_bantuan')->truncate();
+            RencanaPengembanganBantuan::truncate();
             $this->command->info('Data lama dihapus.');
 
             // Skip header row (row 1)
@@ -53,23 +53,23 @@ class RencanaPengembanganBantuanSeeder extends Seeder
                     continue;
                 }
 
-                // Mapping kolom berdasarkan struktur Excel
-                // A: LOKASI, B: Desa, C: Kecamatan, D: Kabupaten/Kota, E: Provinsi
-                // F: Status Desa Berlistrik, G: KODIFIKASI, H: Jumlah Penduduk
-                // I: Jumlah Calon Pelanggan, J: AKSESIBILITAS, K: Skor
-                // L: RADIUS KE JARINGAN TERDEKAT, M: Skor RADIUS KE JARINGAN TERDEKAT
-                // N: ARAH DAN KEBIJAKAN TATA RUANG, O: Skor ARAH DAN KEBIJAKAN TATA RUANG
-                // P: POTENSI KEGIATAN, Q: Skor Potensi, R: JUMLAH PELANGGAN
-                // S: R Jumlah Pelanggan, T: Total Skor, U: Prioritas
+                // Mapping kolom berdasarkan struktur Excel terbaru:
+                // 0: Provinsi, 1: Kabupaten, 2: Kecamatan, 3: Lokasi, 4: Desa, 5: Kodifikasi
+                // 8: Status Desa PLN Berlistrik, 16: Jumlah Penduduk (jiwa), 18: Jumlah Calon Pelanggan
+                // 67: AKSESIBILITAS, 68: Skor Aksesibilitas
+                // 69: RADIUS KE JARINGAN EKSISTING, 70: Skor RADIUS KE JARINGAN EKSISTING
+                // 71: ARAH DAN KEBIJAKAN TATA RUANG, 72: Skor ARAH DAN KEBIJAKAN TATA RUANG
+                // 73: POTENSI KEGIATAN, 74: Skor Potensi
+                // 75: JUMLAH PENGGUNA, 76: S Jumlah Pengguna, 77: Total Skor, 79: Rencana Sumber Listrik
 
-                $lokasi = $row[0] ?? null;
-                $desa = $row[1] ?? null;
+                $provinsi = $row[0] ?? null;
+                $kabupatenKota = $row[1] ?? null;
                 $kecamatan = $row[2] ?? null;
-                $kabupatenKota = $row[3] ?? null;
-                $provinsi = $row[4] ?? null;
-                $statusDesaBerlistrik = $row[5] ?? null;
-                $kodifikasi = $row[6] ?? null;
-                $jumlahPenduduk = $this->parseInteger($row[7] ?? null);
+                $lokasi = $row[3] ?? null;
+                $desa = $row[4] ?? null;
+                $kodifikasi = $row[5] ?? null;
+                $statusDesaBerlistrik = $row[8] ?? null;
+                $jumlahPenduduk = $this->parseInteger($row[16] ?? null);
 
                 // Cari village_id berdasarkan nama desa
                 $villageId = $this->findVillageId($desa, $kecamatan, $kabupatenKota);
@@ -77,19 +77,20 @@ class RencanaPengembanganBantuanSeeder extends Seeder
                 $regencyId = $this->findRegencyId($kabupatenKota);
 
                 // Parse data
-                $jumlahCalonPelanggan = $this->parseInteger($row[8] ?? null);
-                $aksesibilitas = $row[9] ?? null;
-                $skorAksesibilitas = $this->parseInteger($row[10] ?? null);
-                $radiusJaringan = $row[11] ?? null;
-                $skorRadius = $this->parseInteger($row[12] ?? null);
-                $arahKebijakan = $row[13] ?? null;
-                $skorArahKebijakan = $this->parseInteger($row[14] ?? null);
-                $potensiKegiatan = $row[15] ?? null;
-                $skorPotensiKegiatan = $this->parseInteger($row[16] ?? null);
-                $jumlahPelanggan = $row[17] ?? null;
-                $skorJumlahPelanggan = $this->parseInteger($row[18] ?? null);
-                $totalSkor = $this->parseInteger($row[19] ?? null);
-                $prioritas = $row[20] ?? null;
+                $jumlahCalonPelanggan = $this->parseInteger($row[18] ?? null);
+
+                $aksesibilitas = $row[67] ?? null;
+                $skorAksesibilitas = $this->parseInteger($row[68] ?? null);
+                $radiusJaringan = $row[69] ?? null;
+                $skorRadius = $this->parseInteger($row[70] ?? null);
+                $arahKebijakan = $row[71] ?? null;
+                $skorArahKebijakan = $this->parseInteger($row[72] ?? null);
+                $potensiKegiatan = $row[73] ?? null;
+                $skorPotensiKegiatan = $this->parseInteger($row[74] ?? null);
+                $jumlahPelanggan = $row[75] ?? null;
+                $skorJumlahPelanggan = $this->parseInteger($row[76] ?? null);
+                $totalSkor = $this->parseInteger($row[77] ?? null);
+                $rencanaSumberListrik = $row[79] ?? null;
 
                 $data[] = [
                     'regency_id' => $regencyId,
@@ -111,7 +112,7 @@ class RencanaPengembanganBantuanSeeder extends Seeder
                     'jumlah_pelanggan' => $jumlahPelanggan,
                     'skor_jumlah_pelanggan' => $skorJumlahPelanggan,
                     'total_skor' => $totalSkor,
-                    'prioritas' => $prioritas,
+                    'rencana_sumber_listrik' => in_array($rencanaSumberListrik, ['SUTM', 'PLTS']) ? $rencanaSumberListrik : null,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
@@ -132,7 +133,6 @@ class RencanaPengembanganBantuanSeeder extends Seeder
             }
 
             $this->command->info("✓ Selesai! Total {$rowCount} data berhasil di-seed.");
-
         } catch (\Exception $e) {
             $this->command->error('Error: ' . $e->getMessage());
             $this->command->error('Trace: ' . $e->getTraceAsString());
@@ -198,16 +198,29 @@ class RencanaPengembanganBantuanSeeder extends Seeder
 
     /**
      * Parse integer value
+     * Returns null if value exceeds MySQL INT range (to handle concatenated Excel cell values)
      */
     private function parseInteger($value)
     {
-        if (empty($value)) {
+        if (empty($value) && $value !== 0 && $value !== '0') {
             return null;
         }
 
         // Remove non-numeric characters except minus sign
-        $cleaned = preg_replace('/[^0-9-]/', '', $value);
+        $cleaned = preg_replace('/[^0-9-]/', '', (string) $value);
 
-        return is_numeric($cleaned) ? (int) $cleaned : null;
+        if (!is_numeric($cleaned) || $cleaned === '' || $cleaned === '-') {
+            return null;
+        }
+
+        $intVal = (int) $cleaned;
+
+        // MySQL signed INT range: -2147483648 to 2147483647
+        // Return null for out-of-range values (likely corrupted/concatenated cells in Excel)
+        if ($intVal > 2147483647 || $intVal < -2147483648) {
+            return null;
+        }
+
+        return $intVal;
     }
 }

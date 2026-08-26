@@ -190,10 +190,9 @@
         .total-score {
             font-weight: 700;
             font-size: 14px;
-            color: #10B981;
             padding: 6px 12px;
-            background: #ECFDF5;
             border-radius: 8px;
+            display: inline-block;
         }
 
         /* Prioritas badge */
@@ -204,16 +203,22 @@
             font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            display: inline-block;
         }
 
-        .prioritas-rkts {
-            background: #DBEAFE;
-            color: #1E40AF;
+        .color-prio-1 {
+            background: #D1FAE5 !important;
+            color: #065F46 !important;
         }
 
-        .prioritas-sjtm {
-            background: #FEF3C7;
-            color: #92400E;
+        .color-prio-2 {
+            background: #FEF3C7 !important;
+            color: #92400E !important;
+        }
+
+        .color-prio-3 {
+            background: #FEE2E2 !important;
+            color: #991B1B !important;
         }
 
         /* Filter section */
@@ -339,7 +344,7 @@
                 <option value="">Semua Prioritas</option>
                 @foreach ($prioritasOptions as $prio)
                     <option value="{{ $prio }}" {{ request('prioritas') == $prio ? 'selected' : '' }}>
-                        {{ $prio }}
+                        Prioritas {{ $prio }}
                     </option>
                 @endforeach
             </select>
@@ -378,6 +383,7 @@
                         <th>Skor</th>
                         <th>Total Skor</th>
                         <th>Prioritas</th>
+                        <th>Rencana Sumber Listrik</th>
                         <th>Aksi</th>
                     </tr>
                     <!-- Filter Row -->
@@ -486,7 +492,18 @@
                                 @foreach ($prioritasOptions as $prio)
                                     <option value="{{ $prio }}"
                                         {{ request('filter_prioritas') == $prio ? 'selected' : '' }}>
-                                        {{ $prio }}
+                                        Prioritas {{ $prio }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </td>
+                        <td>
+                            <select class="filter-select table-filter" name="filter_rencana_sumber_listrik" id="filter_rencana_sumber_listrik">
+                                <option value="">Semua</option>
+                                @foreach ($sumberListrikOptions as $sumber)
+                                    <option value="{{ $sumber }}"
+                                        {{ request('filter_rencana_sumber_listrik') == $sumber ? 'selected' : '' }}>
+                                        {{ $sumber }}
                                     </option>
                                 @endforeach
                             </select>
@@ -598,16 +615,29 @@
                             </td>
 
                             <!-- Total & Prioritas -->
-                            <td><span class="total-score">{{ $item->total_skor ?? 0 }}</span></td>
+                            <td><span class="total-score color-prio-{{ $item->prioritas ?? 3 }}">{{ $item->total_skor ?? 0 }}</span></td>
                             <td>
                                 @if ($item->prioritas)
-                                    <span
-                                        class="prioritas-badge {{ Str::contains($item->prioritas, 'RKTS') ? 'prioritas-rkts' : 'prioritas-sjtm' }}">
-                                        {{ $item->prioritas }}
+                                    <span class="prioritas-badge color-prio-{{ $item->prioritas }}">
+                                        Prioritas {{ $item->prioritas }}
                                     </span>
                                 @else
                                     -
                                 @endif
+                            </td>
+
+                            <!-- Rencana Sumber Listrik -->
+                            <td>
+                                <select class="editable-select" data-field="rencana_sumber_listrik"
+                                    data-id="{{ $item->id }}" @disabled(auth()->user()->cannot('rencana_pengembangan.edit'))>
+                                    <option value="">Pilih...</option>
+                                    @foreach ($sumberListrikOptions as $sumber)
+                                        <option value="{{ $sumber }}"
+                                            {{ $item->rencana_sumber_listrik && $item->rencana_sumber_listrik == $sumber ? 'selected' : '' }}>
+                                            {{ $sumber }}
+                                        </option>
+                                    @endforeach
+                                </select>
                             </td>
 
                             <!-- Actions -->
@@ -627,7 +657,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="18" style="text-align: center; padding: 40px; color: #94A3B8;">
+                            <td colspan="19" style="text-align: center; padding: 40px; color: #94A3B8;">
                                 <i class="ri-inbox-line" style="font-size: 48px; display: block; margin-bottom: 8px;"></i>
                                 Tidak ada data
                             </td>
@@ -700,14 +730,18 @@
                                 const totalScoreEl = row.querySelector('.total-score');
                                 if (totalScoreEl) {
                                     totalScoreEl.textContent = data.total_skor;
+                                    totalScoreEl.className = `total-score color-prio-${data.prioritas}`;
                                     totalScoreEl.style.transform = 'scale(1.2)';
-                                    totalScoreEl.style.background = '#10B981';
-                                    totalScoreEl.style.color = '#fff';
                                     setTimeout(() => {
                                         totalScoreEl.style.transform = 'scale(1)';
-                                        totalScoreEl.style.background = '#ECFDF5';
-                                        totalScoreEl.style.color = '#10B981';
                                     }, 300);
+                                }
+
+                                // Update prioritas badge
+                                const prioritasBadge = row.querySelector('.prioritas-badge');
+                                if (prioritasBadge) {
+                                    prioritasBadge.className = `prioritas-badge color-prio-${data.prioritas}`;
+                                    prioritasBadge.textContent = `Prioritas ${data.prioritas}`;
                                 }
 
                                 // Show success toast
@@ -829,7 +863,8 @@
                     filter_arah_kebijakan: document.getElementById('filter_arah_kebijakan')?.value || '',
                     filter_potensi_kegiatan: document.getElementById('filter_potensi_kegiatan')?.value || '',
                     filter_jumlah_pelanggan: document.getElementById('filter_jumlah_pelanggan')?.value || '',
-                    filter_prioritas: document.getElementById('filter_prioritas')?.value || ''
+                    filter_prioritas: document.getElementById('filter_prioritas')?.value || '',
+                    filter_rencana_sumber_listrik: document.getElementById('filter_rencana_sumber_listrik')?.value || ''
                 };
 
                 // Clear existing filter params
@@ -866,6 +901,7 @@
                 params.delete('filter_potensi_kegiatan');
                 params.delete('filter_jumlah_pelanggan');
                 params.delete('filter_prioritas');
+                params.delete('filter_rencana_sumber_listrik');
                 params.delete('page');
 
                 // Redirect without filters

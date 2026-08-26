@@ -31,6 +31,10 @@ class RencanaPengembanganBantuan extends Model
         'jumlah_pelanggan',
         'skor_jumlah_pelanggan',
         'total_skor',
+        'rencana_sumber_listrik',
+    ];
+
+    protected $appends = [
         'prioritas',
     ];
 
@@ -128,5 +132,21 @@ class RencanaPengembanganBantuan extends Model
             ($this->skor_jumlah_pelanggan ?? 0);
 
         return $this->total_skor;
+    }
+
+    // Accessor for prioritas
+    public function getPrioritasAttribute()
+    {
+        $skor = $this->total_skor;
+        
+        if ($skor >= 19 && $skor <= 25) {
+            return 1;
+        } elseif ($skor >= 15 && $skor <= 18) {
+            return 2;
+        } elseif ($skor >= 5 && $skor <= 14) {
+            return 3;
+        }
+        
+        return null;
     }
 }
