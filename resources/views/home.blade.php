@@ -943,7 +943,7 @@
                     </a>
                 </div>
 
-                <div class="hero-stats">
+                {{-- <div class="hero-stats">
                     <div class="stat-item">
                         <span class="stat-value">10</span>
                         <span class="stat-label">Data Infrastruktur Jaringan Kabupaten/Kota</span>
@@ -956,7 +956,7 @@
                         <span class="stat-value">6</span>
                         <span class="stat-label">Pembangkit Lokal</span>
                     </div>
-                </div>
+                </div> --}}
             </div>
 
             <div class="hero-visual">
@@ -1030,8 +1030,8 @@
                 @php
                     $step2Route = route('login');
                     if(auth()->check()) {
-                        $step2Route = auth()->user()->hasRole(['superadmin', 'admin']) 
-                            ? route('admin.dashboard') 
+                        $step2Route = auth()->user()->hasRole(['superadmin', 'admin'])
+                            ? route('admin.dashboard')
                             : route('landing');
                     }
                 @endphp
