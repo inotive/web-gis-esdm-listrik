@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\RegVillage;
+use App\Models\RegDistrict;
 use App\Models\ImportedJsonFeature;
 use Illuminate\Support\Facades\Cache;
 
@@ -89,7 +90,40 @@ class UpdateDesa extends Command
                 $desa->save();
                 $countRegVillage++;
             } else {
-                $this->warn("Desa tidak ditemukan di db: {$desaName} (Kec. {$kecamatanName})");
+                // Cari kecamatan (district)
+                $district = RegDistrict::where('name', $kecamatanName)->first();
+                if (!$district) {
+                    $district = RegDistrict::where('name', 'like', "%{$kecamatanName}%")->first();
+                }
+
+                if ($district) {
+                    // Cari ID desa tertinggi di kecamatan ini untuk increment
+                    $maxVillage = RegVillage::where('district_id', $district->id)
+                        ->orderBy('id', 'desc')
+                        ->first();
+
+                    if ($maxVillage) {
+                        $suffix = substr($maxVillage->id, 6);
+                        $nextSuffix = str_pad((int)$suffix + 1, 4, '0', STR_PAD_LEFT);
+                        $newId = $district->id . $nextSuffix;
+                    } else {
+                        // Default jika belum ada desa sama sekali di kecamatan tersebut
+                        $newId = $district->id . '2001';
+                    }
+
+                    // Tambah desa baru
+                    $desa = RegVillage::create([
+                        'id' => $newId,
+                        'district_id' => $district->id,
+                        'name' => $desaName,
+                        'status_berlistrik' => $status,
+                    ]);
+
+                    $this->info("Menambahkan desa baru: {$desaName} (ID: {$newId}, Kec. {$kecamatanName})");
+                    $countRegVillage++;
+                } else {
+                    $this->warn("Desa tidak ditemukan di db & gagal menambahkan (Kecamatan tidak ditemukan): {$desaName} (Kec. {$kecamatanName})");
+                }
             }
 
             // 2. Update tabel ImportedJsonFeature (sub_kategori = Status Desa Berlistrik)
