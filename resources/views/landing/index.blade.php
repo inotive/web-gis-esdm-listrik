@@ -1461,7 +1461,7 @@
                 // ================== DISTANCE MEASUREMENT & COST CALCULATION ==================
                 let distanceMeasurement = new DistanceMeasurement2D({
                     view: view,
-                    unit: "kilometers"
+                    unit: "meters"
                 });
 
                 // Create cost calculation panel
@@ -1480,8 +1480,8 @@
               <div class="cost-value" id="costDistance">-</div>
             </div>
             <div class="cost-row">
-              <div class="cost-label">Harga per km</div>
-              <div class="cost-value">Rp. 150.000</div>
+              <div class="cost-label">Harga per meter</div>
+              <div class="cost-value">Rp 1.355.659</div>
             </div>
             <div class="cost-divider"></div>
             <div class="cost-row total">
@@ -1519,24 +1519,24 @@
                     setTimeout(() => {
                         distanceMeasurement = new DistanceMeasurement2D({
                             view: view,
-                            unit: "kilometers"
+                            unit: "meters"
                         });
 
                         // Re-attach watcher
                         distanceMeasurement.viewModel.watch('measurement', (measurement) => {
                             if (measurement) {
-                                const distanceKm = measurement.length;
-                                const pricePerKm = 150000;
-                                const totalCost = distanceKm * pricePerKm;
+                                const distanceM = measurement.length;
+                                const pricePerM = 1355659;
+                                const totalCost = distanceM * pricePerM;
 
                                 const costDistanceEl = costPanel.querySelector(
                                     '#costDistance');
                                 const costTotalEl = costPanel.querySelector(
                                     '#costTotal');
 
-                                if (distanceKm > 0) {
+                                if (distanceM > 0) {
                                     costDistanceEl.textContent =
-                                        `${distanceKm.toFixed(2)} km`;
+                                        `${distanceM.toFixed(2)} m`;
                                     costTotalEl.textContent =
                                         `Rp. ${totalCost.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
                                 } else {
@@ -1582,25 +1582,25 @@
                         setTimeout(() => {
                             distanceMeasurement = new DistanceMeasurement2D({
                                 view: view,
-                                unit: "kilometers"
+                                unit: "meters"
                             });
 
                             // Re-attach watcher
                             distanceMeasurement.viewModel.watch('measurement', (
                                 measurement) => {
                                 if (measurement) {
-                                    const distanceKm = measurement.length;
-                                    const pricePerKm = 150000;
-                                    const totalCost = distanceKm * pricePerKm;
+                                    const distanceM = measurement.length;
+                                    const pricePerM = 1355659;
+                                    const totalCost = distanceM * pricePerM;
 
                                     const costDistanceEl = costPanel.querySelector(
                                         '#costDistance');
                                     const costTotalEl = costPanel.querySelector(
                                         '#costTotal');
 
-                                    if (distanceKm > 0) {
+                                    if (distanceM > 0) {
                                         costDistanceEl.textContent =
-                                            `${distanceKm.toFixed(2)} km`;
+                                            `${distanceM.toFixed(2)} m`;
                                         costTotalEl.textContent =
                                             `Rp. ${totalCost.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
                                     } else {
@@ -1626,15 +1626,15 @@
                 // Watch for measurement changes
                 distanceMeasurement.viewModel.watch('measurement', (measurement) => {
                     if (measurement) {
-                        const distanceKm = measurement.length;
-                        const pricePerKm = 150000;
-                        const totalCost = distanceKm * pricePerKm;
+                        const distanceM = measurement.length;
+                        const pricePerM = 1355659;
+                        const totalCost = distanceM * pricePerM;
 
                         const costDistanceEl = costPanel.querySelector('#costDistance');
                         const costTotalEl = costPanel.querySelector('#costTotal');
 
-                        if (distanceKm > 0) {
-                            costDistanceEl.textContent = `${distanceKm.toFixed(2)} km`;
+                        if (distanceM > 0) {
+                            costDistanceEl.textContent = `${distanceM.toFixed(2)} m`;
                             costTotalEl.textContent =
                                 `Rp. ${totalCost.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
                         } else {
