@@ -38,7 +38,7 @@ INSERT INTO `reg_regencies` VALUES
 ('6411', '64', 'KAB. MAHAKAM ULU'),
 ('6471', '64', 'KOTA BALIKPAPAN'),
 ('6472', '64', 'KOTA SAMARINDA'),
-('6474', '64', 'KOTA BONTANG'),
+('6474', '64', 'KOTA BONTANG');
 
 SET NAMES utf8;
 SET time_zone = '+00:00';
@@ -158,7 +158,7 @@ INSERT INTO `reg_districts` VALUES
 ('647210', '6472', 'Loa Janan Ilir'),
 ('647401', '6474', 'Bontang Utara'),
 ('647402', '6474', 'Bontang Selatan'),
-('647403', '6474', 'Bontang Barat'),
+('647403', '6474', 'Bontang Barat');
 
 SET NAMES utf8;
 SET time_zone = '+00:00';
@@ -1211,6 +1211,6 @@ INSERT INTO `reg_villages` VALUES
 ('6474021006', '647402', 'Tanjung Laut Indah'),
 ('6474031001', '647403', 'Belimbing'),
 ('6474031002', '647403', 'Gunung Telihan'),
-('6474031003', '647403', 'Kanaan'),
+('6474031003', '647403', 'Kanaan');
 
 

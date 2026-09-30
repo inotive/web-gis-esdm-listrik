@@ -335,6 +335,11 @@
     <!-- TAB 1: PERMOHONAN -->
     <div id="tab-permohonan" class="tab-content {{ ($tab == 'permohonan' || !$tab) ? 'active' : '' }}">
         <div class="mb-2 text-end">
+             @can('permohonan.view')
+             <a href="{{ route('admin.permohonan.export') }}" class="btn btn-success me-2">
+                <i class="ri-file-download-line"></i> Export
+            </a>
+            @endcan
              @can('permohonan.create')
              <a href="{{ route('admin.permohonan.import') }}" class="btn btn-secondary me-2">
                 <i class="ri-file-excel-2-line"></i> Import
@@ -541,6 +546,11 @@
         </div>
 
         <div class="mb-2 text-end">
+            @can('perizinan.view')
+            <a href="{{ route('admin.perizinan.export') }}" class="btn btn-success me-2">
+                <i class="ri-file-download-line"></i> Export
+            </a>
+            @endcan
             @can('perizinan.create')
             <a href="{{ route('admin.perizinan.import') }}" class="btn btn-secondary me-2">
                 <i class="ri-file-excel-2-line"></i> Import

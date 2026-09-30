@@ -255,6 +255,7 @@ Route::group(['middleware' => ['auth', 'verified', 'verified_user'], 'as' => 'ad
         Route::get('/import', [PermohonanController::class, 'import'])->name('import');
         Route::get('/import/template', [PermohonanController::class, 'downloadTemplate'])->name('import.template');
         Route::post('/import', [PermohonanController::class, 'importProcess'])->name('import.process');
+        Route::get('/export', [PermohonanController::class, 'export'])->name('export');
 
         Route::get('/', [PermohonanController::class, 'index'])->name('index');
         Route::get('/create', [PermohonanController::class, 'create'])->name('create');
@@ -273,6 +274,7 @@ Route::group(['middleware' => ['auth', 'verified', 'verified_user'], 'as' => 'ad
         Route::get('/import', [PerizinanController::class, 'import'])->name('import');
         Route::get('/import/template', [PerizinanController::class, 'downloadTemplate'])->name('import.template');
         Route::post('/import', [PerizinanController::class, 'importProcess'])->name('import.process');
+        Route::get('/export', [PerizinanController::class, 'export'])->name('export');
 
         Route::get('/', [PerizinanController::class, 'index'])->name('index');
         Route::get('/create', [PerizinanController::class, 'create'])->name('create');

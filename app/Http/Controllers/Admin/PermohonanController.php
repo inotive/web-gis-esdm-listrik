@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\PermohonanImport;
 use App\Exports\PermohonanTemplateExport;
+use App\Exports\PermohonanExport;
 
 class PermohonanController extends Controller
 {
@@ -25,7 +26,7 @@ class PermohonanController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('can:permohonan.view')->only(['index', 'show']);
+        $this->middleware('can:permohonan.view')->only(['index', 'show', 'export']);
         // Note: permohonan.create was removed, role checks usually handle create logic for users
         // But for admin side management if any:
         $this->middleware('can:permohonan.edit')->only(['edit', 'update']);
@@ -36,6 +37,14 @@ class PermohonanController extends Controller
         // With permohonan.create gone, we might use permohonan.edit or just role check.
         // Assuming 'permohonan.edit' is appropriate for import as it modifies data.
         $this->middleware('can:permohonan.edit')->only(['import', 'importProcess', 'downloadTemplate']);
+    }
+
+    /**
+     * Export seluruh data permohonan ke Excel.
+     */
+    public function export()
+    {
+        return Excel::download(new PermohonanExport(), 'data_permohonan_' . now()->format('Ymd_His') . '.xlsx');
     }
 
     public function index(Request $request)

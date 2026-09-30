@@ -64,6 +64,14 @@ class Perizinan extends Model
     }
 
     /**
+     * Relasi: Perizinan dibuat oleh User
+     */
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
      * Relasi: Perizinan memiliki banyak PerizinanDocument
      */
     public function documents(): HasMany

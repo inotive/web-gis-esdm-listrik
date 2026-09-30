@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\PerizinanImport;
 use App\Exports\PerizinanTemplateExport;
+use App\Exports\PerizinanExport;
 
 class PerizinanController extends Controller
 {
@@ -21,10 +22,18 @@ class PerizinanController extends Controller
 
     public function __construct()
     {
-        $this->middleware('can:perizinan.view')->only(['index', 'show', 'mapData', 'getMapData']);
+        $this->middleware('can:perizinan.view')->only(['index', 'show', 'mapData', 'getMapData', 'export']);
         $this->middleware('can:perizinan.create')->only(['create', 'store', 'import', 'importProcess', 'downloadTemplate']);
         $this->middleware('can:perizinan.edit')->only(['edit', 'update', 'addDocument', 'deleteDocument']);
         $this->middleware('can:perizinan.delete')->only(['destroy']);
+    }
+
+    /**
+     * Export seluruh data perizinan ke Excel.
+     */
+    public function export()
+    {
+        return Excel::download(new PerizinanExport(), 'data_perizinan_' . now()->format('Ymd_His') . '.xlsx');
     }
 
     /**
